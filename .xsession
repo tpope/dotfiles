@@ -45,7 +45,7 @@ if [ ! -f "$HOME/.xmodmap" -a ! -f "$HOME/.Xmodmap" ] && \
 	xmodmap 2>/dev/null|grep Super >/dev/null; then
     xmodmap -e "keysym Super_L = Hyper_L"
     xmodmap -e "keysym Caps_Lock = Super_L"
-    xmodmap -e "Scroll_Lock = Hyper_R Scroll_Lock"
+    xmodmap -e "keysym Scroll_Lock = Hyper_R Scroll_Lock"
     xmodmap -e "keysym Menu = Caps_Lock"
     xmodmap -e "clear lock"
     xmodmap -e "clear Mod4"
