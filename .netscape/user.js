@@ -1,5 +1,6 @@
+// -*- java -*- vim: ft=javascript sw=2 sts=2 
 // Author: Tim Pope
-// -*- javascript -*- vim: ft=javascript
+// $Id$
 
 // This file configures everything from Netscape 4 to Firefox
 
@@ -7,6 +8,8 @@ with (PrefConfig) {
 user_pref("advanced.system.supportDDEExec", false);
 user_pref("browser.blink_allowed", false);
 user_pref("browser.block.target_new_window", true);
+user_pref("browser.download.manager.retention", 1);
+user_pref("browser.enable_automatic_image_resizing", false);
 user_pref("browser.startup.homepage", "about:blank");
 user_pref("browser.tabs.autoHide", false);
 user_pref("browser.tabs.extensions.default.type", 1);
@@ -19,6 +22,7 @@ user_pref("browser.tabs.extensions.show_item.moveRight", true);
 user_pref("browser.tabs.extensions.slow_down_autoreload_in_background.enabled", true);
 user_pref("browser.tabs.extensions.window_hook_mode", 1);
 user_pref("browser.tabs.opentabfor.windowopen", true);
+user_pref("browser.throbber.url","http://www.sexyeek.org/");
 user_pref("content.notify.backoffcount", 200);
 user_pref("content.notify.interval", 120000);
 user_pref("content.notify.ontimer", true);
