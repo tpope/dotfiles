@@ -80,10 +80,6 @@ if ( $?tcsh ) then
     switch ($oldterm)
 
     case screen*:
-	if ( `hostname` == grex.cyberspace.org ) then
-	    setenv TERM vt220
-	    setenv OLDTERM screen
-	endif
     case vt220*:
 	alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
 	#echo -n "k${ttydash}${hostname}\" # "
@@ -103,10 +99,6 @@ if ( $?tcsh ) then
 	alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"${USER}@${hostname}"':`echo $cwd|sed -e s,^$HOME,~,`'"${ttyslash}"']I'"$hostname"'.xpm\"'
 	#alias jobcmd 'echo -n "]2\;\!#"'
 	set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
-	if ( `hostname` == grex.cyberspace.org ) then
-	    setenv TERM xterm
-	    setenv OLDTERM Eterm
-	endif
 	breaksw
 
     case linux*:
@@ -171,10 +163,6 @@ endif
 if ( -x /usr/bin/gvim || -x /usr/local/bin/gvim || -x /opt/sfw/bin/gvim ) then
     alias vi 'vim -X'
     setenv VISUAL 'vim -X'
-endif
-
-if ( -x /usr/bin/sudo || -x /usr/local/bin/sudo ) then
-    alias apt-get='sudo apt-get'
 endif
 
 if ( `uname` == Linux ) then

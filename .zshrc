@@ -16,6 +16,8 @@ watch=(notme)
 [ -f $HOME/.friends ] && watch=(`cat $HOME/.friends`)
 HISTSIZE=100
 WORDCHARS='*?_-.[]~&;!#$%^(){}<>'
+PERIOD=3600
+periodic() { rehash }
 
 export ENV="$HOME/.shrc"
 interactive=1
@@ -85,7 +87,7 @@ screen*|vt220*)
 		print -Pn ") [%l]\a"
 		print -Pn "\ek$tty%m*\e\\"
 		}
-    [ "`hostname`" = grex.cyberspace.org ] &&TERM=vt220 &&export OLDTERM=screen
+    #[ "`hostname`" = grex.cyberspace.org ] &&TERM=vt220 &&export OLDTERM=screen
     ;;
 xterm*|rxvt*|kterm*|dtterm*)
     precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
@@ -110,7 +112,7 @@ Eterm*)
 		print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
 		print -Pn ") [%l]\a"
 		} 
-    [ "`hostname`" = grex.cyberspace.org ] &&TERM=xterm &&export OLDTERM=Eterm
+    #[ "`hostname`" = grex.cyberspace.org ] &&TERM=xterm &&export OLDTERM=Eterm
     ;;
 linux) ;;
 *)
@@ -157,8 +159,8 @@ new-screen() {
     [ -z "$STY" ] || screen < "$TTY"
 }
 zle -N new-screen
-bindkey "$terminfo[kf12]" new-screen
-bindkey -s "$terminfo[kf11]" "^Ascreen ^E\n"
+[[ -z "$terminfo[kf12]" ]] || bindkey "$terminfo[kf12]" new-screen
+[[ -z "$terminfo[kf11]" ]] || bindkey -s "$terminfo[kf11]" "^Ascreen ^E\n"
 
 ;;
 esac
@@ -186,8 +188,6 @@ alias -g HH='|head'
 alias -g TT='|tail'
 alias -g LL='|less'
 
-xdvi() { command xdvi ${*:-*.dvi(om[1])} }
-gv()   { command gv ${*:-*.(ps|pdf)(om[1])} }
 # Section: Modules {{{1
 # ---------------------
 if [[ $ZSH_VERSION == 3.<->* ]]; then
