@@ -11,6 +11,8 @@
 # which determine what media player is running and tell it to perform that
 # action.
 
+[ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
+
 basename="`basename $0`"
 [ "$basename" = tpope ] && tpope='tpope ' basename="$1" && shift
 
@@ -200,6 +202,10 @@ case "$basename" in
     launch)
 	exec >/dev/null 2>&1 </dev/null
 	cd
+	if [ "$1" = "-d" ]; then
+	    shift
+	    pidof "$1" >/dev/null && exit 0
+	fi
 	"$@" &
 	exit 0
     ;;
@@ -260,6 +266,14 @@ case "$basename" in
     ;;
 
     hostinfo) exec "$HOME/bin/hostinfo" "$@" ;;
+    libtrash|lt)    
+	case "$LD_PRELOAD" in *libtrash*) ;; *)
+	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+	   LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+	   export LD_PRELOAD
+	fi ;; esac
+	"$@"
+	;;
     ruptime)  exec "$HOME/bin/hostinfo" -u "$@" ;;
     rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
     ssh)      exec "$HOME/bin/hostinfo" --ssh "$@" ;;
