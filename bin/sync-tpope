@@ -47,7 +47,8 @@ while [ "$#" -gt 0 ]; do
 	-a) tarball=cat; shift; tarfile="${1:-tpope.tar}" ;;
 	-z) tarball="gzip -c"; shift; tarfile="${1:-tpope.tar.gz}" ;;
 	-j) tarball="bzip2 -zc"; shift; tarfile="${1:-tpope.tar.bz2}" ;;
-	-c) commit=1; break ;;
+	-c) cvs="commit"; shift; break ;;
+	-d) cvs="diff -u"; shift; break ;;
 	*)
 	ALL_HOSTS="$1 $ALL_HOSTS"
 	[ "$trusted" ] && MY_HOSTS="$1 $MY_HOSTS"
@@ -68,15 +69,15 @@ if [ -n "$simpson" ]; then
 	GUI_HOSTS="$GUI_HOSTS maggie bart abe homer lisa mona marge"
 fi
 
-if [ -n "$commit" ]; then
+if [ -n "$cvs" ]; then
     mkdir /tmp/tpope-$$
     cd /tmp/tpope-$$
-    cvs co tpope
+    cvs -Qf checkout tpope
     cd
     $RSYNC $FILES /tmp/tpope-$$/tpope/
     cd /tmp/tpope-$$/tpope/
-    cvs ci
-    cvs rel
+    cvs -q $cvs
+    cvs -qf release
     cd
     rm -rf /tmp/tpope-$$
     exit 0
