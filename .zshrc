@@ -180,6 +180,10 @@ gv()   { command gv ${*:-*.(ps|pdf)(om[1])} }
 # ---------------------
 if [[ $ZSH_VERSION == 3.<->* ]]; then
     which zmodload >&/dev/null && zmodload zsh/compctl
+    compctl -c sudo
+    compctl -c which
+    compctl -g '*(-/)' + -g '.*(-/)' -v cd pushd rmdir
+    compctl -k hosts -x 'p[2,-1]' -l '' -- rsh ssh
     return 0
 fi
 
@@ -187,10 +191,12 @@ zmodload -i zsh/mathfunc
 #zmodload -i zsh/complist
 autoload -U zrecompile
 autoload -U zmv
+autoload -U zsh-mime-setup
 # Section: Styles {{{1
 # ------------------------
 zstyle ':mime:*' x-browsers sensible-browser
 zstyle ':mime:*' tty-browsers sensible-browser
+zstyle ':mime:*' mailcap ~/.mailcap
 # The following lines were added by compinstall
 
 zstyle ':completion:*' add-space true
@@ -210,14 +216,15 @@ zstyle ':completion:*:complete:rm:*files' ignored-patterns
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' hosts localhost $friends sexygeek.us cunn.iling.us rebelongto.us
 zstyle ':completion:*' insert-unambiguous true
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# NO NO NO!!! This makes things SLOW
+#zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
 zstyle ':completion:*' local localhost /var/www public_html
 zstyle ':completion:*:complete:*' matcher-list ''
 zstyle ':completion:*:ignored:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 #zstyle ':completion:*:hosts' hosts ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}} }
 zstyle ':completion:*' max-errors 1 numeric
-zstyle ':completion:*' menu select=long
+zstyle ':completion:*' menu select=1
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
 zstyle ':completion:*' substitute 1
