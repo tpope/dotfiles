@@ -1,6 +1,5 @@
-# ~/.shrc
+# -*- sh -*- vim: ft=sh sw=4 sts=4
 # $Id$
-# -*- sh -*- vim: ft=sh
 
 # This location of this file is normally in $ENV, so that it is sourced by the
 # bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
@@ -26,14 +25,22 @@ done
 #fi ;; esac
 
 CLASSPATH=.
-[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
 [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
+[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
 
 PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
 
 export PATH CLASSPATH PERL5LIB
 
+RSYNC_RSH='ssh -axqoBatchmode=yes'
+CVS_RSH='ssh'
+CVSROOT=':ext:rebelongto.us:/home/tpope/.cvs'
+[ "`hostname`" = bart ] && CVSROOT="$HOME/.cvs"
+export RSYNC_RSH CVS_RSH CVSROOT
+
 if [ -t 1 ]; then
+
+RSYNC_RSH='ssh -ax'
 
 hostname=`hostname|sed -e 's/[.].*//'`
 [ "$TERM" = Eterm -o "$TERM" = Eterm-xterm ] && \
@@ -46,9 +53,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     BROWSER="$HOME/bin/sensible-browser"
     PAGER='less'
     [ -x /usr/bin/lesspipe ] && LESSOPEN='|lesspipe %s'
-    RSYNC_RSH='ssh -a -x'
-    CVSROOT=':ext:rebelongto.us:/home/tpope/.cvs'
-    [ "$hostname" = bart ] && CVSROOT="$HOME/.cvs"
 
     umask 022
     stty -ixon
@@ -108,7 +112,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
 	alias mv='mv -i'
 	alias cp='cp -i'
-	alias rm="$HOME/bin/tpope libtrash rm -i"
+	alias rm="$HOME/bin/tpope libtrash rm"
 
 	alias j='jobs'
 
@@ -153,10 +157,10 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	    fi
 	fi
 
-	set -o emacs >/dev/null 2>&1
+	set -o emacs -o noclobber >/dev/null 2>&1
 
     fi
-    export VISUAL PAGER LESSOPEN LESSCHARSET RSYNC_RSH CVSROOT PS1
+    export VISUAL PAGER LESSOPEN LESSCHARSET PS1
 fi
 unset promptchar interactive execbin hostname oldterm dir mtime atime
 fi
