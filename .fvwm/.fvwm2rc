@@ -216,7 +216,7 @@ Style Xedit     UseStyle Editor
 # }}}2
 # Web Browser Styles
 
-Style www-browser HilightBack #806020, BackColor #787858, MiniIcon mini/www.xpm
+Style www-browser HilightBack #806020, BackColor #786050, MiniIcon mini/www.xpm
 Style konqueror         UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 0
 #1 1
 Style kcmshell          UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 0 
