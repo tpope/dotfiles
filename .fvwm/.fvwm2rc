@@ -21,6 +21,8 @@ DeskTopSize 3x3
 ColormapFocus FollowsMouse
 
 PipeRead "echo SetEnv HOST `hostname|sed -e 's/[.].*//'`"
+PipeRead "echo SetEnv sudo `if [ -x /usr/bin/gksudo ]; then echo gksudo; else echo sudo; fi`"
+
 SetEnv SMALLFONT "-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
 SetEnv SMALLXFTFONT "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true"
 
@@ -487,7 +489,7 @@ Silent Key KP_Delete   A       C       GotoDeskAndPage prev
 
 # F11 = SunF36 F12 = SunF37
 
-Key Delete      A       C       Menu MenuGotoDesktop
+#Key Delete      A       C       Menu MenuGotoDesktop
 Key Delete      A       4       Menu MenuGotoDesktop
 Key Escape      A       CM      Menu MenuGotoDesktop
 Key Delete      A       CS      Menu MenuTakeToDesktop
@@ -534,7 +536,7 @@ Key Grave   A   C       FuncIrcScreenSshXterm
 Key Grave   A   SC      FuncIrcScreenSshXtermShared
 Key 0       A   CM      Exec exec favorite-app
 Key 1       A   CM      Exec exec sensible-browser http://www.google.com/
-Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
+Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && $[sudo] /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && $[sudo] /sbin/cardctl eject
 Key 3       A   CM      FuncExec gaim "exec gaim"
 Key 4       A   CM      FuncIrcScreenSshXterm
 Key 6       A   CM      Exec exec xpenguins --nice .8 3
@@ -719,6 +721,7 @@ AddToFunc StartFunction
 + I UnsetEnv fvwm_titlefont
 + I UnsetEnv fvwm_iconfont 
 + I UnsetEnv fvwm_smallfont
++ I UnsetEnv sudo
 
 DestroyFunc InitFunction
 AddToFunc InitFunction
@@ -794,6 +797,7 @@ FuncAddIfExists MenuFvwmPrograms "&Enemy Territory%/usr/local/games/enemy-territ
 Test (f /home/games) + "" Nop
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
+FuncAddIfExists MenuFvwmPrograms "GpsDrive%gpsicon.png%" gpsdrive
 # }}}2
 # Utilities {{{2
 DestroyMenu MenuFvwmUtilities
@@ -935,14 +939,29 @@ AddToFunc FuncConfigureIconBox
 
 DestroyMenu MenuFvwmQuitVerify
 AddToMenu MenuFvwmQuitVerify "Really Quit Fvwm?" Title
-#+ "&No, Don't Quit%menu/choice-no.xpm%"   Nop
-+ "No, &Lock Display%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
-+ "No, &Restart%menu/restart.xpm%"            Restart
-+ "Yes, Really &Quit%menu/choice-yes.xpm%" FuncSmartQuit
++ "No, &Lock Display%mini.xlock.xpm%"       Exec xscreensaver-command -lock || exec xlock
++ "No, &Restart%menu/restart.xpm%"          Restart
++ "Yes, Really &Quit%menu/choice-yes.xpm%"  FuncSmartQuit
++ ""                     Nop
++ "&Halt%menu/lock.xpm%"                    Popup MenuHalt
++ "R&eboot%menu/restart.xpm%"               Popup MenuReboot
 + ""                     Nop
 + "Start &TWM%mini.twm.xpm%"        Restart twm
 + "Start &KDE%mini.kde.xpm%"        Restart startkde
 + "&Just an XTerm%mini.xterm.xpm%"  Restart xterm -n '"X Console"' -T '"X Console"'
+
+DestroyMenu MenuHalt
+AddToMenu MenuHalt "Halt?" Title
++ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec $[sudo] halt
+
+DestroyMenu MenuReboot
+AddToMenu MenuReboot "Reboot?" Title
++ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec $[sudo] reboot
+
+DestroyFunc FuncSmartQuitExec
+AddToFunc FuncSmartQuitExec
++ I Exec $*
++ I FuncSmartQuit
 
 DestroyMenu MenuGotoDesktop
 AddToMenu MenuGotoDesktop "*mini.desktop.xpm*" Title
