@@ -68,6 +68,8 @@ suffix() {
     if /sbin/ifconfig -a|grep ':172\.' >/dev/null 2>&1; then
 	getinfo "$1"
 	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
+    elif /sbin/ifconfig -a|grep ':192\.168\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
+	suffix=".iling"
     elif /sbin/ifconfig -a|grep ':10\.[014]' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
 	suffix=".iling"
 #    elif [ -x /usr/local/bin/connect ]; then
