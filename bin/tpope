@@ -18,6 +18,8 @@ rcd=/etc/init.d
 [ -d "$rcd" ] || rcd=/etc/rc.d
 [ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
 
+hostname="`hostname|sed -e 's/[.].*//'`"
+
 mediaaction() {
     exec "$HOME/bin/media" "$@"
 }
@@ -28,99 +30,164 @@ do_clean() {
 	    FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
 	    shift
 	else
-	    FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-		    PROTECT_TRASH=NO xargs -r0 rm >/dev/null 2>&1; }
 	    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
-		    PROTECT_TRASH=NO xargs -r0 rmdir >/dev/null 2>&1; }
+		    xargs -r0 rmdir >/dev/null 2>&1; }
+	    if [ -x "`which wipe 2>/dev/null`" ]; then
+		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+			xargs -r0 wipe -fcsq >/dev/null 2>&1; }
+	    else
+		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+			xargs -r0 rm >/dev/null 2>&1; }
+	    fi
 	fi
-	case "$1" in 1|2|3|4|5) unit=$1 ;;
-	    '') unit=3 ;;
+	case "$1" in
+	    1|2|3|4|5) unit=$1 ;;
+	    '') unit=4 ;;
 	    *) echo "Usage: $tpope$basename [-v] [1-5]" >&2; exit 1 ;;
 	esac
 	unset LD_PRELOAD
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" \) -atime +`expr $unit \* 30`
-	if [ -d "$HOME/.trash" ]; then
-	    FIND "$HOME/.trash" -atime +`expr $unit \* 15`
-	    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` -size +8192k
-	    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 5` -size +65536k
-	    FINDDIR "$HOME/.trash" -mtime +`expr $unit \* 1` -empty
-	    if [ ! -d "$HOME/.trash" ]; then
-		mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
-	    fi
+	PROTECT_TRASH=NO
+	export PROTECT_TRASH
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) -atime +`expr $unit \* 30`
+	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -atime +`expr $unit \* 30`
+	FIND "$HOME/.trash" -atime +`expr $unit \* 15`
+	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` -size +8192k
+	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 5` -size +65536k
+	FINDDIR "$HOME/.trash" -mtime +`expr $unit \* 1` -empty
+	if [ ! -d "$HOME/.trash" ]; then
+	    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
 	fi
+	rm -f "$HOME/bin/ruptime" "$HOME/bin/rwho" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep"
 	return 0
 }
 
 do_install() {
-	[ "$1" != "--cron" ] || exec >/dev/null
-	if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
-	    touch "$HOME/. tpope"
-	    chmod 0000 "$HOME/. tpope"
-	    hidden=1
+    [ "$1" != "--cron" ] || exec >/dev/null
+    if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
+	touch "$HOME/. tpope"
+	chmod 0000 "$HOME/. tpope"
+	hidden=1
+    fi
+    if [ ! -f "$HOME/.hushlogin" ]; then
+	touch "$HOME/.hushlogin"
+	hidden=1
+    fi
+    if [ -x "`which mplayer 2>/dev/null`" -a ! -d "$HOME/.mplayer" ]; then
+	mkdir "$HOME/.mplayer"
+	cat > "$HOME/.mplayer/config" <<EOF
+# ~/.mplayer/config
+vo=xv,x11,fb,aa
+alang=en
+slang=en
+framedrop=yes
+EOF
+	hidden=1
+    fi
+    [ -z "$hidden" ] || echo "Creating hidden files."
+    if [ ! -d "$HOME/.trash" ]; then
+	mkdir "$HOME/.trash"
+	chmod 0700 "$HOME/.trash"
+	directories=1
+    fi
+    if [ ! -d "$HOME/dl" ]; then
+	if [ -d "$HOME/downloads" ]; then
+	    mv "$HOME/downloads" "$HOME/dl"
+	    ln -s dl "$HOME/downloads"
+	    chmod 0755 "$HOME/dl"
+	    directories=1
+	    for file in "$HOME/.elinks/elinks.conf" "$HOME/.pork/porkrc" "$HOME/.irssi/config"; do
+		if [ -f "$file" ] && grep /downloads "$file" >/dev/null; then
+		    cp "$file" /tmp/.install.$$
+		    sed -e 's,/downloads,/dl,g' < /tmp/.install.$$ > "$file"
+		    rm /tmp/.install.$$
+		fi
+	    done
+	elif [ -d "$HOME/.mozilla" -o -d "$HOME/.irssi" ]; then
+	    mkdir "$HOME/dl"
+	    chmod 0755 "$HOME/dl"
+	    directories=1
 	fi
-	if [ ! -f "$HOME/.hushlogin" ]; then
-	    touch "$HOME/.hushlogin"
-	    hidden=1
+    fi
+    [ -z "$directories" ] || echo "Creating directories."
+    for dir in .firefox/default .phoenix/default .mozilla/default .mozilla/$LOGNAME .mozilla/firefox; do
+	[ -d "$HOME/$dir" ] || continue
+	if [ -f "$HOME/$dir/profiles.ini" ]; then
+	    subdirs="`cat "$HOME/$dir/profiles.ini"|grep '^Path='|sed -e 's/^Path=//'`"
+	else
+	    subdirs="`ls -1 "$HOME/$dir"`"
 	fi
-	if [ ! -d "$HOME/.trash" ]; then
-	    mkdir "$HOME/.trash"
-	    chmod 0700 "$HOME/.trash"
-	    hidden=1
-	fi
-	[ -z "$hidden" ] || echo "Creating hidden files."
-	for dir in .firefox/default .phoenix/default .mozilla/$LOGNAME; do
-	    [ -d "$HOME/$dir" ] || continue
-	    subdir="`ls -1 "$HOME/$dir"|head -n 1`"
+	for subdir in $subdirs; do
+	    subdir="$HOME/$dir/$subdir"
 	    [ -d "$subdir" ] || continue
 	    if [ ! -L "$subdir/user.js" ]; then
 		ln -s ../../../.netscape/user.js "$subdir/user.js"
 		links=1
 	    fi
+	    for file in localstore.rdf ctxextensions.rdf bookmarks.html; do
+		if [ -f "$HOME/.netscape/$file" -a ! -s "$subdir/$file" ]; then
+		    cp "$HOME/.netscape/$file" "$subdir/$file"
+		fi
+	    done
 	done
-	if [ ! -e "$HOME/bin/sdplay" ]; then
-	    if [ -x "`which rplay 2>/dev/null`" ] && pidof rplayd >/dev/null 2>&1; then
-		ln -s "`which rplay`" "$HOME/bin/sdplay"
-	    elif [ -x "`which esdplay 2>/dev/null`" ] && pidof esd >/dev/null 2>&1; then
-		ln -s "`which esdplay`" "$HOME/bin/sdplay"
-	    elif [ -x "`which artsplay 2>/dev/null`" ] && pidof artsd >/dev/null 2>&1; then
-		ln -s "`which artsplay`" "$HOME/bin/sdplay"
-	    elif [ -x "`which play 2>/dev/null`" ]; then
-		ln -s "`which play`" "$HOME/bin/sdplay"
-	    fi
-	    [ ! -L "$HOME/bin/sdplay" ] || links=1
+    done
+    if [ ! -f "$HOME/bin/sdplay" ]; then
+	if [ -x "`which rplay 2>/dev/null`" ] && pidof rplayd >/dev/null 2>&1; then
+	    ln -s "`which rplay`" "$HOME/bin/sdplay"
+	elif [ -x "`which esdplay 2>/dev/null`" ] && pidof esd >/dev/null 2>&1; then
+	    ln -s "`which esdplay`" "$HOME/bin/sdplay"
+	elif [ -x "`which artsplay 2>/dev/null`" ] && pidof artsd >/dev/null 2>&1; then
+	    ln -s "`which artsplay`" "$HOME/bin/sdplay"
+	elif [ -x "`which play 2>/dev/null`" ]; then
+	    ln -s "`which play`" "$HOME/bin/sdplay"
 	fi
-	if [ ! -e "$HOME/.pixmaps/.localhost.xpm" ]; then
-	    if [ -f "$HOME/.pixmaps/`hostname`.xpm" ]; then
-		ln -s "`hostname`.xpm" "$HOME/.pixmaps/.localhost.xpm"
-		links=1
-	    fi
+	[ ! -h "$HOME/bin/sdplay" ] || links=1
+    fi
+    if [ -f "$HOME/.pixmaps/unknown.xpm" -a ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
+	ln -sf unknown.xpm "$HOME/.pixmaps/.localhost.xpm"
+	links=1
+    fi
+    if [ -f "$HOME/.pixmaps/$hostname.xpm" ]; then
+	unknown="`find "$HOME/.pixmaps" -maxdepth 1 -name .localhost.xpm -lname unknown.xpm -print 2>/dev/null`"
+	if [ "$unknown" ]; then
+	    ln -sf "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
+	    links=1
 	fi
-	[ -z "$links" ] || echo "Creating symlinks."
-	if [ -x "`which crontab 2>/dev/null`" ]; then
-	crontab -l >/tmp/crontab.original.$$ 2>/dev/null
-	cron="$?"
-	if [ "$cron" = 0 ]; then
-	    if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
-		sed -ne '/\<tpope\>.*\<cron\>/,$p' /tmp/crontab.original.$$ | \
-		sed -ne '2,$p' > /tmp/crontab.custom.$$
-		cronmsg="Updating skeleton crontab."
-	    else
-		cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
-		cronmsg="Inserting skeleton crontab."
-	    fi
-	elif [ "$cron" = 1 ]; then
+    fi
+#    if [ "`uname`" = Linux ] && [ ! "$HOME/.pixmaps/.localhost.xpm" -ef "$HOME/.pixmaps/$hostname.xpm" ] || [ ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
+#	if [ -f "$HOME/.pixmaps/$hostname.xpm" ]; then
+#	    ln -sf "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
+#	    links=1
+#	elif [ ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
+#	    ln -s "unknown.xpm" "$HOME/.pixmaps/.localhost.xpm"
+#	    links=1
+#	fi
+#    fi
+    [ -z "$links" ] || echo "Creating symlinks."
+    if [ -x "`which crontab 2>/dev/null`" ]; then
+    crontab -l >/tmp/crontab.original.$$ 2>/dev/null
+    cron="$?"
+    if [ "$cron" = 0 ]; then
+	if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
+	    sed -ne '/\<tpope\>.*\<cron\>/,$p' /tmp/crontab.original.$$ | \
+	    sed -ne '2,$p' > /tmp/crontab.custom.$$
+	    cronmsg="Updating skeleton crontab."
+	else
 	    cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
-	    cronmsg="Installing skeleton crontab."
+	    cronmsg="Inserting skeleton crontab."
 	fi
-	if [ "$cron" = 0 -o "$cron" = 1 ]; then
-	    shell=/bin/sh
-	    env=ENV
-	    if [ -x /bin/bash ]; then
-		shell=/bin/bash
-		env=BASH_ENV
-	    fi
-	    cat >/tmp/crontab.template.$$ <<EOF
-# crontab for `whoami`@`hostname`
+    elif [ "$cron" = 1 ]; then
+	cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
+	cronmsg="Installing skeleton crontab."
+    fi
+    if [ "$cron" = 0 -o "$cron" = 1 ]; then
+	shell=/bin/sh
+	env=ENV
+	if [ -x /bin/bash ]; then
+	    shell=/bin/bash
+	    env=BASH_ENV
+	fi
+	cat >/tmp/crontab.template.$$ <<EOF
+# crontab for $LOGNAME@$hostname
 # -*- crontab -*- vim: ft=crontab
 SHELL=$shell
 $env=$HOME/.shrc
@@ -129,38 +196,64 @@ PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
 PERL5LIB=$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
-05   4 * * *	tpope install --cron; tpope clean 5
+05   4 * * *	tpope cron
 EOF
-	    cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
-	    if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
-		echo "$cronmsg"
-		crontab - < /tmp/crontab.template.$$
-	    fi
-	    rm /tmp/crontab.template.$$ /tmp/crontab.custom.$$
+	cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
+	if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
+	    echo "$cronmsg"
+	    crontab - < /tmp/crontab.template.$$
 	fi
-	rm /tmp/crontab.original.$$
-	fi
-	if [ ! -f "$HOME/.ssh/id_rsa" ]; then
-	    echo "Generating ssh key."
-	    ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N ""
-	    cat "$HOME/.ssh/id_rsa.pub" >> "$HOME/.ssh/authorized_keys2"
-	fi
-	zsh="`grep 'zsh$' /etc/shells|head -n 1`"
-	if [ -x "$zsh" ] && grep "^`whoami`:" /etc/passwd >/dev/null && \
-		! grep "^`whoami`:.*zsh" /etc/passwd >/dev/null ; then
+	rm /tmp/crontab.template.$$ /tmp/crontab.custom.$$
+    fi
+    rm /tmp/crontab.original.$$
+    fi
+    if [ ! -f "$HOME/.ssh/id_rsa" ]; then
+	ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N "" >/dev/null 2>&1 &&
+	cat "$HOME/.ssh/id_rsa.pub" >> "$HOME/.ssh/authorized_keys2" &&
+	echo "Generating ssh key."
+    fi
+    zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
+    if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null; then
+	if grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
+	    :
+	else
 	    echo "Changing login shell."
 	    chsh -s "$zsh"
 	fi
+    fi
+}
+
+display_manage() {
+    # Disables DPMS and xscreensaver for the duration of a programs execution
+    [ "$DISPLAY" ] || DISPLAY=:0
+    xset=xset
+    [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
+    dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
+    case "$dmps" in
+	on|standby|suspend|off) ;;
+	*) dpms=on ;;
+    esac
+    #$xset dpms force on
+    while kill -0 $$ 2>/dev/null; do
+	xscreensaver-command -deactivate >/dev/null 2>&1
+	sleep 55
+    done &
+    "$@"
+    ret=$?
+    $xset dpms force $dpms
+    return $?
 }
 
 case "$basename" in
 
     aliases)
-	echo launch lt lv pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media tomorrow vnc word emerge aptitude whois
+	echo launch lt lv dm pg sb sursync ruptime rwho \
+	rclink rc start stop restart reload force-reload \
+	media tomorrow vnc word emerge aptitude whois xscc mpl mpa
 	exit 0 ;;
     
     activity|away)
-	if [ "`hostname`" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
+	if [ "$hostname" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
 	    [ "$#" = 1 -a -z "$1" ] && exec hostinfo -S marge -ax tpope $basename -c
 	    exec hostinfo --batch-ssh marge tpope $basename "$@"
 	fi
@@ -182,7 +275,22 @@ case "$basename" in
 
     clean) do_clean "$@" ;;
 
-    cron) do_install --cron; do_clean 5 ;;
+    cron)
+	[ ! -x "`which renice 2>/dev/null`" ] || renice 12 -p $$ >/dev/null 2>&1
+	if [ "$1" = --login ]; then
+	    (find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
+	    # The part after the || is for versions of find that don't support
+	    # -maxdepth, such as busybox
+	    exit 0
+	fi
+	do_install >/dev/null; do_clean 5
+	find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'sync-tpope -W && touch "$HOME/.autodl"' \; 2>/dev/null
+	touch "$HOME/. tpope"
+    ;;
+
+    display-manage|dm) display_manage "$@" ;;
+    mpl) display_manage mplayer -fs -loop 0 "$@" ;;
+    mpa) DISPLAY=  mplayer -quiet -vo fb,aa "$@" ;;
 
     emerge|aptitude)
 	if [ "$1" = search ]; then
@@ -194,12 +302,28 @@ case "$basename" in
 
     launch)
 	exec >/dev/null 2>&1 </dev/null
-	cd
+	if [ "$1" = "-dm" -o "$1" = "-md" ]; then
+	    shift
+	    pidof -x "$1" >/dev/null && exit 0
+	    prefix="tpope display-manage"
+	fi
 	if [ "$1" = "-d" ]; then
 	    shift
 	    pidof -x "$1" >/dev/null && exit 0
 	fi
-	"$@" &
+	if [ "$1" = "-m" ]; then
+	    shift
+	    prefix="tpope display-manage"
+	fi
+	for arg in "$2" "$3" "$4"; do
+	    case "$arg" in
+		/*) [ -e "$arg" ] && dontcd=1 ;;
+		-*) [ -e "$arg" ] && dontcd=1 ;;
+		*) ;;
+	    esac
+	done
+	[ "$dontcd" ] || cd
+	$prefix "$@" &
 	exit 0
     ;;
 
@@ -212,10 +336,10 @@ case "$basename" in
 
     ps-grep|pg)
     if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
-	ps uf|head -n 1
+	ps uf|head -1
 	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|grep "$@"
     else
-	/usr/bin/ps -f|head -n 1
+	/usr/bin/ps -f|head -1
 	exec /usr/bin/ps -ef|grep -v '\<grep\>'|sed -ne '2,$p'|grep "$@"
     fi
     ;;
@@ -279,7 +403,7 @@ case "$basename" in
 	"$@"
 	;;
 
-    install) do_install ;;
+    install) do_install "$@" ;;
 
     soffice)
 	if [ ! -d "$HOME/.openoffice" ]; then
@@ -304,7 +428,11 @@ case "$basename" in
     exec sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
     ;;
 
-    sync-tpope|sync) exec "$HOME/bin/sync-tpope" "$@" ;;
+    sync-tpope|sync) if [ "$#" = 0 ]; then
+			exec "$HOME/bin/sync-tpope" -W
+		    else
+			exec "$HOME/bin/sync-tpope" "$@"
+		    fi ;;
 
     temperature) webget="curl -m8 -s"
 	[ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
@@ -342,12 +470,24 @@ case "$basename" in
 	exec xvncviewer "$@"
     fi
     exit 1
-    ;;  
+    ;;
 
-    whois) exec whois -H "$@" ;;
+    whois)
+    if [ "$1" != "-H" ]; then
+	exec whois -H "$@"
+    else
+	exec /usr/bin/whois "$@"
+    fi
+    ;;
+
     word) cat /usr/share/dict/words | egrep "$@" ;;
     xauth-get) exec hostinfo --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
     x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+    xscc)
+	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
+	export DISPLAY
+	exec xscreensaver-command "$@" ;;
 
+    '') echo "Usage: `basename $0` <command> [options]" ;;
     *) echo "$basename: unknown command." >&2 ;;
 esac
