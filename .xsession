@@ -10,7 +10,7 @@ unset STY
 
 xsetroot -solid '#001010'
 
-hosts="marge bart maggie lisa homer abe mona"
+hosts="marge bart maggie lisa homer mona"
 dpy=`echo ${DISPLAY:-:0.0} | sed -e 's/localhost//'`
 if echo $dpy|grep '^:' >/dev/null; then
 	hname=`hostname`
@@ -35,8 +35,7 @@ fi
 ) >/dev/null 2>&1 &
 
 xset m 3 3
-[ "`hostname`" = lisa ] && xset m 4 2
-#[ "`hostname`" = mona ] && xset m 3 20
+#[ "`hostname`" = lisa ] && xset m 4 2
 xset r rate 600 30
 xset b 40 440 60
 
@@ -60,12 +59,10 @@ export ESPEAKER="$hname" RPLAY_HOST="$hname"
 export WINDOW_MANAGER="fvwm2"
 
 hostname="`hostname|sed -e 's/[.].*//'`"
-[ ! -e "$HOME/.pixmaps/.localhost.xpm" ] && ln -s "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
-if [ ! -e "$HOME/.pixmaps/$hostname.xpm" ]; then
-    ln -s "unknown.xpm" "$HOME/.pixmaps/$hostname.xpm"
-    echo "Warning: No host picture found." >&2
+if [ ! -f "$HOME/. tpope" ]; then
+    echo 'Performing an initial "tpope install"'
+    "$HOME/bin/tpope" install
 fi
-
 
 #xrdb -merge $HOME/.Xresources
 
