@@ -15,13 +15,13 @@ CLASSPATH=.
 [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
 PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
 
-case "$LD_PRELOAD" in *libtrash*) ;; *)
-if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
-    LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-    export LD_PRELOAD LD_PRELOAD_SCREEN="$LD_PRELOAD"
-fi ;; esac
-export ENV="$HOME/.shrc"
+#case "$LD_PRELOAD" in *libtrash*) ;; *)
+#if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+#    LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+#    export LD_PRELOAD LD_PRELOAD_SCREEN="$LD_PRELOAD"
+#fi ;; esac
 
+export ENV="$HOME/.shrc"
 
 if [ -t 1 ]; then
     case $TERM in

@@ -18,12 +18,12 @@ for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games
     fi
 done
 
-case "$LD_PRELOAD" in *libtrash*) ;; *)
-if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
-    LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-    LD_PRELOAD_SCREEN=$LD_PRELOAD
-    export LD_PRELOAD LD_PRELOAD_SCREEN
-fi ;; esac
+#case "$LD_PRELOAD" in *libtrash*) ;; *)
+#if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+    #LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+    #LD_PRELOAD_SCREEN=$LD_PRELOAD
+    #export LD_PRELOAD LD_PRELOAD_SCREEN
+#fi ;; esac
 
 CLASSPATH=.
 [ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
@@ -108,7 +108,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
 	alias mv='mv -i'
 	alias cp='cp -i'
-	alias rm='rm -i'
+	alias rm="$HOME/bin/tpope libtrash rm -i"
 
 	alias j='jobs'
 

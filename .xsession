@@ -90,10 +90,10 @@ wait
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
 [ "$GPG_AGENT_INFO" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
 
-case "$LD_PRELOAD" in *libtrash*) ;; *)
-[ -f /usr/lib/libtrash/libtrash.so ] && LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-export LD_PRELOAD
-;; esac
+#case "$LD_PRELOAD" in *libtrash*) ;; *)
+#[ -f /usr/lib/libtrash/libtrash.so ] && LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+#export LD_PRELOAD
+#;; esac
 
 xsetroot -solid '#002020'
 

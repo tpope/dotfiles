@@ -12,13 +12,13 @@ foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/ga
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
-if ( $?LD_PRELOAD) then
-    if ( $LD_PRELOAD !~ *libtrash* && -f "$HOME/.libtrash" && -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD "${LD_PRELOAD}:/usr/lib/libtrash/libtrash.so"
-    if ( $LD_PRELOAD !~ *libtrash* && -f "$HOME/.libtrash" && -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD_SCREEN "${LD_PRELOAD}:/usr/lib/libtrash/libtrash.so"
-else
-    if ( -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD /usr/lib/libtrash/libtrash.so
-    if ( -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD_SCREEN /usr/lib/libtrash/libtrash.so
-endif
+#if ( $?LD_PRELOAD) then
+    #if ( $LD_PRELOAD !~ *libtrash* && -f "$HOME/.libtrash" && -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD "${LD_PRELOAD}:/usr/lib/libtrash/libtrash.so"
+    #if ( $LD_PRELOAD !~ *libtrash* && -f "$HOME/.libtrash" && -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD_SCREEN "${LD_PRELOAD}:/usr/lib/libtrash/libtrash.so"
+#else
+    #if ( -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD /usr/lib/libtrash/libtrash.so
+    #if ( -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD_SCREEN /usr/lib/libtrash/libtrash.so
+#endif
 
 setenv ENV "$HOME/.shrc"
 setenv CLASSPATH '.'
@@ -160,7 +160,7 @@ endif
 
 alias mv 'mv -i'
 alias cp 'cp -i'
-alias rm 'rm -i'
+alias rm 'tpope libtrash rm -i'
 
 alias j 'jobs'
 
