@@ -6,6 +6,8 @@
 # and what environment we're in.  The -T option forces a terminal browser, -G
 # a gui browser, and -dump a formatted dump of the website.
 
+[ "$PATH" ] || PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
+
 if [ "$1" = "-T" ]; then
     shift
     terminal=' '
@@ -21,7 +23,6 @@ elif [ "$1" = "-G" ]; then
     launch() { nohup x-terminal-emulator -title 'WWW-Browser' -e "$@" >/dev/null 2>&1 & exit 0
     }
 elif [ "$STY" ]; then
-    #launch() { screen -ln -fn -t "WWW@`hostname|sed -e 's/[.].*//'`" "$@"; sleep 3; exit 0
     launch() { screen -ln -fn -t "WWW" "$@"; sleep 2; exit 0
     }
 elif [ ! -t 1 ]; then
@@ -53,14 +54,66 @@ if [ "$DISPLAY" -a -z "$terminal" ]; then
 	    fi
 	done
 	[ "$gui" ] && \
-	for browser in firefox mozilla-firebird konqueror mozilla netscape; do
-	    if [ -x "`which $browser`" ]; then
+	for browser in firefox mozilla-firebird mozilla konqueror netscape; do
+	    if [ -x "`which $browser 2>/dev/null`" ]; then
+		case $browser in
+		    mozilla) dir="$HOME/.mozilla/default" ;;
+		    firefox) dir="$HOME/.mozilla/firefox" ;;
+		    mozilla-firebird) dir="$HOME/.phoenix/default" ;;
+		esac
+		[ -d "$dir" ] || new=1
 		nohup $browser "$@" >/dev/null 2>/dev/null &
-		sleep 30
+		disown >/dev/null 2>&1
+		sleep 20
+		if [ "$new" -a -d "$dir" ]; then
+		    if killall $browser-bin 2>/dev/null; then
+			echo 'Performing an initial "tpope install"'
+			sleep 5
+			find "$dir" \( -name "localstore.rdf" -o -name "bookmarks.html" \) -exec rm {} \;
+			tpope install
+			echo 'Restarting browser so changes will take effect'
+			nohup $browser "$@" >/dev/null 2>/dev/null &
+			disown >/dev/null 2>&1
+			sleep 20
+		    else
+			echo 'Performing an initial "tpope install"'
+			tpope install
+		    fi
+		fi
+		sleep 5
 		exit 0
 	    fi
 	done ;;
     esac
+fi
+
+if [ -x "`which elinks 2>/dev/null`" ]; then
+    [ -d "$HOME/.elinks" ] || mkdir "$HOME/.elinks"
+    if [ ! -f "$HOME/.elinks/elinks.conf" ]; then
+	cat > "$HOME/.elinks/elinks.conf" <<EOF
+# ~/.elinks/elinks.conf
+set terminal.xterm.colors = 1
+set terminal.Eterm.colors = 1
+set terminal.screen.colors = 1
+set terminal.screen.block_cursor = 1
+set terminal.screen.underline = 1
+set terminal.screen.type = 1
+
+set document.download.directory = "~/dl"
+set document.colors.vlink = "fuchsia"
+EOF
+    fi
+elif [ -x "`which links 2>/dev/null`" ]; then
+    [ -d "$HOME/.links" ] || mkdir "$HOME/.links"
+    if [ ! -f "$HOME/.links/links.cfg" ]; then
+	cat > "$HOME/.links/links.cfg" <<EOF
+# ~/.links/links.cfg
+terminal "xterm" 0 0 1 us-ascii
+terminal "Eterm" 0 0 1 us-ascii
+terminal "screen" 0 0 1 us-ascii
+download_dir "~/dl"
+EOF
+    fi
 fi
 
 if [ "$terminal" = "-dump" -a -x "`which lynx 2>/dev/null`" ]; then
@@ -69,8 +122,10 @@ elif [ -x "`which w3m 2>/dev/null`" ]; then
     if [ "$*" ]; then
 	launch w3m -T text/html "$@"
     else
-	launch w3m http://www.google.com/
+	launch w3m http://www.sexygeek.org/home
     fi
+elif [ -x "`which elinks 2>/dev/null`" ]; then
+    launch elinks "$@"
 elif [ -x "`which links 2>/dev/null`" ]; then
     launch links "$@"
 elif [ -x "`which lynx 2>/dev/null`" ]; then
