@@ -1,4 +1,4 @@
-// -*- java -*- vim: ft=javascript sw=2 sts=2 
+// -*- Mode: java; c-basic-offset: 2 -*- vi:set sw=2 sts=2:
 // Author: Tim Pope
 // $Id$
 

@@ -1,4 +1,4 @@
 #!/bin/sh
 # $Id$
-# -*- sh -*- vim: ft=sh sw=4 sts=4
+# -*- sh -*- vim:set ft=sh sw=4 sts=4:
 
