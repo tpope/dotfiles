@@ -42,6 +42,20 @@ xset b 40 440 60
 
 [ -f "$HOME/.xmodmap" ] && xmodmap "$HOME/.xmodmap"
 
+if [ ! -f "$HOME/.xmodmap" -a ! -f "$HOME/.Xmodmap" ] && \
+	xmodmap 2>/dev/null|grep Super >/dev/null; then
+    xmodmap -e "keysym Super_L = Hyper_L"
+    xmodmap -e "keysym Caps_Lock = Super_L"
+    xmodmap -e "Scroll_Lock = Hyper_R Scroll_Lock"
+    xmodmap -e "keysym Menu = Caps_Lock"
+    xmodmap -e "clear lock"
+    xmodmap -e "clear Mod4"
+    xmodmap -e "clear Mod5"
+    xmodmap -e "add lock = Caps_Lock"
+    xmodmap -e "add Mod4 = Super_L Super_R"
+    xmodmap -e "add Mod4 = Hyper_L Hyper_R"
+fi
+
 export ESPEAKER="$hname" RPLAY_HOST="$hname"
 export WINDOW_MANAGER="fvwm2"
 
