@@ -44,7 +44,7 @@ mediaaction() {
 	    [Pp]ause)  perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if !$remote->is_paused' ;;
 	    [Rr]esume) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if $remote->is_paused' ;;
 	    [Pp]lay) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if $remote->is_paused; $remote->play if !$remote->is_playing' || xmms-shell -e play & ;;
-	    [Tt]oggle) xmms-shell -e pause & ;;
+	    [Tt]oggle) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause; $remote->play if !$remote->is_playing' || xmms-shell -e pause & ;;
 	    [Nn]ext)   xmms-shell -e forward & ;;
 	    [Pp]rev)   xmms-shell -e backward & ;;
 	    [Ff]fwd)   perl -MXmms -e "time '+$time'" ;;
@@ -321,7 +321,7 @@ case "$basename" in
     exit 1
     ;;  
 
-    word) cat /usr/share/dict/words | grep "$@" ;;
+    word) cat /usr/share/dict/words | egrep "$@" ;;
 
     xauth-get) exec host-info --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
     x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
