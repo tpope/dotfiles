@@ -48,18 +48,6 @@ MAILDIR=$HOME/Mail
   | sed -e 's/^rom /From /'
 }
 
-#:0
-#* ^X-Spam-Status:.*(USER_IN_BLACKLIST|SUBJECT_NOT_TPOPE_HOTPOP)
-#definitely-spam
-
-#:0
-#* ^From: .*(AIM Special Offers|Delphi|Jobseeker|JSN)
-#definitely-spam
-
-#:0
-#* ^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
-#super-spam
-
 :0
 * ^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*\*\*
 definitely-spam
@@ -69,6 +57,10 @@ definitely-spam
 :0
 * ^X-Spam-Status: Yes
 spam
+
+:0
+* ^From: domo <domo@tstar.net>
+/dev/null
 
 # Mailing lists
 
