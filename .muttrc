@@ -213,7 +213,7 @@ account-hook imap://mona.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh mona /us
 # Section: Misc {{{1
 # ------------------
 `[ -s ~/.muttrc-$(hostname) ] && echo source ~/.muttrc-$(hostname) || echo set`
-`[ -s ~/.muttrc-local ] && echo source ~/.muttrc-local || echo set`
+`[ -s ~/.muttrc.local ] && echo source ~/.muttrc.local || echo set`
 `[ -s ~/.mail_aliases ] && echo source ~/.mail_aliases || echo set`
 # Section: Aliases {{{1
 # ---------------------
