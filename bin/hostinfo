@@ -63,7 +63,7 @@ suffix() {
     if /sbin/ifconfig -a|grep ':172\.' >/dev/null 2>&1; then
 	getinfo "$1"
 	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
-    elif /sbin/ifconfig -a|grep ':10\.[014]' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" ]; then
+    elif /sbin/ifconfig -a|grep ':10\.[014]' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
 	suffix=".iling"
 #    elif [ -x /usr/local/bin/connect ]; then
 #	suffix=".proxy"
@@ -92,6 +92,13 @@ hostinfo)
 	esac
 	shift; shift
 	exec ssh "$host`suffix $host`" "$@" ;;
+    -b|--batch-ssh)
+	case "$2" in
+	    *.*) host="$2";;
+	    *) host=`gethost ${2:-$host}` ;;
+	esac
+	shift; shift
+	exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
     -H)
 	rm -f "$HOME"/bin/[A-Z]
 	for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do

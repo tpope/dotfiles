@@ -135,7 +135,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	done
 
 	if [ -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
-	    if finger $LOGNAME|grep "^New mail" >/dev/null 2>/dev/null; then
+	    if finger $LOGNAME 2>/dev/null|grep "^New mail" >/dev/null 2>/dev/null; then
 		echo "You have new mail."
 	    fi
 	elif [ "$LS_COLORS" -a -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
