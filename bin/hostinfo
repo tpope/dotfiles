@@ -81,10 +81,10 @@ ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
 hostinfo)
     : ${host:=`hostname`}
     case "$1" in
-    -c|--host-color) `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hterm; exit 0 ;;
-    -l|--letter) `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hltr; exit 0 ;;
+    -c|--host-color) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hterm; exit 0 ;;
+    -l|--letter) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hltr; exit 0 ;;
     -h|--hostname) echo `gethost ${2:-$host}`; exit 0 ;;
-    -s|--screen-code) `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hscrn; exit 0 ;;
+    -s|--screen-code) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hscrn; exit 0 ;;
     -S|--ssh)
 	case "$2" in
 	    *.*) host="$2";;

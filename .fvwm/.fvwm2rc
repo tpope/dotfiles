@@ -115,16 +115,20 @@ AddToDecor Flat
 #+ AddButtonStyle  1 CGradient 16 White grey20
 + ButtonStyle  1 MiniIcon -- flat
 + AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
-#+ AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
-+ AddButtonStyle  1 Inactive --  flat
-#+ AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
-+ AddButtonStyle  1 ActiveUp --  flat
++ AddButtonStyle  1 Inactive (--  flat) ActiveUp (-- flat)
 + ButtonStyle 2 - !MwmDecorMax
 + ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
+#+ ButtonStyle 2 AdjustedPixmap mini.cross.xpm
 + ButtonStyle 4 - MwmDecorMax !MwmDecorMin
 + ButtonStyle 4 Default 2
+#+ ButtonStyle 4 AdjustedPixmap mini.winXX-maximize.xpm
 + ButtonStyle 6 - MwmDecorMin MwmDecorShade
 + ButtonStyle 6 Default 4
+#+ ButtonStyle 6 AdjustedPixmap mini.winXX-minimize.xpm
++ ButtonStyle Right ActiveUp -- flat
++ ButtonStyle Right ToggledActiveUp -- flat
++ ButtonStyle Right Inactive -- flat
++ ButtonStyle Right ToggledInactive -- flat
 + ButtonStyle 3 (11 80x20@1 45x20@1 55x30@1 30x55@1 20x45@1 20x80@1 55x80@0 \
 	45x70@0 70x45@0 80x55@0 80x20@0)
 + ButtonStyle 5 (25 50x10@1 35x25@1 43x25@0 43x43@1 25x43@1 25x35@0 10x50@1 \
@@ -132,7 +136,7 @@ AddToDecor Flat
                             65x75@0 57x75@1 57x57@0 75x57@0 75x65@1 90x50@0 \
                             75x35@1 75x43@1 57x43@1 57x25@0 65x25@0 50x10@1)
 
-Style * UseDecor Flat
+Style * UseDecor Mwm, MwmBorder
 
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
@@ -140,7 +144,7 @@ Style *         Icon norm/unknown.xpm, MiniIcon mini/unknown.xpm
 Style *         Color white/#607860
 Style *         HilightFore white, HilightBack #008000
 Style *         BorderWidth 5, HandleWidth 5
-Style *         MWMFunctions, MWMDecor, MWMButtons, HintOverride
+Style *         MwmFunctions, MwmDecor, MwmButtons, HintOverride
 Style *         DecorateTransient, NoPPosition
 Style *         IconBox 0 -10 -280 -1
 Style *         SloppyFocus, GrabFocus, GrabFocusTransient
@@ -276,7 +280,7 @@ Style Xawtv     Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style Gimp      HilightBack #FF2222, BackColor #786060, MiniIcon mini/gimp.xpm
 Style feh       HilightBack #FF4000, BackColor #80625C, SloppyFocus, GrabFocus, Icon norm/image-viewer.xpm, MiniIcon mini/image-viewer.xpm
-Style MPlayer   HilightBack #FF4000, BackColor #80625C, Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm
+Style MPlayer   HilightBack #FF4000, BackColor #80625C, Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm, UsePPosition
 Style xmms      HilightBack #FF4000, BackColor #80625C, Icon norm/music.xpm, MiniIcon mini/music.xpm
 Style *etri*    Icon norm/game-logic.xpm, MiniIcon mini/game-logic.xpm
 Style xpdf      MiniIcon mini.pdf.xpm
@@ -511,6 +515,11 @@ Key L       A   5       Exec exec xmms-shell -e jump
 Key R       A   5       Exec exec xmms-shell -e repeat
 Key S       A   5       Exec exec xmms-shell -e shuffle
 
+Key Execute A   A       Exec exec tpope media toggle
+Key Cancel  A   A       Exec exec tpope media stop
+Key leftanglebracket A A Exec exec tpope media prev
+Key rightanglebracket A A Exec exec tpope media next
+
 PipeRead "$HOME/bin/hostinfo --fvwm-keys"
 Key Grave   A   C       FuncIrcScreenSshXterm
 Key Grave   A   SC      FuncIrcScreenSshXtermShared
@@ -521,6 +530,7 @@ Key 3       A   CM      FuncExec gaim "exec gaim"
 Key 4       A   CM      FuncIrcScreenSshXterm
 Key 6       A   CM      Exec exec xpenguins --nice .8 3
 Key 7       A   CM      Module FvwmConsole
+Key 8       A   CM      Exec if [ -x "`which beep-media-player 2>/dev/null`" ]; then exec beep-media-player; else exec xmms; fi
 Key 9       A   CM      Exec exec aumix
 Key Space   A   CM      FuncScreenXterm
 
@@ -579,9 +589,9 @@ Mouse 1 1       A       Menu MenuFvwmWindowOps Close
 Mouse 2 1       A       Close
 Mouse 2 1       A       WarpToWindow -20p 7p
 Mouse 3 1       A       Menu MenuFvwmWindowOps Resize 80c 24c
-Mouse 1 2       A       Close
-Mouse 2 2       A       Destroy
-Mouse 3 2       A       Delete
+Mouse 1 2       A       FuncClose
+Mouse 2 2       A       FuncDestroy
+Mouse 3 2       A       FuncDelete
 Mouse 1 4       A       Maximize  100 -72p
 Mouse 2 4       A       Maximize  100  100
 Mouse 3 4       A       Maximize grow grow
@@ -848,8 +858,9 @@ AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
 + "&Screenshot%mini.camera.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 + "Reset X &Resources%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xresources
 + "" Nop
-+ "&MWM Decor%mini.mwm.xpm%"                  Style * UseDecor MWM
-+ "&Flat Decor%menu/window.xpm%"              Style * UseDecor Flat
++ "&Fvwm Decor%mini.fvwm.xpm%"                Style * UseDecor MWM, FvwmBorder
++ "&Mwm Decor%mini.mwm.xpm%"                  Style * UseDecor MWM, MwmBorder
++ "&Flat Decor%menu/window.xpm%"              Style * UseDecor Flat, MwmBorder
 #+ "" Nop
 #+ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
 #+ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
@@ -1036,6 +1047,17 @@ AddToFunc FuncRestore
 + I WindowShade false
 + I Iconify false
 # }}}3
+# FuncDelete / FuncClose / FuncDestroy {{{3
+DestroyFunc FuncDelete
+AddToFunc FuncDelete
++ C Delete
+DestroyFunc FuncClose
+AddToFunc FuncClose
++ C Close
+DestroyFunc FuncDestroy
+AddToFunc FuncDestroy
++ C Destroy
+# }}}3
 # FuncWindowWarp {{{3
 DestroyFunc FuncWindowWarp
 AddToFunc FuncWindowWarp
@@ -1176,8 +1198,10 @@ AddToFunc FuncSmartWebBrowser
 
 DestroyFunc FuncCloseXmms
 AddToFunc FuncCloseXmms
-+ I All (xmms) Close
-+ I All (beep-media-player) Close
++ I Exec exec tpope media quit
+#+ I All (xmms) Close
+#+ I All (beep-media-player) Close
+
 
 DestroyFunc FuncIrcScreenSshXterm
 AddToFunc FuncIrcScreenSshXterm

@@ -36,24 +36,24 @@ fi
 
 PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
 
-if [ "`basename $0`" = bash ]; then
+#if [ "`basename $0`" = bash ]; then
     bind '"\e[1~": beginning-of-line'
     bind '"\e[3~": delete-char'
     bind '"\e[4~": end-of-line'
-fi
+#fi
 [ "$OLDTERM" ] && TERM=$OLDTERM
 case $TERM in
 screen*|vt220*)
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${USER}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e s,$HOME,~,`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${hostname}"'\033\\"'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e s,$HOME,~,`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${hostname}"'\033\\"'
     [ "`hostname`" = grex.cyberspace.org ] &&TERM=vt220 &&export OLDTERM=screen
 ;;
 xterm*|rxvt*|kterm*|dtterm*)
     # If this is an xterm set the title to user@host:dir [tty]
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${USER}@${hostname}"':`echo ${PWD}|sed -e s,$HOME,~,`'"${ttyslash}"'\007"'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${LOGNAME}@${hostname}"':`echo ${PWD}|sed -e s,$HOME,~,`'"${ttyslash}"'\007"'
     ;;
 Eterm*)
     # If this is an Eterm set the title to user@host:dir [tty]
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${USER}@${hostname}"':`echo ${PWD}|sed -e s,$HOME,~,`'"${ttyslash}"'\007\033]I'"$hostname"'.xpm\033\\"'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${LOGNAME}@${hostname}"':`echo ${PWD}|sed -e s,$HOME,~,`'"${ttyslash}"'\007\033]I'"$hostname"'.xpm\033\\"'
     [ "`hostname`" = grex.cyberspace.org ] &&TERM=xterm &&export OLDTERM=Eterm
     ;;
 linux*) ;;
