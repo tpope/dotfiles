@@ -2,6 +2,10 @@
 # Author: Tim Pope
 # vim: ft=sh
 
+# This location of this file is normally in $ENV, so that it is sourced by the
+# bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
+# .zshrc, .bashrc, and .profile, respectively.
+
 for dir in /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin"; do
     if [ ! -d "$dir" ] || echo "$PATH"|grep "$dir" >/dev/null; then :; else
 	PATH="$dir$PATH"

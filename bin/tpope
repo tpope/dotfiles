@@ -1,4 +1,15 @@
 #!/bin/sh
+# Author: Tim Pope
+# -*- sh -*- vim: ft=sh sw=4 sts=4
+
+# This is a multipurpose script that is easier to copy around than 30-odd
+# single purpose ones.  If a function grows too big, it earns its own file,
+# and this script is modified to call that file instead.
+
+# Of particular interest here is the start/restart/etc functions, which call
+# the appropriate script in /etc/init.d, and the play/pause/etc functions,
+# which determine what media player is running and tell it to perform that
+# action.
 
 basename="`basename $0`"
 [ "$basename" = tpope ] && tpope='tpope ' basename="$1" && shift

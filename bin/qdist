@@ -1,4 +1,12 @@
 #!/bin/bash
+# Author: Tim Pope
+# -*- sh -*- vim: ft=sh sw=4 sts=4
+
+# A seldom used script to rapidly distribute a file to a large number of
+# hosts.  The idea was that if, say, I witnessed a crime, I could distribute
+# evidence of it quickly as possible, so that killing me wouldn't be an
+# effective way of destroying it.  As you might expect, I've yet to have a
+# real use for it.
 
 give_to_host() {
     local host defer="" loc=""

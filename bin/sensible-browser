@@ -1,5 +1,10 @@
 #!/bin/sh
 # Author: Tim Pope
+# -*- sh -*- vim: ft=sh sw=4 sts=4
+
+# As the name suggests, picks a sensible web browser based on what's installed
+# and what environment we're in.  The -T option forces a terminal browser, -G
+# a gui browser, and -dump a formatted dump of the website.
 
 if [ "$1" = "-T" ]; then
     shift

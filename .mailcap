@@ -1,3 +1,7 @@
+# ~/.mailcap
+# Author: Tim Pope
+# -*- mailcap -*- vim: ft=mailcap
+
 text/html; sensible-browser '%s'; description="HTML Text"; nametemplate=%s.html
 text/html; sensible-browser -dump '%s'; description="HTML Text"; copiousoutput; nametemplate=%s.html
 text/x-url; sensible-browser `cat '%s'`; description=URL

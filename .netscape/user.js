@@ -1,3 +1,8 @@
+// Author: Tim Pope
+// -*- javascript -*- vim: ft=javascript
+
+// This file configures everything from Netscape 4 to Firefox
+
 with (PrefConfig) {
 user_pref("advanced.system.supportDDEExec", false);
 user_pref("browser.blink_allowed", false);

@@ -1,4 +1,9 @@
 #!/bin/sh
+# Author: Tim Pope
+# -*- sh -*- vim: ft=sh sw=4 sts=4
+
+# This script analyzes what terminal emulators are installed and picks my
+# favorite from the bunch.
 
 if [ -z "$DISPLAY" ]; then
     echo "No display set.  Aborting." >&2

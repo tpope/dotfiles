@@ -1,4 +1,9 @@
 #!/bin/sh
+# Author: Tim Pope
+# -*- sh -*- vim: ft=sh sw=4 sts=4
+
+# This script handles everything to do with hostnames, particularly
+# colourizing them.
 
 hostinfo=`basename $0`
 PATH="/bin:/usr/bin:/usr/local/bin"

@@ -609,7 +609,7 @@ Mouse 2 I       A       Iconify
 #Mouse 2 TSIF    A       StrokeFunc DrawMotion
 #Mouse 2 TSIF    S       StrokeFunc EchoSequence DrawMotion
 Mouse 2 TSI     A       FuncResizeOrRaiseOrShade
-Mouse 3 TSF     A       Menu MenuFvwmWindowOps RaiseLower
+Mouse 3 TSIF    A       Menu MenuFvwmWindowOps RaiseLower
 Mouse 4 T       A       FuncTakeToDesk -1 0 2
 Mouse 5 T       A       FuncTakeToDesk +1 0 2
 
@@ -806,6 +806,7 @@ PipeRead 'if [ -x "`which gaim 2>/dev/null`" ]; then \
 echo "+ \\"&Gaim%mini.gaim.xpm%\\" FuncExec gaim \\"exec gaim\\""; \
 elif [ -x "`which tik 2>/dev/null`" ]; then \
 echo "+ \\"TIK%menu/chat.xpm%\\" Exec exec tik"; fi'
+FuncAddIfExists MenuFvwmNetwork "&Blog%menu/editor.xpm%" BloGTK
 + ""                            Nop
 FuncAddIfExists MenuFvwmNetwork "&Firefox%mozilla.mini.xpm%" firefox
 FuncAddIfExists MenuFvwmNetwork "&Firebird%mozilla.mini.xpm%" mozilla-firebird

@@ -1,6 +1,12 @@
 #!/bin/sh
 # Author: Tim Pope
+# -*- sh -*- vim: ft=sh sw=4 sts=4
 
+# Keeps my configuration files in sync.  Also used to create a tarball of
+# them, and commit them to cvs.
+
+# Whoops.  This script wasn't meant to be called as root.  Maybe this is what
+# I meant.
 [ "$EUID" = 0 ] && exec /usr/local/sbin/sync-simpson "$@"
 
 FILES="\
