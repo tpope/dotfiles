@@ -31,7 +31,7 @@ off=(maggie.simpson bart.simpson marge.simpson lisa.simpson homer.simpson mona.s
 for host in $off; do
     [ "${host%.simpson}" != `hostname` ] && family=($family $host)
     [ -d "$HOME/simpson" ] && typeset ${host%.simpson}=$HOME/simpson/${host%.simpson}
-    : ~${host%.simpson}
+    : ~$host
 done
 
 namedir() { export $1=$PWD; : ~$1 }
