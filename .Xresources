@@ -103,7 +103,7 @@ XTerm-white*boldMode: false
 XTerm-white*scrollBar: false
 !XTerm-white*backarrowKey: false
 XTerm-white*colorBDMode: true
-XTerm-white*colorBD: #ffffff
+XTerm-white*colorBD: #000000
 XTerm-white*cursorColor: #333333
 XTerm-white*font: -misc-fixed-medium-r-semicondensed--12-*-*-*-c-*-iso8859-1
 XTerm-white*fontMenu*fontdefault*Label: Default
@@ -145,6 +145,7 @@ XTerm-white*VT100*color15: #000000
 Rxvt*background: #000000
 Rxvt*foreground: #aaaaaa
 Rxvt*colorBD: #ffffff
+Rxvt*boldFont: 
 
 !## ATERM {{{1
 Aterm*background: #000000

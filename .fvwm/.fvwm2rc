@@ -179,8 +179,8 @@ Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
 Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
 Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff, UseDecor
 Style FvwmConsole  Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 6
-Style FvwmForm*    Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, NoButton 2
-Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 2, MiniIcon mini.run.xpm, Icon run.xpm
+Style FvwmForm*    Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, NoButton 4
+Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 4, MiniIcon mini.run.xpm, Icon run.xpm
 Style FvwmPager*   BorderWidth 4, NoHandles
 Style FvwmBanner   StaysOnTop
 Style FvwmIconMan  NeverFocus, BorderWidth 4, HandleWidth 4
@@ -192,8 +192,8 @@ Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 4, NoHandles
 Style *lock     NoTitle, NoHandles, Sticky, WindowListSkip, ClickToFocus, Icon norm/lock.xpm, MiniIcon mini/lock.xpm
 Style gkrellm*  Sticky, WindowListSkip, FocusFollowsMouse
 Style *biff     NoTitle, Sticky, WindowListSkip, ClickToFocus
-Style xcalc     NoButton 2, ClickToFocus, Icon norm/calculator.xpm, MiniIcon mini/calculator.xpm
-Style xmh       StickyIcon, NoButton 2, Icon mail1.xpm, NoIconTitle
+Style xcalc     NoButton 4, ClickToFocus, Icon norm/calculator.xpm, MiniIcon mini/calculator.xpm
+Style xmh       StickyIcon, NoButton 4, Icon mail1.xpm, NoIconTitle
 Style xman      ClickToFocus, Icon xman.xpm, MiniIcon mini.xman.xpm
 Style xmag      ClickToFocus, Icon norm/viewer.xpm, MiniIcon mini/viewer.xpm
 Style xzoom*    ClickToFocus, Icon norm/viewer.xpm, MiniIcon mini/viewer.xpm
@@ -216,7 +216,7 @@ Style *etri*    Icon norm/game-logic.xpm, MiniIcon mini/game-logic.xpm
 Style xpdf      MiniIcon mini.pdf.xpm
 Style gv        MiniIcon mini/ghostview.xpm
 Style xdvi      MiniIcon mini/printing.xpm
-Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, PPosition
+Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, UsePPosition
 Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
 Style SDL_App   BorderWidth 0, HandleWidth 0, NoTitle, MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
 
@@ -247,7 +247,6 @@ Key Comma       A       SM4     Prev                        FuncFocusWindow
 Key Period      A       SM4     Next                        FuncFocusWindow
 
 Key Tab         A       4       WindowList [CurrentPage] Root c c SelectOnRelease Super_L
-Key Tab         A       S4      Prev [CurrentPage] FuncFlipFocusWindow
 Key Tab         A       C4      WindowList [$c] Root c c SelectOnRelease Super_L
 Key Tab         A       SC4     Prev [$c] FuncFlipFocusWindow
 Key Tab         A       M4      WindowList Root c c NoDeskSort SelectOnRelease Super_L
@@ -260,6 +259,7 @@ Key Tab         A       C       Next [CurrentPage !Iconic] FuncFocusWindow
 Key Tab         A       SC      Prev [CurrentPage !Iconic] FuncFocusWindow
 Key Tab         A       CM      Next [CurrentPage] FuncFocusWindow
 Key Tab         A       SCM     Prev [CurrentPage] FuncFocusWindow
+Key Tab         A       S4      SendToModule FvwmProxy ShowToggle
 
 Key Left        A       SM    Direction West  [CurrentDesk] FuncFlipFocusWindow
 Key Right       A       SM    Direction East  [CurrentDesk] FuncFlipFocusWindow
@@ -644,6 +644,7 @@ AddToFunc StartFunction
 + I Module FvwmButtons
 + I Module FvwmCommandS
 + I Module FvwmEvent
++ I Module FvwmProxy
 + I UnsetEnv fvwm_titlefont
 + I UnsetEnv fvwm_iconfont 
 #+ I UnsetEnv fvwm_datefont
@@ -736,7 +737,7 @@ AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
 +       "X&Lock%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
 +       "&Screenshot%menu/windows.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 +       ""              Nop
-+       "Reset X &Defaults%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xdefaults
++       "Reset X &Resources%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xresources
 
 # Remote Logins and Screens {{{2
 PipeRead "$HOME/bin/hostinfo --fvwm-menus"
@@ -936,6 +937,14 @@ AddToFunc FuncWindowWarp
 # WindowListFunc {{{2
 DestroyFunc WindowListFunc
 AddToFunc WindowListFunc
++ I FuncDeiconifyAndRearrange
++ I FlipFocus
++ I Raise
++ I WarpToWindow 25p 7p
+# }}}2
+# EWMHActivateWindowFunc {{{2
+DestroyFunc EWMHActivateWindowFunc
+AddToFunc EWMHActivateWindowFunc
 + I FuncDeiconifyAndRearrange
 + I FlipFocus
 + I Raise
@@ -1304,6 +1313,11 @@ DestroyModuleConfig FvwmIdent: *
 *FvwmIdent: Back MidnightBlue
 *FvwmIdent: Fore Yellow
 *FvwmIdent: Font -adobe-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*
+
+DestroyModuleConfig FvwmProxy: *
+*FvwmProxy: Font $[fvwm_titlefont]
+*FvwmProxy: ProxyMove true
+*FvwmProxy: Action Click2 SendToModule FvwmProxy ShowToggle
 
 DestroyModuleConfig FvwmWinList: *
 *FvwmWinList: Back #908090
