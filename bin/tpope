@@ -144,7 +144,7 @@ mediaaction() {
 case "$basename" in
 
     aliases)
-	echo launch pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media vnc emerge aptitude
+	echo launch pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media tomorrow vnc word emerge aptitude
 	exit 0 ;;
     
     activity|away)
@@ -300,6 +300,8 @@ case "$basename" in
 	    *) echo " --$temp.-" ;;
 	esac
 	;;
+
+    tomorrow) today --date=tomorrow "$@" ;;
 
     url)
 	if [ "$*" = "-" ]; then
