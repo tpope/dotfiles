@@ -193,7 +193,7 @@ Style Fvwm*     NoTitle,  Sticky, WindowListSkip, Icon norm/system.xpm, MiniIcon
 Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
 Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
 Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff, UseDecor
-Style FvwmConsole  Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 6
+Style FvwmConsole  Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 5
 Style FvwmForm*    Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, NoButton 4
 Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 4, MiniIcon mini.run.xpm, Icon run.xpm
 Style FvwmPager*   BorderWidth 4, NoHandles
@@ -532,7 +532,7 @@ Key KP_Subtract A   4   Exec exec ssh homer br -d -1
 #Mouse 0 R A
 Mouse 1 R       A       Menu MenuFvwmRoot All [Transient] Raise
 #Mouse 2 R       A       Menu MenuFvwmWindowOps Nop
-Mouse 2 R A
+Mouse 2 R       A
 Mouse 2 R       S       StrokeFunc EchoSequence DrawMotion
 Mouse 3 R       A       WindowList
 
@@ -542,6 +542,7 @@ Mouse 5 R       A       GotoDesk +1 0 2
 #   for the title bar buttons:
 Mouse 1 1       A       Menu MenuFvwmWindowOps Close
 Mouse 2 1       A       Close
+Mouse 2 1       A       WarpToWindow -20p 7p
 Mouse 3 1       A       Menu MenuFvwmWindowOps Resize 80c 24c
 Mouse 1 2       A       Close
 Mouse 2 2       A       Destroy
@@ -730,24 +731,25 @@ AddToMenu MenuFvwmPrograms "Programs" Title
 +       "&UT2004%menu/game-action.xpm%"     Exec exec ut2004
 +       "&IRC%menu/chat.xpm%"        FuncFvwmIrcScreenSshXterm
 +       "OpenOffice &Writer%menu/word-processor.xpm%" Exec exec oowriter
-
-DestroyMenu MenuFvwmUtilities
-AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
-+       "&XTerm%mini.xterm.xpm%"     Exec exec xterm -T localhost -n localhost
-+       "&Calculator%menu/calculator.xpm%" Exec exec xcalc
-+       "X&mag%menu/viewer.xpm%"     Exec exec xmag
-+       "Edit&res%menu/unknown.xpm%" Exec exec editres
-+       ""                           Nop
-+       "G&vim%mini.vim.xpm%"        Exec exec vim -g
-+       "M&utt%mutt.mini.xpm%"       Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
-+       "Ga&im%mini.gaim.xpm%"       FuncFvwmExec gaim "exec gaim"
-+       "X&awtv%menu/video.xpm%"     Exec xawtv || exec tvtime
-+       "&Gimp%menu/gimp.xpm%"       FuncFvwmExec gimp* "gimp-2.0 || exec gimp"
 +       ""                           Nop
 +       "&Firefox%mozilla.mini.xpm%" Exec mozilla-firebird || exec firefox
 +       "&Konqueror%mini.kde.xpm%"   Exec exec konqueror about:blank
 +       "M&ozilla%mozilla.mini.xpm%" Exec exec mozilla
 +       "&Netscape%mini.netscape.xpm%" Exec exec netscape
+
+DestroyMenu MenuFvwmUtilities
+AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
++       "&XTerm%mini.xterm.xpm%"     Exec exec xterm -T localhost -n localhost
++       "&Calculator%menu/calculator.xpm%" Exec exec xcalc
++       "&Zoom%menu/viewer.xpm%"     Exec xzoom || exec xmag
++       "&Editres%menu/unknown.xpm%" Exec exec editres
++       "&Aumix%aumix.mini.xpm%"      Exec exec aumix
++       ""                           Nop
++       "G&vim%mini.vim.xpm%"        Exec exec vim -g
++       "M&utt%mutt.mini.xpm%"       Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
++       "Ga&im%mini.gaim.xpm%"       FuncFvwmExec gaim "exec gaim"
++       "Xaw&tv%menu/video.xpm%"     Exec xawtv || exec tvtime
++       "&Gimp%menu/gimp.xpm%"       FuncFvwmExec gimp* "gimp-2.0 || exec gimp"
 +       ""                           Nop
 +       "X&Lock%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
 +       "&Screenshot%menu/windows.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
@@ -860,7 +862,7 @@ AddToMenu   MenuHeadlines "Headlines" Title
 + "BBSpot"     Popup bbspot
 + "FreshMeat"  Popup freshmeat
 + "LinuxToday" Popup linuxtoday
-+ "KDE News"   Popup kde-news
+#+ "KDE News"   Popup kde-news
 + "CNN"        Popup cnn
 + ""           Nop
 + "Reset all"  FuncResetHeadlines
@@ -1079,13 +1081,13 @@ DestroyFunc FuncFvwmIrcScreenSshXterm
 AddToFunc FuncFvwmIrcScreenSshXterm
 + I Next (screen-irc@mona, AcceptsFocus) Iconify off
 + I Next (screen-irc@mona, AcceptsFocus) Focus
-+ I None (screen-irc@mona, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@mona -n screen-irc@mona -e hostinfo -S mona -t sh -c "'DISPLAY=:0.0 exec screen -dRR irc irssi'"
++ I None (screen-irc@mona, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@mona -n screen-irc@mona -e hostinfo -S mona -t sh -c "'DISPLAY=:0.0 exec screen -c $HOME/.irssi/screenrc -dRR irc'"
 
 DestroyFunc FuncFvwmIrcScreenIrcXterm
 AddToFunc FuncFvwmIrcScreenXterm
 + I Next (screen-irc@localhost) Iconify off
 + I Next (screen-irc@localhost, AcceptsFocus) Focus
-+ I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -T screen-irc@localhost -n screen-irc@localhost -e screen -xRR irc irssi
++ I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -T screen-irc@localhost -n screen-irc@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
 
 DestroyFunc FuncFvwmExec
 AddToFunc FuncFvwmExec

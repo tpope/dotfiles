@@ -164,8 +164,8 @@ alias rm 'rm -i'
 alias j 'jobs'
 
 if ( -x /usr/bin/vim || -x /usr/local/bin/vim || -x /opt/sfw/bin/vim ) then
-    alias vi 'vim'
-    setenv VISUAL 'vim'
+    alias vi 'vim -X'
+    setenv VISUAL 'vim -X'
 endif
 
 if ( -x /usr/bin/sudo || -x /usr/local/bin/sudo ) then

@@ -12,6 +12,23 @@ case "$basename" in
     aliases)
 	echo launch pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho vnc emerge aptitude
 	exit 0 ;;
+    
+    activity|away)
+	if [ "$#" = 0 ]; then
+	    cat "$HOME/.$basename" 2>/dev/null
+	    exit
+	elif [ "$1" = "-c" -o "$1" = "" ]; then
+	    rm -f "$HOME/.$basename"
+	    exit 0
+	elif [ "$1" = "-" ]; then
+	    cat > "$HOME/.$basename"
+	    [ -s "$HOME/.$basename" ] || rm -f "$HOME/.$basename"
+	    exit
+	else
+	    echo "$@" > "$HOME/.$basename"
+	    exit
+	fi
+	;;
 
     clean)
 	if [ "$1" = -v ]; then

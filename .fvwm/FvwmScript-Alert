@@ -13,6 +13,7 @@ Init
   ChangeFont 1 $font
   Set $title ={mini/game.xpm}
   ChangeTitle 1 {:)}
+  Set $activity ={}
 # ChangeIcon 1 $title
   Set $color ={White}
   Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
@@ -22,10 +23,23 @@ PeriodicTasks
  Begin
   If (RemainderOfDiv (Add (GetTime) -25) 1200)==0 Then
    Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
-  If (RemainderOfDiv (GetTime) 10)==0 Then
+  If (RemainderOfDiv (GetTime) 60)==0 Then
+   Set $activity =(GetOutput {tpope activity} 1 1)
+  If (RemainderOfDiv (GetTime) 5)==0 Then
   Begin
    Set $newtitle =$temp
    Set $newforecolor =DarkGreen
+   If $activity=={} Then
+   Begin
+   End
+   Else
+   Begin
+    Set $newforecolor =Orange
+    If $activity=={Playing} Then
+     Set $newtitle =mini/game.xpm
+    Else
+     Set $newtitle ="!"
+   End
    Set $load =(Div (GetOutput {uptime|sed -e 's/^.*average: //' -e 's/ .*$//' -e 's/\.//'} 1 -1) 10)
    If 19 < $load Then
    Begin

@@ -9,7 +9,7 @@ escape "^^^^"
 bindkey ^Q command
 #bindkey ^A command
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* WS=\E[8;%d;%dt
-termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* ti@:te@ # use scrollback
+termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* ti@:te@:G0 # use scrollback
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007
 termcapinfo Eterm* "XT:C8"
 setenv LD_PRELOAD "$LD_PRELOAD_SCREEN"

@@ -107,7 +107,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	[ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && \
 	    alias apt-get='sudo apt-get'
 	[ -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
-	    alias vi=vim && VISUAL=vim
+	    alias vi='vim -X' && VISUAL='vim -X'
 
 	if [ -x "`which dircolors 2>/dev/null`" ]; then
 	    eval `dircolors -b $HOME/.dir_colors`
