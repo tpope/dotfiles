@@ -49,7 +49,7 @@ PeriodicTasks
 Widget 1
 Property
  Position 0 0
- Size 68 16
+ Size 70 16
  Type ItemDraw
  Flags Center NoReliefString
  Title {YYYY-mm-dd}
@@ -62,8 +62,8 @@ End
 
 Widget 2
 Property
- Position 66 0
- Size 45 16
+ Position 68 0
+ Size 44 16
  Type ItemDraw
  Flags Right
  Title {HH:MM}

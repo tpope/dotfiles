@@ -218,6 +218,7 @@ zstyle ':completion:*' hosts localhost $friends sexygeek.us cunn.iling.us rebelo
 zstyle ':completion:*' insert-unambiguous true
 # NO NO NO!!! This makes things SLOW
 #zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors no=00 fi=00 di=01\;34 pi=33 so=01\;35 bd=00\;35 cd=00\;34 or=00\;41 mi=00\;45 ex=01\;32
 zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
 zstyle ':completion:*' local localhost /var/www public_html
 zstyle ':completion:*:complete:*' matcher-list ''

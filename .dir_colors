@@ -73,8 +73,6 @@ EXEC 01;32
 .BAT 00;32
 .cmd 00;32
 .CMD 00;32
-.scr 00;32
-.SCR 00;32
 .class 00;32
 .sh 00;32
 .pl 00;32
@@ -132,11 +130,6 @@ EXEC 01;32
 .wmv 01;35
 .rm 01;35
 .mov 01;35
-.fli 01;35
-.gl 01;35
-.dl 01;35
-.swf 01;35
-.dcr 01;35
 
 # sound formats
 .wav 01;35
@@ -180,63 +173,18 @@ EXEC 01;32
 .CFG 00;36
 .ini 00;36
 .INI 00;36
-.inf 00;36
-.INF 00;36
-.reg 00;36
-.REG 00;36
-.pol 00;36
-.POL 00;36
 
 # system libraries, etc.
 .so 00;33
 .o 00;33
 .a 00;33
-.dll 00;33
-.DLL 00;33
-.sys 00;33
-.SYS 00;33
-.vxd 00;33
-.Vxd 00;33
-.VXD 00;33
-.drv 00;33
-.DRV 00;33
-.ocx 00;33
-.Ocx 00;33
-.OCX 00;33
-.ocm 00;33
-.ax 00;33
-.AX 00;33
-.acm 00;33
-.ACM 00;33
-.vwp 00;33
-.qts 00;33
-.bpl 00;33
-.lrc 00;33
-.LRC 00;33
-.cpl 00;33
-.CPL 00;33
 
 # data and help files
-.pwl 00;35
-.PWL 00;35
 .dat 00;35
 .DAT 00;35
-.MYD 00;35
-.MYI 00;35
 .db 00;35
 .DB 00;35
 .dba 00;35
-.DBA 00;35
-.pst 00;35
-.PST 00;35
-.pif 00;35
-.PIF 00;35
-.nls 00;35
-.NLS 00;35
-.gid 00;35
-.GID 00;35
-.hlp 00;33
-.HLP 00;33
 .pdb 00;33
 .PDB 00;33
 
