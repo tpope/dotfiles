@@ -84,6 +84,7 @@ if [ -n "$cvs" ]; then
     cd /tmp/tpope-$$/tpope/
     cvs -q $cvs
     $RSYNC $FILES "$HOME"
+    chmod 0644 "$HOME/.ssh/authorized_keys" "$HOME/.ssh/authorized_keys2"
     cvs -qf release
     cd
     rm -rf /tmp/tpope-$$

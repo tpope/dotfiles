@@ -1,5 +1,5 @@
 # ~/.bashrc
-# Author: Tim Pope
+# $Id$
 
 [ "$PS1" ] && interactive=1
 export ENV="$HOME/.shrc"
