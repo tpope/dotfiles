@@ -1,0 +1,67 @@
+application/vnd.sun.xml.writer;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.writer.global;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.writer;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.writer-global;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-starwriter;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.writer.template;/home/tpope/.openoffice/1.1.1/soffice %s
+application/msword;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.calc;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.calc;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-starcalc;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.calc.template;/home/tpope/.openoffice/1.1.1/soffice %s
+application/excel;/home/tpope/.openoffice/1.1.1/soffice %s
+application/msexcel;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.ms-excel;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-msexcel;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.impress;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.impress;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.impress-packed;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-starimpress;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.impress.template;/home/tpope/.openoffice/1.1.1/soffice %s
+application/powerpoint;/home/tpope/.openoffice/1.1.1/soffice %s
+application/mspowerpoint;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.ms-powerpoint;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-mspowerpoint;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.draw;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.draw;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-stardraw;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.draw.template;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.math;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.stardivision.math;/home/tpope/.openoffice/1.1.1/soffice %s
+application/x-starmath;/home/tpope/.openoffice/1.1.1/soffice %s
+application/vnd.sun.xml.writer;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.writer.global;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.writer;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.writer-global;/home/tpope/.openoffice/1.1.0/soffice %s
+application/x-starwriter;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.writer.template;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.calc;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.calc;/home/tpope/.openoffice/1.1.0/soffice %s
+application/x-starcalc;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.calc.template;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.impress;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.impress;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.impress-packed;/home/tpope/.openoffice/1.1.0/soffice %s
+application/x-starimpress;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.impress.template;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.draw;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.draw;/home/tpope/.openoffice/1.1.0/soffice %s
+application/x-stardraw;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.draw.template;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.sun.xml.math;/home/tpope/.openoffice/1.1.0/soffice %s
+application/vnd.stardivision.math;/home/tpope/.openoffice/1.1.0/soffice %s
+application/x-starmath;/home/tpope/.openoffice/1.1.0/soffice %s
+text/html; sensible-browser %s; description="HTML Text"; nametemplate=%s.html
+#text/html; lynx -force_html -dump %s; description="HTML Text"; copiousoutput; nametemplate=%s.html
+text/html; sensible-browser -dump %s; description="HTML Text"; copiousoutput; nametemplate=%s.html
+text/x-url; sensible-browser `cat %s`; description=URL
+text/x-url; sensible-browser -dump `cat %s`; description=URL; copiousoutput
+text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
+text/richtext; richtext -t; description="Rich Text"; copiousoutput
+video/*; mplayer %s; description="Video"
+image/*; feh %s; description="Image"; test=test -n "$DISPLAY"
+image/*; xv %s;  description="Image"; test=test -n "$DISPLAY"
+image/*; anytopnm %s > %s.pnm && aview -driver curses %s.pnm && rm -f %s.pnm;  description="Image"
+image/*; anytopnm %s | pnmscale -xysize 80 46 | ppmtopgm | pgmtopbm | pbmtoascii -1x2 2>&1 ; copiousoutput
+# Java Web Start
+application/x-java-jnlp-file; /usr/local/lib/j2sdk1.4.2/jre/javaws/javaws %s

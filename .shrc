@@ -1,0 +1,154 @@
+# ~/.shrc
+# Author: Tim Pope
+# vim: ft=sh
+
+for dir in /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin"; do
+    if [ ! -d "$dir" ] || echo "$PATH"|grep "$dir" >/dev/null; then :; else
+	PATH="$dir$PATH"
+    fi
+done
+
+for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin; do
+    if [ ! -d "$dir" ] || echo "$PATH"|grep ":$dir" >/dev/null; then :; else
+	PATH="$PATH$dir"
+    fi
+done
+
+case "$LD_PRELOAD" in *libtrash*) ;; *)
+if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+    LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+    LD_PRELOAD_SCREEN=$LD_PRELOAD
+    export LD_PRELOAD LD_PRELOAD_SCREEN
+fi ;; esac
+
+export PATH
+
+if [ -t 1 ]; then
+
+hostname=`hostname|sed -e 's/[.].*//'`
+[ "$TERM" = Eterm -o "$TERM" = Eterm-xterm ] && \
+    echo -n "]I$hostname.xpm\\"
+
+if [ "$interactive" -o "$_" = "interactive" ] || \
+    echo $0|grep '^[^.]*sh[0-9.-]*$' >/dev/null; then
+
+    VISUAL='vi'
+    BROWSER="$HOME/bin/sensible-browser"
+    PAGER='less'
+    [ -x /usr/bin/lesspipe ] && LESSOPEN='|lesspipe %s'
+    CLASSPATH=.
+    [ -d "$HOME/java" ] && CLASSPATH="$CLASSPATH$HOME/java"
+    RSYNC_RSH='ssh -x'
+    CVSROOT=':ext:bart.simpson:/home/tpope/.cvs'
+    [ "$hostname" = bart ] && CVSROOT="$HOME/.cvs"
+
+    umask 022
+    stty -ixon
+
+    oldterm="$TERM"
+    [ "$OLDTERM" ] && oldterm="$OLDTERM"
+    case "$oldterm" in
+	screen*|vt220*)
+	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
+	    echo -n "k`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname\\"
+	    echo -n "]1;`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname"
+	else
+	    echo -n "k$hostname\\"
+	    echo -n "]1;$hostname"
+	fi
+	[ "`hostname`" = grex.cyberspace.org ] && TERM=vt220 && OLDTERM=screen && \
+	export OLDTERM
+	;;
+	xterm*|rxvt*|kterm*|dtterm*)
+	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
+	echo -n "]1;`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname"
+	else
+	    echo -n "]1;$hostname"
+	fi ;;
+	Eterm*)
+	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
+	    echo -n "]1;`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname"
+	else
+	    echo -n "]1;$hostname"
+	fi
+	[ "`hostname`" = grex.cyberspace.org ] && TERM=xterm && \
+	    OLDTERM=Eterm && export OLDTERM
+	;;
+    esac
+
+    execbin=`echo $0|sed -e 's/^-//' -e 's/\.shrc/_/'`
+
+    if [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ]; then
+	promptchar='#'
+    else
+	promptchar='$'
+	[ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "`whoami`" ] && \
+	umask 002
+    fi
+
+    PS1="`whoami`@$hostname `basename $execbin`$promptchar "
+
+    #case `basename $execbin` in
+    #*ksh*)
+       #PS1="`whoami`@$hostname$HOME,~,"`'"$promptchar "
+	#;;
+    #esac
+
+    if [ "`basename $execbin`" != sh ]; then
+
+	alias ls='ls -F'
+
+	alias mv='mv -i'
+	alias cp='cp -i'
+	alias rm='rm -i'
+
+	alias j='jobs'
+
+	[ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && \
+	    alias apt-get='sudo apt-get'
+	[ -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
+	    alias vi=vim && VISUAL=vim
+
+	if [ -x "`which dircolors 2>/dev/null`" ]; then
+	    eval `dircolors -b $HOME/.dir_colors`
+	    #alias ls="LS_COLORS=\"$LS_COLORS\" ls -F --color=auto"
+	    alias ls="ls -F --color=auto"
+	elif [ -x "`which gdircolors 2>/dev/null`" ]; then
+	    eval `gdircolors -b $HOME/.dir_colors`
+	    #alias ls="LS_COLORS=\"$LS_COLORS\" gls -F --color=auto"
+	    alias ls="gls -F --color=auto"
+	fi
+
+	if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
+	    alias less='less -R'
+	    alias zless='zless -R'
+	    PAGER='less -R'
+	    LESSCHARSET='iso8859'
+	fi
+
+	for cmd in `tpope aliases`; do
+	    alias $cmd="tpope $cmd"
+	done
+
+	if [ -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
+	    if finger $LOGNAME|grep "^New mail" >/dev/null 2>/dev/null; then
+		echo "You have new mail."
+	    fi
+	elif [ "$LS_COLORS" -a -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
+	    [ "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+	    [ "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+	    mtime=-1 atime=-1
+	    mtime=`ls -l --time-style=+%s "$MAIL"|awk '{print $6}'`
+	    atime=`ls -ul --time-style=+%s "$MAIL"|awk '{print $6}'`
+	    if [ "`expr $mtime - $atime`" -gt 0 ]; then
+		echo "You have new mail."
+	    fi
+	fi
+
+	set -o emacs >/dev/null 2>&1
+
+    fi
+    export VISUAL PAGER LESSOPEN LESSCHARSET CLASSPATH RSYNC_RSH CVSROOT PS1
+fi
+unset promptchar interactive execbin hostname oldterm dir mtime atime
+fi

@@ -1,0 +1,148 @@
+#!/bin/sh
+
+basename="`basename $0`"
+[ "$basename" = tpope ] && tpope='tpope ' basename="$1" && shift
+
+rcd=/etc/init.d
+[ -d "$rcd" ] || rcd=/etc/rc.d
+[ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
+
+case "$basename" in
+
+    aliases)
+	echo launch pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho vnc emerge aptitude
+	exit 0 ;;
+
+    clean)
+	if [ "$1" = -v ]; then
+	    FIND() { find "$@" ! -type d -print 2>/dev/null; }
+	    shift
+	else
+	    FIND() { find "$@" ! -type d -print0 2>/dev/null | \
+		    PROTECT_TRASH=NO xargs -r0 rm >/dev/null 2>&1; }
+	fi
+	case "${1:-3}" in 1|2|3|4|5) unit=${1:-3} ;;
+	    *) echo "Usage: $tpope$basename [-v] [1-5]" >&2; exit 1 ;;
+	esac
+	unset LD_PRELOAD
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name "*.aux" -o -name "*.blg" \) -atime +`expr $unit \* 30`
+	if [ -d "$HOME/.trash" ]; then
+	    FIND "$HOME/.trash" -atime +`expr $unit \* 15`
+	    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` -size +8192k
+	    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 5` -size +65536k
+	fi
+	exit 0
+	;;
+
+    emerge|aptitude)
+	if [ "$1" = search ]; then
+	    exec "$basename" "$@"
+	else
+	    exec $sudo "$basename" "$@"
+	fi
+	;;
+
+    launch)
+	exec >/dev/null 2>&1 </dev/null
+	cd
+	"$@" &
+	exit 0
+    ;;
+
+    ps-grep|pg)
+    if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
+	ps uf|head -n 1
+	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|grep "$@"
+    else
+	/usr/bin/ps -f|head -n 1
+	exec /usr/bin/ps -ef|grep -v '\<grep\>'|sed -ne '2,$p'|grep "$@"
+    fi
+    ;;
+
+    rclink|link)
+	if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
+		echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
+		exit 1
+	fi
+	sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
+	    2>/dev/null |read run start stop trash
+	[ "$stop" ] || run=2345 start=20 stop=20
+	[ -z "$2" ] || run="$2"
+	[ -z "$3" ] || start="$3" stop="$3"
+	[ -z "$4" ] || stop="$4"
+	for i in 0 1 2 3 4 5 6; do
+	    $sudo rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
+	    case $run in
+		[Xx])   ;;
+		*$i*) $sudo ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
+		*)    $sudo ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
+	    esac
+	done
+	exit 0
+    ;;
+
+    runcontrol|rc)
+	if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
+		echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
+		exit 1
+	fi
+	while [ "$#" -gt 0 ]; do
+	    $sudo "$rcd/$2" "$1"
+	    shift 2
+	done
+	exit 0
+    ;;
+
+    sensible-browser|sb) exec "$HOME/bin/sensible-browser" "$@" ;;
+
+    start|stop|restart|reload|force-reload)
+	for daemon in "$@"; do
+	    $sudo "$rcd/$daemon" "$basename"
+	done
+	[ "$*" ]
+	exit
+    ;;
+
+    hostinfo) exec "$HOME/bin/hostinfo" "$@" ;;
+    ruptime)  exec "$HOME/bin/hostinfo" -u "$@" ;;
+    rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
+    ssh)      exec "$HOME/bin/hostinfo" -S "$@" ;;
+
+    sursync|suscp)
+    for arg in "$@"; do
+	case "$arg" in
+	    [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
+	esac
+    done
+    [ "$basename" = suscp ] && args=-P
+    exec sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
+    ;;
+
+    sync-tpope|sync) exec "$HOME/bin/sync-tpope" "$@" ;;
+
+    temperature) webget="curl -m8 -s"
+	[ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
+	temp="`$webget http://weather.noaa.gov/weather/current/${1:-KSAT}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
+	case temp in
+	    ?????*) echo "$temp" ;;
+	    ????)  echo " $temp" ;;
+	    ???)  echo "  $temp" ;;
+	    ??)  echo "   $temp" ;;
+	    *) echo " --.-" ;;
+	esac
+	;;
+
+    vnc)
+    if [ -f "$HOME/.vnc/$1" ]; then
+	exec xvncviewer -passwd "$HOME/.vnc/$1" "$@"
+    else
+	exec xvncviewer "$@"
+    fi
+    exit 1
+    ;;  
+
+    xauth-get) exec ssh -ax "$1" xauth extract - "$1:0"|xauth merge - ;;
+    x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+
+    *) echo "$basename: unknown command." >&2 ;;
+esac

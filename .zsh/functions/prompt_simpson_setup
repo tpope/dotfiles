@@ -1,0 +1,74 @@
+# vim: ft=zsh
+prompt_simpson_help () {
+	cat <<'EOF'
+Prompt reminiscent of the Simpsons.
+You can configure this prompt to derive from a particular family member:
+
+  prompt simpson [<simpson-name>]
+
+The default family member is derived from the host name.
+EOF
+}
+
+prompt_simpson_setup () {
+	local hostname=${1:-`/bin/hostname`}
+	local hostcolor
+	case "$hostname" in
+		maggie*) hostletter=A
+			hostcolor="$fg_bold[cyan]"  ;;
+		bart*) hostletter=B
+			hostcolor="$fg_bold[red]"  ;;
+		lisa*) hostletter=L
+			hostcolor="$fg_no_bold[red]"  ;;
+		marge*) hostletter=M
+			hostcolor="$fg_bold[green]"  ;;
+		homer*) hostletter=H
+			hostcolor="$fg_no_bold[yellow]"  ;;
+		abe*) hostletter=E
+			hostcolor="$fg_no_bold[cyan]"  ;;
+		snowball*) hostletter=S
+			hostcolor="$fg_bold[black]"  ;;
+		carl*) hostletter=R
+			hostcolor="$fg_no_bold[magenta]"  ;;
+		lenny*) hostletter=Y
+			hostcolor="$fg_bold[blue]"  ;;
+		chief*|clancy*) hostletter=C
+			hostcolor="$fg_no_bold[blue]"  ;;
+		*) hostletter=`hostinfo -l`
+			hostcolor="`echo '\e'`[`hostinfo -c`m"  ;;
+	esac
+	local usercolor="$fg_bold[yellow]"
+	[ $UID = '0' ] && usercolor="$fg_bold[white]"
+	#if [ "$TERM" = "linux" -o "$TERM" = "xterm" -o "$TERM" = "screen" -o "$TERM" = "screen-w" -o "$TERM" = "Eterm" ]
+	case "$TERM" in
+	linux*|screen*|xterm*|rxvt*|kterm*|Eterm*|dtterm*|vt220*)
+		PROMPT="%{$usercolor%}%n%{$reset_color%}@%{$hostcolor%}%m%{$reset_color%}:%{$fg_bold[blue]%}%20<...<%~%<<%{$reset_color%}%{$reset_color%}%# "
+		;;
+	*)
+		PS1="$hostletter%# "
+		;;
+	esac
+	#PS2="> "
+	precmd () {
+		setopt promptsubst
+	}
+	preexec () {
+		
+	}
+}
+
+prompt_simpson_preview () {
+	local host
+	if (( ! $#* ))
+	then
+		for host in homer marge bart lisa maggie abe
+		do
+			prompt_preview_theme simpson $host
+			print
+		done
+	else
+		prompt_preview_theme simpson "$@"
+	fi
+}
+
+prompt_simpson_setup "$@"

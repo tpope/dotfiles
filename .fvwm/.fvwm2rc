@@ -1,0 +1,1356 @@
+# ~/.fvwm/.fvwm2rc
+# Author: Tim Pope
+# vim: et sts=4
+# vim600: foldmethod=marker
+
+# Basic Settings {{{1
+
+ImagePath ${HOME}/.pixmaps:${HOME}/.wm-icons:.fvwm/icons:/usr/local/share/icons:/usr/share/icons:/usr/include/X11/pixmaps:/usr/local/share/pixmaps:/usr/share/pixmaps:/usr/include/X11/bitmaps:/usr/X11R6/include/bitmaps:/usr/share/icons/wm-icons:/usr/share/icons/fvwm:/usr/share/fvwm/images
+
+EdgeResistance 2000 16
+EdgeScroll 0 0
+EdgeThickness 1
+SnapAttraction 3 Screen
+MoveThreshold 2
+OpaqueMoveSize 21
+XorPixmap resize.rainbow.xpm
+ClickTime 750
+
+DeskTopSize 3x3
+#DeskTopSize 3x2
+ColormapFocus FollowsMouse
+
+PipeRead "echo SetEnv HOST `hostname|sed -e 's/[.].*//'`"
+SetEnv SMALLFONT "-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
+SetEnv SMALLXFTFONT "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true"
+
+DestroyFunc Fvwm24
+AddToFunc Fvwm24
++ I SetEnv fvwm_titlefont "-adobe-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
++ I SetEnv fvwm_iconfont  "-adobe-helvetica-medium-r-*--10-*-*-*-*-*-*-*"
++ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
++ I SetEnv fvwm_timefont "-adobe-helvetica-bold-r-*--14-*-*-*-*-*-*-*"
++ I SetEnv fvwm_alertfont "-adobe-helvetica-bold-r-*--17-*-*-*-*-*-*-*"
++ I SetEnv fvwm_smallfont "$[SMALLFONT]"
++ I DefaultFont 7x13
+
+DestroyFunc Fvwm25
+AddToFunc Fvwm25
++ I SetEnv fvwm_titlefont "xft:Arial:style=Bold:pixelsize=12;-adobe-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
++ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=10;-adobe-helvetica-medium-r-*--10-*-*-*-*-*-*-*"
++ I SetEnv fvwm_datefont "xft:Arial:pixelsize=12;-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
+#+ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
++ I SetEnv fvwm_timefont "xft:Arial:Bold:pixelsize=15;-adobe-helvetica-bold-r-*--14-*-*-*-*-*-*-*"
++ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=14;-adobe-helvetica-bold-r-*--17-*-*-*-*-*-*-*"
++ I SetEnv fvwm_smallfont "xft:$[SMALLXFTFONT];$[SMALLFONT]"
++ I DefaultFont "xft:Mono:pixelsize=11;7x13"
+
+PipeRead "if fvwm --version >/dev/null 2>&1; then echo Fvwm25; else echo Fvwm24; fi"
+
+# }}}1
+# Styles {{{1
+# Colorsets {{{2
+
+DestroyModuleConfig FvwmTheme: *
+*FvwmTheme: Colorset 41 DGradient 256 3 Red 20 Blue 30 Black 50 Grey
+*FvwmTheme: Colorset 42 DGradient 256 yellow goldenrod, fg black, bg goldenrod
+*FvwmTheme: Colorset 42 DGradient 256 LightCoral salmon, fg black, bg Coral
+*FvwmTheme: Colorset 43 DGradient 256 PaleGreen MediumSeaGreen, fg black, bg MediumSeaGreen
+*FvwmTheme: Colorset 50 bg #303030, fg White
+*FvwmTheme: Colorset 51 bg #403030, fg White
+*FvwmTheme: Colorset 52 bg #303040, fg White
+*FvwmTheme: Colorset 53 bg #304030, fg White
+*FvwmTheme: Colorset 60 bg #404040, fg White
+*FvwmTheme: Colorset 61 bg #504040, fg White
+*FvwmTheme: Colorset 62 bg #404050, fg White
+*FvwmTheme: Colorset 63 bg #405040, fg White
+
+# }}}2
+# Menu Styles {{{2
+MenuStyle * Foreground black, Background SteelBlue, Greyed grey40, Animation
+MenuStyle * ActiveFore white, HilightBack navy, PopupOffset -16 100
+MenuStyle * MenuFace DGradient 256 LightSteelBlue SteelBlue
+MenuStyle * Font "$[fvwm_titlefont]"
+CopyMenuStyle * Logins
+CopyMenuStyle * Screens
+MenuStyle Logins  MenuColorset 42, ActiveFore White, HilightBack DarkRed
+MenuStyle Screens MenuColorset 43, ActiveFore White, HilightBack DarkGreen
+
+# }}}2
+# Default Styles {{{2
+
+DefaultFont 7x13
+TitleStyle      Height 18
+ButtonStyle     1 -- UseTitleStyle
+#AddButtonStyle  1 CGradient 16 White grey20
+AddButtonStyle  1 MiniIcon -- flat
+AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
+AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
+AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
+
+Style *         Font       "$[fvwm_titlefont]"
+Style *         IconFont   "$[fvwm_iconfont]"
+Style *         Icon norm/unknown.xpm, MiniIcon mini/unknown.xpm
+Style *         Color white/#607860
+Style *         HilightFore white, HilightBack #008000
+Style *         BorderWidth 6, HandleWidth 6
+Style *         MWMFunctions, MWMDecor, MWMButtons, HintOverride
+Style *         DecorateTransient, NoPPosition
+Style *         IconBox 0 -10 -280 -1
+Style *         SloppyFocus, GrabFocus, GrabFocusTransient
+Style *         TileCascadePlacement
+Style *         MinOverlapPlacement
+
+# }}}2
+# Terminal Emulator Styles {{{2
+
+DestroyDecor Terminal
+AddToDecor Terminal
++ TitleStyle Height 18
++ AddTitleStyle Inactive   ( HGradient 192 3 grey30 20 grey12 60 grey12 20 grey30 )
++ AddTitleStyle ActiveUp   ( HGradient 192 3 grey16 20 grey8  60 grey8  20 grey16 )
++ AddTitleStyle ActiveDown ( HGradient 192 3 grey12 20 grey4  60 grey4  20 grey12 )
++ ButtonStyle     1 -- UseTitleStyle
++ AddButtonStyle  1 CGradient 16 grey90 black
++ AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1) Inactive (CGradient 16 grey90 grey10)
++ AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
++ AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
++ AddButtonStyle  1 MiniIcon -- flat
+
+Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm, SloppyFocus
+Style Terminal  GrabFocus, GrabFocusTransient, UseDecor Terminal
+Style Terminal  HilightBack grey16, BackColor grey32
+Style Terminal  HilightBorderColorset 50, BorderColorset 60
+Style Terminal  HandleWidth 5
+# , IconBox -70 1 -1 -140
+Style XTerm*    UseStyle Terminal, Icon rterm.xpm
+Style UXTerm*   UseStyle Terminal, Icon rterm.xpm
+Style Eterm*    UseStyle Terminal
+Style rxvt*     UseStyle Terminal
+Style kterm*    UseStyle Terminal
+Style dtterm*   UseStyle Terminal
+Style Dtterm*   UseStyle Terminal
+Style konsole*  UseStyle Terminal
+Style *ssh*     Icon norm/terminal-remote.xpm, MiniIcon mini/terminal-remote.xpm, HilightBorderColorset 51, BorderColorset 61
+Style screen*  Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm, HilightBorderColorset 52, BorderColorset 62
+Style screen-ssh* Icon norm/terminal-special.xpm, MiniIcon mini/terminal-special.xpm, HilightBorderColorset 53, BorderColorset 63
+Style screen-irc* Icon norm/chat.xpm, MiniIcon mini/chat.xpm, HilightBorderColorset 53, BorderColorset 63
+
+# }}}2
+# Editor Styles {{{2
+
+Style Editor    GrabFocus, GrabFocusTransient, MiniIcon mini/editor.xpm, Icon norm/editor.xpm
+Style Editor    HilightBack #202060, BackColor #606078
+Style *vim      UseStyle Editor, MiniIcon mini.vim.xpm
+Style Xedit     UseStyle Editor
+
+# }}}2
+# Web Browser Styles
+
+Style www-browser HilightBack #806020, BackColor #787858, MiniIcon mini/www.xpm
+Style konqueror         UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 1
+Style kcmshell          UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 1
+Style Mozilla*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 2 0
+Style MozillaFirebird*  UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
+Style Firefox*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
+Style Netscape*         UseStyle www-browser, MiniIcon mini.netscape.xpm, StartsOnPage 2 1
+Style links             UseStyle www-browser
+Style w3m               UseStyle www-browser
+Style lynx              UseStyle www-browser
+Style WWW-Browser       UseStyle www-browser
+
+# }}}2
+# Host Specific Styles {{{2
+
+PipeRead "$HOME/bin/hostinfo --fvwm-styles"
+PipeRead "echo 'Style *localhost* UseStyle' \\*@`hostname|sed -e 's/[.].*//'`\\*"
+
+# }}}2
+# Fvwm Module Styles {{{2
+
+Style Fvwm*     NoTitle,  Sticky, WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
+Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
+Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
+Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff, UseDecor
+Style FvwmConsole  Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 6
+Style FvwmForm*    Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, NoButton 2
+Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 2, MiniIcon mini.run.xpm, Icon run.xpm
+Style FvwmPager*   BorderWidth 4, NoHandles
+Style FvwmBanner   StaysOnTop
+Style FvwmIconMan  NeverFocus, BorderWidth 4, HandleWidth 4
+Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 4, NoHandles
+
+# }}}2
+# Common Program Styles {{{2
+
+Style *lock     NoTitle, NoHandles, Sticky, WindowListSkip, ClickToFocus, Icon norm/lock.xpm, MiniIcon mini/lock.xpm
+Style gkrellm*  Sticky, WindowListSkip, FocusFollowsMouse
+Style *biff     NoTitle, Sticky, WindowListSkip, ClickToFocus
+Style xcalc     NoButton 2, ClickToFocus, Icon norm/calculator.xpm, MiniIcon mini/calculator.xpm
+Style xmh       StickyIcon, NoButton 2, Icon mail1.xpm, NoIconTitle
+Style xman      ClickToFocus, Icon xman.xpm, MiniIcon mini.xman.xpm
+Style xmag      ClickToFocus, Icon norm/viewer.xpm, MiniIcon mini/viewer.xpm
+Style xzoom*    ClickToFocus, Icon norm/viewer.xpm, MiniIcon mini/viewer.xpm
+Style XConsole  NoTitle, ClickToFocus, GrabFocusOff
+
+Style desktop_window Sticky, NoTitle, NoHandles, StaysOnBottom, StaysPut, Layer 0 0
+Style editres   Icon editres.xpm, MiniIcon mini.x2.xpm
+Style XScreenSaver Icon norm/display.xpm, MiniIcon mini/display.xpm
+Style *font*    MiniIcon mini/font.xpm
+Style aumix     MiniIcon aumix.mini.xpm
+Style *OpenOffice* MiniIcon mini/word-processor.xpm
+Style *mutt*    Icon mutt.xpm, MiniIcon mutt.mini.xpm
+Style Xawtv     Icon norm/video.xpm, MiniIcon mini/video.xpm
+Style tvtime    Icon norm/video.xpm, MiniIcon mini/video.xpm
+Style Gimp      HilightBack #FF2222, BackColor #786060, MiniIcon mini/gimp.xpm
+Style feh       HilightBack #FF4000, BackColor #80625C, SloppyFocus, GrabFocus, Icon norm/image-viewer.xpm, MiniIcon mini/image-viewer.xpm
+Style MPlayer   HilightBack #FF4000, BackColor #80625C, Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm
+Style xmms      HilightBack #FF4000, BackColor #80625C, Icon norm/music.xpm, MiniIcon mini/music.xpm
+Style *etri*    Icon norm/game-logic.xpm, MiniIcon mini/game-logic.xpm
+Style xpdf      MiniIcon mini.pdf.xpm
+Style gv        MiniIcon mini/ghostview.xpm
+Style xdvi      MiniIcon mini/printing.xpm
+Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm
+Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
+Style SDL_App   BorderWidth 0, HandleWidth 0, NoTitle, MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
+
+# }}}2
+# }}}1
+# Key Bindings {{{1
+
+IgnoreModifiers 2
+# Ignore Caps Lock and two alternate Num Locks
+#IgnoreModifiers L23
+
+# Focus Bindings {{{2
+Key Slash       A       4       WarpToWindow 25p 7p
+Key Grave       A       4       WarpToWindow 25p 7p
+#Key Insert      A       4       WarpToWindow 25p 7p
+#Key Insert      A       5       WarpToWindow 25p 7p
+Key Comma       A       4       Prev [CurrentPage !Iconic]  FuncFocusWindow
+Key Period      A       4       Next [CurrentPage !Iconic]  FuncFocusWindow
+Key Comma       A       S4      Prev [CurrentPage]          FuncFocusWindow
+Key Period      A       S4      Next [CurrentPage]          FuncFocusWindow
+Key Comma       A       C4      Prev [$c !Iconic]           FuncFocusWindow
+Key Period      A       C4      Next [$c !Iconic]           FuncFocusWindow
+Key Comma       A       SC4     Prev [$c]                   FuncFocusWindow
+Key Period      A       SC4     Next [$c]                   FuncFocusWindow
+Key Comma       A       M4      Prev [!Iconic]              FuncFocusWindow
+Key Period      A       M4      Next [!Iconic]              FuncFocusWindow
+Key Comma       A       SM4     Prev                        FuncFocusWindow
+Key Period      A       SM4     Next                        FuncFocusWindow
+
+Key Tab         A       4       WindowList [CurrentPage] Root c c SelectOnRelease Super_L
+Key Tab         A       S4      Prev [CurrentPage] FuncFlipFocusWindow
+Key Tab         A       C4      WindowList [$c] Root c c SelectOnRelease Super_L
+Key Tab         A       SC4     Prev [$c] FuncFlipFocusWindow
+Key Tab         A       M4      WindowList Root c c NoDeskSort SelectOnRelease Super_L
+Key Tab         A       SM4     Prev FuncFlipFocusWindow
+Key Tab         A       5       Next FuncFocusWindow
+Key Tab         A       S5      Prev FuncFocusWindow
+Key Tab         A       M       WindowList Root c c NoDeskSort SelectOnRelease Meta_L
+Key Tab         A       SM      WindowList Root c c NoDeskSort SelectOnRelease Meta_L
+Key Tab         A       C       Next [CurrentPage !Iconic] FuncFocusWindow
+Key Tab         A       SC      Prev [CurrentPage !Iconic] FuncFocusWindow
+Key Tab         A       CM      Next [CurrentPage] FuncFocusWindow
+Key Tab         A       SCM     Prev [CurrentPage] FuncFocusWindow
+
+Key Left        A       SM    Direction West  [CurrentDesk] FuncFlipFocusWindow
+Key Right       A       SM    Direction East  [CurrentDesk] FuncFlipFocusWindow
+Key Up          A       SM    Direction North [CurrentDesk] FuncFlipFocusWindow
+Key Down        A       SM    Direction South [CurrentDesk] FuncFlipFocusWindow
+
+Key Left        A       C5    Direction West  [CurrentDesk] FuncFlipFocusWindow
+Key Right       A       C5    Direction East  [CurrentDesk] FuncFlipFocusWindow
+Key Up          A       C5    Direction North [CurrentDesk] FuncFlipFocusWindow
+Key Down        A       C5    Direction South [CurrentDesk] FuncFlipFocusWindow
+
+# }}}2
+
+Key F1          A       4       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key F2          A       4       FvwmForm FvwmForm-Run
+Key F2          A       S4      Read .FvwmForm-RunLast Quiet
+Key F3          A       4       Menu MenuFvwmWindowOps Interior 0 0 Nop
+Key F3          A       S4      FvwmForm FvwmForm-Talk
+
+Key Escape      A       C       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key Escape      A       S       Menu MenuFvwmWindowOps Interior 0 0 Nop
+Key F1          A       M       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key F1          A       SM      Menu MenuFvwmWindowOps Interior 0 0 Nop
+Key F2          A       M       FvwmForm FvwmForm-Run
+Key F2          A       SM      Read .FvwmForm-RunLast Quiet
+Key F3          A       M       Lower
+Key F3          A       SM      FvwmForm FvwmForm-Talk
+Key F4          A       M       Close
+Key F4          A       SM      Destroy
+Key F5          A       M       Raise
+Key F5          A       SM      FuncRestore
+Key F6          A       M       Next FuncFocusWindow
+Key F6          A       SM      Prev FuncFocusWindow
+Key F7          A       M       Move
+Key F7          A       SM      RefreshWindow
+Key F8          A       M       Resize
+Key F8          A       SM      RecaptureWindow
+Key F9          A       M       Iconify
+Key F9          A       SM      Module FvwmIdent
+Key F10         A       M       Maximize 100 -72p
+Key F10         A       SM      Maximize 0 100
+Silent Key F11  A       M       Stick
+Silent Key SunF36 A     M       Stick
+Silent Key F11  A       SM      Module FvwmScroll 2 2
+Silent Key SunF36 A     SM      Module FvwmScroll 2 2
+Silent Key F12  A       M       WindowShade
+Silent Key SunF37 A     M       WindowShade
+Silent Key F12  A       SM      Delete
+Silent Key SunF37 A     SM      Delete
+
+Silent Key Print A      C       Pick FuncCaptureWindow
+Silent Key Print A      SC      Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
+Key Escape      A       SCM     EscapeFunc
+
+Key 1           A       4       FuncWindowWarp 25 25
+Key 2           A       4       FuncWindowWarp 75 25
+Key 3           A       4       FuncWindowWarp 25 75
+Key 4           A       4       FuncWindowWarp 75 75
+Key 5           A       4       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key 6           A       4       FvwmForm FvwmForm-Run
+Key 6           A       S4      Read .FvwmForm-RunLast Quiet
+Key 7           A       4       Menu MenuFvwmUtilities
+Key 7           A       S4      Menu /Debian
+Key 8           A       4       Menu MenuFvwmScreens
+Key 8           A       S4      Menu MenuFvwmLogins
+
+# Desk and Page Bindings {{{2
+
+Key Left        A       4       GotoPage -1p 0p
+Key Left        A       4       Scroll -100000 0
+Key Right       A       4       GotoPage +1p 0p
+Key Right       A       4       Scroll  100000 0
+Key Up          A       4       GotoPage 0p -1p
+Key Up          A       4       Scroll 0 -100000
+Key Down        A       4       GotoPage 0p +1p
+Key Down        A       4       Scroll  0 100000
+Key Next        A       4       GotoDesk +1 0 2
+Key Prior       A       4       GotoDesk -1 0 2
+
+Key Left        A       CM      GotoPage -1p 0p
+Key Right       A       CM      GotoPage +1p 0p
+Key Up          A       CM      GotoPage 0p -1p
+Key Down        A       CM      GotoPage 0p +1p
+Key Next        A       CM      GotoDesk +1 0 2
+Key Prior       A       CM      GotoDesk -1 0 2
+
+Key Left        A       C4      FuncTakeToPage -1p 0p
+Key Right       A       C4      FuncTakeToPage +1p 0p
+Key Up          A       C4      FuncTakeToPage 0p -1p
+Key Down        A       C4      FuncTakeToPage 0p +1p
+Key Next        A       C4      FuncTakeToDesk +1 0 2
+Key Prior       A       C4      FuncTakeToDesk -1 0 2
+
+Key Left        A       SCM     FuncTakeToPage -1p 0p
+Key Right       A       SCM     FuncTakeToPage +1p 0p
+Key Up          A       SCM     FuncTakeToPage 0p -1p
+Key Down        A       SCM     FuncTakeToPage 0p +1p
+Key Next        A       SCM     FuncTakeToDesk +1 0 2
+Key Prior       A       SCM     FuncTakeToDesk -1 0 2
+
+Key Left        A       M4      MoveToPage -1p 0p
+Key Right       A       M4      MoveToPage +1p 0p
+Key Up          A       M4      MoveToPage 0p -1p
+Key Down        A       M4      MoveToPage 0p +1p
+Key Next        A       M4      MoveToDesk +1 0 2
+Key Prior       A       M4      MoveToDesk -1 0 2
+
+Key Left        A       5       CursorMove -5 0
+Key Right       A       5       CursorMove +5 0
+Key Up          A       5       CursorMove 0 -5
+Key Down        A       5       CursorMove 0 +5
+
+Key Left        A       45      CursorMove -1p 0
+Key Right       A       45      CursorMove +1p 0
+Key Up          A       45      CursorMove 0 -1p
+Key Down        A       45      CursorMove 0 +1p
+
+Key Left        A       S5      CursorMove -1p 0
+Key Right       A       S5      CursorMove +1p 0
+Key Up          A       S5      CursorMove 0 -1p
+Key Down        A       S5      CursorMove 0 +1p
+
+Key Space       A       4       GotoDeskAndPage 0 0 0
+PipeRead 'for i in `seq 1 26`; do echo Key \
+ `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4 \
+ GotoDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+
+Key Space       A       4M      FuncMoveToDeskAndPage 0 0 0
+PipeRead 'for i in `seq 1 26`; do echo Key \
+ `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4M \
+ FuncMoveToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+
+Key Space       A       4C      FuncTakeToDeskAndPage 0 0 0
+PipeRead 'for i in `seq 1 26`; do echo Key \
+ `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4C \
+ FuncTakeToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+
+Silent Key KP_Home     A       C       GotoPage 0 0
+Silent Key KP_Up       A       C       GotoPage 1 0
+Silent Key KP_Prior    A       C       GotoPage 2 0
+Silent Key KP_Left     A       C       GotoPage 0 1
+Silent Key KP_Begin    A       C       GotoPage 1 1
+Silent Key KP_Right    A       C       GotoPage 2 1
+Silent Key KP_End      A       C       GotoPage 0 2
+Silent Key KP_Down     A       C       GotoPage 1 2
+Silent Key KP_Next     A       C       GotoPage 2 2
+Silent Key KP_Insert   A       C       GotoPage prev
+Silent Key KP_Divide   A       C       GotoDesk 0 0
+Silent Key KP_Multiply A       C       GotoDesk 0 1
+Silent Key KP_Subtract A       C       GotoDesk 0 2
+Silent Key KP_Delete   A       C       GotoDeskAndPage prev
+#Key BackSpace          A       C       GotoDeskAndPage prev
+
+Key F1          A       C       GotoPage 0 0
+Key F2          A       C       GotoPage 1 0
+Key F3          A       C       GotoPage 2 0
+Key F4          A       C       GotoPage 0 1
+Key F5          A       C       GotoPage 1 1
+Key F6          A       C       GotoPage 2 1
+Key F7          A       C       GotoPage 0 2
+Key F8          A       C       GotoPage 1 2
+Key F9          A       C       GotoPage 2 2
+#Silent Key Home A       C       GotoPage prev
+Key F10         A       C       GotoDesk 0 0
+Silent Key F11  A       C       GotoDesk 0 1
+Silent Key SunF36 A     C       GotoDesk 0 1
+Silent Key F12  A       C       GotoDesk 0 2
+Silent Key SunF37 A     C       GotoDesk 0 2
+
+Key Delete      A       C       Menu MenuGotoDesktop
+Key Delete      A       4       Menu MenuGotoDesktop
+Key Escape      A       CM      Menu MenuGotoDesktop
+Key Delete      A       CS      Menu MenuTakeToDesktop
+Key Delete      A       4C      Menu MenuTakeToDesktop
+Key Escape      A       CS      Menu MenuTakeToDesktop
+Key Delete      A       MS      Menu MenuMoveToDesktop
+Key Delete      A       4M      Menu MenuMoveToDesktop
+Key Escape      A       MS      Menu MenuMoveToDesktop
+Key Escape      A       4       Menu MenuGotoDesktop Nop
+Key Escape      A       5       Menu MenuGotoDesktop Nop
+Key Delete      A       CM      Menu MenuFvwmQuitVerify Root c c
+
+Key BackSpace   A       4       GotoDeskAndPage prev
+Key BackSpace   A       5       GotoDeskAndPage prev
+
+Key F1          A       CS      FuncTakeToPage 0 0
+Key F2          A       CS      FuncTakeToPage 1 0
+Key F3          A       CS      FuncTakeToPage 2 0
+Key F4          A       CS      FuncTakeToPage 0 1
+Key F5          A       CS      FuncTakeToPage 1 1
+Key F6          A       CS      FuncTakeToPage 2 1
+Key F7          A       CS      FuncTakeToPage 0 2
+Key F8          A       CS      FuncTakeToPage 1 2
+Key F9          A       CS      FuncTakeToPage 2 2
+Silent Key Home A       CS      FuncTakeToPage prev
+Key F10         A       CS      FuncTakeToDesk 0 0
+Silent Key F11  A       CS      FuncTakeToDesk 0 1
+Silent Key SunF36 A     CS      FuncTakeToDesk 0 1
+Silent Key F12  A       CS      FuncTakeToDesk 0 2
+Silent Key SunF37 A     CS      FuncTakeToDesk 0 2
+
+# }}}2
+
+PipeRead "$HOME/bin/hostinfo --fvwm-keys"
+Key 0       A   CM      Exec exec favorite-app
+Key 1       A   CM      Exec exec sensible-browser http://www.google.com/
+Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
+Key 3       A   CM      FuncFvwmExec gaim "exec gaim"
+Key 4       A   CM      FuncFvwmIrcScreenSshXterm
+Key 6       A   CM      Exec exec xpenguins --nice .8 3
+Key 7       A   CM      Module FvwmConsole
+Key 9       A   CM      Exec exec aumix
+Key Space   A   CM      FuncFvwmScreenXterm
+
+Key 1       A   SCM     Exec exec sensible-browser
+Key 2       A   SCM     Exec sleep 1; xscreensaver-command -lock || exec xlock
+Key 3       A   SCM     Exec exec gaim -a
+Key 4       A   SCM     FuncFvwmIrcScreenXterm
+Key 6       A   SCM     Exec exec xpenguins -t "Big Penguins" --nice .8 3
+Key 7       A   SCM     Exec exec pkill -U $[USER] xpenguins
+Key 9       A   SCM     Exec tvtime || exec xawtv
+Key Space   A   SCM     FuncFvwmXterm
+Key G       A   SCM     Exec exec gaim -a
+Key W       A   SCM     Exec exec sensible-browser
+Key Z       A   SCM     Exec tvtime || exec xawtv
+
+Key Home    A   4       Exec exec aumix -w +5
+Key End     A   4       Exec exec aumix -w -5
+Key Home    A   5       Exec exec aumix -v +5
+Key End     A   5       Exec exec aumix -v -5
+
+Key KP_Home     A   4   Exec exec ssh homer br -n 1
+Key KP_Left     A   4   Exec exec ssh homer br -n 2
+Key KP_End      A   4   Exec exec ssh homer br -n 3
+Key KP_Insert   A   4   Exec exec ssh homer br -n 4
+Key KP_Up       A   4   Exec exec ssh homer br -f 1
+Key KP_Begin    A   4   Exec exec ssh homer br -f 2
+Key KP_Down     A   4   Exec exec ssh homer br -f 3
+Key KP_Prior    A   4   Exec exec ssh homer br -n 5
+Key KP_Right    A   4   Exec exec ssh homer br -f 5
+#Key KP_Divide   A   4   Exec exec ssh snowball irsend Send_Once Fan Osc
+#Key KP_Multiply A   4   Exec exec ssh snowball irsend Send_Once Fan On
+#Key KP_Prior    A   4   Exec exec ssh snowball irsend Send_Once Fan Mode
+#Key KP_Right    A   4   Exec exec ssh snowball irsend Send_Once Fan Timer
+#Key KP_Next     A   4   Exec exec ssh snowball irsend Send_Once Fan Off
+Key KP_Delete   A   4   Exec exec ssh homer br -F
+Key KP_Add      A   4   Exec exec ssh homer br -d +1
+Key KP_Subtract A   4   Exec exec ssh homer br -d -1
+
+# }}}1
+# Mouse Bindings {{{1
+# some simple default mouse bindings:
+#   for the root window:
+
+#Mouse 0 R A
+Mouse 1 R       A       Menu MenuFvwmRoot All [Transient] Raise
+#Mouse 2 R       A       Menu MenuFvwmWindowOps Nop
+Mouse 2 R A
+Mouse 2 R       S       StrokeFunc EchoSequence DrawMotion
+Mouse 3 R       A       WindowList
+
+Mouse 4 R       A       GotoDesk -1 0 2
+Mouse 5 R       A       GotoDesk +1 0 2
+
+#   for the title bar buttons:
+Mouse 1 1       A       Menu MenuFvwmWindowOps Close
+Mouse 2 1       A       Close
+Mouse 3 1       A       Menu MenuFvwmWindowOps Close
+Mouse 1 2       A       Maximize  100 -72p
+Mouse 2 2       A       Maximize  100  100
+Mouse 3 2       A       Maximize grow grow
+Mouse 1 4       A       FuncUnshadeAndIconify
+Mouse 2 4       A       Iconify
+Mouse 3 4       A       WindowShade
+
+#   for other parts of the window/borders/icons:
+Mouse 1 F       A       FuncResizeOrRaiseOrShade
+Mouse 1 TS      A       FuncMoveOrRaise
+Mouse 1 TSIFW   4       FuncMoveOrRaise
+Mouse 3 TSIFW   4       Menu MenuFvwmWindowOps Close
+Mouse 1 I       A       FuncMoveOrIconify
+Mouse 2 I       A       Iconify
+#Mouse 2 TSIF    A       StrokeFunc DrawMotion
+#Mouse 2 TSIF    S       StrokeFunc EchoSequence DrawMotion
+Mouse 2 TSIF    A       FuncResizeOrRaiseOrShade
+Mouse 3 TSF     A       Menu MenuFvwmWindowOps RaiseLower
+Mouse 4 T       A       FuncTakeToDesk -1 0 2
+Mouse 5 T       A       FuncTakeToDesk +1 0 2
+
+# Strokes {{{2
+
+#Stroke 7415963  0 R     A Exec exec sensible-browser
+
+Stroke 25852    2 R     N GotoPage 0p +1p
+Stroke 258      2 R     N GotoPage 0p +1p
+Stroke 85258    2 R     N GotoPage 0p -1p
+Stroke 852      2 R     N GotoPage 0p -1p
+Stroke 45654    2 R     N GotoPage +1p 0p
+Stroke 456      2 R     N GotoPage +1p 0p
+Stroke 65456    2 R     N GotoPage -1p 0p
+Stroke 654      2 R     N GotoPage -1p 0p
+Stroke 15951    2 R     N GotoDesk +1 0 2
+Stroke 123696321 2 R    N GotoDesk +1 0 2
+Stroke 147898741 2 R    N GotoDesk +1 0 2
+Stroke 159      2 R     N GotoDesk +1 0 2
+Stroke 1259     2 R     N GotoDesk +1 0 2
+Stroke 1589     2 R     N GotoDesk +1 0 2
+Stroke 12369    2 R     N GotoDesk +1 0 2
+Stroke 14789    2 R     N GotoDesk +1 0 2
+Stroke 95159    2 R     N GotoDesk -1 0 2
+Stroke 987414789 2 R    N GotoDesk -1 0 2
+Stroke 963212369 2 R    N GotoDesk -1 0 2
+Stroke 951      2 R     N GotoDesk -1 0 2
+Stroke 9541     2 R     N GotoDesk -1 0 2
+Stroke 9541     2 R     N GotoDesk -1 0 2
+Stroke 9651     2 R     N GotoDesk -1 0 2
+Stroke 96521    2 R     N GotoDesk -1 0 2
+Stroke 98741    2 R     N GotoDesk -1 0 2
+Stroke 96321    2 R     N GotoDesk -1 0 2
+Stroke 357      2 R     N All [CurrentPage !Fvwm*] Iconify
+Stroke 32147    2 R     N All [CurrentPage !Fvwm*] Iconify true
+Stroke 36987    2 R     N All [CurrentPage !Fvwm*] Iconify false
+Stroke 1478963  2 R     N Exec exec xmag
+Stroke 3698741  2 R     N Exec exec xzoom
+
+Stroke 25852    0 TSIF  A MoveToPage 0p +1p
+Stroke 258      0 TSIF  A FuncTakeToPage 0p +1p
+Stroke 85258    0 TSIF  A MoveToPage 0p -1p
+Stroke 852      0 TSIF  A FuncTakeToPage 0p -1p
+Stroke 45654    0 TSIF  A MoveToPage +1p 0p
+Stroke 456      0 TSIF  A FuncTakeToPage +1p 0p
+Stroke 65456    0 TSIF  A MoveToPage -1p 0p
+Stroke 654      0 TSIF  A FuncTakeToPage -1p 0p
+Stroke 15951    0 TSIF  A MoveToDesk +1 0 2
+Stroke 123696321 0 TSIF A MoveToDesk +1 0 2
+Stroke 147898741 0 TSIF A MoveToDesk +1 0 2
+Stroke 159      0 TSIF  A FuncTakeToDesk +1 0 2
+Stroke 1259     0 TSIF  A FuncTakeToDesk +1 0 2
+Stroke 1589     0 TSIF  A FuncTakeToDesk +1 0 2
+Stroke 12369    0 TSIF  A FuncTakeToDesk +1 0 2
+Stroke 14789    0 TSIF  A FuncTakeToDesk +1 0 2
+Stroke 95159    0 TSIF  A MoveToDesk -1 0 2
+Stroke 987414789 0 TSIF A MoveToDesk -1 0 2
+Stroke 963212369 0 TSIF A MoveToDesk -1 0 2
+Stroke 951      0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 9521     0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 9541     0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 9651     0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 96521    0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 98741    0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 96321    0 TSIF  A FuncTakeToDesk -1 0 2
+Stroke 357      0 TSIF  N Iconify
+Stroke 32147    0 TSIF  N Iconify
+Stroke 36987    0 TSIF  N Iconify
+Stroke 35753    0 TSIF  N WindowShade
+Stroke 321474123 0 TSIF N WindowShade
+Stroke 369878963 0 TSIF N WindowShade
+
+Stroke 21478962 2 R     A Restart
+Stroke 21478963 2 R     A Restart
+Stroke 214789632 2 R    A Restart
+Stroke 321478963 2 R    A Restart
+Stroke 3214789632 2 R   A Restart
+Stroke 0        0 R     N Menu MenuFvwmRoot Nop
+Stroke 0        0 TSF   N FuncResizeOrRaiseOrShade
+Stroke 0        0 I     N Menu MenuFvwmWindowOps Iconify
+Stroke 0        1 R     A Menu MenuFvwmRoot Nop
+Stroke 0        2 R     A Menu MenuFvwmWindowOps Nop
+Stroke 0        3 R     A WindowList
+# }}}2
+# }}}1
+# Initialization Functions {{{1
+
+AddToFunc StartFunction
++ I ModuleSynchronous Timeout 5 FvwmTheme
++ I Module FvwmAnimate
++ I Module FvwmAuto 1500
++ I Module FvwmBacker
++ I Module FvwmButtons
++ I Module FvwmCommandS
++ I Module FvwmEvent
++ I UnsetEnv fvwm_titlefont
++ I UnsetEnv fvwm_iconfont 
+#+ I UnsetEnv fvwm_datefont
+#+ I UnsetEnv fvwm_timefont
+#+ I UnsetEnv fvwm_alertfont
++ I UnsetEnv fvwm_smallfont
+
+DestroyFunc InitFunction
+AddToFunc InitFunction
++ I exec xsetroot -solid '#003030'
++ I Module FvwmBanner
++ I DestroyFunc FuncSmartQuit
+PipeRead 'if test -x /usr/dt/bin/dtaction; then echo + I AddToFunc FuncSmartQuit I Exec exec /usr/dt/bin/dtaction ExitSession; else echo  + I AddToFunc FuncSmartQuit I Quit; fi'
++ I Exec test -x /usr/bin/ssh-add -a -S "$SSH_AUTH_SOCK" && exec /usr/bin/ssh-add
+
+DestroyFunc RestartFunction
+AddToFunc RestartFunction
++ I DestroyFunc FuncSmartQuit
+PipeRead 'if test -x /usr/dt/bin/dtaction; then echo + I AddToFunc FuncSmartQuit I Exec exec /usr/dt/bin/dtaction ExitSession; else echo  + I AddToFunc FuncSmartQuit I Quit; fi'
+
+AddToFunc SessionInitFunction
++ I exec xsetroot -solid '#003030'
++ I DestroyFunc FuncSmartQuit
++ I AddToFunc FuncSmartQuit I QuitSession
++ I AddToFunc FuncSmartQuit I Exec exec pkill -TERM -U $[USER] xsm >/dev/null 2>&1
++ I Exec test -x /usr/bin/ssh-add -a -S "$SSH_AUTH_SOCK" && exec /usr/bin/ssh-add
+
+AddToFunc SessionRestartFunction
++ I DestroyFunc FuncSmartQuit
++ I AddToFunc FuncSmartQuit I QuitSession
++ I AddToFunc FuncSmartQuit I Exec exec pkill -TERM -U $[USER] xsm >/dev/null 2>&1
+
+# }}}1
+# Menus {{{1
+DestroyMenu MenuFvwmRoot
+AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
++       "X &Terminal%menu/terminal.xpm%"       FuncFvwmScreenXterm
++       "&Web Browser%menu/www.xpm%"           Exec sensible-browser http://www.google.com/
++       "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
++       ""              Nop
++       "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins
++       "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens
++       ""              Nop
++       "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
++       "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
+PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian'
+PipeRead 'test -e "$KDEDIR" -o -e /usr/share/applnk && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
+PipeRead 'test -e /usr/share/gnome/apps && echo + \\"\\&GNOME%menu/gnome.xpm%\\" Popup Gnome-sys'
++       "&Headlines%menu/news.xpm"          Popup MenuHeadlines
++       ""              Nop
++       "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
++       "Fvwm Config &Ops%menu/configuration.xpm%" Popup MenuFvwmConfig
++       "Re&fresh Screen%menu/refresh.xpm%" Refresh
++       "R&ecapture Screen%menu/display.xpm%" Recapture
++       ""              Nop
++       "E&xit Fvwm%menu/quit.xpm%"         Popup MenuFvwmQuitVerify
+
+DestroyMenu Kde-sys
+AddToMenu Kde-sys
++ DynamicPopupAction PipeRead '[ -z "$KDEDIR" ] && export KDEDIR=/usr; fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --destroy-type dynamic'
+
+DestroyMenu Gnome-sys
+AddToMenu Gnome-sys
++ DynamicPopupAction PipeRead 'fvwm-menu-desktop --desktop gnome-sys --merge-user-menu --enable-mini-icons --destroy-type dynamic'
+
+DestroyMenu MenuFvwmPrograms
+AddToMenu MenuFvwmPrograms "Programs" Title
++       "&UT2004%menu/game-action.xpm%"     Exec exec ut2004
++       "&IRC%menu/chat.xpm%"     FuncFvwmIrcScreenSshXterm
+
+DestroyMenu MenuFvwmUtilities
+AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
++       "&XTerm%mini.xterm.xpm%"     Exec exec xterm -T localhost -n localhost
++       "&Calculator%menu/calculator.xpm%" Exec exec xcalc
++       "X&mag%menu/viewer.xpm%"     Exec exec xmag
++       "Edit&res%menu/unknown.xpm%" Exec exec editres
++       ""                           Nop
++       "G&vim%mini.vim.xpm%"        Exec exec vim -g
++       "M&utt%mutt.mini.xpm%"       Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
++       "Ga&im%mini.gaim.xpm%"       Exec exec gaim
++       "X&awtv%menu/video.xpm%"     Exec xawtv || exec tvtime
++       "&Gimp%menu/gimp.xpm%"       FuncFvwmExec gimp* "gimp-2.0 || exec gimp"
++       ""                           Nop
++       "&Firefox%mozilla.mini.xpm%" Exec mozilla-firebird || exec firefox
++       "&Konqueror%mini.kde.xpm%"   Exec exec konqueror about:blank
++       "M&ozilla%mozilla.mini.xpm%" Exec exec mozilla
++       "&Netscape%mini.netscape.xpm%" Exec exec netscape
++       ""                           Nop
++       "X&Lock%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
++       "&Screenshot%menu/windows.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
++       ""              Nop
++       "Reset X &Defaults%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xdefaults
+
+# Remote Logins and Screens {{{2
+PipeRead "$HOME/bin/hostinfo --fvwm-menus"
+# }}}2
+# Fvwm Menus {{{2
+
+DestroyMenu MenuFvwmConfig
+AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
++ "Fvwm &Modules"           Popup MenuFvwmModules
++ "Stop Fvwm Mo&dule"       Popup MenuFvwmStopModule
++ "" Nop
++ "&Sloppy Focus"           FuncFvwmFocusPolicyChange SloppyFocus
++ "&Click To Focus"         FuncFvwmFocusPolicyChange ClickToFocus
++ "&Focus Follows Mouse"    FuncFvwmFocusPolicyChange FocusFollowsMouse
++ "" Nop
++ "Co&lormap Follows Mouse" ColormapFocus FollowsMouse
++ "Colormap Follows F&ocus" ColormapFocus FollowsFocus
++ "" Nop
++ "&All Paging OFF"           EdgeScroll 0 0
++ "F&ull Paging"              EdgeScroll 100 100
++ "&Horizontal Paging Only"   EdgeScroll 100 0
++ "&Vertical Paging Only"     EdgeScroll 0 100
++ "&Partial Paging"           EdgeScroll 50 50
++ "Full Paging && &Edge Wrap" EdgeScroll 100000 100000
+
+DestroyFunc FuncFvwmFocusPolicyChange
+AddToFunc FuncFvwmFocusPolicyChange
++ I Style * $0
++ I Recapture
+
+DestroyMenu MenuFvwmModules
+AddToMenu MenuFvwmModules "Fvwm Modules"        Title
++ "&Gkrellm"            Module FvwmButtons FvwmButtonsGkrellm
++ "Control &Animation"  Popup  MenuFvwmAnimate
++ "&Button-Bar"         Module FvwmButtons
++ "Ic&onBox"            FuncFvwmConfigureIconBox
+#+ "&Forms"              Popup  MenuFvwmForms
++ "&Identify"           Module FvwmIdent
++ "Icon&Man"            Module FvwmIconMan
++ "Ba&nner"             Module FvwmBanner
++ "&Console"            Module FvwmConsole
++ "&Pager"              Module FvwmPager *
++ "Pager (&3 desks)"    Module FvwmPager 0 2
++ "Backe&r"             Module FvwmBacker
+#+ "&ScrollBar"          Module FvwmScroll 50 50
++ "&TaskBar"            Module FvwmTaskBar
++ "A&utoRaise"          Module FvwmAuto 200 Raise Nop
++ "&WinList"            Module FvwmWinList
+
+DestroyMenu MenuFvwmStopModule
+AddToMenu MenuFvwmStopModule "Stop Fvwm Modules" Title
++ "Stop &Button-Bar"  KillModule FvwmButtons
++ "Stop Ic&onBox"     KillModule FvwmIconBox
++ "Stop Icon&Man"     KillModule FvwmIconMan
++ "Stop &Pager"       KillModule FvwmPager
++ "Stop &Backer"      KillModule FvwmBacker
++ "Stop &ScrollBar"   KillModule FvwmScroll
++ "Stop &TaskBar"     KillModule FvwmTaskBar
++ "Stop A&utoRaise"   KillModule FvwmAuto
++ "Stop &WinList"     KillModule FvwmWinList
+
+
+# Configure and start using an iconbox on the fly
+DestroyFunc FuncFvwmConfigureIconBox
+AddToFunc FuncFvwmConfigureIconBox
++ I Module FvwmIconBox
+#+ I Style     *  NoIcon
+
+# }}}2
+
+DestroyMenu MenuFvwmQuitVerify
+AddToMenu MenuFvwmQuitVerify "Really Quit Fvwm?" Title
++ "&No, Don't Quit%menu/choice-no.xpm%"   Nop
++ "&Restart%menu/restart.xpm%"            Restart
++ "Yes, Really &Quit%menu/choice-yes.xpm%" FuncSmartQuit
++ ""                     Nop
++ "Start &TWM%mini.twm.xpm%"        Restart twm
++ "Start &KDE%mini.kde.xpm%"       Restart startkde
++ "&Just an XTerm%mini.xterm.xpm%"    Restart xterm -n '"X Console"' -T '"X Console"'
+
+DestroyMenu MenuGotoDesktop
+AddToMenu MenuGotoDesktop "*mini.desktop.xpm*" Title
+PipeRead 'for i in `seq 0 26`; do echo + \\"\\&\
+`expr substr " ABCDEFGHIJKLMNOPQRSTUVWXYZ" \\( $i + 1 \\) 1`\\" \
+ GotoDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+
+DestroyMenu MenuMoveToDesktop
+AddToMenu MenuMoveToDesktop "*mini.book3.xpm*" Title
+PipeRead 'for i in `seq 0 26`; do echo + \\"\\&\
+`expr substr " ABCDEFGHIJKLMNOPQRSTUVWXYZ" \\( $i + 1 \\) 1`\\" \
+ FuncMoveToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+
+DestroyMenu MenuTakeToDesktop
+AddToMenu MenuTakeToDesktop "*mini.book4.xpm*" Title
+PipeRead 'for i in `seq 0 26`; do echo + \\"\\&\
+`expr substr " ABCDEFGHIJKLMNOPQRSTUVWXYZ" \\( $i + 1 \\) 1`\\" \
+ FuncTakeToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+
+
+DestroyMenu MenuHeadlines
+AddToMenu   MenuHeadlines "Headlines" Title
++ MissingSubmenuFunction FuncMenuHeadlines
++ "Slashdot"   Popup slashdot
++ "Kuro5hin"   Popup kuro5hin
++ "BBSpot"     Popup bbspot
++ "FreshMeat"  Popup freshmeat
++ "LinuxToday" Popup linuxtoday
++ "KDE News"   Popup kde-news
++ "CNN"        Popup cnn
++ ""           Nop
++ "Reset all"  FuncResetHeadlines
+
+# Window Operations Menu {{{2
+DestroyMenu MenuFvwmWindowOps
+AddToMenu MenuFvwmWindowOps
++ "&Move	   M-F7%menu/window-move.xpm%"          Move
++ "&Resize	   M-F8%menu/window-resize.xpm%"        Resize
++ "R&aise	   M-F5%menu/window-raise.xpm%"         Raise
++ "&Lower	   M-F3%menu/window-lower.xpm%"         Lower
++ "(De)&Iconify	   M-F9%menu/window-iconify.xpm%"       Iconify
++ "(Un)Ma&ximize	   M-F10%menu/window-maximize.xpm%" Maximize
++ "(Un)&Stick	   M-F11%menu/window-stick.xpm%"        Stick
++ "(Un)S&hade	   M-F12%menu/window-shade.xpm%"        WindowShade
++ ""                                                    Nop
++ "Re&fresh	S-M-F7%menu/refresh.xpm%"               RefreshWindow
++ "R&ecapture	S-M-F8%menu/display.xpm%"               RecaptureWindow
++ "Identif&y	S-M-F9%menu/window-identify.xpm%"       Module FvwmIdent
++ "Scroll&Bar	S-M-F11%mini.move.xpm%"                 Module FvwmScroll 2 2
++ "Ca&pture	C-Print%mini.camera.xpm%"               Pick FuncCaptureWindow
++ ""                                                    Nop
++ "&Take To Desk	 S-C-Del%mini.book4.xpm%"       Popup MenuTakeToDesktop
++ "Mo&ve To Desk	S-M-Del%mini.book3.xpm%"        Popup MenuMoveToDesktop
++ ""                                                    Nop
++ "&Delete	S-M-F12%menu/window-delete.xpm%"        Delete
++ "&Close	   M-F4%menu/window-close.xpm%"         Close
++ "Destroy	S-M-F4%menu/window-destroy.xpm%"        Destroy
+
+# }}}2
+# }}}1
+# Functions {{{1
+# FuncDeiconifyAndRearrange {{{2
+DestroyFunc FuncDeiconifyAndRearrange
+AddToFunc FuncDeiconifyAndRearrange
++ I Iconify off
++ I All (CurrentPage Iconic) PlaceAgain Icon
+#}}}2
+# FuncMoveOrRaise {{{2
+DestroyFunc FuncMoveOrRaise
+AddToFunc FuncMoveOrRaise
++ I Focus
++ I Raise
++ M Move
++ D Lower
+# }}}2
+# FuncMaximize {{{2
+DestroyFunc FuncMaximize
+AddToFunc FuncMaximize
++ M Maximize   0 100
++ H Maximize   0 100
++ C Maximize 100  90
++ D Maximize 100 100
+# }}}2
+# FuncMoveOrIconify {{{2
+DestroyFunc FuncMoveOrIconify
+AddToFunc FuncMoveOrIconify
++ I Raise
++ M Move
++ D Iconify
+# }}}2
+# FuncResizeOrRaiseOrShade {{{2
+DestroyFunc FuncResizeOrRaiseOrShade
+AddToFunc FuncResizeOrRaiseOrShade
++ I Raise
++ M Resize
++ D WindowShade
+# }}}2
+# FuncUnshadeAndIconify {{{2
+DestroyFunc FuncUnshadeAndIconify
+AddToFunc FuncUnshadeAndIconify
++ I WindowShade false
++ I Iconify
+# }}}2
+# FuncRestore {{{2
+DestroyFunc FuncRestore
+AddToFunc FuncRestore
++ I Maximize false
++ I WindowShade false
++ I Iconify false
+# }}}2
+# FuncWindowWarp {{{2
+DestroyFunc FuncWindowWarp
+AddToFunc FuncWindowWarp
++ I WindowId root 1 WarpToWindow $*
++ I PointerWindow Focus
++ I PointerWindow WarpToWindow 25p 7p
+# }}}2
+# WindowListFunc {{{2
+DestroyFunc WindowListFunc
+AddToFunc WindowListFunc
++ I FuncDeiconifyAndRearrange
++ I FlipFocus
++ I Raise
++ I WarpToWindow 25p 7p
+# }}}2
+# FuncFocusWindow {{{2
+DestroyFunc FuncFocusWindow
+AddToFunc FuncFocusWindow
++ I FuncDeiconifyAndRearrange
++ I Focus
++ I Raise
++ I WarpToWindow 25p 7p
+
+DestroyFunc FuncFlipFocusWindow
+AddToFunc FuncFlipFocusWindow
++ I FuncDeiconifyAndRearrange
++ I FlipFocus
++ I Raise
++ I WarpToWindow 25p 7p
+# }}}2
+# FuncCaptureWindow {{{2
+DestroyFunc FuncCaptureWindow
+AddToFunc FuncCaptureWindow
++ I Exec exec import -window $[w.id] $[HOME]/$[w.id]-`date +%Y-%m-%d_%H-%M-%S`.png
+# }}}2
+# Desktop Functions {{{2
+DestroyFunc FuncTakeToPage
+AddToFunc FuncTakeToPage
++ I Raise
++ I MoveToPage $*
++ I GoToPage $*
+
+DestroyFunc FuncTakeToDesk
+AddToFunc FuncTakeToDesk
++ I Raise
++ I MoveToDesk $*
++ I GoToDesk $*
++ I Focus
+
+DestroyFunc FuncTakeToDeskAndPage
+AddToFunc FuncTakeToDeskAndPage
++ I MoveToDesk 0 $0
++ I MoveToPage $1 $2
++ I GotoDeskAndPage $0 $1 $2
+
+DestroyFunc FuncMoveToDeskAndPage
+AddToFunc FuncMoveToDeskAndPage
++ I MoveToDesk 0 $0
++ I MoveToPage $1 $2
+
+DestroyFunc FuncGotoPrevDeskAndPage
+AddToFunc FuncGotoPrevDeskAndPage
++ I GoToPage prev
++ I GoToDesk prev
+
+DestroyFunc FuncTakeToPrevDeskAndPage
+AddToFunc FuncTakeToPrevDeskAndPage
++ I Raise
++ I MoveToPage prev
++ I MoveToDesk prev
++ I GotoPage prev
++ I GotoDesk prev
+# }}}2
+# Xterm Functions {{{2
+DestroyFunc FuncFvwmXterm
+AddToFunc FuncFvwmXterm
++ I Exec exec x-terminal-emulator -T localhost -n localhost
+DestroyFunc FuncFvwmScreenXterm
+AddToFunc FuncFvwmScreenXterm
++ I Next (screen@localhost) Iconify off
++ I Next (screen@localhost, AcceptsFocus) Focus
++ I None (screen@localhost) Exec exec x-terminal-emulator -T screen@localhost -n screen@localhost -e screen -RR
+DestroyFunc FuncFvwmSshXterm
+AddToFunc FuncFvwmSshXterm
++ I Exec exec x-terminal-emulator -ut -T ssh@$0 -n ssh@$0 -e hostinfo -S $0 -t
+DestroyFunc FuncFvwmScreenSshXterm
+AddToFunc FuncFvwmScreenSshXterm
++ I Next (screen-ssh@$0) Iconify off
++ I Next (screen-ssh@$0, AcceptsFocus) Focus
++ I None (screen-ssh@$0) Exec exec x-terminal-emulator -ut -T screen-ssh@$0 -n screen-ssh@$0 -e hostinfo -S $0 -t screen -RR
+DestroyFunc FuncFvwmXtermSsh
+AddToFunc FuncFvwmXtermSsh
++ I Exec exec ssh -X $0 xterm
+# }}}2
+# Application Functions {{{2
+DestroyFunc FuncFvwmWebBrowser
+AddToFunc FuncFvwmWebBrowser
++ I Exec exec sensible-browser $*
++ I Next (Mozilla*) Iconify off
++ I Next (Mozilla*, AcceptsFocus) Focus
+
+DestroyFunc FuncFvwmIrcScreenSshXterm
+AddToFunc FuncFvwmIrcScreenSshXterm
++ I Next (screen-irc@mona) Iconify off
++ I Next (screen-irc@mona, AcceptsFocus) Focus
++ I None (screen-irc@mona) Exec exec x-terminal-emulator -ut -T screen-irc@mona -n screen-irc@mona -e hostinfo -S mona -t sh -c "'DISPLAY=:0.0 exec screen -xRR irc irssi'"
+
+DestroyFunc FuncFvwmIrcScreenIrcXterm
+AddToFunc FuncFvwmIrcScreenXterm
++ I Next (screen-irc@localhost) Iconify off
++ I Next (screen-irc@localhost, AcceptsFocus) Focus
++ I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -T screen-irc@localhost -n screen-irc@localhost -e screen -xRR irc irssi
+
+DestroyFunc FuncFvwmExec
+AddToFunc FuncFvwmExec
++ I Next ($0) Iconify off
++ I Next ($0, AcceptsFocus) Focus
++ I None ($0) Exec $1
+# }}}2
+# Headline Functions {{{2
+DestroyFunc FuncMenuHeadlines
+AddToFunc   FuncMenuHeadlines
++ I PipeRead "fvwm-menu-headlines --site $0 --wm-icons --exec='sensible-browser %u'"
+
+DestroyFunc FuncResetHeadlines
+AddToFunc   FuncResetHeadlines
++ I DestroyMenu slashdot
++ I DestroyMenu kuro5hin
++ I DestroyMenu bbspot
++ I DestroyMenu freshmeat
++ I DestroyMenu linuxtoday
++ I DestroyMenu kde-news
++ I DestroyMenu cnn
+# }}}2
+# }}}1
+# Modules Config {{{1
+# FvwmBacker Config {{{2
+
+DestroyFunc FuncSetRootAPM
+AddToFunc FuncSetRootAPM I Piperead "\
+ if test -x /usr/bin/apm && /usr/bin/apm 2>/dev/null | grep \
+    'AC off-line, battery status high' >/dev/null 2>/dev/null; then \
+  xsetroot -solid rgb:`expr substr 369 $0 1`0/`expr substr 369 $1 1`0/`expr substr 369 $2 1`0; \
+ elif test -x /usr/bin/apm && /usr/bin/apm 2>/dev/null | grep \
+    'AC off-line, battery status ' >/dev/null 2>/dev/null; then \
+  xsetroot -solid black; \
+ else \
+  xsetroot -solid rgb:`expr substr 48C $0 1`0/`expr substr 48C $1 1`0/`expr substr 48C $2 1`0; \
+ fi >/dev/null 2>/dev/null"
+
+DestroyModuleConfig FvwmBacker: *
+
+*FvwmBacker: Command (Desk 0, Page 0 0) FuncSetRootAPM 0 1 1
+*FvwmBacker: Command (Desk 0, Page 1 0) FuncSetRootAPM 0 1 2
+*FvwmBacker: Command (Desk 0, Page 2 0) FuncSetRootAPM 0 1 3
+*FvwmBacker: Command (Desk 0, Page 0 1) FuncSetRootAPM 0 2 1
+*FvwmBacker: Command (Desk 0, Page 1 1) FuncSetRootAPM 0 2 2
+*FvwmBacker: Command (Desk 0, Page 2 1) FuncSetRootAPM 0 2 3
+*FvwmBacker: Command (Desk 0, Page 0 2) FuncSetRootAPM 0 3 1
+*FvwmBacker: Command (Desk 0, Page 1 2) FuncSetRootAPM 0 3 2
+*FvwmBacker: Command (Desk 0, Page 2 2) FuncSetRootAPM 0 3 3
+
+*FvwmBacker: Command (Desk 1, Page 0 0) FuncSetRootAPM 1 1 0
+*FvwmBacker: Command (Desk 1, Page 1 0) FuncSetRootAPM 1 2 0
+*FvwmBacker: Command (Desk 1, Page 2 0) FuncSetRootAPM 1 3 0
+*FvwmBacker: Command (Desk 1, Page 0 1) FuncSetRootAPM 2 1 0
+*FvwmBacker: Command (Desk 1, Page 1 1) FuncSetRootAPM 2 2 0
+*FvwmBacker: Command (Desk 1, Page 2 1) FuncSetRootAPM 2 3 0
+*FvwmBacker: Command (Desk 1, Page 0 2) FuncSetRootAPM 3 1 0
+*FvwmBacker: Command (Desk 1, Page 1 2) FuncSetRootAPM 3 2 0
+*FvwmBacker: Command (Desk 1, Page 2 2) FuncSetRootAPM 3 3 0
+
+*FvwmBacker: Command (Desk 2, Page 0 0) FuncSetRootAPM 1 0 1
+*FvwmBacker: Command (Desk 2, Page 1 0) FuncSetRootAPM 2 0 1
+*FvwmBacker: Command (Desk 2, Page 2 0) FuncSetRootAPM 3 0 1
+*FvwmBacker: Command (Desk 2, Page 0 1) FuncSetRootAPM 1 0 2
+*FvwmBacker: Command (Desk 2, Page 1 1) FuncSetRootAPM 2 0 2
+*FvwmBacker: Command (Desk 2, Page 2 1) FuncSetRootAPM 3 0 2
+*FvwmBacker: Command (Desk 2, Page 0 2) FuncSetRootAPM 1 0 3
+*FvwmBacker: Command (Desk 2, Page 1 2) FuncSetRootAPM 2 0 3
+*FvwmBacker: Command (Desk 2, Page 2 2) FuncSetRootAPM 3 0 3
+
+# }}}2
+# FvwmButtons Config {{{2
+#+--+--+-------------------------+-------+
+#|< |/\|day MMM DD hh:mm:ss CCYY |gkrellm|
+#+--+--+-----+-----+-----+-------+-+-----+
+#|           | 2nd |xeyes|         | o o |
+#|   First   |     |     |         |  >  |
+#|           +-----+-----+  xbiff  | \_/ |
+#|   Pager   | 3rd |xload|         |     |
+#|           |     |     |         |tpope|
+#+-----------+-----+-----+---------+-----+
+KillModule FvwmButtons
+DestroyModuleConfig FvwmButtons: *
+*FvwmButtons: ButtonGeometry 4x4-0-0
+#*FvwmButtons: Geometry -0-0
+*FvwmButtons: Back PaleTurquoise
+*FvwmButtons: Fore Black
+*FvwmButtons: Rows 16
+*FvwmButtons: Font $[fvwm_smallfont]
+*FvwmButtons: Padding 0 0
+#*FvwmButtons: (2x2, Padding 4 1, Panel(up, indicator, position Button -450 -0p, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
+*FvwmButtons: (28x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
+#*FvwmButtons: (16x2, Padding 1 2, Frame 1, Swallow(UseOld,NoHints,Respawn) "xclock" "Exec xclock -d -padding 0 -fn $[SMALLFONT] -fa '$[SMALLXFTFONT]' -update 1 -bg PaleTurquoise -fg black -g -3000-3000 >/dev/null || exec xclock -d -padding 1 -fn $[SMALLFONT] -update 1 -bg PaleTurquoise -fg black -g -3000-3000")
+*FvwmButtons: (9x5, Padding 0 1, Frame 0, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
+*FvwmButtons: (4x6, Padding 1 6, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
+#*FvwmButtons: (4x2, Padding 1 1, Panel(up, indicator, position Button mtb mlr right 0 -2p, UseOld, NoClose) gkrellm "Exec exec gkrellm -g -0+0")
+*FvwmButtons: (24x12, Frame 0, Padding 0 0, Container(Rows 6, Columns 12, Frame 0, Padding 0 0, Fore black, Back black))
+*FvwmButtons: (8x6, Padding 1 0, Back black, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineA" "Module FvwmPager FvwmPagerInlineA 0")
+*FvwmButtons: (4x6, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineB" "Module FvwmPager FvwmPagerInlineB 1 2")
+*FvwmButtons: (End)
+#*FvwmButtons: (4x3, Frame 0, Swallow(UseOld,NoHints,Respawn) "xeyes" `Exec exec xeyes -geometry -3000-3000`)
+#*FvwmButtons: (4x2, Frame 0, Padding 0 0, Title $[USER], Action FuncFvwmScreenXterm)
+#PipeRead "echo -n '*FvwmButtons: (6x6, Frame 0, Padding 0 0, \
+#    Swallow(UseOld,NoHints,Respawn) '; \
+#    if glxinfo 2>/dev/null|grep 'direct rendering: Yes' >/dev/null && \
+#        test -x /usr/bin/X11/glbiff; \
+#    then echo 'glbiff `Exec exec glbiff -geometry -3000-3000`)'; \
+#    else echo 'xbiff `Exec exec xbiff -shape -geometry -3000-3000`)'; fi"
+#*FvwmButtons: (6x6, Frame 0, Padding 0 0, Container(Font fixed, Rows 1, Columns 1, Frame 0, Padding 0 0 ))
+*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action FuncFvwmWebBrowser http://www.google.com/)
+#*FvwmButtons: (4x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "xload" "Exec exec xload -bg PaleTurquoise -fg black -hl blue -update 5 -nolabel -jumpscroll 1 -g -3000-3000")
+*FvwmButtons: (4x6, Padding 1 6, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
+#*FvwmButtons: (4x3, Frame 0, Swallow(UseOld) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 2")
+# }}}2
+# FvwmButtonsGkrellm Config {{{2
+#*FvwmButtonsGkrellm: Geometry 360x331-0+0
+DestroyModuleConfig FvwmButtonsGkrellm: *
+*FvwmButtonsGkrellm: Back #404040
+*FvwmButtonsGkrellm: Rows 1
+*FvwmButtonsGkrellm: Frame 0
+*FvwmButtonsGkrellm: ButtonGeometry 72x335-0+0
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-maggie" `Exec exec ssh -oBatchmode=yes -X maggie gkrellm -w`)
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-bart" `Exec exec ssh -oBatchmode=yes -X bart gkrellm -w`)
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-lisa" `Exec exec ssh -oBatchmode=yes -X lisa gkrellm -w`)
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-marge" `Exec exec ssh -oBatchmode=yes -X marge gkrellm -w`)
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-homer" `Exec exec ssh -oBatchmode=yes -X homer gkrellm -w`)
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-abe" `Exec exec ssh -oBatchmode=yes -X abe gkrellm -w`)
+*FvwmButtonsGkrellm: (Swallow(UseOld,Respawn) "gkrellm-mona" `Exec exec ssh -oBatchmode=yes -X mona gkrellm -w`)
+# }}}2
+# FvwmEvent Config {{{2
+DestroyModuleConfig FvwmEvent: *
+*FvwmEvent: Cmd "Exec exec sdplay"
+*FvwmEvent: StartDelay 3
+#*FvwmEvent: PassId
+*FvwmEvent: startup /usr/lib/openoffice/share/gallery/sounds/curve.wav
+*FvwmEvent: shutdown /usr/lib/openoffice/share/gallery/sounds/beam.wav
+#*FvwmEvent: unknown /usr/lib/openoffice/share/gallery/sounds/ok.wav
+#Piperead "for event in `strings /usr/lib/fvwm/2.4.16/FvwmEvent|sed -ne '/new_page/,/unknown/p'|egrep -v 'window_name|icon_name|old_configure_window'`; do echo -n '*FvwmEvent:' $event \\'; echo $event\\'|sed -e 's/_/ /g'; done"
+#*FvwmEvent: iconify /usr/lib/openoffice/share/gallery/sounds/ok.wav
+#*FvwmEvent: deiconify bong.au
+# }}}2
+# FvwmIconMan Config {{{2
+# this FvwmIconMan setup is for swallowing in button bar example
+DestroyModuleConfig FvwmIconMan: *
+*FvwmIconMan: *numManagers 1
+*FvwmIconMan: *Resolution  page
+*FvwmIconMan: *Background  PaleTurquoise
+*FvwmIconMan: *Foreground  black
+*FvwmIconMan: *Format      "%t"
+*FvwmIconMan: *Font        "$[fvwm_iconfont]"
+*FvwmIconMan: *Action      Mouse   1 A sendcommand "FlipFocus"
+*FvwmIconMan: *Action      Mouse   2 A sendcommand "Iconify"
+*FvwmIconMan: *Action      Mouse   3 A sendcommand "Menu MenuFvwmWindowOps Nop"
+*FvwmIconMan: *FollowFocus true
+*FvwmIconMan: *Sort        none
+*FvwmIconMan: *PlainButton          flat black LightSkyBlue
+*FvwmIconMan: *IconButton           flat black LightSteelBlue
+*FvwmIconMan: *SelectButton         flat black LightSlateBlue
+*FvwmIconMan: *FocusButton          flat yellow NavyBlue
+*FvwmIconMan: *FocusAndSelectButton flat yellow Blue
+*FvwmIconMan: *TitleButton	    flat PaleTurquoise PaleTurquoise
+*FvwmIconMan: *DontShow icon=Untitled resource=Untitled
+*FvwmIconMan: *DrawIcons always
+*FvwmIconMan: *ButtonGeometry  188x21
+#*FvwmIconMan: *ButtonGeometry  228x21
+*FvwmIconMan: *ManagerGeometry 1x3+3000+3000
+# }}}2
+# FvwmPager Config {{{2
+
+DestroyModuleConfig FvwmPagerInlineA: *
+*FvwmPagerInlineA: Rows 1
+*FvwmPagerInlineA: Columns 1
+*FvwmPagerInlineA: Geometry 144x48-3000-3000
+*FvwmPagerInlineA: Font none
+*FvwmPagerInlineA: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
+*FvwmPagerInlineA: SmallFont micro
+*FvwmPagerInlineA: Hilight White
+*FvwmPagerInlineA: DeskColor 0 #00FCFC
+*FvwmPagerInlineA: DeskPixmap 0 cyan_62x47.xpm
+*FvwmPagerInlineA: DeskColor 1 #FCFC00
+*FvwmPagerInlineA: DeskPixmap 1 yellow_62x47.xpm
+*FvwmPagerInlineA: DeskColor 2 #FC00FC
+*FvwmPagerInlineA: DeskPixmap 2 magenta_62x47.xpm
+*FvwmPagerInlineA: Label 0 "_ABCDEFGH"
+*FvwmPagerInlineA: Label 1 "IJKLMNOPQ"
+*FvwmPagerInlineA: Label 2 "RSTUVWXYZ"
+
+DestroyModuleConfig FvwmPagerInlineB: *
+*FvwmPagerInlineB: Rows 2
+*FvwmPagerInlineB: Columns 1
+*FvwmPagerInlineB: Geometry 144x48-3000-3000
+*FvwmPagerInlineB: Font none
+*FvwmPagerInlineB: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
+*FvwmPagerInlineB: SmallFont micro
+*FvwmPagerInlineB: Hilight White
+*FvwmPagerInlineB: DeskColor 0 #00FCFC
+*FvwmPagerInlineB: DeskPixmap 0 cyan_32x23.xpm
+*FvwmPagerInlineB: DeskColor 1 #FCFC00
+*FvwmPagerInlineB: DeskPixmap 1 yellow_32x23.xpm
+*FvwmPagerInlineB: DeskColor 2 #FC00FC
+*FvwmPagerInlineB: DeskPixmap 2 magenta_32x23.xpm
+*FvwmPagerInlineB: Label 1 "IJKLMNOPQ"
+*FvwmPagerInlineB: Label 2 "RSTUVWXYZ"
+
+DestroyModuleConfig FvwmPagerSubPanel: *
+*FvwmPagerSubPanel: Rows 1
+*FvwmPagerSubPanel: Columns 3
+*FvwmPagerSubPanel: Geometry 368x92-3000-3000
+*FvwmPagerSubPanel: Font none
+*FvwmPagerSubPanel: SmallFont 5x7
+*FvwmPagerSubPanel: MiniIcons
+*FvwmPagerSubPanel: SloppyFocus
+*FvwmPagerSubPanel: Balloons
+*FvwmPagerSubPanel: Hilight White
+*FvwmPagerSubPanel: DeskColor 0 #00FCFC
+*FvwmPagerSubPanel: DeskPixmap 0 cyan_122x92.xpm
+*FvwmPagerSubPanel: DeskColor 1 #FCFC00
+*FvwmPagerSubPanel: DeskPixmap 1 yellow_122x92.xpm
+*FvwmPagerSubPanel: DeskColor 2 #FC00FC
+*FvwmPagerSubPanel: DeskPixmap 2 magenta_122x92.xpm
+*FvwmPagerSubPanel: Label 0 "_ABCDEFGH"
+*FvwmPagerSubPanel: Label 1 "IJKLMNOPQ"
+*FvwmPagerSubPanel: Label 2 "RSTUVWXYZ"
+
+*FvwmPager: Geometry 400x300
+*FvwmPager: Font none
+# }}}2
+# Fvwm Modules Misc Config {{{2
+
+DestroyModuleConfig FvwmAnimate: *
+*FvwmAnimate: Effect Twist
+*FvwmAnimate: Iterations 24
+*FvwmAnimate: Width 2
+*FvwmAnimate: Twist .500000
+*FvwmAnimate: Delay 0
+*FvwmAnimate: Pixmap resize.rainbow.xpm
+
+DestroyModuleConfig FvwmIdent: *
+*FvwmIdent: Back MidnightBlue
+*FvwmIdent: Fore Yellow
+*FvwmIdent: Font -adobe-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*
+
+DestroyModuleConfig FvwmWinList: *
+*FvwmWinList: Back #908090
+*FvwmWinList: Fore Black
+*FvwmWinList: Font "$[fvwm_iconfont]"
+*FvwmWinList: Action Click1 Iconify false, FlipFocus
+*FvwmWinList: Action Click2 Iconify toggle
+*FvwmWinList: Action Click3 Module FvwmIdent
+*FvwmWinList: UseSkipList
+*FvwmWinList: Geometry +0-1
+
+DestroyModuleConfig FvwmScroll: *
+*FvwmScroll: Back grey40
+*FvwmScroll: Fore green
+
+# }}}2
+# FvwmForm-Run Config {{{2
+DestroyModuleConfig  FvwmForm-Run: *
+#*FvwmForm-Run: WarpPointer
+*FvwmForm-Run: Title        "Run Program"
+*FvwmForm-Run: Line         right
+*FvwmForm-Run: Text         "Command:"
+*FvwmForm-Run: Input        Program        30      ""
+*FvwmForm-Run: Line         right
+*FvwmForm-Run: Text         "Host (optional):"
+*FvwmForm-Run: Input        Host           20      ""
+#*FvwmForm-Run: Line         center
+#*FvwmForm-Run: Selection    UserSel single
+#*FvwmForm-Run: Choice       Default Default on      "same user"
+#*FvwmForm-Run: Choice       Terminal Terminal  off     "Run in terminal"
+#*FvwmForm-Run: Input        UserName        10      ""
+*FvwmForm-Run: Line         expand
+*FvwmForm-Run: Button       quit    "Run"           ^M
+#*FvwmForm-Run: Command      Exec $(Host?ssh -X $(Host)) $(Program)
+*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -T screen-ssh@$(Host) -n screen-ssh@$(Host))$(Host!-T screen@localhost -n screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -RR ;; *://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
+# Before saving the data, remove any previously saved data:
+*FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
+*FvwmForm-Run: Command !(                                      /bin/echo \
+  "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
+  '*FvwmForm-RunDefault: Program $(Program)'                 ; /bin/echo \
+) > ${FVWM_USERDIR}/.FvwmForm-Run
+*FvwmForm-Run: Command !(                                      /bin/echo \
+  "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
+ Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -T screen-ssh@$(Host) -n screen-ssh@$(Host))$(Host!-T screen@localhost -n screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -RR ';; *://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
+) > ${FVWM_USERDIR}/.FvwmForm-RunLast
+#  Exec case '"$(Program)"' in '*://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
+
+*FvwmForm-Run: Button       quit    "In Terminal"           ^J
+*FvwmForm-Run: Command      Exec exec x-terminal-emulator $(Host?-ut) -name $(Host?ssh@$(Host)) $(Host!localhost) -n $(Host?ssh@$(Host)) $(Host!localhost) -e $(Host?ssh -Xt $(Host)) $(Program)
+# Before saving the data, remove any previously saved data:
+*FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
+*FvwmForm-Run: Command !(                                      /bin/echo \
+  "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
+  '*FvwmForm-RunDefault: Program $(Program)'                 ; /bin/echo \
+) > ${FVWM_USERDIR}/.FvwmForm-Run
+*FvwmForm-Run: Command !(                                      /bin/echo \
+  "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
+  Exec exec x-terminal-emulator $(Host?-ut) -name $(Host?ssh@$(Host)) $(Host!localhost) -n $(Host?ssh@$(Host)) $(Host!localhost) -e $(Host?ssh -Xt $(Host)) '$(Program)' \
+) > ${FVWM_USERDIR}/.FvwmForm-RunLast
+#*FvwmForm-Run: Button       quit    "Screen"        ^J
+#*FvwmForm-Run: Command      Exec exec ssh -X $(Custom?-l $(UserName)) $(HostName) xterm -T xterm@$(HostName) &
+*FvwmForm-Run: Button       restart "Reset"         F3
+*FvwmForm-Run: Button       quit    "Cancel"        ^[
+*FvwmForm-Run: Command      Nop
+# Tell FvwmForm to read vars from the .FvwmForm-RunDefault file:
+*FvwmForm-Run: UseData .FvwmForm-Run *FvwmForm-RunDefault
+
+# }}}2
+# }}}1
+# Other Config Files {{{1
+
+#read ConfigFvwmBacker
+#read ConfigFvwmButtons
+read ConfigFvwmIconBox
+#read ConfigFvwmIconMan
+#read ConfigFvwmIdent
+#read ConfigFvwmPager
+#read ConfigFvwmScroll
+read ConfigFvwmTaskBar
+#read ConfigFvwmWinList
+
+Read /etc/X11/fvwm/menudefs.hook Quiet
+Read menudefs.hook Quiet
+
+# }}}1

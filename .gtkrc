@@ -1,0 +1,12 @@
+include "/usr/share/themes/ThinIce/gtk/gtkrc"
+
+style "default" {
+    font = "-bitstream-bitstream vera sans-medium-r-normal-*-13-*-*-*-p-*-iso8859-1"
+    base[NORMAL] = "#ffffff"
+}
+
+style "serif" = "default" {
+    font = "-bitstream-bitstream vera serif-medium-r-normal-*-12-*-*-*-p-*-iso8859-1"
+}
+
+widget_class "*Notebook*" style "serif"

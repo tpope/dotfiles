@@ -1,0 +1,178 @@
+#!/bin/sh
+# Author: Tim Pope
+
+[ "$EUID" = 0 ] && exec /usr/local/sbin/sync-simpson "$@"
+
+FILES="\
+ .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
+ .profile .bashrc .bash_profile .bash_logout .screenrc .terminfo .dir_colors \
+ .vimrc .vim/[^_]* .muttrc .urlview .mailcap .procmailrc .imaprc .cvsignore \
+ .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 .gnupg/gpg.conf \
+ .xsession .Xdefaults .Eterm .gtkrc .gtkrc-2.0 .fvwm/.fvwm2rc .fvwm/icons/* \
+ .fvwm/FvwmScript-* .pixmaps/[^_]* .netscape/user.js bin/x-terminal-emulator \
+ bin/sensible-browser bin/tpope bin/hostinfo bin/sync-tpope bin/qdist \
+ "
+# bin/ps-grep bin/rwho bin/ruptime bin/launch bin/runcontrol \
+# bin/start bin/stop bin/restart bin/reload bin/force-reload \
+GUI_FILES="\
+ .kde/share/config/kdeglobals .kde/share/apps/konqueror/bookmarks.xml \
+ .kde/share/apps/konsole .kde/share/icons .gkrellm .gkrellm2/[^l]* .qt \
+ .gnupg/pubring.gpg .libtrash .irssi \
+ "
+
+SSH="ssh -a -x -oStrictHostKeyChecking=no"
+RSYNC_RSH="$SSH"
+RSYNC="rsync -urlptRC --exclude='.*.sw?' --exclude='.*.lock' --exclude='*.local'"
+
+[ -z "$TPOPE_GET" ] || return
+NAME=`basename $0`
+
+output_progress() {
+    echo -n "$1"
+}
+
+output_newline() {
+    echo
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+	-t)    trusted=1;;
+	-T|+t) trusted= ;;
+	-g)    gui=1    ;;
+	-G|+g) gui=     ;;
+	-s) simpson=1 ;;
+	-A) tarpipe=1 tgzpipe= ;;
+	-Z) tgzpipe=1 tarpipe= ;;
+	-a) tarball=cat; shift; tarfile="${1:-tpope.tar}" ;;
+	-z) tarball="gzip -c"; shift; tarfile="${1:-tpope.tar.gz}" ;;
+	-j) tarball="bzip2 -zc"; shift; tarfile="${1:-tpope.tar.bz2}" ;;
+	*)
+	ALL_HOSTS="$1 $ALL_HOSTS"
+	[ "$trusted" ] && MY_HOSTS="$1 $MY_HOSTS"
+	[ "$gui" ]    && GUI_HOSTS="$1 $GUI_HOSTS"
+	;;
+    esac
+    shift
+done
+
+if [ "$tarball" -a "$simpson$ALL_HOSTS" ]; then
+    echo "Warning: hosts ignored." >&2
+fi
+
+[ -n "$ALL_HOSTS" ] || simpson=1
+if [ -n "$simpson" ]; then
+	MY_HOSTS="$MY_HOSTS maggie bart abe homer lisa mona marge"
+	ALL_HOSTS="$ALL_HOSTS maggie bart abe homer lisa mona marge snowball chief right left"
+	GUI_HOSTS="$GUI_HOSTS maggie bart abe homer lisa mona marge"
+fi
+
+if [ -n "$tarball" ]; then
+    ( cd "$HOME"
+    tar -cf - -X "$HOME/.cvsignore" --exclude='*~' $FILES ${gui:+$GUI_FILES})|\
+	$tarball > "$tarfile"
+    exit
+fi
+
+cd "$HOME"
+
+if [ "$tarpipe" ]; then
+
+    output_progress "Uploading base:   "
+    for host in $ALL_HOSTS; do
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
+	tar cf - -X .cvsignore --exclude='*~' $FILES|\
+	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
+	    output_progress " $host"
+    done
+    output_newline
+
+    [ "$GUI_HOSTS" ] && output_progress "Uploading extra:  " && \
+    for host in $GUI_HOSTS; do
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
+	tar cf - -X .cvsignore --exclude='*~' $GUI_FILES|\
+	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
+	    output_progress " $host"
+    done && \
+    output_newline
+
+    exit 0
+fi
+
+if [ "$tgzpipe" ]; then
+
+    output_progress "Uploading base:   "
+    for host in $ALL_HOSTS; do
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
+	tar cf - -X .cvsignore --exclude='*~' \
+	    $FILES|gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
+	    output_progress " $host"
+    done
+    output_newline
+
+    [ "$GUI_HOSTS" ] && output_progress "Uploading extra:  " && \
+    for host in $GUI_HOSTS; do
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
+	tar cf - -X .cvsignore --exclude='*~' \
+	    $GUI_FILES|gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
+	    output_progress " $host"
+    done && \
+    output_newline
+
+    exit 0
+fi
+
+if [ -f "$HOME/.LCK..$NAME" ]; then
+    if [ -d "/proc/`cat $HOME/.LCK..$NAME`" ]; then
+	echo "Locked.  Exiting." >&2
+	exit 1
+    else
+	echo "Stale lock file found.  Removing." >&2
+	rm -f $HOME/.LCK..$NAME
+    fi
+fi
+
+trap 'rm -f "$HOME/.LCK..$NAME"' EXIT
+echo $$ > $HOME/.LCK..$NAME
+
+if [ "$MY_HOSTS" ]; then
+output_progress "Downloading base: "
+for host in $MY_HOSTS; do
+    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ]; then
+	$RSYNC_RSH $host $RSYNC "$FILES" `hostname`: 2>/dev/null &&
+	output_progress " $host"
+    fi
+done
+output_newline
+fi
+
+output_progress "Uploading base:   "
+for host in $ALL_HOSTS; do
+    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ]; then
+	$RSYNC --delete $FILES $host: 2>/dev/null &&
+	output_progress " $host"
+    fi
+done
+output_newline
+
+if [ "$GUI_HOSTS" ]; then
+output_progress "Downloading extra:"
+for host in $GUI_HOSTS; do
+    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ]; then
+	$RSYNC_RSH $host $RSYNC "$GUI_FILES" `hostname`: 2>/dev/null &&
+	output_progress " $host"
+    fi
+done
+output_newline
+
+output_progress "Uploading extra:  "
+for host in $GUI_HOSTS; do
+    if [ "$host" != "`hostname`" ]; then
+	$RSYNC --delete $GUI_FILES $host: 2>/dev/null &&
+	output_progress " $host"
+    fi
+done
+output_newline
+fi
+
+rm -f "$HOME/.LCK..$NAME"

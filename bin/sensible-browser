@@ -1,0 +1,75 @@
+#!/bin/sh
+# Author: Tim Pope
+
+if [ "$1" = "-T" ]; then
+    shift
+    terminal=' '
+fi
+
+if [ "$1" = "-dump" ]; then
+    shift
+    terminal='-dump'
+    launch() { exec "$@" -dump
+    }
+elif [ "$1" = "-G" ]; then
+    shift
+    launch() { nohup x-terminal-emulator -title 'WWW-Browser' -e "$@" >/dev/null 2>&1 & exit 0
+    }
+elif [ "$STY" ]; then
+    launch() { screen -ln -fn -t "WWW-Browser@`hostname|sed -e 's/[.].*//'`" "$@"; sleep 3; exit 0
+    }
+elif [ ! -t 1 ]; then
+    launch() { nohup x-terminal-emulator -title 'WWW-Browser' -e "$@" >/dev/null 2>/dev/null & exit 0
+    }
+else
+    launch() { exec "$@"
+    }
+fi
+
+if [ "$DISPLAY" -a -z "$terminal" ]; then
+    url="$*"
+    case "$DISPLAY" in
+	:*|localhost*:0*|`hostname`*:0*) gui=: ;;
+    esac
+    if [ -e "$url" ]; then
+	case "$url" in
+	    /*) ;;
+	    *) url="`pwd`/$url" ;;
+	esac
+    fi
+    case "$gui$url" in
+	file:*|/*) ;;
+	*:*|www*|'')
+	for browser in firefox mozilla-firebird mozilla netscape; do
+	    if [ -x "`which $browser 2>/dev/null`" ] && \
+		    $browser -remote 'ping()' >/dev/null 2>/dev/null; then
+		$browser -remote "openURL($url,new-tab)" >/dev/null 2>/dev/null && exit 0
+	    fi
+	done
+	[ "$gui" ] && \
+	for browser in firefox mozilla-firebird konqueror mozilla netscape; do
+	    if [ -x "`which $browser`" ]; then
+		nohup $browser "$@" >/dev/null 2>/dev/null &
+		sleep 30
+		exit 0
+	    fi
+	done ;;
+    esac
+fi
+
+if [ "$terminal" = "-dump" -a -x "`which lynx 2>/dev/null`" ]; then
+    launch lynx -force_html "$@"
+elif [ -x "`which w3m 2>/dev/null`" ]; then
+    if [ "$*" ]; then
+	launch w3m -T text/html "$@"
+    else
+	launch w3m http://www.google.com/
+    fi
+elif [ -x "`which links 2>/dev/null`" ]; then
+    launch links "$@"
+elif [ -x "`which lynx 2>/dev/null`" ]; then
+    launch lynx -force_html "$@"
+fi
+
+echo "No web browsers found." >&2
+exit 1

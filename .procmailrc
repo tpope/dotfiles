@@ -1,0 +1,102 @@
+PATH=/home/tpope/bin:/usr/local/bin:/usr/bin:/bin
+MAILDIR=$HOME/Mail
+#LOGFILE=$MAILDIR/.from
+
+:0
+* !^Content-Type: message/
+* !^Content-Type: multipart/
+* !^Content-Type: application/pgp
+{
+    :0 fBw
+    * ^-----BEGIN PGP MESSAGE-----
+    * ^-----END PGP MESSAGE-----
+    | formail -i "Content-Type: application/pgp; format=text; x-action=encrypt"
+
+    :0 fBw
+    * ^-----BEGIN PGP SIGNED MESSAGE-----
+    * ^-----BEGIN PGP SIGNATURE-----
+    * ^-----END PGP SIGNATURE-----
+    | formail -i "Content-Type: application/pgp; format=text; x-action=sign"
+}
+
+# SpamAssassin sample procmailrc
+#
+# Pipe the mail through spamassassin (replace 'spamassassin' with 'spamc'
+# if you use the spamc/spamd combination)
+# The condition line ensures that only messages smaller than 250 kB
+# (250 * 1024 = 256000 bytes) are processed by SpamAssassin. Most spam
+# isn't bigger than a few k and working with big messages can bring
+# SpamAssassin to its knees.
+:0 fw
+* < 256000
+#* Received: from pop\.pi\.sbcglobal\.net
+* ^Received: from (pop-sbc-.*\.yahoo\.com|pop\.hotpop\.com)
+| $HOME/bin/spamfilter
+
+# Work around procmail bug: any output on stderr will cause the "F" in "From"
+# to be dropped.  This will re-add it.
+:0 H
+* ! ^From[ ]
+* ^rom[ ]
+{
+  LOG="*** Dropped F off From_ header! Fixing up. "
+
+  :0 fhw
+  | sed -e 's/^rom /From /'
+}
+
+#:0
+#* ^X-Spam-Status:.*(USER_IN_BLACKLIST|SUBJECT_NOT_TPOPE_HOTPOP)
+#definitely-spam
+
+#:0
+#* ^From: .*(AIM Special Offers|Delphi|Jobseeker|JSN)
+#definitely-spam
+
+#:0
+#* ^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+#super-spam
+
+:0
+* ^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*\*\*
+definitely-spam
+
+# All mail tagged as spam (eg. with a score higher than the set threshold)
+# is moved to "Spam".
+:0
+* ^X-Spam-Status: Yes
+spam
+
+# Mailing lists
+
+#:0
+#* ^Subject: .*\[OldAPDs\]
+#apds
+
+#:0
+#* ^Subject: .*\[capd-adults\]
+#capd
+
+:0
+* ^Subject: .*\[(SS|speedseductionlist)\]
+speed
+
+:0
+* ^Subject: .*\[Zaurus-general\]
+zaurus
+
+:0
+* ^X-BeenThere: debian-knoppix@linuxtag\.org
+#* ^Subject: .*\[debian-knoppix\]
+debian-knoppix
+
+:0
+* ^From debian-knoppix-admin@linuxtag\.org
+debian-knoppix
+
+:0
+* ^Return-path: .*mutt-users.*@mutt\.org>$
+mutt-users
+
+:0 ic
+| /usr/bin/Mailsound -h mona

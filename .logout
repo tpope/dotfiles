@@ -1,0 +1,8 @@
+# ~/.logout
+# Author: Tim Pope
+# vim: ft=csh
+
+#[ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && \
+#    [ `who|grep -c "^$USER\>"` -le 1 ] && sudo -k >& /dev/null
+
+if ( ! $?SSH_TTY && "$TERM" == linux ) clear

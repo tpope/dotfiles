@@ -1,0 +1,16 @@
+*~
+*.old
+*.OLD
+.*.sw?
+.viminfo
+.*.lock
+*.local
+*.aux
+*.bbl
+*.log
+*.blg
+*.ent
+*.toc
+*.dvi
+*.pdf
+*.ps

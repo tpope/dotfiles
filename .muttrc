@@ -1,0 +1,210 @@
+# ~/.muttrc
+# Author: Tim Pope
+
+# Section: Options {{{1
+# ---------------------
+set meta_key
+set allow_ansi
+set noconfirmappend
+set fast_reply
+set nopipe_decode
+set nowait_key
+set record==sent
+set postponed==postponed
+set index_format="%4C %Z %{%b %d} %-15.15F (%?l?%4l&%4c?) %s"
+set sort_browser=reverse-date
+set mime_forward=ask-no
+set status_format="-%r-Mutt@%h:%f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s/%S)-%>-(%P)---"
+set alias_file=~/.mail_aliases
+set sendmail_wait=1
+`test "$GPG_AGENT_INFO" && echo set pgp_use_gpg_agent || echo set`
+set pgp_replysign
+#`[ -s "$HOME/.gnupg/secring.gpg" ] && echo set pgp_autosign || echo set nopgp_autosign`
+set nopgp_autosign
+set pgp_replysignencrypted
+set pgp_timeout=900
+set realname="Tim Pope"
+set alternates="^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
+set reverse_name
+set reverse_realname
+`[ -d "$HOME/.smime/certificates" ] && echo set smime_default_key=$(hostname).pem || echo set`
+`[ -x /usr/bin/muttprint ] && echo set print_command=muttprint || echo set`
+
+mailboxes "!" "imap://bart/" "imap://lisa/" "imap://marge/" "imap://homer/" "imap://abe/" "imap://mona/"
+auto_view text/richtext text/html
+#set implicit_autoview
+alternative_order text/enriched text/richtext text/plain text
+#mime_lookup application/octet-stream
+
+# Section: Headers {{{1
+# ---------------------
+unhdr_order *
+hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: User-Agent: X-Mailer: X-Editor: X-Operating-System: Subject: X-Spam-Status:
+
+my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
+my_hdr X-All-Your-Base-Are-Belong-To: Us
+#
+# More header weeding
+#
+unignore Date User-Agent X-Mailer
+ignore Envelope-to X-OriginalArrivalTime X-ClientAddr X-Originating-IP X-UID
+ignore Importance X-Keywords Delivery-date X-Apparently-To X-Apparently-From
+ignore X-Authentication-Info List- Mailing-List X-IMAPbase Old-Content-Type
+ignore X-Message-Info X-gotmail-version X-Virus-Scanned
+ignore X-Spam-Flag X-Spam-Level X-Spam-Checker-Version X-Spam-Prev
+ignore X-All-Your-Base-Are-Belong-To X-BFI X-HotPOP-Delivered-To X-Return-Path
+ignore X-eGroups- X-Yahoo-Profile X-Juno-Line-Breaks X-Mailman- X-BeenThere
+ignore Return-Path Message-ID Received Mime-Version Content-Disposition
+ignore Content-Type Content-Length Status Lines "From "
+
+# Section: Bindings {{{1
+# ----------------------
+bind pager , previous-line
+bind pager _ previous-line
+bind pager < previous-line
+bind pager > next-line
+bind pager + next-line
+bind pager 0 next-page
+bind generic 0 next-page
+
+# Section: Macros {{{1
+# --------------------
+#macro pager \ef "|view-x-face\n" "Show X-Face"
+macro pager \ef "<enter-command>set nopipe_decode\n<pipe-message>sed -ne '/\^X-Face:/,/\^[\^ \\t]/ p'|sed -ne 's/\^X-Face://' -e '/\^[ \\t]/ p'|sed -e 's/\^[ \\t]\+//'|{ echo '/* Width=48, Height=48 */'; uncompface; }|icontopbm|{ xli -fork -title 'X-Face' stdin || aview; }\n<enter-command>set nopipe_decode" "Show X-Face"
+macro pager \cb "<enter-command>set pipe_decode\n<pipe-message>urlview\n<enter-command>set nopipe_decode\n" 'call urlview to extract URLs out of a message'
+macro index \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
+macro index \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
+macro index \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
+macro pager \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
+macro pager \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
+macro pager \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
+
+# Section: Hooks {{{1
+# -------------------
+#send-hook . 'set pgp_create_traditional=yes; unmy_hdr From:' #; set from='
+message-hook '~A' 'unignore X-Face; ignore X-Spam-Status'
+message-hook '~P|~h ^X-All-Your-Base-Are-Belong-To:' 'ignore X-Face X-Spam-Status'
+message-hook '~h X-Spam-Level:\ \\*' 'unignore X-Face X-Spam-Status'
+save-hook '~h X-Spam-Level:\ \\*\\*\\*' =spam
+#message-hook '~h X-Face:' 'push \ef'
+#reply-hook . 'set pgp_autosign=yes; set pgp_create_traditional=ask-no'
+#reply-hook '~h ^X-Mailer: (Internet Mail Service|AOL|Microsoft Outlook)' 'set pgp_create_traditional=ask-yes'
+#reply-hook '~h ^User-Agent: (Mutt)' 'set pgp_create_traditional=no'
+
+# Section: Colors {{{1
+# --------------------
+`mutt -v|grep +HAVE_COLOR >/dev/null && [ -f ~/.muttrc-color ] && echo source ~/.muttrc-color || echo set`
+color normal	white black
+color attachment brightwhite black
+color hdrdefault cyan black
+color indicator black cyan
+color markers	brightblack black
+color quoted	green black
+color signature cyan black
+color status	brightgreen blue
+color tilde	blue black
+color tree	red black
+
+# Headers
+color header    brightblue      black   ^(Delivered-|X-Original-|Envelope-)?To:
+color header    brightblue      black   ^Bcc:
+color header    brightblue      black   ^Cc:
+color header    brightgreen     black   ^From
+color header    brightgreen     black   From:|-from:
+color header    brightgreen     black   Return-[Pp]ath:
+color header    brightgreen     black   ^(X-)?Sender:
+color header    brightgreen     black   ^Reply-To:
+color header    brightgreen     black   ^Mail-Followup-To:
+color header    brightgreen     black   ^X-Disposition-Notification-To:
+color header    brightgreen     black   ^X-URL:
+color header    magenta         black   ^Date:
+color header    magenta         black   ^Delivery-date:
+color header    brightcyan      black   ^Subject:
+color header    brightwhite     black   ^X-All-Your-Base-Are-Belong-To:
+color header    green           black   ^Received:
+color header    green           black   ^Message-ID:
+color header    green           black   ^References:
+color header    green           black   ^In-Reply-To:
+color header    green           black   ^Organi[sz]ation:
+color header    yellow          black   ^X-Spam-
+color header    red             black   ^Status:
+color header    red             black   ^Content-Length:
+color header    red             black   ^Lines:
+color header    brightyellow    black   ^(X-)?Mime
+color header    brightyellow    black   ^(Old-)?Content-(Type|Disposition|Transfer-Encoding):
+color header    brightyellow    black   ^User-Agent:
+color header    brightyellow    black   ^X-Mailer[A-Za-z-]*:
+color header    brightyellow    black   ^X-Editor:
+color header    brightyellow    black   ^X-Operating-System:
+color header    brightyellow    black   ^X-Accept-Language:
+color header    brightyellow    black   ^X-MSMail-
+color header    brightyellow    black   ^X-Priority:
+color header    brightblack     black   ^X-HotPOP-Delivered-To:
+color header    brightblack     black   ^X-Face:
+mono  header    bold                    ^From:
+mono  header    bold                    ^To:
+mono  header    bold                    ^Cc:
+mono  header    bold                    ^Subject:
+mono  header    bold                    ^X-All-Your-Base-Are-Belong-To:
+
+# URL highlighting
+color body      brightred       black   `cat "$HOME/.urlview"|sed -ne 's/^REGEXP //;ta' -e b -e :a -e 's/\([ ";.?]\)/\\\1/g;p'|tee /tmp/url.log`
+mono  body      bold                    `cat "$HOME/.urlview"|sed -ne 's/^REGEXP //;ta' -e b -e :a -e 's/\([ ";.?]\)/\\\1/g;p'|tee /tmp/url.log`
+
+# Email highlighting
+color body      brightmagenta   black   "[-a-z_0-9%.]+@[-a-z_0-9.]*[-a-z_0-9]"
+mono  body      bold                    "[-a-z_0-9%.]+@[-a-z_0-9.]*[-a-z_0-9]"
+
+# Bad PGP signature
+color body      brightwhite     red     "Bad signature from.*"
+mono  body      bold                    "Bad signature from.*"
+
+# Formatting
+color body      brightwhite     black   "(^| |\t)\\*[a-z0-9]([a-z0-9-]* ){,3}[a-z0-9,.!?-]*\\*"
+color body      brightyellow    default "(^| |\t)_[a-z0-9]([a-z0-9-]* ){,6}[a-z0-9,.!?-]+_"
+color body      brightyellow    default "(^| |\t)_[a-z0-9][a-z0-9,.!?_-]*_"
+
+# Misc
+color body      brightblack     black   "^[-_=*]{3,}\n"
+color body      yellow          black   "^SPAM:"
+
+# Section: Lists {{{1
+# -------------------
+lists mutt-users speedseductionlist zaurus-general debian-knoppix
+
+# Section: IMAP {{{1
+# ------------------
+`mutt -v|grep +USE_IMAP >/dev/null && echo set imap_list_subscribed=yes || echo set`
+
+account-hook . 'unset imap_user; unset imap_pass; unset tunnel'
+
+account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'
+account-hook imap://bart/   'set tunnel="hostinfo -S bart -qx /usr/sbin/imapd"'
+account-hook imap://lisa/   'set tunnel="hostinfo -S lisa -qx /usr/sbin/imapd"'
+account-hook imap://marge/  'set tunnel="hostinfo -S marge -qx /usr/sbin/imapd"'
+account-hook imap://homer/  'set tunnel="hostinfo -S homer -qx /usr/sbin/imapd"'
+account-hook imap://abe/    'set tunnel="hostinfo -S abe -qx /usr/sbin/imapd"'
+account-hook imap://mona/   'set tunnel="hostinfo -S mona -qx /usr/sbin/imapd"'
+
+account-hook imap://bart.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh bart /usr/sbin/imapd"'
+account-hook imap://lisa.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh lisa /usr/sbin/imapd"'
+account-hook imap://marge.sexygeek.us/ 'set tunnel="ssh sexygeek.us ssh marge /usr/sbin/imapd"'
+account-hook imap://homer.sexygeek.us/ 'set tunnel="ssh sexygeek.us ssh homer /usr/sbin/imapd"'
+account-hook imap://abe.sexygeek.us/   'set tunnel="ssh sexygeek.us ssh abe /usr/sbin/imapd"'
+account-hook imap://mona.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh mona /usr/sbin/imapd"'
+
+# }}}1
+# Section: Misc {{{1
+# ------------------
+`[ -s ~/.muttrc-$(hostname) ] && echo source ~/.muttrc-$(hostname) || echo set`
+`[ -s ~/.muttrc-local ] && echo source ~/.muttrc-local || echo set`
+`[ -s ~/.mail_aliases ] && echo source ~/.mail_aliases || echo set`
+# Section: Aliases {{{1
+# ---------------------
+alias maggie Tim Pope <tpope@maggie.simpson>
+alias bart   Tim Pope <tpope@bart.simpson>
+alias lisa   Tim Pope <tpope@lisa.simpson>
+alias marge  Tim Pope <tpope@marge.simpson>
+alias homer  Tim Pope <tpope@homer.simpson>
+alias abe    Tim Pope <tpope@abe.simpson>
+alias mona   Tim Pope <tpope@mona.simpson>

@@ -1,0 +1,6 @@
+#compdef bibtex
+
+local expl
+
+_description files expl 'LaTeX aux file'
+_files "$expl[@]" -g '*.aux'

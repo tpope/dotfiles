@@ -1,0 +1,212 @@
+! ~/.Xdefaults
+! Author: Tim Pope
+! vim600: foldmethod=marker
+
+*customization: -color
+!## NETSCAPE {{{1
+Gecko*drawingArea.translations:  #replace    \
+	<Btn6Down>: xfeDoCommand(back)\n\
+	<Btn7Down>: xfeDoCommand(forward)\n
+
+Gecko*globalNonTextTranslations: #override\n\
+	<Btn6Down>: xfeDoCommand(back)\n\
+	<Btn7Down>: xfeDoCommand(forward)\n
+
+Netscape*drawingArea.translations:  #replace    \
+	<Btn1Down>:           ArmLink()   \n\
+	<Btn2Down>:           ArmLink()   \n\
+	~Shift<Btn1Up>:       ActivateLink()  \n\
+	~Shift<Btn2Up>:       ActivateLink(new-window)DisarmLink()    \n\
+	Shift<Btn1Up>:        ActivateLink(save-only)DisarmLink()    \n\
+	Shift<Btn2Up>:        ActivateLink(save-only)DisarmLink()    \n\
+	<Btn1Motion>:             DisarmLinkIfMoved()  \n\
+	<Btn2Motion>:             DisarmLinkIfMoved()  \n\
+	<Btn3Motion>:             DisarmLinkIfMoved()  \n\
+	<Motion>:             DescribeLink()  \n\
+	<Btn3Down>:           xfeDoPopup()    \n\
+	<Btn3Up>:             ActivatePopup() \n\
+	Ctrl<Btn4Down>: PageUp()\n\
+	Ctrl<Btn5Down>: PageDown()\n\
+	Shift<Btn4Down>: LineUp()\n\
+	Shift<Btn5Down>: LineDown()\n\
+	None<Btn4Down>: LineUp()LineUp()LineUp()LineUp()LineUp()LineUp()\n\
+	None<Btn5Down>: LineDown()LineDown()LineDown()LineDown()LineDown()LineDown()\n\
+	Alt<Btn4Down>: xfeDoCommand(forward)\n\
+	Alt<Btn5Down>: xfeDoCommand(back)\n\
+	<Btn6Down>: xfeDoCommand(back)\n\
+	<Btn7Down>: xfeDoCommand(forward)\n
+	
+
+Netscape*globalNonTextTranslations: #override\n\
+	Shift<Btn4Down>: LineUp()\n\
+	Shift<Btn5Down>: LineDown()\n\
+	None<Btn4Down>:LineUp()LineUp()LineUp()LineUp()LineUp()LineUp()\n\
+	None<Btn5Down>:LineDown()LineDown()LineDown()LineDown()LineDown()LineDown()\n\
+	Alt<Btn4Down>: xfeDoCommand(forward)\n\
+	Alt<Btn5Down>: xfeDoCommand(back)\n\
+	<Btn6Down>: xfeDoCommand(back)\n\
+	<Btn7Down>: xfeDoCommand(forward)\n
+
+Netscape*documentFonts.sizeIncrement: 20
+Netscape*documentFonts.xResolution*iso-8859-1: 100
+Netscape*documentFonts.yResolution*iso-8859-1: 100
+
+!## XTERM {{{1
+xterm*background: #000000
+xterm*foreground: #aaaaaa
+
+XTerm*VT100*background: #000000
+XTerm*VT100*foreground: #aaaaaa
+XTerm*boldMode: false
+XTerm*scrollBar: false
+!XTerm*backarrowKey: false
+XTerm*colorBDMode: true
+XTerm*colorBD: #ffffff
+XTerm*cursorColor: #cccccc
+XTerm*font: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm*fontMenu*fontdefault*Label: Default
+XTerm*font1: -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
+XTerm*fontMenu*font1*Label: Tiny
+XTerm*font2: -misc-fixed-medium-r-normal--7-*-*-*-c-*-iso8859-1
+XTerm*fontMenu*font2*Label: Small
+XTerm*font3: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
+XTerm*fontMenu*font3*Label: Large
+XTerm*font4: -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
+XTerm*fontMenu*font4*Label: VGA
+XTerm*font5: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm*fontMenu*font5*Label: Huge
+XTerm*font6: -sony-fixed-medium-r-normal--24-*-*-*-c-*-iso8859-1
+XTerm*fontMenu*font6*Label: Gigantic
+XTerm*boldFont: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm*faceSize: 10
+XTerm*visualBell: true
+XTerm*eightBitInput: false
+XTerm*modifyCursorKeys: 1
+XTerm*VT100*color0: #000000
+XTerm*VT100*color1: #aa0000
+XTerm*VT100*color2: #00aa00
+XTerm*VT100*color3: #aa5522
+XTerm*VT100*color4: #0000aa
+XTerm*VT100*color5: #aa00aa
+XTerm*VT100*color6: #00aaaa
+XTerm*VT100*color7: #aaaaaa
+XTerm*VT100*color8: #444444
+XTerm*VT100*color9: #ff4444
+XTerm*VT100*color10: #44ff44
+XTerm*VT100*color11: #ffff00
+XTerm*VT100*color12: #4444ff
+XTerm*VT100*color13: #ff00ff
+XTerm*VT100*color14: #00ffff
+XTerm*VT100*color15: #ffffff
+
+!## XTERM-WHITE {{{1
+XTerm-white*background: #ffffff
+XTerm-white*foreground: #444444
+XTerm-white*boldMode: false
+XTerm-white*scrollBar: false
+!XTerm-white*backarrowKey: false
+XTerm-white*colorBDMode: true
+XTerm-white*colorBD: #ffffff
+XTerm-white*cursorColor: #333333
+XTerm-white*font: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm-white*fontMenu*fontdefault*Label: Default
+XTerm-white*font1: -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
+XTerm-white*fontMenu*font1*Label: Tiny
+XTerm-white*font2: -misc-fixed-medium-r-normal--7-*-*-*-c-*-iso8859-1
+XTerm-white*fontMenu*font2*Label: Small
+XTerm-white*font3: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
+XTerm-white*fontMenu*font3*Label: Large
+XTerm-white*font4: -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
+XTerm-white*fontMenu*font4*Label: VGA
+XTerm-white*font5: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm-white*fontMenu*font5*Label: Huge
+XTerm-white*font6: -sony-fixed-medium-r-normal--24-*-*-*-c-*-iso8859-1
+XTerm-white*fontMenu*font6*Label: Gigantic
+XTerm-white*boldFont: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm-white*faceSize: 10
+XTerm-white*visualBell: true
+XTerm-white*eightBitInput: false
+XTerm-white*modifyCursorKeys: 1
+XTerm-white*VT100*color0: #ffffff
+XTerm-white*VT100*color1: #ff4444
+XTerm-white*VT100*color2: #44ff44
+XTerm-white*VT100*color3: #ffff00
+XTerm-white*VT100*color4: #4444ff
+XTerm-white*VT100*color5: #ff00ff
+XTerm-white*VT100*color6: #00ffff
+XTerm-white*VT100*color7: #444444
+XTerm-white*VT100*color8: #aaaaaa
+XTerm-white*VT100*color9: #aa0000
+XTerm-white*VT100*color10: #00aa00
+XTerm-white*VT100*color11: #aa5522
+XTerm-white*VT100*color12: #0000aa
+XTerm-white*VT100*color13: #aa00aa
+XTerm-white*VT100*color14: #00aaaa
+XTerm-white*VT100*color15: #000000
+
+!## RXVT {{{1
+Rxvt*background: #000000
+Rxvt*foreground: #aaaaaa
+Rxvt*colorBD: #ffffff
+
+!## ATERM {{{1
+Aterm*background: #000000
+Aterm*foreground: #aaaaaa
+
+!## KTERM {{{1
+Kterm*background: #000000
+Kterm*foreground: #aaaaaa
+
+!## DTTERM {{{1
+Dtterm*background: #000000
+Dtterm*foreground: #aaaaaa
+
+!## DTSESSION {{{1
+Dtsession*wmStartupCommand: /opt/sfw/bin/fvwm2
+Dtsession*waitWmTimeout: 1
+
+!## XCONSOLE {{{1
+XConsole*file: /dev/xconsole
+XConsole*verbose: true
+XConsole*saveLines: 128
+XConsole*geometry: 364x225-72-168
+XConsole*font: 5x7
+!## CLOCK {{{1
+Clock*hour: red
+Clock*minute: blue
+Clock*jewel: black
+Clock*BorderColor: darkgreen
+Clock*Background: white
+
+XClock*font: -misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1
+! }}}1
+!## XBIFF {{{1
+XBiff*volume: 80
+XBiff*flip: false
+XBiff*updates: 10
+XBiff*fullPixmap: mailfull
+XBiff*fullPixmapMask: mailfullmsk
+XBiff*emptyPixmap: mailempty
+XBiff*emptyPixmapMask: mailemptymsk
+!XBiff*shapeWindow: true
+
+XFaces.facedbPath:	.picons:/home/tpope/.picons:/usr/share/picons:/usr/share/picons/users:/usr/share/picons/domains:/usr/share/picons/unknown:/usr/lib/picon/:/usr/lib/picon/users:/usr/lib/picon/domains:/usr/lib/picon/unknown
+!## XDVI {{{1
+XDvi.editor: vim -g --remote +%l %f
+!XDvi.editor: vim -c ":RemoteOpen +%l %f"
+XDvi.wwwBrowser: sensible-browser
+XDvi.geometry: 746x738+50+0
+XDvi.shrinkFactor: 7
+XDvi.expert: true
+XDvi.Margin: 1in
+XDvi.mainTranslations: #override \
+	<Btn1Down>: do-href()magnifier(*1)\n\
+	<Btn2Down>: do-href-newwindow()source-special()\n\
+	<Btn3Down>: magnifier(*3)\n
+! }}}1
+!## XSCREENSAVER {{{1
+XScreenSaver.dpmsEnabled: true
+XScreenSaver.splash: false
+XScreenSaver.ignoreUninstalledPrograms: true
+XScreenSaver.loadURL: sensible-browser '%s'
+! }}}1

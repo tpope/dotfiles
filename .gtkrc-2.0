@@ -1,0 +1,19 @@
+include "/usr/share/themes/ThinIce/gtk-2.0/gtkrc"
+
+style "default" {
+    font_name = "Bitstream Vera Sans 12"
+    base[NORMAL] = "#ffffff"
+}
+
+style "serif" = "default" {
+    font_name = "Bitstream Vera Serif 12"
+}
+
+style "mono" = "default" {
+    font_name = "Bitstream Vera Sans Mono 12"
+}
+
+widget_class "*Notebook*" style "serif"
+widget_class "*Text*" style "mono"
+
+gtk-key-theme-name = "Emacs"

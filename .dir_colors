@@ -1,0 +1,285 @@
+# Configuration file for dircolors, a utility to help you set the
+# LS_COLORS environment variable used by GNU ls with the --color option.
+
+# The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
+# slackware version of dircolors) are recognized but ignored.
+
+# Below, there should be one TERM entry for each termtype that is colorizable
+TERM linux
+TERM linux-c
+TERM mach-color
+TERM console
+TERM con132x25
+TERM con132x30
+TERM con132x43
+TERM con132x60
+TERM con80x25
+TERM con80x28
+TERM con80x30
+TERM con80x43
+TERM con80x50
+TERM con80x60
+TERM dtterm
+TERM xterm
+TERM xterm-color
+TERM xterm-debian
+TERM rxvt
+TERM screen
+TERM screen-w
+TERM vt100
+TERM Eterm
+TERM Eterm-xterm
+
+# Below are the color init strings for the basic file types. A color init
+# string consists of one or more of the following numeric codes:
+# Attribute codes:
+# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
+# Text color codes:
+# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
+# Background color codes:
+# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
+NORMAL 00	# global default, although everything should be something.
+FILE 00		# normal file
+DIR 01;34	# directory
+#LINK target
+#LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
+		# numerical value, the color is as for the file pointed to.)
+FIFO 33		# pipe
+SOCK 01;35	# socket
+#DOOR 01;44	# door
+BLK 00;35	# block device driver
+CHR 00;34	# character device driver
+ORPHAN 00;41	# symlink to nonexistent file
+MISSING 00;45	# said nonexistent file
+
+# This is for files with execute permission:
+EXEC 01;32
+
+# List any file extensions like '.gz' or '.tar' that you would like ls
+# to colorize below. Put the extension, a space, and the color init string.
+# (and any comments you want to add after a '#')
+
+# executables (dark green)
+.cmd 00;32
+.exe 00;32
+.EXE 00;32
+.com 00;32
+.COM 00;32
+.btm 00;32
+.bat 00;32
+.BAT 00;32
+.cmd 00;32
+.CMD 00;32
+.scr 00;32
+.SCR 00;32
+.class 00;32
+.sh 00;32
+.pl 00;32
+.py 00;32
+
+# archives or compressed (bright red)
+.arj 01;31
+.taz 01;31
+.lzh 01;31
+.zip 01;31
+.ZIP 01;31
+.tar 01;31
+.z   01;31
+.Z   01;31
+.gz  01;31
+.tgz 01;31
+.bz2 01;31
+.tbz 01;31
+.tbz2 01;31
+.deb 01;31
+.rpm 01;31
+.ipk 01;31
+.prc 01;31
+.PRC 01;31
+.jar 01;31
+.cab 01;31
+.CAB 01;31
+
+# image formats
+.jpg 01;35
+.JPG 01;35
+.jpeg 01;35
+.JPEG 01;35
+.png 01;35
+.gif 01;35
+.bmp 01;35
+.pbm 01;35
+.pgm 01;35
+.pnm 01;35
+.ppm 01;35
+.tga 01;35
+.xbm 01;35
+.xpm 01;35
+.tif 01;35
+.xcf 01;35
+.ico 01;35
+
+# video formats
+.mpg 01;35
+.MPG 01;35
+.mpeg 01;35
+.avi 01;35
+.AVI 01;35
+.asf 01;35
+.wmv 01;35
+.rm 01;35
+.mov 01;35
+.fli 01;35
+.gl 01;35
+.dl 01;35
+.swf 01;35
+.dcr 01;35
+
+# sound formats
+.wav 01;35
+.au 01;35
+.mp3 01;35
+.ogg 01;35
+.pvf 01;35
+.ra 01;35
+.ram 01;35
+.pls 01;35
+.m3u 01;35
+.wma 01;35
+
+# backup and temporary files
+*~ 01;30
+*- 01;30
+.old 01;30
+.OLD 01;30
+.bak 01;30
+.BAK 01;30
+.back 01;30
+.dpkg-old 01;30
+.org 01;30
+.swp 01;30
+.swo 01;30
+.aux 01;30
+.bbl 01;30
+.glo 01;30
+.gls 01;30
+.ind 01;30
+.idx 01;30
+.blg 01;30
+
+# config files
+.conf 00;36
+.config 00;36
+.cnf 00;36
+*Conf 00;36
+*Config 00;36
+.cfg 00;36
+.CFG 00;36
+.ini 00;36
+.INI 00;36
+.inf 00;36
+.INF 00;36
+.reg 00;36
+.REG 00;36
+.pol 00;36
+.POL 00;36
+
+# system libraries, etc.
+.so 00;33
+.o 00;33
+.a 00;33
+.dll 00;33
+.DLL 00;33
+.sys 00;33
+.SYS 00;33
+.vxd 00;33
+.Vxd 00;33
+.VXD 00;33
+.drv 00;33
+.DRV 00;33
+.ocx 00;33
+.Ocx 00;33
+.OCX 00;33
+.ocm 00;33
+.ax 00;33
+.AX 00;33
+.acm 00;33
+.ACM 00;33
+.vwp 00;33
+.qts 00;33
+.bpl 00;33
+.lrc 00;33
+.LRC 00;33
+.cpl 00;33
+.CPL 00;33
+
+# data and help files
+.pwl 00;35
+.PWL 00;35
+.dat 00;35
+.DAT 00;35
+.MYD 00;35
+.MYI 00;35
+.db 00;35
+.DB 00;35
+.dba 00;35
+.DBA 00;35
+.pst 00;35
+.PST 00;35
+.pif 00;35
+.PIF 00;35
+.nls 00;35
+.NLS 00;35
+.gid 00;35
+.GID 00;35
+.hlp 00;33
+.HLP 00;33
+.pdb 00;33
+.PDB 00;33
+
+#.0 00;33
+#.1 00;33
+#.2 00;33
+#.3 00;33
+#.4 00;33
+#.5 00;33
+#.6 00;33
+#.7 00;33
+#.8 00;33
+#.9 00;33
+
+# text and document files
+.TXT 01;33
+.htm 01;33
+*html 01;33
+.css 01;33
+.xml 01;33
+.pdf 01;33
+.dvi 01;33
+.ps 01;33
+.eps 01;33
+.tex 01;33
+.bib 01;33
+
+# source code
+.c 00;31
+.cpp 00;31
+.c++ 00;31
+.cc 00;31
+.C 00;31
+.h 00;31
+.diff 00;31
+.patch 00;31
+
+# misc.
+*akefile 01;37
+*akefile.in 01;37
+*akefile.am 01;37
+.dpkg-dist 01;37
+*core 01;37
+.lnk 01;36
+.url 01;36
+
+# needs to come first
+*rc 00;36
+

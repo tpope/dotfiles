@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if [ -z "$DISPLAY" ]; then
+    echo "No display set.  Aborting." >&2
+    exit 2
+elif [ "$1" = "-E" ]; then
+    term="$2"; shift 2
+    exec "$term" "$@"
+fi
+
+[ -x "$XTERM" ] && exec "$XTERM" "$@"
+if [ -x "`which Eterm`" ]; then
+    if [ "$1" = -ut ]; then
+	shift
+	exec Eterm --utmp-logging=false "$@"
+    else
+	exec Eterm "$@"
+    fi
+fi
+
+[ -x /opt/sfw/bin/xterm ] && exec /opt/sfw/bin/xterm "$@"
+[ -x /usr/local/bin/xterm ] && exec /usr/local/bin/xterm "$@"
+[ -x /usr/X11R6/bin/xterm ] && exec /usr/X11R6/bin/xterm "$@"
+for term in Eterm rxvt aterm konsole gnome-multi-terminal gnome-terminal dtterm; do
+    [ -x "`which $term`" ] && exec $term "$@"
+done
+
+echo "No terminal emulators found." >&2
+exit 1
