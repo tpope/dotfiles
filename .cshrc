@@ -12,19 +12,14 @@ foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/ga
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
-#if ( $?LD_PRELOAD) then
-    #if ( $LD_PRELOAD !~ *libtrash* && -f "$HOME/.libtrash" && -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD "${LD_PRELOAD}:/usr/lib/libtrash/libtrash.so"
-    #if ( $LD_PRELOAD !~ *libtrash* && -f "$HOME/.libtrash" && -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD_SCREEN "${LD_PRELOAD}:/usr/lib/libtrash/libtrash.so"
-#else
-    #if ( -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD /usr/lib/libtrash/libtrash.so
-    #if ( -f /usr/lib/libtrash/libtrash.so ) setenv LD_PRELOAD_SCREEN /usr/lib/libtrash/libtrash.so
-#endif
-
 setenv ENV "$HOME/.shrc"
 setenv CLASSPATH '.'
-if ( -d "$HOME/java" )  setenv CLASSPATH "${CLASSPATH}:$HOME/java"
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java"
+if ( -d "$HOME/java" )  setenv CLASSPATH "${CLASSPATH}:$HOME/java"
 setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
+if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
+setenv CVS_RSH 'ssh'
 
 unset dir
 
@@ -39,10 +34,11 @@ setenv VISUAL 'vi'
 setenv PAGER 'less'
 setenv BROWSER "$HOME/bin/sensible-browser"
 setenv LESSOPEN '|lesspipe %s'
-setenv RSYNC_RSH 'ssh -a -x'
 set hostname = `hostname|sed -e 's/[.].*//'`
 setenv CVSROOT ':ext:rebelongto.us:/home/tpope/.cvs'
 if ( $hostname == bart ) setenv CVSROOT "$HOME/.cvs"
+
+set noclobber
 # }}}
 # Prompt {{{1
 if ( `id|sed -e 's/^uid=\([0-9]*\).*$/\1/'` == 0 ) then
@@ -160,7 +156,7 @@ endif
 
 alias mv 'mv -i'
 alias cp 'cp -i'
-alias rm 'tpope libtrash rm -i'
+alias rm "$HOME/bin/tpope libtrash rm"
 
 alias j 'jobs'
 
