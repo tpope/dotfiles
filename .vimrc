@@ -29,6 +29,7 @@ set grepprg=grep\ -nH\ $*
 let spell_auto_type = "mail"
 let spell_insert_mode = 0
 let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
+let c_comment_strings=1
 
 set background=dark
 if has ("gui_running")
@@ -39,9 +40,6 @@ if has ("gui_running")
   map <S-Insert> <MiddleMouse>
   map! <S-Insert> <MiddleMouse>
 endif
-
-let c_comment_strings=1
-
 
 if version>600
     set printoptions=paper:letter,syntax:n
@@ -54,7 +52,7 @@ if has("dos16") || has("dos32") || has("gui_win32")
   set shellpipe=2>&1<BAR><SPACE>tee
   set shellslash
 else
-  " I guess we're on unix then...
+  " UNIX
 endif
 "
 " Section: Functions {{{1
@@ -77,42 +75,21 @@ endf
 fu! Version()
   return version
 endf
-" ============================================================
-" Options() - used to display some important option values
-" within the status line (see below at "set statusline".
-" ============================================================
-fu! Options()
-" let opt="Opt:"
-  let opt=""
-  " autoindent
-  if &ai|   let opt=opt." ai"   |endif
-  "  expandtab
-  if &et|   let opt=opt." et"   |endif
-  "  hlsearch
-  if &hls|  let opt=opt." hls"  |endif
-  "  paste
-  if &paste|let opt=opt." paste"|endif
-  "  shiftwidth
-  if &shiftwidth!=8|let opt=opt." sw=".&shiftwidth|endif
-  "  textwidth - show always!
-  let opt=opt." tw=".&tw
-  return opt
+
+fu! TemplateFileFunc_sh()
+  $
 endf
-"
+
+fu! TemplateFileFunc_pl()
+  $
+endf
+
 " Section: Status Line {{{1
 " -------------------------
 
 if version>503
-" set statusline=%1*0x%02B%*\ %2*[%02n]%*\ %3*%<%F%*%(\ %Y%M%R%H%W%)\ %=%{Options()}\ %4*<%l,%c%V>%*
   set statusline=%1*%.99f%*\ %2*%h%w%m%r%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 endif
-" Text between "%{" and "%}" is being evaluated and thus suited for functions.
-" Here I will use the function "Options()" as defined above to show the
-" values of some (local) options..
-" The strings "%N*" unto "%*" correspond to the highlight group "UserN":
-" User2: color for buffer number
-" User3: color for filename
-" User4: color for position
 
 if ! has("gui_running")
   set notitle titlestring=Vim-%{Version()}@%{hostname()}:%{fnamemodify(getcwd(),\":p:~\")}
@@ -227,7 +204,7 @@ fun! FTCheck_asmsyntax()
   endif
 endfun
 
-autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if exists("*LoadTemplateFileConfirm") | if filereadable(expand($HOME . "/.vim/templates/skel.sh")) | call LoadTemplateFileConfirm($HOME . "/.vim/templates/skel.sh") | endif | endif | set ft=sh | exe 'norm G'
+autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if filereadable(expand($HOME . "/.vim/templates/skel.sh")) | execute "0r " . $HOME . "/.vim/templates/skel.sh" | silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/g" | endif | set ft=sh | $
  autocmd BufNewFile,BufRead *.txt			set tw=78 linebreak
  autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*	set ft=simpsons
  autocmd BufNewFile,BufRead *Fvwm*			set ft=fvwm
