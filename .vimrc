@@ -147,8 +147,8 @@ map <Leader>sw <Esc>:!echo "<cword>"\|aspell -a --<CR>
 map <Leader>fj <Esc>{:.,/^ *$/-2 call Justify('',3,)<CR>
 map <Leader>fJ <Esc>% call Justify('',3,)<CR>
 map <Leader>fp gqap
-map <Leader>fd <Esc>:!webster "<dword>" &<CR>
-map <Leader>ft <Esc>:!thesaurus "<dword>" &<CR>
+map <Leader>fd <Esc>:!webster "<cword>" &<CR>
+map <Leader>ft <Esc>:!thesaurus "<cword>" &<CR>
 
 " Emacs style mappings
 noremap! <C-A>    <Home>
@@ -174,9 +174,10 @@ noremap! <Esc>}   <C-O>}
 "     source ~/.vim/abbr.vim
 " endif
 iab Ysuper supercalifragilisticexpialidocious
-iab YTqb The quick brown fox jumps over the lazy dog
-iab teh the
+iab YTqb The quick, brown fox jumps over the lazy dog
+iab Ysg http://www.sexygeek.org
 iab YDATE <C-R>=strftime("%a %b %d %T %Z %Y")<CR>
+iab teh the
 
 " Section: Syntax Highlighting and Colors {{{1
 " --------------------------------------------
@@ -241,6 +242,7 @@ autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if exists("*Lo
 	\	|| getline(4) =~ '^!' || getline(5) =~ '^!') |
 	\   setf router |
 	\ endif
+ autocmd BufWritePost ~/.vimrc   so ~/.vimrc
  autocmd FileType perl,php,sh,zsh,csh,c,cpp,vim,html,java set sw=4 sts=4 ai
  autocmd FileType java set efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
  autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
