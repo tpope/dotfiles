@@ -10,7 +10,8 @@ text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
 text/richtext; richtext -t; description="Rich Text"; copiousoutput
 text/plain; vim -R '%s'; edit=vim '%s'; needsterminal; test=test -t 0
 text/plain; vim -gRf '%s'; edit=vim -gf '%s'; test=test -n "$DISPLAY" -a ! -t 0
-video/*; mplayer '%s'; description="Video"
+video/*; mplayer '%s'; description="Video"; needsterminal; test=test -t 0
+video/*; gmplayer '%s'; description="Video"; test =test -n "$DISPLAY"
 image/*; feh '%s'; edit=gimp '%s'; description=Image; test=test -n "$DISPLAY"
 image/*; xv '%s';  description="Image"; test=test -n "$DISPLAY"
 image/*; anytopnm '%s' > '%s.pnm' && aview -driver curses '%s.pnm' && rm -f '%s.pnm';  description="Image"; needsterminal
