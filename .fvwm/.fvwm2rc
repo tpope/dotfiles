@@ -818,14 +818,6 @@ FuncAddIfExists MenuFvwmNetwork "&Netscape%mini.netscape.xpm%" netscape
 DestroyMenu MenuFvwmMultimedia
 AddToMenu MenuFvwmMultimedia "Multimedia" Title
 + MissingSubmenuFunction FuncMenuMusic
-Test (x $[HOME]/.fvwm/fvwm-menu-music) + "Mus&ic%menu/folder.xpm%" Popup $[HOME]/media/music
-Test (x cdcd) + "&Disc Tracks%menu/disk-cd.xpm%" Popup MenuCDTracks
-+ "P&revious%mini/prev.xpm%"    Exec exec tpope media prev
-+ "&Play%mini/play.xpm%"        Exec exec tpope media play
-+ "Pa&use%mini/pause.xpm%"      Exec exec tpope media toggle
-+ "&Stop%mini/stop.xpm%"        Exec exec tpope media stop
-+ "&Next%mini/next.xpm%"        Exec exec tpope media next
-+ ""                            Nop
 + "&Aumix%aumix.mini.xpm%"      Exec exec aumix
 + "&Gimp%menu/gimp.xpm%"        FuncExec gimp* "exec gimp"
 PipeRead 'if [ -x "`which tvtime 2>/dev/null`" ]; then \
@@ -842,6 +834,15 @@ PipeRead 'if [ -x "`which gmplayer 2>/dev/null`" ]; then \
 echo "+ \\"MPlay&er%menu/video.xpm%\\" Exec exec gmplayer"; \
 elif [ -x "`which xine 2>/dev/null`" ]; then \
 echo "+ \\"Xin&e%menu/video.xpm%\\" Exec exec xine"; fi'
+
++ ""                            Nop
+Test (x $[HOME]/.fvwm/fvwm-menu-music) + "Mus&ic%menu/folder.xpm%" Popup $[HOME]/media/music
+Test (x cdcd) + "&Disc Tracks%menu/disk-cd.xpm%" Popup MenuCDTracks
++ "P&revious%mini/prev.xpm%"    Exec exec tpope media prev
++ "&Play%mini/play.xpm%"        Exec exec tpope media play
++ "Pa&use%mini/pause.xpm%"      Exec exec tpope media toggle
++ "&Stop%mini/stop.xpm%"        Exec exec tpope media stop
++ "&Next%mini/next.xpm%"        Exec exec tpope media next
 # }}}2
 # Remote Logins and Screens {{{2
 PipeRead "$HOME/bin/hostinfo --fvwm-menus"
@@ -954,6 +955,7 @@ PipeRead 'for i in `seq 0 26`; do echo + \\"\\&\
 DestroyMenu MenuHeadlines
 AddToMenu   MenuHeadlines "Headlines" Title
 + MissingSubmenuFunction FuncMenuHeadlines
+Test (f $[HOME]/.fvwm/.fvwm-menu-headlines/extension.pl) + "SexyGeek"   Popup sexygeek
 + "Slashdot"   Popup slashdot
 + "Kuro5hin"   Popup kuro5hin
 + "BBSpot"     Popup bbspot
@@ -1276,6 +1278,7 @@ AddToFunc   FuncMenuHeadlines
 
 DestroyFunc FuncResetHeadlines
 AddToFunc   FuncResetHeadlines
++ I DestroyMenu sexygeek
 + I DestroyMenu slashdot
 + I DestroyMenu kuro5hin
 + I DestroyMenu bbspot
