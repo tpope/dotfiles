@@ -52,9 +52,6 @@ Netscape*documentFonts.xResolution*iso-8859-1: 100
 Netscape*documentFonts.yResolution*iso-8859-1: 100
 
 !## XTERM {{{1
-xterm*background: #000000
-xterm*foreground: #aaaaaa
-
 XTerm*VT100*background: #000000
 XTerm*VT100*foreground: #aaaaaa
 XTerm*boldMode: false
@@ -63,7 +60,7 @@ XTerm*scrollBar: false
 XTerm*colorBDMode: true
 XTerm*colorBD: #ffffff
 XTerm*cursorColor: #cccccc
-XTerm*font: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm*font: -misc-fixed-medium-r-semicondensed--12-*-*-*-c-*-iso8859-1
 XTerm*fontMenu*fontdefault*Label: Default
 XTerm*font1: -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
 XTerm*fontMenu*font1*Label: Tiny
@@ -77,7 +74,7 @@ XTerm*font5: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
 XTerm*fontMenu*font5*Label: Huge
 XTerm*font6: -sony-fixed-medium-r-normal--24-*-*-*-c-*-iso8859-1
 XTerm*fontMenu*font6*Label: Gigantic
-XTerm*boldFont: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm*boldFont: -misc-fixed-medium-r-semicondensed--12-*-*-*-c-*-iso8859-1
 XTerm*faceSize: 10
 XTerm*visualBell: true
 XTerm*eightBitInput: false
@@ -108,7 +105,7 @@ XTerm-white*scrollBar: false
 XTerm-white*colorBDMode: true
 XTerm-white*colorBD: #ffffff
 XTerm-white*cursorColor: #333333
-XTerm-white*font: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm-white*font: -misc-fixed-medium-r-semicondensed--12-*-*-*-c-*-iso8859-1
 XTerm-white*fontMenu*fontdefault*Label: Default
 XTerm-white*font1: -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
 XTerm-white*fontMenu*font1*Label: Tiny
@@ -122,7 +119,7 @@ XTerm-white*font5: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
 XTerm-white*fontMenu*font5*Label: Huge
 XTerm-white*font6: -sony-fixed-medium-r-normal--24-*-*-*-c-*-iso8859-1
 XTerm-white*fontMenu*font6*Label: Gigantic
-XTerm-white*boldFont: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm-white*boldFont: -misc-fixed-medium-r-semicondensed--12-*-*-*-c-*-iso8859-1
 XTerm-white*faceSize: 10
 XTerm-white*visualBell: true
 XTerm-white*eightBitInput: false
