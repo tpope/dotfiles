@@ -29,6 +29,7 @@ TERM xterm-debian
 TERM rxvt
 TERM screen
 TERM screen-w
+TERM screen.linux
 TERM vt100
 TERM Eterm
 TERM Eterm-xterm
