@@ -5,7 +5,7 @@ local tmp
 case $service in
 tpope)
 if [[ $CURRENT = 2 ]]; then
-    tmp=(start stop restart reload force-reload 'runcontrol:start or stop daemons' rclink 'launch:start and disown a process' 'sensible-browser:web browser' 'x-terminal-emulator: X terminal emulator' 'xauth-get:retrieve X authoritization' 'ruptime:remote uptime' 'rwho: remote who')
+    tmp=(start stop restart reload force-reload 'runcontrol:start or stop daemons' rclink 'launch:start and disown a process' 'sensible-browser:web browser' 'x-terminal-emulator: X terminal emulator' 'xauth-get:retrieve X authoritization' 'ruptime:remote uptime' 'rwho: remote who' activity away)
     _describe 'tpope command' tmp -- && ret=0
 else
     shift words

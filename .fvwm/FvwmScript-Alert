@@ -41,7 +41,7 @@ PeriodicTasks
     If $activity=={Playing} Then
      Set $newtitle =mini/game.xpm
     Else
-     Set $newtitle ="!"
+     Set $newtitle ={!}
    End
 #   If $away=={Out} Then
 #   Begin
@@ -54,7 +54,7 @@ PeriodicTasks
     Set $newtitle =(Div $load 10) {.} (RemainderOfDiv $load 10)
     Set $newforecolor =Blue
    End
-   Set $cell =(GetOutput {cat $HOME/.blue/last_slh 2>/dev/null || date +%s} 1 1)
+   Set $cell =(GetOutput {if [ -f /tmp/.phone-status ]; then . /tmp/.phone-status; if [ "$is_active" = 1 ]; then date +%s; elif [ "$is_active" = 0 ]; then echo 0; else cat $HOME/.blue/last_slh 2>/dev/null || date +%s; fi; else cat $HOME/.blue/last_slh 2>/dev/null || date +%s; fi} 1 1)
    If (Add (GetTime) (Mult -1 $cell)) > 420 Then
    Begin
     Set $newforecolor =Orange
@@ -69,7 +69,7 @@ PeriodicTasks
    Else
    Begin
    End
-   Set $apm =(GetOutput {if [ -x /usr/bin/apm ]; then power=`/usr/bin/apm | sed -e 's/^.* \([0-9]*\)%.*$/\1/' -e 's/.....*/100/'`; echo $power; else echo 101; fi} 1 -1)
+   Set $apm =(GetOutput {if [ -x /usr/bin/apm ]; then power=`/usr/bin/apm | sed -e 's/^.* \([0-9]*\)%.*$/\1/' -e 's/.....*/100/'`; echo $power; elif [ -f /tmp/.phone-status ]; then . /tmp/.phone-status; [ "$battery" -a "$source" = 0 ] || battery=101; echo $battery; else echo 101; fi} 1 -1)
    If $apm < 31 Then
    Begin
     Set $newtitle =$apm {%}
@@ -112,10 +112,18 @@ Property
  Font xft:Sans:pixelsize=14
 Main
  Case message of
-  SingleClic :
+  SingleClic:
   Begin
-#   Do {FuncFvwmScreenXterm}
-   If $forecolor=={DarkGreen}
+   If $forecolor=={DarkGreen} Then
+   Begin
     Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+   End
+   If $forecolor=={Orange} Then
+   Begin
+    If $title=={mini/game.xpm} Then
+     Do {Exec pkill -INT ut2004-bin >/dev/null 2>&1}
+    Set $activity =(GetOutput {tpope activity} 1 1)
+    Set $away =(GetOutput {tpope away} 1 1)
+   End
   End
 End

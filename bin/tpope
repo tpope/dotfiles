@@ -15,8 +15,8 @@ case "$basename" in
     
     activity|away)
 	if [ "`hostname`" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
-	    [ "$#" = 1 -a -z "$1" ] && exec ssh marge tpope $basename -c
-	    exec ssh marge tpope $basename "$@"
+	    [ "$#" = 1 -a -z "$1" ] && exec ssh -ax marge tpope $basename -c
+	    exec ssh -ax marge tpope $basename "$@"
 	fi
 	if [ "$#" = 0 ]; then
 	    cat "$HOME/.$basename" 2>/dev/null
@@ -185,6 +185,8 @@ case "$basename" in
     fi
     exit 1
     ;;  
+
+    word) cat /usr/share/dict/words | grep "$@" ;;
 
     xauth-get) exec ssh -ax "$1" xauth extract - "$1:0"|xauth merge - ;;
     x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;

@@ -21,7 +21,13 @@ if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
     export LD_PRELOAD LD_PRELOAD_SCREEN
 fi ;; esac
 
-export PATH
+CLASSPATH=.
+[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
+[ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
+
+PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+
+export PATH CLASSPATH PERL5LIB
 
 if [ -t 1 ]; then
 
@@ -36,9 +42,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     BROWSER="$HOME/bin/sensible-browser"
     PAGER='less'
     [ -x /usr/bin/lesspipe ] && LESSOPEN='|lesspipe %s'
-    CLASSPATH=.
-    [ -d "$HOME/java" ] && CLASSPATH="$CLASSPATH$HOME/java"
-    RSYNC_RSH='ssh -x'
+    RSYNC_RSH='ssh -a -x'
     CVSROOT=':ext:bart.simpson:/home/tpope/.cvs'
     [ "$hostname" = bart ] && CVSROOT="$HOME/.cvs"
 
@@ -148,7 +152,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	set -o emacs >/dev/null 2>&1
 
     fi
-    export VISUAL PAGER LESSOPEN LESSCHARSET CLASSPATH RSYNC_RSH CVSROOT PS1
+    export VISUAL PAGER LESSOPEN LESSCHARSET RSYNC_RSH CVSROOT PS1
 fi
 unset promptchar interactive execbin hostname oldterm dir mtime atime
 fi

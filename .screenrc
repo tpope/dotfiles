@@ -64,12 +64,16 @@ bind -c shiftalt A copy
 bind -c shiftalt B colon
 bind -c shiftalt C next
 bind -c shiftalt D prev
-bind -c shiftalt P windowlist -p
+bind -c shiftalt P windowlist -b
 bind -c shiftalt Q screen
 bind -c shiftalt R select 0
 bind -c shiftalt S select 1
 #bind -c shiftalt ~ stuff ^D
 bind -c shiftalt ~ command -c ssh
+bind -c shiftalt 0 stuff ^[[20
+bind -c shiftalt 1 stuff ^[[21
+bind -c shiftalt 3 stuff ^[[23
+bind -c shiftalt 4 stuff ^[[24
 
 bindkey -d -k kD
 bindkey -d -k kb
@@ -94,7 +98,7 @@ bindkey ^[[d      prev
 bindkey ^[^[[3~  detach
 bindkey ^[[3;3~  detach
 
-bindkey ^[[23~    windowlist -b
+#bindkey ^[[23~    windowlist -b
 #bindkey ^[O2P     windowlist -b
 bindkey ^[[24~    screen
 #bindkey ^[O2Q     screen

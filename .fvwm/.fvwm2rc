@@ -80,34 +80,66 @@ MenuStyle Screens MenuColorset 43, ActiveFore White, HilightBack DarkGreen
 # Default Styles {{{2
 
 DefaultFont 7x13
-TitleStyle      Height 18
-#ButtonStyle     1 -- MwmDecorMenu
-ButtonStyle     1 -- UseTitleStyle
-#AddButtonStyle  1 CGradient 16 White grey20
-AddButtonStyle  1 MiniIcon -- flat
-AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
-AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
-AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
-ButtonStyle 2 - !MwmDecorMax
-ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
-ButtonStyle 4 - MwmDecorMax !MwmDecorMin
-ButtonStyle 4 Default 2
-ButtonStyle 6 - MwmDecorMin MwmDecorShade
-ButtonStyle 6 Default 4
 
-#ButtonStyle 2 17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1 - !MwmDecorMax
-#ButtonStyle 2 - !MwmDecorMax
-#ButtonStyle 4 Default 2 - MwmDecorMax !MwmDecorMin
-#ButtonStyle 4 - MwmDecorMax
-#ButtonStyle 6 Default 4 - MwmDecorMin
-#ButtonStyle 6 - MwmDecorMin
+DestroyDecor Default
+AddToDecor Default
++ TitleStyle      Height 18
++ ButtonStyle     1 -- MwmDecorMenu
++ ButtonStyle     1 -- UseTitleStyle
+#+ AddButtonStyle  1 CGradient 16 White grey20
++ ButtonStyle  1 MiniIcon -- flat
++ AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
++ AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
+#+ AddButtonStyle  1 Inactive --  flat
++ AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
+#+ AddButtonStyle  1 ActiveUp --  flat
++ ButtonStyle 2 - !MwmDecorMax
++ ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
++ ButtonStyle 4 - MwmDecorMax !MwmDecorMin
++ ButtonStyle 4 Default 2
++ ButtonStyle 6 - MwmDecorMin MwmDecorShade
++ ButtonStyle 6 Default 4
++ ButtonStyle 3 (11 80x20@1 45x20@1 55x30@1 30x55@1 20x45@1 20x80@1 55x80@0 \
+	45x70@0 70x45@0 80x55@0 80x20@0)
++ ButtonStyle 5 (25 50x10@1 35x25@1 43x25@0 43x43@1 25x43@1 25x35@0 10x50@1 \
+                            25x65@0 25x57@0 43x57@0 43x75@1 35x75@1 50x90@0 \
+                            65x75@0 57x75@1 57x57@0 75x57@0 75x65@1 90x50@0 \
+                            75x35@1 75x43@1 57x43@1 57x25@0 65x25@0 50x10@1)
+
+DestroyDecor Flat
+AddToDecor Flat
++ BorderStyle -- NoInset HiddenHandles
++ TitleStyle      Height 18 -- Flat
++ ButtonStyle     1 -- MwmDecorMenu
++ ButtonStyle     1 -- UseTitleStyle
+#+ AddButtonStyle  1 CGradient 16 White grey20
++ ButtonStyle  1 MiniIcon -- flat
++ AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
+#+ AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
++ AddButtonStyle  1 Inactive --  flat
+#+ AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
++ AddButtonStyle  1 ActiveUp --  flat
++ ButtonStyle 2 - !MwmDecorMax
++ ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
++ ButtonStyle 4 - MwmDecorMax !MwmDecorMin
++ ButtonStyle 4 Default 2
++ ButtonStyle 6 - MwmDecorMin MwmDecorShade
++ ButtonStyle 6 Default 4
++ ButtonStyle 3 (11 80x20@1 45x20@1 55x30@1 30x55@1 20x45@1 20x80@1 55x80@0 \
+	45x70@0 70x45@0 80x55@0 80x20@0)
++ ButtonStyle 5 (25 50x10@1 35x25@1 43x25@0 43x43@1 25x43@1 25x35@0 10x50@1 \
+                            25x65@0 25x57@0 43x57@0 43x75@1 35x75@1 50x90@0 \
+                            65x75@0 57x75@1 57x57@0 75x57@0 75x65@1 90x50@0 \
+                            75x35@1 75x43@1 57x43@1 57x25@0 65x25@0 50x10@1)
+
+Style * UseDecor Default
 
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
 Style *         Icon norm/unknown.xpm, MiniIcon mini/unknown.xpm
 Style *         Color white/#607860
 Style *         HilightFore white, HilightBack #008000
-Style *         BorderWidth 6, HandleWidth 6
+Style *         BorderWidth 5, HandleWidth 5
 Style *         MWMFunctions, MWMDecor, MWMButtons, HintOverride
 Style *         DecorateTransient, NoPPosition
 Style *         IconBox 0 -10 -280 -1
@@ -137,12 +169,20 @@ AddToDecor Terminal
 + ButtonStyle 4 Default 2
 + ButtonStyle 6 - MwmDecorMin MwmDecorShade
 + ButtonStyle 6 Default 4
++ ButtonStyle 3 (11 80x20@1 45x20@1 55x30@1 30x55@1 20x45@1 20x80@1 55x80@0 45x70@0 70x45@0 80x55@0 80x20@0)
++ ButtonStyle 5 (25 50x10@1 35x25@1 43x25@0 43x43@1 25x43@1 25x35@0 10x50@1 \
+                          25x65@0 25x57@0 43x57@0 43x75@1 35x75@1 50x90@0 \
+                          65x75@0 57x75@1 57x57@0 75x57@0 75x65@1 90x50@0 \
+                          75x35@1 75x43@1 57x43@1 57x25@0 65x25@0 50x10@1)
+#+ ButtonStyle 5 (12 50x10@1 25x35@1 40x35@1 40x60@1 25x60@1 50x85@1 75x60@0 60x60@0 60x35@0 75x35@0 50x10@0 50x10@1)
+#+ ButtonStyle 7 (12 10x50@1 35x25@1 35x40@1 65x40@1 65x25@1 90x50@1 65x75@0 65x60@0 35x60@0 35x75@0 10x50@0 10x50@1)
 
 Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm, SloppyFocus
-Style Terminal  GrabFocus, GrabFocusTransient, UseDecor Terminal
-Style Terminal  HilightBack grey24, BackColor grey32
-Style Terminal  HilightBorderColorset 50, BorderColorset 60
-Style Terminal  HandleWidth 5
+Style Terminal  GrabFocus, GrabFocusTransient
+# , UseDecor Terminal
+Style Terminal  HilightBack grey20, BackColor grey28
+#Style Terminal  HilightBorderColorset 50, BorderColorset 60
+Style Terminal  HandleWidth 4
 # , IconBox -70 1 -1 -140
 Style XTerm*    UseStyle Terminal, Icon rterm.xpm
 Style UXTerm*   UseStyle Terminal, Icon rterm.xpm
@@ -152,10 +192,14 @@ Style kterm*    UseStyle Terminal
 Style dtterm*   UseStyle Terminal
 Style Dtterm*   UseStyle Terminal
 Style konsole*  UseStyle Terminal
-Style *ssh*     Icon norm/terminal-remote.xpm, MiniIcon mini/terminal-remote.xpm, HilightBorderColorset 51, BorderColorset 61
-Style screen*  Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm, HilightBorderColorset 52, BorderColorset 62
-Style screen-ssh* Icon norm/terminal-special.xpm, MiniIcon mini/terminal-special.xpm, HilightBorderColorset 53, BorderColorset 63
-Style screen-irc* Icon norm/chat.xpm, MiniIcon mini/chat.xpm, HilightBorderColorset 53, BorderColorset 63
+Style *ssh*     Icon norm/terminal-remote.xpm, MiniIcon mini/terminal-remote.xpm
+#Style *ssh*     HilightBorderColorset 51, BorderColorset 61
+Style screen*   Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm
+#Style screen*   HilightBorderColorset 52, BorderColorset 62
+Style screen-ssh* Icon norm/terminal-special.xpm, MiniIcon mini/terminal-special.xpm
+#Style screen-ssh* HilightBorderColorset 53, BorderColorset 63
+Style screen-irc* Icon norm/chat.xpm, MiniIcon mini/chat.xpm
+#Style screen-irc* HilightBorderColorset 53, BorderColorset 63
 
 # }}}2
 # Editor Styles {{{2
@@ -193,10 +237,12 @@ Style screen-irc* ForeColor #d0ff80, HilightFore #d0ff80
 Style Fvwm*     NoTitle,  Sticky, WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
 Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
 Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
-Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff, UseDecor
-Style FvwmConsole  Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 5
+Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff
+#, UseDecor
+Style FvwmConsole  Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, BorderWidth 5, HandleWidth 5
 Style FvwmForm*    Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, NoButton 4
 Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 4, MiniIcon mini.run.xpm, Icon run.xpm
+Style FvwmAmetista Slippery, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient
 Style FvwmPager*   BorderWidth 4, NoHandles
 Style FvwmBanner   StaysOnTop
 Style FvwmIconMan  NeverFocus, BorderWidth 4, HandleWidth 4
@@ -208,9 +254,9 @@ Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 4, NoHandles
 Style *lock     NoTitle, NoHandles, Sticky, WindowListSkip, ClickToFocus, Icon norm/lock.xpm, MiniIcon mini/lock.xpm
 Style gkrellm*  Sticky, WindowListSkip, FocusFollowsMouse
 Style *biff     NoTitle, Sticky, WindowListSkip, ClickToFocus
-Style xcalc     NoButton 4, ClickToFocus, Icon norm/calculator.xpm, MiniIcon mini/calculator.xpm
+Style xcalc     NoButton 4, Icon norm/calculator.xpm, MiniIcon mini/calculator.xpm
 Style xmh       StickyIcon, NoButton 4, Icon mail1.xpm, NoIconTitle
-Style xman      ClickToFocus, Icon xman.xpm, MiniIcon mini.xman.xpm
+Style xman      Icon xman.xpm, MiniIcon mini.xman.xpm
 Style xmag      ClickToFocus, Icon norm/viewer.xpm, MiniIcon mini/viewer.xpm
 Style xzoom*    ClickToFocus, Icon norm/viewer.xpm, MiniIcon mini/viewer.xpm
 Style XConsole  NoTitle, ClickToFocus, GrabFocusOff
@@ -221,7 +267,7 @@ Style XScreenSaver Icon norm/display.xpm, MiniIcon mini/display.xpm
 Style *font*    MiniIcon mini/font.xpm
 Style aumix     MiniIcon aumix.mini.xpm
 Style *OpenOffice* MiniIcon mini/word-processor.xpm
-Style *mutt*    Icon mutt.xpm, MiniIcon mutt.mini.xpm
+Style mutt*     Icon mutt.xpm, MiniIcon mutt.mini.xpm
 Style Xawtv     Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style Gimp      HilightBack #FF2222, BackColor #786060, MiniIcon mini/gimp.xpm
@@ -233,6 +279,7 @@ Style xpdf      MiniIcon mini.pdf.xpm
 Style gv        MiniIcon mini/ghostview.xpm
 Style xdvi      MiniIcon mini/printing.xpm
 Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, UsePPosition
+Style VCLSalFrame GrabFocusOff, UsePPosition
 Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
 Style SDL_App   BorderWidth 0, HandleWidth 0, NoTitle, MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
 
@@ -309,10 +356,10 @@ Key F5          A       M       Raise
 Key F5          A       SM      FuncRestore
 Key F6          A       M       Next FuncFocusWindow
 Key F6          A       SM      Prev FuncFocusWindow
-Key F7          A       M       Move
+Key F7          A       M       FuncMove
 Key F7          A       SM      RefreshWindow
 Key F8          A       M       Resize
-Key F8          A       SM      RecaptureWindow
+Key F8          A       SM      FuncRecaptureWindow
 Key F9          A       M       Iconify
 Key F9          A       SM      Module FvwmIdent
 Key F10         A       M       Maximize 100 -72p
@@ -429,21 +476,21 @@ Silent Key KP_Subtract A       C       GotoDesk 0 2
 Silent Key KP_Delete   A       C       GotoDeskAndPage prev
 #Key BackSpace          A       C       GotoDeskAndPage prev
 
-Key F1          A       C       GotoPage 0 0
-Key F2          A       C       GotoPage 1 0
-Key F3          A       C       GotoPage 2 0
-Key F4          A       C       GotoPage 0 1
-Key F5          A       C       GotoPage 1 1
-Key F6          A       C       GotoPage 2 1
-Key F7          A       C       GotoPage 0 2
-Key F8          A       C       GotoPage 1 2
-Key F9          A       C       GotoPage 2 2
+#Key F1          A       C       GotoPage 0 0
+#Key F2          A       C       GotoPage 1 0
+#Key F3          A       C       GotoPage 2 0
+#Key F4          A       C       GotoPage 0 1
+#Key F5          A       C       GotoPage 1 1
+#Key F6          A       C       GotoPage 2 1
+#Key F7          A       C       GotoPage 0 2
+#Key F8          A       C       GotoPage 1 2
+#Key F9          A       C       GotoPage 2 2
 #Silent Key Home A       C       GotoPage prev
-Key F10         A       C       GotoDesk 0 0
-Silent Key F11  A       C       GotoDesk 0 1
-Silent Key SunF36 A     C       GotoDesk 0 1
-Silent Key F12  A       C       GotoDesk 0 2
-Silent Key SunF37 A     C       GotoDesk 0 2
+#Key F10         A       C       GotoDesk 0 0
+#Silent Key F11  A       C       GotoDesk 0 1
+#Silent Key SunF36 A     C       GotoDesk 0 1
+#Silent Key F12  A       C       GotoDesk 0 2
+#Silent Key SunF37 A     C       GotoDesk 0 2
 
 Key Delete      A       C       Menu MenuGotoDesktop
 Key Delete      A       4       Menu MenuGotoDesktop
@@ -461,25 +508,27 @@ Key Delete      A       CM      Menu MenuFvwmQuitVerify Root c c
 Key BackSpace   A       4       GotoDeskAndPage prev
 Key BackSpace   A       5       GotoDeskAndPage prev
 
-Key F1          A       CS      FuncTakeToPage 0 0
-Key F2          A       CS      FuncTakeToPage 1 0
-Key F3          A       CS      FuncTakeToPage 2 0
-Key F4          A       CS      FuncTakeToPage 0 1
-Key F5          A       CS      FuncTakeToPage 1 1
-Key F6          A       CS      FuncTakeToPage 2 1
-Key F7          A       CS      FuncTakeToPage 0 2
-Key F8          A       CS      FuncTakeToPage 1 2
-Key F9          A       CS      FuncTakeToPage 2 2
+#Key F1          A       CS      FuncTakeToPage 0 0
+#Key F2          A       CS      FuncTakeToPage 1 0
+#Key F3          A       CS      FuncTakeToPage 2 0
+#Key F4          A       CS      FuncTakeToPage 0 1
+#Key F5          A       CS      FuncTakeToPage 1 1
+#Key F6          A       CS      FuncTakeToPage 2 1
+#Key F7          A       CS      FuncTakeToPage 0 2
+#Key F8          A       CS      FuncTakeToPage 1 2
+#Key F9          A       CS      FuncTakeToPage 2 2
 Silent Key Home A       CS      FuncTakeToPage prev
-Key F10         A       CS      FuncTakeToDesk 0 0
-Silent Key F11  A       CS      FuncTakeToDesk 0 1
-Silent Key SunF36 A     CS      FuncTakeToDesk 0 1
-Silent Key F12  A       CS      FuncTakeToDesk 0 2
-Silent Key SunF37 A     CS      FuncTakeToDesk 0 2
+#Key F10         A       CS      FuncTakeToDesk 0 0
+#Silent Key F11  A       CS      FuncTakeToDesk 0 1
+#Silent Key SunF36 A     CS      FuncTakeToDesk 0 1
+#Silent Key F12  A       CS      FuncTakeToDesk 0 2
+#Silent Key SunF37 A     CS      FuncTakeToDesk 0 2
 
 # }}}2
 
 PipeRead "$HOME/bin/hostinfo --fvwm-keys"
+Key Grave   A   C       FuncIrcScreenSshXterm
+Key Grave   A   SC      FuncIrcScreenSshXtermShared
 Key 0       A   CM      Exec exec favorite-app
 Key 1       A   CM      Exec exec sensible-browser http://www.google.com/
 Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
@@ -564,7 +613,7 @@ Mouse 1 I       A       FuncMoveOrIconify
 Mouse 2 I       A       Iconify
 #Mouse 2 TSIF    A       StrokeFunc DrawMotion
 #Mouse 2 TSIF    S       StrokeFunc EchoSequence DrawMotion
-Mouse 2 TSIF    A       FuncResizeOrRaiseOrShade
+Mouse 2 TSI     A       FuncResizeOrRaiseOrShade
 Mouse 3 TSF     A       Menu MenuFvwmWindowOps RaiseLower
 Mouse 4 T       A       FuncTakeToDesk -1 0 2
 Mouse 5 T       A       FuncTakeToDesk +1 0 2
@@ -664,10 +713,10 @@ AddToFunc StartFunction
 + I Module FvwmProxy
 + I UnsetEnv fvwm_titlefont
 + I UnsetEnv fvwm_iconfont 
++ I UnsetEnv fvwm_smallfont
 #+ I UnsetEnv fvwm_datefont
 #+ I UnsetEnv fvwm_timefont
 #+ I UnsetEnv fvwm_alertfont
-+ I UnsetEnv fvwm_smallfont
 
 DestroyFunc InitFunction
 AddToFunc InitFunction
@@ -708,8 +757,8 @@ AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
 +       "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
 +       "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
 PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian'
-PipeRead 'test -e "$KDEDIR" -o -e /usr/share/applnk && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
 PipeRead 'test -e /usr/share/gnome/apps && echo + \\"\\&GNOME%menu/gnome.xpm%\\" Popup Gnome-sys'
+PipeRead 'test -e "$KDEDIR" -o -e /usr/share/applnk && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
 +       "&Headlines%menu/news.xpm"          Popup MenuHeadlines
 +       ""              Nop
 +       "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
@@ -767,9 +816,12 @@ AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
 + "Fvwm &Modules"           Popup MenuFvwmModules
 + "Stop Fvwm Mo&dule"       Popup MenuFvwmStopModule
 + "" Nop
-+ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
-+ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
-+ "&Focus Follows Mouse"    FuncFocusPolicyChange FocusFollowsMouse
++ "MWM Decor"               Style * UseDecor Default
++ "Flat Decor"              Style * UseDecor Flat
+#+ "" Nop
+#+ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
+#+ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
+#+ "&Focus Follows Mouse"    FuncFocusPolicyChange FocusFollowsMouse
 + "" Nop
 + "Co&lormap Follows Mouse" ColormapFocus FollowsMouse
 + "Colormap Follows F&ocus" ColormapFocus FollowsFocus
@@ -871,7 +923,7 @@ AddToMenu   MenuHeadlines "Headlines" Title
 # Window Operations Menu {{{2
 DestroyMenu MenuFvwmWindowOps
 AddToMenu MenuFvwmWindowOps
-+ "&Move	   M-F7%menu/window-move.xpm%"          Move
++ "&Move	   M-F7%menu/window-move.xpm%"          FuncMove
 + "&Resize	   M-F8%menu/window-resize.xpm%"        Resize
 + "R&aise	   M-F5%menu/window-raise.xpm%"         Raise
 + "&Lower	   M-F3%menu/window-lower.xpm%"         Lower
@@ -881,9 +933,9 @@ AddToMenu MenuFvwmWindowOps
 + "(Un)S&hade	   M-F12%menu/window-shade.xpm%"        WindowShade
 + ""                                                    Nop
 + "Re&fresh	S-M-F7%menu/refresh.xpm%"               RefreshWindow
-+ "R&ecapture	S-M-F8%menu/display.xpm%"               RecaptureWindow
++ "R&ecapture	S-M-F8%menu/display.xpm%"               FuncRecaptureWindow
 + "Identif&y	S-M-F9%menu/window-identify.xpm%"       Module FvwmIdent
-+ "Scroll&Bar	S-M-F11%mini.move.xpm%"                 Module FvwmScroll 2 2
++ "Scroll&Bar	S-M-F11%mini.move2.xpm%"                Module FvwmScroll 2 2
 + "Ca&pture	C-Print%mini.camera.xpm%"               Pick FuncCaptureWindow
 + ""                                                    Nop
 + "&Take To Desk	 S-C-Del%mini.book4.xpm%"       Popup MenuTakeToDesktop
@@ -903,12 +955,17 @@ AddToFunc FuncDeiconifyAndRearrange
 + I Iconify off
 + I All (CurrentPage Iconic) PlaceAgain Icon
 #}}}3
+# FuncMove {{{3
+DestroyFunc FuncMove
+AddToFunc FuncMove
++ I Move $0
+# }}}3
 # FuncMoveOrRaise {{{3
 DestroyFunc FuncMoveOrRaise
 AddToFunc FuncMoveOrRaise
 + I Focus
 + I Raise
-+ M Move
++ M FuncMove
 + D Lower
 # }}}3
 # FuncMaximize {{{3
@@ -923,7 +980,7 @@ AddToFunc FuncMaximize
 DestroyFunc FuncMoveOrIconify
 AddToFunc FuncMoveOrIconify
 + I Raise
-+ M Move
++ M FuncMove
 + D Iconify
 # }}}3
 # FuncResizeOrRaiseOrShade {{{3
@@ -983,6 +1040,12 @@ AddToFunc FuncFlipFocusWindow
 + I FlipFocus
 + I Raise
 + I WarpToWindow 25p 7p
+# }}}3
+# FuncRecaptureWindow {{{3
+DestroyFunc FuncRecaptureWindow
+AddToFunc FuncRecaptureWindow
++ I PlaceAgain
++ I RecaptureWindow
 # }}}3
 # FuncCaptureWindow {{{3
 DestroyFunc FuncCaptureWindow
@@ -1084,6 +1147,12 @@ AddToFunc FuncIrcScreenSshXterm
 + I Next (screen-irc@marge, AcceptsFocus) Focus
 + I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e hostinfo -S marge -t sh -c "'DISPLAY=mona:0.0 exec screen -c $HOME/.irssi/screenrc -dRR irc'"
 
+DestroyFunc FuncIrcScreenSshXtermShared
+AddToFunc FuncIrcScreenSshXtermShared
++ I Next (screen-irc@marge, AcceptsFocus) Iconify off
++ I Next (screen-irc@marge, AcceptsFocus) Focus
++ I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e hostinfo -S marge -t sh -c "'DISPLAY=mona:0.0 exec screen -c $HOME/.irssi/screenrc -xRR irc'"
+
 DestroyFunc FuncIrcScreenIrcXterm
 AddToFunc FuncIrcScreenXterm
 + I Next (screen-irc@localhost) Iconify off
@@ -1159,6 +1228,8 @@ DestroyModuleConfig FvwmBacker: *
 *FvwmBacker: Command (Desk 2, Page 0 2) FuncSetRootAPM 1 0 3
 *FvwmBacker: Command (Desk 2, Page 1 2) FuncSetRootAPM 2 0 3
 *FvwmBacker: Command (Desk 2, Page 2 2) FuncSetRootAPM 3 0 3
+
+Read FvwmBacker-Fancy Quiet
 
 # }}}2
 # FvwmButtons Config {{{2

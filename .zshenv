@@ -10,6 +10,11 @@ for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games
 done
 path=($HOME/bin $path /usr/bin /bin /usr/bin/X11 /usr/games /usr/local/sbin /usr/sbin /sbin)
 
+CLASSPATH=.
+[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
+[ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
+PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+
 case "$LD_PRELOAD" in *libtrash*) ;; *)
 if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
     LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"

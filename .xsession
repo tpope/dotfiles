@@ -2,17 +2,12 @@
 # Author: Tim Pope
 
 PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
-[ -n "$ENV" ] || ENV="$HOME/bin/.shrc"
+[ -n "$ENV" ] || ENV="$HOME/.shrc"
 . "$ENV"
 [ -x /bin/zsh ] && export SHELL=/bin/zsh
 unset STY
 
 xsetroot -solid '#001010'
-xset m 3 3
-[ "`hostname`" = lisa ] && xset m 4 3
-[ "`hostname`" = mona ] && xset m 3 20
-xset r rate 600 30
-xset b 40 440 60
 
 hosts="marge bart maggie lisa homer abe mona"
 dpy=`echo ${DISPLAY:-:0.0} | sed -e 's/localhost//'`
@@ -37,6 +32,14 @@ fi
 ( [ -d /KNOPPIX ] && ping -c 1 www.sexygeek.org && \
   wget -qO- -T10 http://www.sexygeek.org/tpope.tar.gz|gzip -dc|tar xpC "$HOME" -f - || true
 ) >/dev/null 2>&1 &
+
+xset m 3 3
+[ "`hostname`" = lisa ] && xset m 4 3
+#[ "`hostname`" = mona ] && xset m 3 20
+xset r rate 600 30
+xset b 40 440 60
+
+[ -f "$HOME/.xmodmap" ] && xmodmap "$HOME/.xmodmap"
 
 export ESPEAKER="$hname" RPLAY_HOST="$hname"
 export WINDOW_MANAGER="fvwm2"
@@ -63,9 +66,10 @@ fi
 
 wait
 
-[ ! -x "`which xscreensaver`" ] || nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
-[ ! -x "`which unclutter`" ] || unclutter -idle 10 &
-[ ! -x "`which imwheel`" ] || imwheel -k -b 000067 2>/dev/null &
+[ ! -x "`which xscreensaver 2>/dev/null`" ] || nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
+#[ ! -x "`which btcid-launch 2>/dev/null`" ] || btcid-launch
+[ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 &
+[ ! -x "`which imwheel 2>/dev/null`" ] || imwheel -k -b 000067 2>/dev/null &
 [ ! -f "$HOME/.lircrc" ] || irexec &
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
 [ "$GPG_AGENT_INFO" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
@@ -76,6 +80,16 @@ export LD_PRELOAD
 ;; esac
 
 xsetroot -solid '#002020'
+
+if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
+    width="`xwininfo -root|grep Width:|awk '{print $2}'`"
+    height="`xwininfo -root|grep Height:|awk '{print $2}'`"
+    depth="`xwininfo -root|grep Depth:|awk '{print $2}'`"
+    Xwnc -ac -depth "$depth" -geometry "${width}x$height" :7 &
+    xterm -title Metisse -e metisse-start-fvwm -wd :7 -wp abc123
+    pkill Xwnc
+    exit 0
+fi
 
 if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
     exec $sshagent $wm
