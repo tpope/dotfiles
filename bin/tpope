@@ -329,7 +329,7 @@ case "$basename" in
 
     word) cat /usr/share/dict/words | egrep "$@" ;;
 
-    xauth-get) exec host-info --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
+    xauth-get) exec hostinfo --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
     x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
     *) echo "$basename: unknown command." >&2 ;;

@@ -73,20 +73,8 @@ spam
 # Mailing lists
 
 #:0
-#* ^Subject: .*\[OldAPDs\]
-#apds
-
-#:0
-#* ^Subject: .*\[capd-adults\]
-#capd
-
-:0
-* ^Subject: .*\[(SS|speedseductionlist)\]
-speed
-
-:0
-* ^Subject: .*\[Zaurus-general\]
-zaurus
+#* ^Subject: .*\[Zaurus-general\]
+#zaurus
 
 :0
 * ^X-BeenThere: debian-knoppix@linuxtag\.org
