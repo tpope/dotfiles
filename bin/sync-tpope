@@ -83,6 +83,7 @@ if [ -n "$cvs" ]; then
     $RSYNC $FILES /tmp/tpope-$$/tpope/
     cd /tmp/tpope-$$/tpope/
     cvs -q $cvs
+    $RSYNC $FILES "$HOME"
     cvs -qf release
     cd
     rm -rf /tmp/tpope-$$
