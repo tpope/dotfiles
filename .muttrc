@@ -12,6 +12,7 @@ set nowait_key
 set record==sent
 set postponed==postponed
 set index_format="%4C %Z %{%b %d} %-15.15F (%?l?%4l&%4c?) %s"
+set sort=threads
 set sort_browser=reverse-date
 set mime_forward=ask-no
 set status_format="-%r-Mutt@%h:%f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s/%S)-%>-(%P)---"
@@ -30,7 +31,7 @@ set reverse_realname
 `[ -d "$HOME/.smime/certificates" ] && echo set smime_default_key=$(hostname).pem || echo set`
 `[ -x /usr/bin/muttprint ] && echo set print_command=muttprint || echo set`
 
-mailboxes "!" "imap://bart/" "imap://lisa/" "imap://marge/" "imap://homer/" "imap://abe/" "imap://mona/"
+mailboxes "!" # "imap://bart/" "imap://lisa/" "imap://marge/" "imap://homer/" "imap://abe/" "imap://mona/"
 auto_view text/richtext text/html
 #set implicit_autoview
 alternative_order text/enriched text/richtext text/plain text
@@ -161,8 +162,8 @@ mono  body      bold                    "Bad signature from.*"
 
 # Formatting
 color body      brightwhite     black   "(^| |\t)\\*[a-z0-9]([a-z0-9-]* ){,3}[a-z0-9,.!?-]*\\*"
-color body      brightyellow    default "(^| |\t)_[a-z0-9]([a-z0-9-]* ){,6}[a-z0-9,.!?-]+_"
-color body      brightyellow    default "(^| |\t)_[a-z0-9][a-z0-9,.!?_-]*_"
+color body      brightyellow    black "(^| |\t)_[a-z0-9]([a-z0-9-]* ){,6}[a-z0-9,.!?-]+_"
+color body      brightyellow    black "(^| |\t)_[a-z0-9][a-z0-9,.!?_-]*_"
 
 # Misc
 color body      brightblack     black   "^[-_=*]{3,}\n"
@@ -176,15 +177,15 @@ lists mutt-users speedseductionlist zaurus-general debian-knoppix
 # ------------------
 `mutt -v|grep +USE_IMAP >/dev/null && echo set imap_list_subscribed=yes || echo set`
 
-account-hook . 'unset imap_user; unset imap_pass; unset tunnel'
+account-hook . 'unset imap_user imap_pass tunnel'; folder-hook . 'set folder="$HOME/Mail"'
 
-account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'
-account-hook imap://bart/   'set tunnel="hostinfo -S bart -qx /usr/sbin/imapd"'
-account-hook imap://lisa/   'set tunnel="hostinfo -S lisa -qx /usr/sbin/imapd"'
-account-hook imap://marge/  'set tunnel="hostinfo -S marge -qx /usr/sbin/imapd"'
-account-hook imap://homer/  'set tunnel="hostinfo -S homer -qx /usr/sbin/imapd"'
-account-hook imap://abe/    'set tunnel="hostinfo -S abe -qx /usr/sbin/imapd"'
-account-hook imap://mona/   'set tunnel="hostinfo -S mona -qx /usr/sbin/imapd"'
+account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
+account-hook imap://bart/   'set tunnel="hostinfo -S bart -qx /usr/sbin/imapd"'; folder-hook imap://bart/ 'set folder=imap://bart/'
+account-hook imap://lisa/   'set tunnel="hostinfo -S lisa -qx /usr/sbin/imapd"'; folder-hook imap://lisa/ 'set folder=imap://lisa/'
+account-hook imap://marge/  'set tunnel="hostinfo -S marge -qx /usr/sbin/imapd"'; folder-hook imap://marge/ 'set folder=imap://marge/'
+account-hook imap://homer/  'set tunnel="hostinfo -S homer -qx /usr/sbin/imapd"'; folder-hook imap://homer/ 'set folder=imap://homer/'
+account-hook imap://abe/    'set tunnel="hostinfo -S abe -qx /usr/sbin/imapd"'; folder-hook imap://abe/ 'set folder=imap://abe/'
+account-hook imap://mona/   'set tunnel="hostinfo -S mona -qx /usr/sbin/imapd"'; folder-hook imap://mona/ 'set folder=imap://mona/'
 
 account-hook imap://bart.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh bart /usr/sbin/imapd"'
 account-hook imap://lisa.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh lisa /usr/sbin/imapd"'

@@ -12,18 +12,20 @@ termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* WS=\E[8;%d;%dt
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* ti@:te@:G0 # use scrollback
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007
 termcapinfo Eterm* "XT:C8"
-setenv LD_PRELOAD "$LD_PRELOAD_SCREEN"
 defflow off
 #time "%c:%s %M %d %H%? %l%?"
 windowlist string "%3n %{= dd}%?%h%:%t%?%=%f%{-}"
 caption    string "%?%F%{y}%?%3n %{= wk}%?%h%:%t%?%{-}"
+activity "Activity in window %n (%t)^G^G"
+bell_msg "Bell in window %n (%t)^G"
+setenv LD_PRELOAD "$LD_PRELOAD_SCREEN"
 bind `  select 0
 bind  e screen -ln vim
 bind ^E screen -ln vim
 #bind ^ stuff "^^"
 bind ^Y colon "screen -ln ssh "
 bind  y colon "screen -ln ssh "
-bind  S eval "height 51" "hardstatus alwayslastline '%-Lw%{= WK}%34>%n%f* %t%{-}%+Lw %= %0c'" "split"
+bind  S eval "height 51" "hardstatus alwayslastline '%-Lw%{= WK}%34>%n*%f %t%{-}%+Lw %= %0c'" "split"
 bind  Q eval "hardstatus message %?%h%:%t%?" "only" "height 24"
 bind ^U screen -ln -fn -t uptime sh -c 'echo -ne "\e]0;UPTIME\a"; export TERMINAL=1; while clear >/tmp/ruptime.$$; do echo "HOST      STATUS       TIME        USERS   LOAD" >>/tmp/ruptime.$$; tpope ruptime >>/tmp/ruptime.$$; if [ `(cat /tmp/ruptime.$$; rwho)|wc -l` -le 22 ]; then echo >>/tmp/ruptime.$$; tpope rwho >>/tmp/ruptime.$$; fi; cat /tmp/ruptime.$$; rm -f /tmp/ruptime.$$; sleep 15; done'
 bind ^B eval "hardcopy_append off" "hardcopy -h $HOME/.screen-urlview" "screen -fn -ln -t urlview urlview $HOME/.screen-urlview"

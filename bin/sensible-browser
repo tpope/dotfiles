@@ -16,7 +16,8 @@ elif [ "$1" = "-G" ]; then
     launch() { nohup x-terminal-emulator -title 'WWW-Browser' -e "$@" >/dev/null 2>&1 & exit 0
     }
 elif [ "$STY" ]; then
-    launch() { screen -ln -fn -t "WWW-Browser@`hostname|sed -e 's/[.].*//'`" "$@"; sleep 3; exit 0
+    #launch() { screen -ln -fn -t "WWW@`hostname|sed -e 's/[.].*//'`" "$@"; sleep 3; exit 0
+    launch() { screen -ln -fn -t "WWW" "$@"; sleep 2; exit 0
     }
 elif [ ! -t 1 ]; then
     launch() { nohup x-terminal-emulator -title 'WWW-Browser' -e "$@" >/dev/null 2>/dev/null & exit 0

@@ -81,7 +81,7 @@ MenuStyle Screens MenuColorset 43, ActiveFore White, HilightBack DarkGreen
 
 DefaultFont 7x13
 TitleStyle      Height 18
-ButtonStyle     1 -- MwmDecorMenu
+#ButtonStyle     1 -- MwmDecorMenu
 ButtonStyle     1 -- UseTitleStyle
 #AddButtonStyle  1 CGradient 16 White grey20
 AddButtonStyle  1 MiniIcon -- flat
@@ -124,7 +124,7 @@ AddToDecor Terminal
 + AddTitleStyle Inactive   ( HGradient 192 3 grey30 20 grey12 60 grey12 20 grey30 )
 + AddTitleStyle ActiveUp   ( HGradient 192 3 grey16 20 grey8  60 grey8  20 grey16 )
 + AddTitleStyle ActiveDown ( HGradient 192 3 grey12 20 grey4  60 grey4  20 grey12 )
-+ ButtonStyle     1 -- MwmDecorMenu
+#+ ButtonStyle     1 -- MwmDecorMenu
 + ButtonStyle     1 -- UseTitleStyle
 + AddButtonStyle  1 CGradient 16 grey90 black
 + AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1) Inactive (CGradient 16 grey90 grey10)
@@ -185,6 +185,7 @@ Style WWW-Browser       UseStyle www-browser
 
 PipeRead "$HOME/bin/hostinfo --fvwm-styles"
 PipeRead "echo 'Style *localhost* UseStyle' \\*@`hostname|sed -e 's/[.].*//'`\\*"
+Style screen-irc* ForeColor #d0ff80, HilightFore #d0ff80
 
 # }}}2
 # Fvwm Module Styles {{{2
@@ -193,8 +194,8 @@ Style Fvwm*     NoTitle,  Sticky, WindowListSkip, Icon norm/system.xpm, MiniIcon
 Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
 Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
 Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff, UseDecor
-Style FvwmConsole  Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 5
-Style FvwmForm*    Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, NoButton 4
+Style FvwmConsole  Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, BorderWidth 6, HandleWidth 5
+Style FvwmForm*    Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, NoButton 4
 Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 4, MiniIcon mini.run.xpm, Icon run.xpm
 Style FvwmPager*   BorderWidth 4, NoHandles
 Style FvwmBanner   StaysOnTop
@@ -482,21 +483,21 @@ PipeRead "$HOME/bin/hostinfo --fvwm-keys"
 Key 0       A   CM      Exec exec favorite-app
 Key 1       A   CM      Exec exec sensible-browser http://www.google.com/
 Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
-Key 3       A   CM      FuncFvwmExec gaim "exec gaim"
-Key 4       A   CM      FuncFvwmIrcScreenSshXterm
+Key 3       A   CM      FuncExec gaim "exec gaim"
+Key 4       A   CM      FuncIrcScreenSshXterm
 Key 6       A   CM      Exec exec xpenguins --nice .8 3
 Key 7       A   CM      Module FvwmConsole
 Key 9       A   CM      Exec exec aumix
-Key Space   A   CM      FuncFvwmScreenXterm
+Key Space   A   CM      FuncScreenXterm
 
 Key 1       A   SCM     Exec exec sensible-browser
 Key 2       A   SCM     Exec sleep 1; xscreensaver-command -lock || exec xlock
 Key 3       A   SCM     Exec exec gaim -a
-Key 4       A   SCM     FuncFvwmIrcScreenXterm
+Key 4       A   SCM     FuncIrcScreenXterm
 Key 6       A   SCM     Exec exec xpenguins -t "Big Penguins" --nice .8 3
 Key 7       A   SCM     Exec exec pkill -U $[USER] xpenguins
 Key 9       A   SCM     Exec tvtime || exec xawtv
-Key Space   A   SCM     FuncFvwmXterm
+Key Space   A   SCM     FuncXterm
 Key G       A   SCM     Exec exec gaim -a
 Key W       A   SCM     Exec exec sensible-browser
 Key Z       A   SCM     Exec tvtime || exec xawtv
@@ -697,7 +698,7 @@ AddToFunc SessionRestartFunction
 # Menus {{{1
 DestroyMenu MenuFvwmRoot
 AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
-+       "X &Terminal%menu/terminal.xpm%"       FuncFvwmScreenXterm
++       "X &Terminal%menu/terminal.xpm%"       FuncScreenXterm
 +       "&Web Browser%menu/www.xpm%"           Exec sensible-browser http://www.google.com/
 +       "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
 +       ""              Nop
@@ -729,7 +730,7 @@ AddToMenu Gnome-sys
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
 +       "&UT2004%menu/game-action.xpm%"     Exec exec ut2004
-+       "&IRC%menu/chat.xpm%"        FuncFvwmIrcScreenSshXterm
++       "&IRC%menu/chat.xpm%"        FuncIrcScreenSshXterm
 +       "OpenOffice &Writer%menu/word-processor.xpm%" Exec exec oowriter
 +       ""                           Nop
 +       "&Firefox%mozilla.mini.xpm%" Exec mozilla-firebird || exec firefox
@@ -747,9 +748,9 @@ AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
 +       ""                           Nop
 +       "G&vim%mini.vim.xpm%"        Exec exec vim -g
 +       "M&utt%mutt.mini.xpm%"       Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
-+       "Ga&im%mini.gaim.xpm%"       FuncFvwmExec gaim "exec gaim"
++       "Ga&im%mini.gaim.xpm%"       FuncExec gaim "exec gaim"
 +       "Xaw&tv%menu/video.xpm%"     Exec xawtv || exec tvtime
-+       "&Gimp%menu/gimp.xpm%"       FuncFvwmExec gimp* "gimp-2.0 || exec gimp"
++       "&Gimp%menu/gimp.xpm%"       FuncExec gimp* "gimp-2.0 || exec gimp"
 +       ""                           Nop
 +       "X&Lock%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
 +       "&Screenshot%menu/windows.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
@@ -766,9 +767,9 @@ AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
 + "Fvwm &Modules"           Popup MenuFvwmModules
 + "Stop Fvwm Mo&dule"       Popup MenuFvwmStopModule
 + "" Nop
-+ "&Sloppy Focus"           FuncFvwmFocusPolicyChange SloppyFocus
-+ "&Click To Focus"         FuncFvwmFocusPolicyChange ClickToFocus
-+ "&Focus Follows Mouse"    FuncFvwmFocusPolicyChange FocusFollowsMouse
++ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
++ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
++ "&Focus Follows Mouse"    FuncFocusPolicyChange FocusFollowsMouse
 + "" Nop
 + "Co&lormap Follows Mouse" ColormapFocus FollowsMouse
 + "Colormap Follows F&ocus" ColormapFocus FollowsFocus
@@ -780,8 +781,8 @@ AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
 + "&Partial Paging"           EdgeScroll 50 50
 + "Full Paging && &Edge Wrap" EdgeScroll 100000 100000
 
-DestroyFunc FuncFvwmFocusPolicyChange
-AddToFunc FuncFvwmFocusPolicyChange
+DestroyFunc FuncFocusPolicyChange
+AddToFunc FuncFocusPolicyChange
 + I Style * $0
 + I Recapture
 
@@ -790,7 +791,7 @@ AddToMenu MenuFvwmModules "Fvwm Modules"        Title
 + "&Gkrellm"            Module FvwmButtons FvwmButtonsGkrellm
 + "Control &Animation"  Popup  MenuFvwmAnimate
 + "&Button-Bar"         Module FvwmButtons
-+ "Ic&onBox"            FuncFvwmConfigureIconBox
++ "Ic&onBox"            FuncConfigureIconBox
 #+ "&Forms"              Popup  MenuFvwmForms
 + "&Identify"           Module FvwmIdent
 + "Icon&Man"            Module FvwmIconMan
@@ -818,8 +819,8 @@ AddToMenu MenuFvwmStopModule "Stop Fvwm Modules" Title
 
 
 # Configure and start using an iconbox on the fly
-DestroyFunc FuncFvwmConfigureIconBox
-AddToFunc FuncFvwmConfigureIconBox
+DestroyFunc FuncConfigureIconBox
+AddToFunc FuncConfigureIconBox
 + I Module FvwmIconBox
 #+ I Style     *  NoIcon
 
@@ -895,79 +896,80 @@ AddToMenu MenuFvwmWindowOps
 # }}}2
 # }}}1
 # Functions {{{1
-# FuncDeiconifyAndRearrange {{{2
+# Window Functions {{{2
+# FuncDeiconifyAndRearrange {{{3
 DestroyFunc FuncDeiconifyAndRearrange
 AddToFunc FuncDeiconifyAndRearrange
 + I Iconify off
 + I All (CurrentPage Iconic) PlaceAgain Icon
-#}}}2
-# FuncMoveOrRaise {{{2
+#}}}3
+# FuncMoveOrRaise {{{3
 DestroyFunc FuncMoveOrRaise
 AddToFunc FuncMoveOrRaise
 + I Focus
 + I Raise
 + M Move
 + D Lower
-# }}}2
-# FuncMaximize {{{2
+# }}}3
+# FuncMaximize {{{3
 DestroyFunc FuncMaximize
 AddToFunc FuncMaximize
 + M Maximize   0 100
 + H Maximize   0 100
 + C Maximize 100  90
 + D Maximize 100 100
-# }}}2
-# FuncMoveOrIconify {{{2
+# }}}3
+# FuncMoveOrIconify {{{3
 DestroyFunc FuncMoveOrIconify
 AddToFunc FuncMoveOrIconify
 + I Raise
 + M Move
 + D Iconify
-# }}}2
-# FuncResizeOrRaiseOrShade {{{2
+# }}}3
+# FuncResizeOrRaiseOrShade {{{3
 DestroyFunc FuncResizeOrRaiseOrShade
 AddToFunc FuncResizeOrRaiseOrShade
 + I Raise
 + M Resize
 + D WindowShade
-# }}}2
-# FuncUnshadeAndIconify {{{2
+# }}}3
+# FuncUnshadeAndIconify {{{3
 DestroyFunc FuncUnshadeAndIconify
 AddToFunc FuncUnshadeAndIconify
 + I WindowShade false
 + C Iconify
-# }}}2
-# FuncRestore {{{2
+# }}}3
+# FuncRestore {{{3
 DestroyFunc FuncRestore
 AddToFunc FuncRestore
 + I Maximize false
 + I WindowShade false
 + I Iconify false
-# }}}2
-# FuncWindowWarp {{{2
+# }}}3
+# FuncWindowWarp {{{3
 DestroyFunc FuncWindowWarp
 AddToFunc FuncWindowWarp
 + I WindowId root 1 WarpToWindow $*
 + I PointerWindow Focus
 + I PointerWindow WarpToWindow 25p 7p
-# }}}2
-# WindowListFunc {{{2
+# }}}3
+# WindowListFunc {{{3
 DestroyFunc WindowListFunc
 AddToFunc WindowListFunc
 + I FuncDeiconifyAndRearrange
 + I FlipFocus
 + I Raise
 + I WarpToWindow 25p 7p
-# }}}2
-# EWMHActivateWindowFunc {{{2
+# }}}3
+# EWMHActivateWindowFunc {{{3
 DestroyFunc EWMHActivateWindowFunc
 AddToFunc EWMHActivateWindowFunc
 + I FuncDeiconifyAndRearrange
 + I FlipFocus
 + I Raise
 + I WarpToWindow 25p 7p
-# }}}2
-# FuncFocusWindow {{{2
+# }}}3
+# FuncFocusWindow {{{3
 DestroyFunc FuncFocusWindow
 AddToFunc FuncFocusWindow
 + I FuncDeiconifyAndRearrange
@@ -981,11 +983,12 @@ AddToFunc FuncFlipFocusWindow
 + I FlipFocus
 + I Raise
 + I WarpToWindow 25p 7p
-# }}}2
-# FuncCaptureWindow {{{2
+# }}}3
+# FuncCaptureWindow {{{3
 DestroyFunc FuncCaptureWindow
 AddToFunc FuncCaptureWindow
 + I Exec exec import -window $[w.id] $[HOME]/$[w.id]-`date +%Y-%m-%d_%H-%M-%S`.png
+# }}}3
 # }}}2
 # Desktop Functions {{{2
 DestroyFunc FuncTakeToPage
@@ -1026,71 +1029,69 @@ AddToFunc FuncTakeToPrevDeskAndPage
 + I GotoDesk prev
 # }}}2
 # Xterm Functions {{{2
-DestroyFunc FuncFvwmXterm
-AddToFunc FuncFvwmXterm
+DestroyFunc FuncXterm
+AddToFunc FuncXterm
 + I Exec exec x-terminal-emulator -T localhost -n localhost
 
-DestroyFunc FuncFvwmScreenXterm
-AddToFunc FuncFvwmScreenXterm
+DestroyFunc FuncScreenXterm
+AddToFunc FuncScreenXterm
 + I Next (screen@localhost, AcceptsFocus) Iconify off
 + I Next (screen@localhost, AcceptsFocus) Focus
 + I Next (screen@localhost, AcceptsFocus) WarpToWindow 25p 7p
-+ I None (screen@localhost, AcceptsFocus) Exec exec x-terminal-emulator -T screen@localhost -n screen@localhost -e screen -RR
++ I None (screen@localhost, AcceptsFocus) Exec exec x-terminal-emulator -T screen@localhost -n screen@localhost -e screen -dRR $[HOST]
 
-DestroyFunc FuncFvwmSshXterm
-AddToFunc FuncFvwmSshXterm
+DestroyFunc FuncSshXterm
+AddToFunc FuncSshXterm
 + I Exec exec x-terminal-emulator -ut -T ssh@$0 -n ssh@$0 -e hostinfo -S $0 -t
 
-DestroyFunc FuncFvwmScreenSshXterm
-AddToFunc FuncFvwmScreenSshXterm
+DestroyFunc FuncScreenSshXterm
+AddToFunc FuncScreenSshXterm
 + I Next (screen-ssh@$0, AcceptsFocus) Iconify off
 + I Next (screen-ssh@$0, AcceptsFocus) Focus
 + I Next (screen-ssh@$0, AcceptsFocus) WarpToWindow 25p 7p
-+ I None (screen-ssh@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-ssh@$0 -n screen-ssh@$0 -e hostinfo -S $0 -t screen -RR
++ I None (screen-ssh@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-ssh@$0 -n screen-ssh@$0 -e hostinfo -S $0 -t screen -dRR $[HOST]
 
-DestroyFunc FuncFvwmXtermSsh
-AddToFunc FuncFvwmXtermSsh
+DestroyFunc FuncXtermSsh
+AddToFunc FuncXtermSsh
 + I Exec exec ssh -X $0 xterm
 # }}}2
 # Application Functions {{{2
-DestroyFunc FuncFvwmFindWebBrowser
-AddToFunc FuncFvwmFindWebBrowser
+DestroyFunc FuncFindWebBrowser
+AddToFunc FuncFindWebBrowser
 + I Next (WWW-Browser*, AcceptsFocus) Focus
 + I Next (*Mozilla*, AcceptsFocus) Focus
 + I Next (Firefox-bin, AcceptsFocus) Iconify off
 + I Next (Firefox-bin, AcceptsFocus) Focus
 
-DestroyFunc FuncFvwmWebBrowser
-AddToFunc FuncFvwmWebBrowser
+DestroyFunc FuncWebBrowser
+AddToFunc FuncWebBrowser
 + I Exec exec sensible-browser $*
-+ I FuncFvwmFindWebBrowser
++ I FuncFindWebBrowser
 
-DestroyFunc FuncFvwmCustomWebBrowser
-AddToFunc FuncFvwmCustomWebBrowser
+DestroyFunc FuncCustomWebBrowser
+AddToFunc FuncCustomWebBrowser
 + I Exec $*
-+ I FuncFvwmFindWebBrowser
++ I FuncFindWebBrowser
 
-DestroyFunc FuncFvwmSmartWebBrowser
-AddToFunc FuncFvwmSmartWebBrowser
-+ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo $*|tr -d ' \t\n\r\f'`" ;; *) exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo $*|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;; esac
-+ I FuncFvwmFindWebBrowser
+DestroyFunc FuncSmartWebBrowser
+AddToFunc FuncSmartWebBrowser
++ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo $*|tr -d ' \t\n\r\f'`" ;; *) echo "$*"; exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo \"$*\"|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e s/\'/%27/g`" ;; esac
++ I FuncFindWebBrowser
 
-    vnc)
+DestroyFunc FuncIrcScreenSshXterm
+AddToFunc FuncIrcScreenSshXterm
++ I Next (screen-irc@marge, AcceptsFocus) Iconify off
++ I Next (screen-irc@marge, AcceptsFocus) Focus
++ I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e hostinfo -S marge -t sh -c "'DISPLAY=mona:0.0 exec screen -c $HOME/.irssi/screenrc -dRR irc'"
 
-DestroyFunc FuncFvwmIrcScreenSshXterm
-AddToFunc FuncFvwmIrcScreenSshXterm
-+ I Next (screen-irc@mona, AcceptsFocus) Iconify off
-+ I Next (screen-irc@mona, AcceptsFocus) Focus
-+ I None (screen-irc@mona, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@mona -n screen-irc@mona -e hostinfo -S mona -t sh -c "'DISPLAY=:0.0 exec screen -c $HOME/.irssi/screenrc -dRR irc'"
-
-DestroyFunc FuncFvwmIrcScreenIrcXterm
-AddToFunc FuncFvwmIrcScreenXterm
+DestroyFunc FuncIrcScreenIrcXterm
+AddToFunc FuncIrcScreenXterm
 + I Next (screen-irc@localhost) Iconify off
 + I Next (screen-irc@localhost, AcceptsFocus) Focus
 + I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -T screen-irc@localhost -n screen-irc@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
 
-DestroyFunc FuncFvwmExec
-AddToFunc FuncFvwmExec
+DestroyFunc FuncExec
+AddToFunc FuncExec
 + I Next ($0) Iconify off
 + I Next ($0, AcceptsFocus) Focus
 + I None ($0) Exec $1
@@ -1190,7 +1191,7 @@ DestroyModuleConfig FvwmButtons: *
 *FvwmButtons: (4x6, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineB" "Module FvwmPager FvwmPagerInlineB 1 2")
 *FvwmButtons: (End)
 #*FvwmButtons: (4x3, Frame 0, Swallow(UseOld,NoHints,Respawn) "xeyes" `Exec exec xeyes -geometry -3000-3000`)
-#*FvwmButtons: (4x2, Frame 0, Padding 0 0, Title $[USER], Action FuncFvwmScreenXterm)
+#*FvwmButtons: (4x2, Frame 0, Padding 0 0, Title $[USER], Action FuncScreenXterm)
 #PipeRead "echo -n '*FvwmButtons: (6x6, Frame 0, Padding 0 0, \
 #    Swallow(UseOld,NoHints,Respawn) '; \
 #    if glxinfo 2>/dev/null|grep 'direct rendering: Yes' >/dev/null && \
@@ -1198,8 +1199,8 @@ DestroyModuleConfig FvwmButtons: *
 #    then echo 'glbiff `Exec exec glbiff -geometry -3000-3000`)'; \
 #    else echo 'xbiff `Exec exec xbiff -shape -geometry -3000-3000`)'; fi"
 #*FvwmButtons: (6x6, Frame 0, Padding 0 0, Container(Font fixed, Rows 1, Columns 1, Frame 0, Padding 0 0 ))
-#*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) FuncFvwmCustomWebBrowser xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'|exec tpope url -)
-*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) PipeRead 'echo FuncFvwmSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncFvwmScreenXterm)
+#*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) FuncCustomWebBrowser xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'|exec tpope url -)
+*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
 #*FvwmButtons: (4x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "xload" "Exec exec xload -bg PaleTurquoise -fg black -hl blue -update 5 -nolabel -jumpscroll 1 -g -3000-3000")
 *FvwmButtons: (4x6, Padding 1 5, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
 #*FvwmButtons: (4x3, Frame 0, Swallow(UseOld) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 2")
@@ -1264,7 +1265,7 @@ DestroyModuleConfig FvwmPagerInlineA: *
 *FvwmPagerInlineA: Geometry 144x48-3000-3000
 *FvwmPagerInlineA: Font none
 *FvwmPagerInlineA: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
-*FvwmPagerInlineA: SmallFont micro
+#*FvwmPagerInlineA: SmallFont micro
 *FvwmPagerInlineA: Hilight White
 *FvwmPagerInlineA: DeskColor 0 #00FCFC
 *FvwmPagerInlineA: DeskPixmap 0 cyan_62x47.xpm
@@ -1282,7 +1283,7 @@ DestroyModuleConfig FvwmPagerInlineB: *
 *FvwmPagerInlineB: Geometry 144x48-3000-3000
 *FvwmPagerInlineB: Font none
 *FvwmPagerInlineB: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
-*FvwmPagerInlineB: SmallFont micro
+#*FvwmPagerInlineB: SmallFont micro
 *FvwmPagerInlineB: Hilight White
 *FvwmPagerInlineB: DeskColor 0 #00FCFC
 *FvwmPagerInlineB: DeskPixmap 0 cyan_32x23.xpm

@@ -14,6 +14,10 @@ case "$basename" in
 	exit 0 ;;
     
     activity|away)
+	if [ "`hostname`" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
+	    [ "$#" = 1 -a -z "$1" ] && exec ssh marge tpope $basename -c
+	    exec ssh marge tpope $basename "$@"
+	fi
 	if [ "$#" = 0 ]; then
 	    cat "$HOME/.$basename" 2>/dev/null
 	    exit
@@ -149,12 +153,12 @@ case "$basename" in
     temperature) webget="curl -m8 -s"
 	[ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
 	temp="`$webget http://weather.noaa.gov/weather/current/${1:-KSAT}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
-	case temp in
+	case "$temp" in
 	    ?????*) echo "$temp" ;;
 	    ????)  echo " $temp" ;;
 	    ???)  echo "  $temp" ;;
 	    ??)  echo "   $temp" ;;
-	    *) echo " --.-" ;;
+	    *) echo " --$temp.-" ;;
 	esac
 	;;
 

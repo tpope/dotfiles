@@ -17,7 +17,7 @@ FILES="\
 GUI_FILES="\
  .kde/share/config/kdeglobals .kde/share/apps/konqueror/bookmarks.xml \
  .kde/share/apps/konsole .kde/share/icons .gkrellm .gkrellm2/[^l]* .qt \
- .gnupg/pubring.gpg .libtrash .irssi \
+ .gnupg/pubring.gpg .libtrash .irssi .pork/porkrc .pork/scract.pl \
  "
 
 SSH="ssh -a -x -oStrictHostKeyChecking=no"

@@ -23,8 +23,11 @@ PeriodicTasks
  Begin
   If (RemainderOfDiv (Add (GetTime) -25) 1200)==0 Then
    Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
-  If (RemainderOfDiv (GetTime) 60)==0 Then
+  If (RemainderOfDiv (GetTime) 60)==20 Then
+  Begin
    Set $activity =(GetOutput {tpope activity} 1 1)
+   Set $away =(GetOutput {tpope away} 1 1)
+  End
   If (RemainderOfDiv (GetTime) 5)==0 Then
   Begin
    Set $newtitle =$temp
@@ -40,11 +43,22 @@ PeriodicTasks
     Else
      Set $newtitle ="!"
    End
+#   If $away=={Out} Then
+#   Begin
+#    Set $newforecolor =Orange
+#    Set $newtitle =mini.connect.xpm
+#   End
    Set $load =(Div (GetOutput {uptime|sed -e 's/^.*average: //' -e 's/ .*$//' -e 's/\.//'} 1 -1) 10)
    If 19 < $load Then
    Begin
     Set $newtitle =(Div $load 10) {.} (RemainderOfDiv $load 10)
     Set $newforecolor =Blue
+   End
+   Set $cell =(GetOutput {cat $HOME/.blue/last_slh 2>/dev/null || date +%s} 1 1)
+   If (Add (GetTime) (Mult -1 $cell)) > 420 Then
+   Begin
+    Set $newforecolor =Orange
+    Set $newtitle =mini.connect.xpm
    End
    Set $mail =(GetOutput {finger $LOGNAME 2>/dev/null|grep '^New mail' 2>/dev/null} 1 2)
    If $mail=={mail} Then
@@ -100,6 +114,8 @@ Main
  Case message of
   SingleClic :
   Begin
-   Do {FuncFvwmScreenXterm}
+#   Do {FuncFvwmScreenXterm}
+   If $forecolor=={DarkGreen}
+    Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
   End
 End
