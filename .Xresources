@@ -53,7 +53,7 @@ Netscape*documentFonts.yResolution*iso-8859-1: 100
 
 !## XTERM {{{1
 #define FIXED -misc-fixed-medium-r
-#define FIXED -jmk-neep-medium-r
+!#define FIXED -jmk-neep-medium-r
 XTerm*VT100*background: #000000
 XTerm*VT100*foreground: #aaaaaa
 XTerm*boldMode: false
@@ -198,6 +198,6 @@ XScreenSaver.dpmsEnabled: true
 XScreenSaver.splash: false
 XScreenSaver.ignoreUninstalledPrograms: true
 XScreenSaver.loadURL: sensible-browser '%s'
-!XScreensaver.captureStderr: false
+XScreensaver.captureStderr: false
 XScreensaver.overlayStderr: false
 ! }}}1
