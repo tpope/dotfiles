@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # $Id$
 # -*- sh -*- vim: ft=sh sw=4 sts=4
 
@@ -26,20 +26,20 @@ fi
 
 if /sbin/ifconfig | grep '172\.28\.6' >/dev/null; then
 	for host in $hosts; do
-		xauth -i extract - $hname$dpy | ssh -oBatchmode=yes $host xauth merge - &
+		xauth -i extract - $hname$dpy | ssh -axqoBatchmode=yes $host xauth merge - &
 	done
 fi
 
-( [ -d /KNOPPIX ] && ping -c 1 www.sexygeek.org && \
-  wget -qO- -T10 http://www.sexygeek.org/tpope.tar.gz|gzip -dc|tar xpC "$HOME" -f - || true
-) >/dev/null 2>&1 &
+#( [ -d /KNOPPIX ] && ping -c 1 www.sexygeek.org && \
+#  wget -qO- -T10 http://www.sexygeek.org/tpope.tar.gz|gzip -dc|tar xpC "$HOME" -f - || true
+#) >/dev/null 2>&1 &
 
 xset m 3 3
 #[ "`hostname`" = lisa ] && xset m 4 2
 xset r rate 600 30
 xset b 40 440 60
 
-[ -f "$HOME/.xmodmap" ] && xmodmap "$HOME/.xmodmap"
+[ ! -f "$HOME/.xmodmap" ] || xmodmap "$HOME/.xmodmap"
 
 if [ ! -f "$HOME/.xmodmap" -a ! -f "$HOME/.Xmodmap" ] && \
 	xmodmap 2>/dev/null|grep Super >/dev/null; then
@@ -63,6 +63,7 @@ if [ ! -f "$HOME/. tpope" ]; then
     echo 'Performing an initial "tpope install"'
     "$HOME/bin/tpope" install
 fi
+tpope cron --login
 
 #xrdb -merge $HOME/.Xresources
 
@@ -87,11 +88,6 @@ wait
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
 [ "$GPG_AGENT_INFO" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
 
-#case "$LD_PRELOAD" in *libtrash*) ;; *)
-#[ -f /usr/lib/libtrash/libtrash.so ] && LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-#export LD_PRELOAD
-#;; esac
-
 xsetroot -solid '#002020'
 
 if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
@@ -104,7 +100,6 @@ if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
 #    exit 0
     xset m 2 4
     exec x-terminal-emulator
-    exec gamelaunch doom3
 fi
 
 #if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
