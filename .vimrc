@@ -205,6 +205,7 @@ fun! FTCheck_asmsyntax()
 endfun
 
 autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if filereadable(expand($HOME . "/.vim/templates/skel.sh")) | execute "0r " . $HOME . "/.vim/templates/skel.sh" | silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/g" | endif | set ft=sh | $
+autocmd BufNewFile */init.d/* if filereadable("/etc/init.d/skeleton") | 0r /etc/init.d/skeleton | $d | silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/g" | endif | set ft=sh | 1
  autocmd BufNewFile,BufRead *.txt			set tw=78 linebreak
  autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*	set ft=simpsons
  autocmd BufNewFile,BufRead *Fvwm*			set ft=fvwm
@@ -219,7 +220,6 @@ autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if filereadabl
 	\	|| getline(4) =~ '^!' || getline(5) =~ '^!') |
 	\   setf router |
 	\ endif
- autocmd BufWritePost ~/.vimrc   so ~/.vimrc
  autocmd FileType perl,php,sh,zsh,csh,c,cpp,vim,html,java set sw=4 sts=4 ai
  autocmd FileType java set efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
  autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
@@ -250,6 +250,7 @@ autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if filereadabl
 	\%+Q%*[^()])%r,
 	\%+Q[%\\d%*[^()])%r
  autocmd FileType tex if exists("*IMAP") | call IMAP('{}','{}','tex')|call IMAP('[]','[]','tex')|call IMAP('$$','$$','tex')|call IMAP('`\','`\','tex')|call IMAP('`/','`/','tex')|call IMAP('{{','{{','tex')|call IMAP('^^','^^','tex')|endif
+ autocmd BufWritePost ~/.vimrc   so ~/.vimrc
 augroup END
 endif " has("autocmd")
 
