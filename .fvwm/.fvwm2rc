@@ -515,6 +515,15 @@ Key L       A   5       Exec exec xmms-shell -e jump
 Key R       A   5       Exec exec xmms-shell -e repeat
 Key S       A   5       Exec exec xmms-shell -e shuffle
 
+Key 7       A   5       Exec exec ssh homer br -n 1
+Key 8       A   5       Exec exec ssh homer br -f 1
+Key U       A   5       Exec exec ssh homer br -n 2
+Key I       A   5       Exec exec ssh homer br -f 2
+Key J       A   5       Exec exec ssh homer br -n 3
+Key K       A   5       Exec exec ssh homer br -f 3
+Key M       A   5       Exec exec ssh homer br -n 5
+Key Comma   A   5       Exec exec ssh homer br -f 5
+
 Key Execute A   A       Exec exec tpope media toggle
 Key Cancel  A   A       Exec exec tpope media stop
 Key leftanglebracket A A Exec exec tpope media prev
@@ -603,6 +612,7 @@ Mouse 3 6       A       WindowShade
 Mouse 1 F       A       FuncResizeOrRaiseOrShade
 Mouse 1 TS      A       FuncMoveOrRaise
 Mouse 1 TSIFW   4       FuncMoveOrRaise
+Mouse 2 TSIFW   4       FuncResizeOrRaiseOrShade
 Mouse 3 TSIFW   4       Menu MenuFvwmWindowOps Close
 Mouse 1 I       A       FuncMoveOrIconify
 Mouse 2 I       A       Iconify
