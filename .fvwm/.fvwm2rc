@@ -1011,13 +1011,29 @@ AddToFunc FuncFvwmXtermSsh
 + I Exec exec ssh -X $0 xterm
 # }}}2
 # Application Functions {{{2
-DestroyFunc FuncFvwmWebBrowser
-AddToFunc FuncFvwmWebBrowser
-+ I Exec exec sensible-browser $*
+DestroyFunc FuncFvwmFindWebBrowser
+AddToFunc FuncFvwmFindWebBrowser
 + I Next (WWW-Browser*, AcceptsFocus) Focus
 + I Next (*Mozilla*, AcceptsFocus) Focus
 + I Next (Firefox-bin) Iconify off
 + I Next (Firefox-bin, AcceptsFocus) Focus
+
+DestroyFunc FuncFvwmWebBrowser
+AddToFunc FuncFvwmWebBrowser
++ I Exec exec sensible-browser $*
++ I FuncFvwmFindWebBrowser
+
+DestroyFunc FuncFvwmCustomWebBrowser
+AddToFunc FuncFvwmCustomWebBrowser
++ I Exec $*
++ I FuncFvwmFindWebBrowser
+
+DestroyFunc FuncFvwmSmartWebBrowser
+AddToFunc FuncFvwmSmartWebBrowser
++ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo $*|tr -d ' \t\n\r\f'`" ;; *) exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo $*|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;; esac
++ I FuncFvwmFindWebBrowser
+
+    vnc)
 
 DestroyFunc FuncFvwmIrcScreenSshXterm
 AddToFunc FuncFvwmIrcScreenSshXterm
@@ -1139,7 +1155,8 @@ DestroyModuleConfig FvwmButtons: *
 #    then echo 'glbiff `Exec exec glbiff -geometry -3000-3000`)'; \
 #    else echo 'xbiff `Exec exec xbiff -shape -geometry -3000-3000`)'; fi"
 #*FvwmButtons: (6x6, Frame 0, Padding 0 0, Container(Font fixed, Rows 1, Columns 1, Frame 0, Padding 0 0 ))
-*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) FuncFvwmWebBrowser "`xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'`")
+#*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) FuncFvwmCustomWebBrowser xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'|exec tpope url -)
+*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) PipeRead 'echo FuncFvwmSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncFvwmScreenXterm)
 #*FvwmButtons: (4x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "xload" "Exec exec xload -bg PaleTurquoise -fg black -hl blue -update 5 -nolabel -jumpscroll 1 -g -3000-3000")
 *FvwmButtons: (4x6, Padding 1 5, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
 #*FvwmButtons: (4x3, Frame 0, Swallow(UseOld) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 2")

@@ -132,6 +132,21 @@ case "$basename" in
 	esac
 	;;
 
+    url)
+	if [ "$*" = "-" ]; then
+	    url="`cat`"
+	else
+	    url="$*"
+	fi
+	if [ ! -e "$url" ]; then
+	case url in
+	    /*|./*) ;;
+	    *://*|*.*.*/*) url="`echo $url|tr -d ' \t\n\r\f'`" ;;
+	    *) url="http://www.google.com/search?q=`echo $url|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;;
+	esac
+	fi
+    exec "$HOME/bin/sensible-browser" "$url" ;;
+
     vnc)
     if [ -f "$HOME/.vnc/$1" ]; then
 	exec xvncviewer -passwd "$HOME/.vnc/$1" "$@"
