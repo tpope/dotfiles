@@ -1,7 +1,7 @@
 # ~/.bash_profile
 # $Id$
 
-. $HOME/.bashrc
+. "$HOME/.bashrc"
 test -f "$HOME/.profile.local" && . "$HOME/.profile.local"
 
 if [ ! -f "$HOME/. tpope" ]; then
@@ -10,3 +10,4 @@ if [ ! -f "$HOME/. tpope" ]; then
 elif [ -x /usr/games/fortune ] && [ "$SHLVL" -le 1 -a \( -z "$SSH_TTY" -o "$TERMCAP" \) ]; then
     /usr/games/fortune
 fi
+tpope cron --login
