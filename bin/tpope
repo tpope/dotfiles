@@ -7,9 +7,7 @@
 # and this script is modified to call that file instead.
 
 # Of particular interest here is the start/restart/etc functions, which call
-# the appropriate script in /etc/init.d, and the play/pause/etc functions,
-# which determine what media player is running and tell it to perform that
-# action.
+# the appropriate script in /etc/init.d.
 
 [ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
 
@@ -21,156 +19,10 @@ rcd=/etc/init.d
 [ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
 
 mediaaction() {
-    if ps x|grep -v grep|grep ' g*mplayer' >/dev/null && [ -p "$HOME/.mplayer/mplayer" ]; then
-	exec > "$HOME/.mplayer/mplayer"
-	case "$1" in
-	    [Qq]uit)   echo quit ;;
-	    [Ss]top)   echo gui_stop ;;
-	    [Pp]lay) echo gui_play ;;
-	    [Pp]ause|[Rr]esume)  echo pause ;;
-	    [Tt]oggle) echo pause ;;
-	    [Nn]ext)   echo seek 5; echo pt_step 1 ;;
-	    [Pp]rev)   echo seek -5; echo pt_step -1 ;;
-	    [Ff]fwd)   echo seek ${2:-5} ;;
-	    [Rr]ew)    echo seek -${2:-5} ;;
-	esac
-	return 0
-    elif ps x|grep -v grep|egrep "[0-9][0-9] (xmms|beep-media-player)" \
-	>/dev/null && [ -x /usr/bin/xmms-shell ]; then
-	case "$2" in *:[0-9][0-9]) time="$(expr 60 \* $(echo $2|sed -e 's/:.*//') + $(echo $2|sed -e 's/.*://'))" ;; *) time="${2:-5}" ;; esac
-	exec >/dev/null
-	case "$1" in
-	    [Qq]uit)   xmms-shell -e xmmsexit & ;;
-	    [Ss]top)   xmms-shell -e stop & ;;
-#	    [Pp]lay)   xmms-shell -e play & ;;
-	    [Pp]ause)  perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if !$remote->is_paused' ;;
-	    [Rr]esume) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if $remote->is_paused' ;;
-	    [Pp]lay) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if $remote->is_paused; $remote->play if !$remote->is_playing' || xmms-shell -e play & ;;
-	    [Tt]oggle) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause; $remote->play if !$remote->is_playing' || xmms-shell -e pause & ;;
-	    [Nn]ext)   xmms-shell -e forward & ;;
-	    [Pp]rev)   xmms-shell -e backward & ;;
-	    [Ff]fwd)   perl -MXmms -e "time '+$time'" ;;
-	    [Rr]ew)    perl -MXmms -e "time '-$time'" ;;
-	esac
-	return 0
-    elif [ -p "/tmp/.TV-$USER/tvtimefifo-`hostname`" ] && pidof tvtime >/dev/null 2>&1; then
-	exec >/dev/null 2>&1
-	case "$1" in
-	    [Ss]top|[Qq]uit)   tvtime-command QUIT & ;;
-	    [Pp]lay|[Rr]esume) tvtime-command PICTURE & ;;
-	    [Pp]ause|[Rr]esume)  tvtime-command TOGGLE_MUTE & ;;
-	    [Tt]oggle) tvtime-command TOGGLE_MUTE & ;;
-	    [Nn]ext)   tvtime-command CHANNEL_UP & ;;
-	    [Pp]rev)   tvtime-command CHANNEL_DOWN & ;;
-	    [Ff]fwd)   tvtime-command PICTURE_UP & ;;
-	    [Rr]ew)    tvtime-command PICTURE_DOWN & ;;
-	esac
-	return 0
-    elif [ -n "$DISPLAY" ]; then
-	xlsclients|grep xmms >/dev/null && player=xmms
-	xlsclients|grep beep-media-player >/dev/null && player=beep-media-player
-	if [ -n "$player" ]; then
-	    exec >/dev/null
-	    case "$1" in
-		[Qq]uit)   pkill xmms beep-media-player ;;
-		[Ss]top)   $player -s & ;;
-		[Pp]lay|[Rr]esume) $player -p & ;;
-		[Pp]ause)  $player -u & ;;
-		[Tt]oggle) $player -t & ;;
-		[Nn]ext)   $player -f & ;;
-		[Pp]rev)   $player -r & ;;
-	    esac
-	    return 0
-	fi
-
-	xlsclients|grep xawtv >/dev/null && player=xawtv-remote
-	if [ -n "$player" ]; then
-	    exec >/dev/null
-	    case "$1" in
-		[Ss]top|[Qq]uit)   $player quit & ;;
-		[Pp]lay|[Rr]esume) $player volume mute & ;;
-		[Pp]ause)  $player volume mute & ;;
-		[Tt]oggle) $player volume mute & ;;
-		[Nn]ext)   $player setchannel next & ;;
-		[Pp]rev)   $player setchannel prev & ;;
-	    esac
-	    return 0
-	fi
-    fi
-    if [ -x "/usr/bin/cdcd" ]; then
-	[ -f "$HOME/.cdcdrc" ] || \
-	    echo "device=/dev/cdrom" > "$HOME/.cdcdrc"
-	if [ "`cdcd info 2>/dev/null`" != "No disc in drive" -a -n "`cdcd info 2>/dev/null`" ]; then
-	case "$1" in
-	    [Qq]uit) cdcd open ;;
-	    [Ss]top) cdcd stop ;;
-	    [Pp]ause) cdcd pause ;;
-	    [Rr]esume) cdcd resume ;;
-	    [Nn]ext) cdcd next ;;
-	    [Pp]rev) cdcd prev ;;
-	    [Ff]fwd) cdcd ff "${2:-5}" ;;
-	    [Rr]fwd) cdcd rew "${2:-5}" ;;
-	    [Pp]lay|[Tt]oggle)
-	    if cdcd info 2>/dev/null|grep Playing >/dev/null; then
-		cdcd pause
-	    elif cdcd info 2>/dev/null|grep Paused >/dev/null; then
-		cdcd resume
-	    else
-		cdcd play
-	    fi ;;
-	esac
-	return 0
-	fi
-    fi
-    if [ "`hostname`" = lisa ] && ping -c 1 mona >/dev/null 2>&1; then
-	hostinfo --batch-ssh mona DISPLAY=:0 "$HOME/bin/tpope" media "$@"
-	return
-    fi
-    LONGEST="`lsdvd 2>/dev/null|tail -1|sed -e 's/Longest track: //'`"
-    if [ "$LONGEST" ]; then
-	case "$1" in
-	    [Qq]uit) eject /dev/dvd ;;
-	    [Pp]lay|[Tt]oggle)
-		gmplayer -af volume=10 dvd://$LONGEST >/dev/null 2>&1 </dev/null &
-		if [ -p "$HOME/.mplayer/mplayer" ]; then
-		    sleep 5
-		    #echo "vo_fullscreen" > "$HOME/.mplayer/mplayer"
-		    echo "vo_fullscreen" > "$HOME/.mplayer/mplayer"
-		fi ;;
-	esac
-	return
-    fi
-    return 1
+    exec "$HOME/bin/media" "$@"
 }
 
-case "$basename" in
-
-    aliases)
-	echo launch lt lv pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media tomorrow vnc word emerge aptitude
-	exit 0 ;;
-    
-    activity|away)
-	if [ "`hostname`" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
-	    [ "$#" = 1 -a -z "$1" ] && exec hostinfo -S marge -ax tpope $basename -c
-	    exec hostinfo --batch-ssh marge tpope $basename "$@"
-	fi
-	if [ "$#" = 0 ]; then
-	    cat "$HOME/.$basename" 2>/dev/null
-	    exit
-	elif [ "$1" = "-c" -o "$1" = "" ]; then
-	    rm -f "$HOME/.$basename"
-	    exit 0
-	elif [ "$1" = "-" ]; then
-	    cat > "$HOME/.$basename"
-	    [ -s "$HOME/.$basename" ] || rm -f "$HOME/.$basename"
-	    exit
-	else
-	    echo "$@" > "$HOME/.$basename"
-	    exit
-	fi
-	;;
-
-    clean)
+clean() {
 	if [ "$1" = -v ]; then
 	    FIND()    { find "$@" ! -type d -print 2>/dev/null; }
 	    FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
@@ -195,104 +47,10 @@ case "$basename" in
 		mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
 	    fi
 	fi
-	exit 0
-	;;
+	return 0
+}
 
-    emerge|aptitude)
-	if [ "$1" = search ]; then
-	    exec "$basename" "$@"
-	else
-	    exec $sudo "$basename" "$@"
-	fi
-	;;
-
-    launch)
-	exec >/dev/null 2>&1 </dev/null
-	cd
-	if [ "$1" = "-d" ]; then
-	    shift
-	    pidof "$1" >/dev/null && exit 0
-	fi
-	"$@" &
-	exit 0
-    ;;
-
-    logview|lv)
-	[ "$PAGER" ] || PAGER=more
-	# Pager should already be "less" or something is wrong
-	cd /var/log
-	exec $PAGER +G "$@"
-	;;
-
-    ps-grep|pg)
-    if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
-	ps uf|head -n 1
-	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|grep "$@"
-    else
-	/usr/bin/ps -f|head -n 1
-	exec /usr/bin/ps -ef|grep -v '\<grep\>'|sed -ne '2,$p'|grep "$@"
-    fi
-    ;;
-
-    rclink|link)
-	if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
-		echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
-		exit 1
-	fi
-	sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
-	    2>/dev/null |read run start stop trash
-	[ "$stop" ] || run=2345 start=20 stop=20
-	[ -z "$2" ] || run="$2"
-	[ -z "$3" ] || start="$3" stop="$3"
-	[ -z "$4" ] || stop="$4"
-	for i in 0 1 2 3 4 5 6; do
-	    $sudo rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
-	    case $run in
-		[Xx])   ;;
-		*$i*) $sudo ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
-		*)    $sudo ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
-	    esac
-	done
-	exit 0
-    ;;
-
-    runcontrol|rc)
-	if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
-		echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
-		exit 1
-	fi
-	while [ "$#" -gt 0 ]; do
-	    $sudo "$rcd/$2" "$1"
-	    shift 2
-	done
-	exit 0
-    ;;
-
-    sensible-browser|sb) exec "$HOME/bin/sensible-browser" "$@" ;;
-
-    start|stop|restart|reload|force-reload)
-	for daemon in "$@"; do
-	    $sudo "$rcd/$daemon" "$basename"
-	done
-	[ -z "$*" -a "$basename" = stop ] && mediaaction stop && exit 0
-	[ "$*" ]
-	exit
-    ;;
-
-    hostinfo) exec "$HOME/bin/hostinfo" "$@" ;;
-    libtrash|lt)    
-	case "$LD_PRELOAD" in *libtrash*) ;; *)
-	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
-	   LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-	   export LD_PRELOAD
-	fi ;; esac
-	"$@"
-	;;
-    ruptime)  exec "$HOME/bin/hostinfo" -u "$@" ;;
-    rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
-    ssh)      exec "$HOME/bin/hostinfo" --ssh "$@" ;;
-
-    install)
+do_install() {
 	[ "$1" != "--cron" ] || exec >/dev/null
 	if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
 	    touch "$HOME/. tpope"
@@ -392,7 +150,134 @@ EOF
 	    echo "Changing login shell."
 	    chsh -s "$zsh"
 	fi
+}
+
+case "$basename" in
+
+    aliases)
+	echo launch lt lv pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media tomorrow vnc word emerge aptitude whois
+	exit 0 ;;
+    
+    activity|away)
+	if [ "`hostname`" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
+	    [ "$#" = 1 -a -z "$1" ] && exec hostinfo -S marge -ax tpope $basename -c
+	    exec hostinfo --batch-ssh marge tpope $basename "$@"
+	fi
+	if [ "$#" = 0 ]; then
+	    cat "$HOME/.$basename" 2>/dev/null
+	    exit
+	elif [ "$1" = "-c" -o "$1" = "" ]; then
+	    rm -f "$HOME/.$basename"
+	    exit 0
+	elif [ "$1" = "-" ]; then
+	    cat > "$HOME/.$basename"
+	    [ -s "$HOME/.$basename" ] || rm -f "$HOME/.$basename"
+	    exit
+	else
+	    echo "$@" > "$HOME/.$basename"
+	    exit
+	fi
+	;;
+
+    clean)
+	clean "$@"
+	;;
+
+    emerge|aptitude)
+	if [ "$1" = search ]; then
+	    exec "$basename" "$@"
+	else
+	    exec $sudo "$basename" "$@"
+	fi
+	;;
+
+    launch)
+	exec >/dev/null 2>&1 </dev/null
+	cd
+	if [ "$1" = "-d" ]; then
+	    shift
+	    pidof -x "$1" >/dev/null && exit 0
+	fi
+	"$@" &
+	exit 0
     ;;
+
+    logview|lv)
+	[ "$PAGER" ] || PAGER=more
+	# Pager should already be "less" or something is wrong
+	cd /var/log
+	exec $PAGER +G "$@"
+	;;
+
+    ps-grep|pg)
+    if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
+	ps uf|head -n 1
+	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|grep "$@"
+    else
+	/usr/bin/ps -f|head -n 1
+	exec /usr/bin/ps -ef|grep -v '\<grep\>'|sed -ne '2,$p'|grep "$@"
+    fi
+    ;;
+
+    rclink|link)
+	if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
+		echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
+		exit 1
+	fi
+	sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
+	    2>/dev/null |read run start stop trash
+	[ "$stop" ] || run=2345 start=20 stop=20
+	[ -z "$2" ] || run="$2"
+	[ -z "$3" ] || start="$3" stop="$3"
+	[ -z "$4" ] || stop="$4"
+	for i in 0 1 2 3 4 5 6; do
+	    $sudo rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
+	    case $run in
+		[Xx])   ;;
+		*$i*) $sudo ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
+		*)    $sudo ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
+	    esac
+	done
+	exit 0
+    ;;
+
+    runcontrol|rc)
+	if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
+		echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
+		exit 1
+	fi
+	while [ "$#" -gt 0 ]; do
+	    $sudo "$rcd/$2" "$1"
+	    shift 2
+	done
+	exit 0
+    ;;
+
+    sensible-browser|sb) exec "$HOME/bin/sensible-browser" "$@" ;;
+
+    start|stop|restart|reload|force-reload)
+	for daemon in "$@"; do
+	    $sudo "$rcd/$daemon" "$basename"
+	done
+	[ -z "$*" -a "$basename" = stop ] && mediaaction stop && exit 0
+	[ "$*" ]
+	exit
+    ;;
+
+    hostinfo) exec "$HOME/bin/hostinfo" "$@" ;;
+    libtrash|lt)    
+	case "$LD_PRELOAD" in *libtrash*) ;; *)
+	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+	   LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+	   export LD_PRELOAD
+	fi ;; esac
+	"$@"
+	;;
+    ruptime)  exec "$HOME/bin/hostinfo" -u "$@" ;;
+    rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
+    ssh)      exec "$HOME/bin/hostinfo" --ssh "$@" ;;
+
+    install) do_install ;;
 
     soffice)
 	if [ ! -d "$HOME/.openoffice" ]; then
@@ -457,6 +342,8 @@ EOF
     exit 1
     ;;  
 
+    whois) exec whois -H "$@" ;;
+    
     word) cat /usr/share/dict/words | egrep "$@" ;;
 
     xauth-get) exec hostinfo --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;

@@ -1,0 +1,134 @@
+#!/bin/sh
+# $Id$
+# -*- sh -*- vim: ft=sh sw=4 sts=4
+
+# Originally this was integrated into the tpope script.  It provides a
+# standard interface for sending commands to various media players.
+
+mediaaction() {
+    if ps x|grep -v grep|grep ' g*mplayer' >/dev/null && [ -p "$HOME/.mplayer/mplayer" ]; then
+	exec > "$HOME/.mplayer/mplayer"
+	case "$1" in
+	    [Qq]uit)   echo quit ;;
+	    [Ss]top)   echo gui_stop ;;
+	    [Pp]lay) echo gui_play ;;
+	    [Pp]ause|[Rr]esume)  echo pause ;;
+	    [Tt]oggle) echo pause ;;
+	    [Nn]ext)   echo seek 5; echo pt_step 1 ;;
+	    [Pp]rev)   echo seek -5; echo pt_step -1 ;;
+	    [Ff]fwd)   echo seek ${2:-5} ;;
+	    [Rr]ew)    echo seek -${2:-5} ;;
+	esac
+	return 0
+    elif ps x|grep -v grep|egrep "[0-9][0-9] (xmms|beep-media-player)" \
+	>/dev/null && [ -x /usr/bin/xmms-shell ]; then
+	case "$2" in *:[0-9][0-9]) time="$(expr 60 \* $(echo $2|sed -e 's/:.*//') + $(echo $2|sed -e 's/.*://'))" ;; *) time="${2:-5}" ;; esac
+	exec >/dev/null
+	case "$1" in
+	    [Qq]uit)   xmms-shell -e xmmsexit & ;;
+	    [Ss]top)   xmms-shell -e stop & ;;
+#	    [Pp]lay)   xmms-shell -e play & ;;
+	    [Pp]ause)  perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if !$remote->is_paused' ;;
+	    [Rr]esume) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if $remote->is_paused' ;;
+	    [Pp]lay) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause if $remote->is_paused; $remote->play if !$remote->is_playing' || xmms-shell -e play & ;;
+	    [Tt]oggle) perl -MXmms::Remote -e 'my $remote = Xmms::Remote->new; $remote->pause; $remote->play if !$remote->is_playing' || xmms-shell -e pause & ;;
+	    [Nn]ext)   xmms-shell -e forward & ;;
+	    [Pp]rev)   xmms-shell -e backward & ;;
+	    [Ff]fwd)   perl -MXmms -e "time '+$time'" ;;
+	    [Rr]ew)    perl -MXmms -e "time '-$time'" ;;
+	esac
+	return 0
+    elif [ -p "/tmp/.TV-$USER/tvtimefifo-`hostname`" ] && pidof tvtime >/dev/null 2>&1; then
+	exec >/dev/null 2>&1
+	case "$1" in
+	    [Ss]top|[Qq]uit)   tvtime-command QUIT & ;;
+	    [Pp]lay|[Rr]esume) tvtime-command PICTURE & ;;
+	    [Pp]ause|[Rr]esume)  tvtime-command TOGGLE_MUTE & ;;
+	    [Tt]oggle) tvtime-command TOGGLE_MUTE & ;;
+	    [Nn]ext)   tvtime-command CHANNEL_UP & ;;
+	    [Pp]rev)   tvtime-command CHANNEL_DOWN & ;;
+	    [Ff]fwd)   tvtime-command PICTURE_UP & ;;
+	    [Rr]ew)    tvtime-command PICTURE_DOWN & ;;
+	esac
+	return 0
+    elif [ -n "$DISPLAY" ]; then
+	xlsclients|grep xmms >/dev/null && player=xmms
+	xlsclients|grep beep-media-player >/dev/null && player=beep-media-player
+	if [ -n "$player" ]; then
+	    exec >/dev/null
+	    case "$1" in
+		[Qq]uit)   pkill xmms beep-media-player ;;
+		[Ss]top)   $player -s & ;;
+		[Pp]lay|[Rr]esume) $player -p & ;;
+		[Pp]ause)  $player -u & ;;
+		[Tt]oggle) $player -t & ;;
+		[Nn]ext)   $player -f & ;;
+		[Pp]rev)   $player -r & ;;
+	    esac
+	    return 0
+	fi
+
+	xlsclients|grep xawtv >/dev/null && player=xawtv-remote
+	if [ -n "$player" ]; then
+	    exec >/dev/null
+	    case "$1" in
+		[Ss]top|[Qq]uit)   $player quit & ;;
+		[Pp]lay|[Rr]esume) $player volume mute & ;;
+		[Pp]ause)  $player volume mute & ;;
+		[Tt]oggle) $player volume mute & ;;
+		[Nn]ext)   $player setchannel next & ;;
+		[Pp]rev)   $player setchannel prev & ;;
+	    esac
+	    return 0
+	fi
+    fi
+    if [ -x "/usr/bin/cdcd" ]; then
+	[ -f "$HOME/.cdcdrc" ] || \
+	    echo "device=/dev/cdrom" > "$HOME/.cdcdrc"
+	if [ "`cdcd info 2>/dev/null`" != "No disc in drive" -a -n "`cdcd info 2>/dev/null`" ]; then
+	case "$1" in
+	    [Qq]uit) cdcd open ;;
+	    [Ss]top) cdcd stop ;;
+	    [Pp]ause) cdcd pause ;;
+	    [Rr]esume) cdcd resume ;;
+	    [Nn]ext) cdcd next ;;
+	    [Pp]rev) cdcd prev ;;
+	    [Ff]fwd) cdcd ff "${2:-5}" ;;
+	    [Rr]fwd) cdcd rew "${2:-5}" ;;
+	    [Pp]lay|[Tt]oggle)
+	    if cdcd info 2>/dev/null|grep Playing >/dev/null; then
+		cdcd pause
+	    elif cdcd info 2>/dev/null|grep Paused >/dev/null; then
+		cdcd resume
+	    else
+		cdcd play
+	    fi ;;
+	esac
+	return 0
+	fi
+    fi
+    if [ "`hostname`" = lisa ] && ping -c 1 mona >/dev/null 2>&1; then
+	hostinfo --batch-ssh mona DISPLAY=:0 "$HOME/bin/tpope" media "$@"
+	return
+    fi
+    LONGEST="`lsdvd 2>/dev/null|tail -1|sed -e 's/Longest track: //'`"
+    if [ "$LONGEST" ]; then
+	case "$1" in
+	    [Qq]uit) eject /dev/dvd ;;
+	    [Pp]lay|[Tt]oggle)
+		gmplayer -af volume=10 dvd://$LONGEST >/dev/null 2>&1 </dev/null &
+		if [ -p "$HOME/.mplayer/mplayer" ]; then
+		    sleep 5
+		    #echo "vo_fullscreen" > "$HOME/.mplayer/mplayer"
+		    echo "vo_fullscreen" > "$HOME/.mplayer/mplayer"
+		fi ;;
+	esac
+	return
+    fi
+    return 1
+}
+
+basename="`basename $0`"
+[ "$basename" = media ] && prefix='media ' basename="$1" && shift
+
+mediaaction "$basename" "$@"
