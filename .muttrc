@@ -25,7 +25,7 @@ set nopgp_autosign
 set pgp_replysignencrypted
 set pgp_timeout=900
 set realname="Tim Pope"
-alternates "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
+`if mutt -v|head -n 1|egrep '1.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
 set reverse_name
 set reverse_realname
 `[ -d "$HOME/.smime/certificates" ] && echo set smime_default_key=$(hostname).pem || echo set`

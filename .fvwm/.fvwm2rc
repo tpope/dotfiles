@@ -5,7 +5,7 @@
 
 # Basic Settings {{{1
 
-ImagePath ${HOME}/.pixmaps:${HOME}/.wm-icons:.fvwm/icons:/usr/local/share/icons:/usr/share/icons:/usr/include/X11/pixmaps:/usr/local/share/pixmaps:/usr/share/pixmaps:/usr/include/X11/bitmaps:/usr/X11R6/include/bitmaps:/usr/share/icons/wm-icons:/usr/share/icons/fvwm:/usr/share/fvwm/images
+ImagePath ${HOME}/.pixmaps:${HOME}/.wm-icons:.fvwm/icons:/usr/local/share/icons:/usr/share/icons:/usr/include/X11/pixmaps:/usr/local/share/pixmaps:/usr/share/pixmaps:/usr/include/X11/bitmaps:/usr/X11R6/include/bitmaps:/usr/share/icons/wm-icons:/usr/share/icons/fvwm:/usr/share/fvwm/images:/usr/share/icons/default.kde/16x16/apps
 
 EdgeResistance 2000 16
 EdgeScroll 0 0
@@ -79,10 +79,10 @@ MenuStyle Screens MenuColorset 43, ActiveFore White, HilightBack DarkGreen
 # }}}2
 # Default Styles {{{2
 
-DefaultFont 7x13
+#DefaultFont 7x13
 
-DestroyDecor Default
-AddToDecor Default
+DestroyDecor MWM
+AddToDecor MWM
 + TitleStyle      Height 18
 + ButtonStyle     1 -- MwmDecorMenu
 + ButtonStyle     1 -- UseTitleStyle
@@ -132,7 +132,7 @@ AddToDecor Flat
                             65x75@0 57x75@1 57x57@0 75x57@0 75x65@1 90x50@0 \
                             75x35@1 75x43@1 57x43@1 57x25@0 65x25@0 50x10@1)
 
-Style * UseDecor Default
+Style * UseDecor Flat
 
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
@@ -180,9 +180,9 @@ AddToDecor Terminal
 Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm, SloppyFocus
 Style Terminal  GrabFocus, GrabFocusTransient
 # , UseDecor Terminal
-Style Terminal  HilightBack grey20, BackColor grey28
+Style Terminal  HilightBack grey18, BackColor grey28
 #Style Terminal  HilightBorderColorset 50, BorderColorset 60
-Style Terminal  HandleWidth 4
+Style Terminal  HandleWidth 5
 # , IconBox -70 1 -1 -140
 Style XTerm*    UseStyle Terminal, Icon rterm.xpm
 Style UXTerm*   UseStyle Terminal, Icon rterm.xpm
@@ -213,12 +213,16 @@ Style Xedit     UseStyle Editor
 # Web Browser Styles
 
 Style www-browser HilightBack #806020, BackColor #787858, MiniIcon mini/www.xpm
-Style konqueror         UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 1
-Style kcmshell          UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 1
-Style Mozilla*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 2 0
+Style konqueror         UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 0
+#1 1
+Style kcmshell          UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 0 
+#1 1
+Style Mozilla*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0 
+#2 0
 Style MozillaFirebird*  UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
 Style Firefox*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
-Style Netscape*         UseStyle www-browser, MiniIcon mini.netscape.xpm, StartsOnPage 2 1
+Style Netscape*         UseStyle www-browser, MiniIcon mini.netscape.xpm, StartsOnPage 1 0
+#2 1
 Style links             UseStyle www-browser
 Style w3m               UseStyle www-browser
 Style lynx              UseStyle www-browser
@@ -375,6 +379,7 @@ Silent Key SunF37 A     SM      Delete
 
 Silent Key Print A      C       Pick FuncCaptureWindow
 Silent Key Print A      SC      Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
+Silent Key Print A      M       Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 Key Escape      A       SCM     EscapeFunc
 
 Key 1           A       4       FuncWindowWarp 25 25
@@ -525,6 +530,16 @@ Silent Key Home A       CS      FuncTakeToPage prev
 #Silent Key SunF37 A     CS      FuncTakeToDesk 0 2
 
 # }}}2
+
+Key Q       A   5       FuncCloseXmms
+Key Z       A   5       Exec exec tpope media prev
+Key X       A   5       Exec exec tpope media play
+Key C       A   5       Exec exec tpope media toggle
+Key V       A   5       Exec exec tpope media stop
+Key B       A   5       Exec exec tpope media next
+Key L       A   5       Exec exec xmms-shell -e jump
+Key R       A   5       Exec exec xmms-shell -e repeat
+Key S       A   5       Exec exec xmms-shell -e shuffle
 
 PipeRead "$HOME/bin/hostinfo --fvwm-keys"
 Key Grave   A   C       FuncIrcScreenSshXterm
@@ -747,65 +762,110 @@ AddToFunc SessionRestartFunction
 # Menus {{{1
 DestroyMenu MenuFvwmRoot
 AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
-+       "X &Terminal%menu/terminal.xpm%"       FuncScreenXterm
-+       "&Web Browser%menu/www.xpm%"           Exec sensible-browser http://www.google.com/
-+       "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
-+       ""              Nop
-+       "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins
-+       "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens
-+       ""              Nop
-+       "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
-+       "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
++ "X &Terminal%menu/terminal.xpm%"       FuncScreenXterm
++ "&Web Browser%menu/www.xpm%"           Exec sensible-browser http://www.google.com/
++ "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
++ ""              Nop
++ "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins
++ "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens
++ ""              Nop
++ "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
++ "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
++ "N&etwork%menu/network.xpm%"           Popup MenuFvwmNetwork
++ "&Multimedia%menu/multimedia.xpm%"     Popup MenuFvwmMultimedia
++ ""              Nop
 PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian'
 PipeRead 'test -e /usr/share/gnome/apps && echo + \\"\\&GNOME%menu/gnome.xpm%\\" Popup Gnome-sys'
 PipeRead 'test -e "$KDEDIR" -o -e /usr/share/applnk && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
-+       "&Headlines%menu/news.xpm"          Popup MenuHeadlines
-+       ""              Nop
-+       "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
-+       "Fvwm Config &Ops%menu/configuration.xpm%" Popup MenuFvwmConfig
-+       "Re&fresh Screen%menu/refresh.xpm%" Refresh
-+       "R&ecapture Screen%menu/display.xpm%" Recapture
-+       ""              Nop
-+       "E&xit Fvwm%menu/quit.xpm%"         Popup MenuFvwmQuitVerify
++ ""              Nop
++ "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
++ "Fvwm Config &Ops%menu/configuration.xpm%" Popup MenuFvwmConfig
++ ""              Nop
++ "E&xit Fvwm%menu/quit.xpm%"         Popup MenuFvwmQuitVerify
 
 DestroyMenu Kde-sys
 AddToMenu Kde-sys
-+ DynamicPopupAction PipeRead '[ -z "$KDEDIR" ] && export KDEDIR=/usr; fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --destroy-type dynamic'
++ DynamicPopupAction PipeRead '[ -z "$KDEDIR" ] && export KDEDIR=/usr; LANG=C PATH=":$PATH" fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --mini-icons-path "" --destroy-type dynamic'
 
 DestroyMenu Gnome-sys
 AddToMenu Gnome-sys
-+ DynamicPopupAction PipeRead 'fvwm-menu-desktop --desktop gnome-sys --merge-user-menu --enable-mini-icons --destroy-type dynamic'
++ DynamicPopupAction PipeRead 'PATH=":$PATH" fvwm-menu-desktop --desktop gnome-sys --merge-user-menu --enable-mini-icons --mini-icons-path "" --destroy-type dynamic'
 
+DestroyFunc FuncAddIfExists
+AddToFunc FuncAddIfExists
++ I PipeRead '\
+if [ -x "`which $2 2>/dev/null`" ]; then \
+    echo "AddToMenu $0 \\"$1\\" Exec exec $2 $3 $4 $5"; fi'
+
+# Programs {{{2
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
-+       "&UT2004%menu/game-action.xpm%"     Exec exec ut2004
-+       "&IRC%menu/chat.xpm%"        FuncIrcScreenSshXterm
-+       "OpenOffice &Writer%menu/word-processor.xpm%" Exec exec oowriter
-+       ""                           Nop
-+       "&Firefox%mozilla.mini.xpm%" Exec mozilla-firebird || exec firefox
-+       "&Konqueror%mini.kde.xpm%"   Exec exec konqueror about:blank
-+       "M&ozilla%mozilla.mini.xpm%" Exec exec mozilla
-+       "&Netscape%mini.netscape.xpm%" Exec exec netscape
-
+FuncAddIfExists MenuFvwmPrograms "&UT2004%/usr/local/games/ut2004/ut2004.xpm%" ut2004
+Test (x /usr/local/bin/armyops) + "&America's Army%/usr/local/games/armyops/ArmyOps.xpm%" Exec exec armyops
+FuncAddIfExists MenuFvwmPrograms  "&Quake 3%/usr/local/games/quake3/quake3.xpm%" quake3
+FuncAddIfExists MenuFvwmPrograms "&Enemy Territory%/usr/local/games/enemy-territory/ET.xpm%" et
+Test (f /home/games) + "" Nop
+FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
+FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
+# }}}2
+# Utilities {{{2
 DestroyMenu MenuFvwmUtilities
-AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
-+       "&XTerm%mini.xterm.xpm%"     Exec exec xterm -T localhost -n localhost
-+       "&Calculator%menu/calculator.xpm%" Exec exec xcalc
-+       "&Zoom%menu/viewer.xpm%"     Exec xzoom || exec xmag
-+       "&Editres%menu/unknown.xpm%" Exec exec editres
-+       "&Aumix%aumix.mini.xpm%"      Exec exec aumix
-+       ""                           Nop
-+       "G&vim%mini.vim.xpm%"        Exec exec vim -g
-+       "M&utt%mutt.mini.xpm%"       Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
-+       "Ga&im%mini.gaim.xpm%"       FuncExec gaim "exec gaim"
-+       "Xaw&tv%menu/video.xpm%"     Exec xawtv || exec tvtime
-+       "&Gimp%menu/gimp.xpm%"       FuncExec gimp* "gimp-2.0 || exec gimp"
-+       ""                           Nop
-+       "X&Lock%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
-+       "&Screenshot%menu/windows.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
-+       ""              Nop
-+       "Reset X &Resources%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xresources
+#AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
+AddToMenu MenuFvwmUtilities "Utilities" Title
++ "&XTerm%mini.xterm.xpm%"      Exec exec xterm -T localhost -n localhost
++ "G&vim%menu/editor.xpm%"      Exec exec vim -g
++ "&Calculator%menu/calculator.xpm%" Exec exec xcalc
++ "&Zoom%menu/viewer.xpm%"      Exec xzoom || exec xmag
++ "&Editres%menu/unknown.xpm%"  Exec exec editres
+# }}}2
+# Network {{{2
+DestroyMenu MenuFvwuNetwork
+AddToMenu MenuFvwmNetwork "Network" Title
++ "&Headlines%menu/news.xpm%"   Popup MenuHeadlines
++ "&IRC%menu/chat.xpm%"         FuncIrcScreenSshXterm
++ "M&utt%mutt.mini.xpm%"        Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
+#Test (x /usr/bin/gaim) + "&Gaim%mini.gaim.xpm%" FuncExec gaim "exec gaim"
+PipeRead 'if [ -x "`which gaim 2>/dev/null`" ]; then \
+echo "+ \\"&Gaim%mini.gaim.xpm%\\" FuncExec gaim \\"exec gaim\\""; \
+elif [ -x "`which tik 2>/dev/null`" ]; then \
+echo "+ \\"TIK%menu/chat.xpm%\\" Exec exec tik"; fi'
++ ""                            Nop
+FuncAddIfExists MenuFvwmNetwork "&Firefox%mozilla.mini.xpm%" firefox
+FuncAddIfExists MenuFvwmNetwork "&Firebird%mozilla.mini.xpm%" mozilla-firebird
+FuncAddIfExists MenuFvwmNetwork "&Konqueror%mini.kde.xpm%"   Exec exec konqueror about:blank
+Test (!x /usr/bin/firefox) Test (!x /usr/bin/mozilla-firebird) FuncAddIfExists MenuFvwmNetwork "M&ozilla%mozilla.mini.xpm%" mozilla
+Test (x /usr/bin/firefox) Test (x /usr/lib/mozilla/run-mozilla.sh) FuncAddIfExists MenuFvwmNetwork "M&ozilla%mozilla.mini.xpm%" mozilla
+FuncAddIfExists MenuFvwmNetwork "&Netscape%mini.netscape.xpm%" netscape
+# }}}2
+# Multimedia {{{2
+DestroyMenu MenuFvwmMultimedia
+AddToMenu MenuFvwmMultimedia "Multimedia" Title
++ MissingSubmenuFunction FuncMenuMusic
+Test (x $[HOME]/media/fvwm-menu-music) + "Mus&ic%menu/folder.xpm%" Popup $[HOME]/media/music
+Test (x cdcd) + "&CD Tracks%menu/disk-cd.xpm%" Popup MenuCDTracks
++ "P&revious%mini/prev.xpm%"    Exec exec tpope media prev
++ "&Play%mini/play.xpm%"        Exec exec tpope media play
++ "Pa&use%mini/pause.xpm%"      Exec exec tpope media toggle
++ "&Stop%mini/stop.xpm%"        Exec exec tpope media stop
++ "&Next%mini/next.xpm%"        Exec exec tpope media next
++ ""                            Nop
++ "&Aumix%aumix.mini.xpm%"      Exec exec aumix
++ "&Gimp%menu/gimp.xpm%"        FuncExec gimp* "exec gimp"
+PipeRead 'if [ -x "`which tvtime 2>/dev/null`" ]; then \
+echo "+ \\"&TVTime%menu/graphics.xpm%\\" Exec exec tvtime"; \
+elif [ -x "`which xawtv 2>/dev/null`" ]; then \
+echo "+ \\"Xaw&TV%menu/graphics.xpm%\\" Exec exec xawtv"; fi'
 
+PipeRead 'if [ -x "`which beep-media-player 2>/dev/null`" ]; then \
+echo "+ \\"Beep &Media Player%menu/music.xpm%\\" Exec exec beep-media-player -m"; \
+elif [ -x "`which xmms 2>/dev/null`" ]; then \
+echo "+ \\"X&MMS%menu/music.xpm%\\" Exec exec xmms -m"; fi'
+
+PipeRead 'if [ -x "`which gmplayer 2>/dev/null`" ]; then \
+echo "+ \\"MPlay&er%menu/video.xpm%\\" Exec exec gmplayer"; \
+elif [ -x "`which xine 2>/dev/null`" ]; then \
+echo "+ \\"Xin&e%menu/video.xpm%\\" Exec exec xine"; fi'
+# }}}2
 # Remote Logins and Screens {{{2
 PipeRead "$HOME/bin/hostinfo --fvwm-menus"
 # }}}2
@@ -813,25 +873,30 @@ PipeRead "$HOME/bin/hostinfo --fvwm-menus"
 
 DestroyMenu MenuFvwmConfig
 AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
-+ "Fvwm &Modules"           Popup MenuFvwmModules
-+ "Stop Fvwm Mo&dule"       Popup MenuFvwmStopModule
++ "Fvwm &Modules%mini.fvwm.xpm%"              Popup MenuFvwmModules
++ "Stop Fvwm Mo&dule%mini.crosbone.xpm%"      Popup MenuFvwmStopModule
 + "" Nop
-+ "MWM Decor"               Style * UseDecor Default
-+ "Flat Decor"              Style * UseDecor Flat
++ "Re&fresh Screen%menu/refresh.xpm%"         Refresh
++ "R&ecapture Screen%menu/display.xpm%"       Recapture
++ "&Screenshot%mini.camera.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
++ "Reset X &Resources%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xresources
++ "" Nop
++ "&MWM Decor%mini.mwm.xpm%"                  Style * UseDecor MWM
++ "&Flat Decor%menu/window.xpm%"              Style * UseDecor Flat
 #+ "" Nop
 #+ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
 #+ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
 #+ "&Focus Follows Mouse"    FuncFocusPolicyChange FocusFollowsMouse
 + "" Nop
-+ "Co&lormap Follows Mouse" ColormapFocus FollowsMouse
-+ "Colormap Follows F&ocus" ColormapFocus FollowsFocus
++ "Co&lormap Follows Mouse%mini.mouse.xpm%"   ColormapFocus FollowsMouse
++ "Colormap Follows F&ocus%mini.windows.xpm%" ColormapFocus FollowsFocus
 + "" Nop
-+ "&All Paging OFF"           EdgeScroll 0 0
-+ "F&ull Paging"              EdgeScroll 100 100
-+ "&Horizontal Paging Only"   EdgeScroll 100 0
-+ "&Vertical Paging Only"     EdgeScroll 0 100
-+ "&Partial Paging"           EdgeScroll 50 50
-+ "Full Paging && &Edge Wrap" EdgeScroll 100000 100000
++ "&All Paging OFF%mini.rball.xpm%"           EdgeScroll 0 0
++ "F&ull Paging%mini.gball.xpm%"              EdgeScroll 100 100
+#+ "&Horizontal Paging Only"   EdgeScroll 100 0
+#+ "&Vertical Paging Only"     EdgeScroll 0 100
+#+ "&Partial Paging"           EdgeScroll 50 50
++ "Full Paging && &Edge Wrap%mini.bball.xpm%" EdgeScroll 100000 100000
 
 DestroyFunc FuncFocusPolicyChange
 AddToFunc FuncFocusPolicyChange
@@ -880,13 +945,14 @@ AddToFunc FuncConfigureIconBox
 
 DestroyMenu MenuFvwmQuitVerify
 AddToMenu MenuFvwmQuitVerify "Really Quit Fvwm?" Title
-+ "&No, Don't Quit%menu/choice-no.xpm%"   Nop
-+ "&Restart%menu/restart.xpm%"            Restart
+#+ "&No, Don't Quit%menu/choice-no.xpm%"   Nop
++ "No, &Lock Display%mini.xlock.xpm%"     Exec xscreensaver-command -lock || exec xlock
++ "No, &Restart%menu/restart.xpm%"            Restart
 + "Yes, Really &Quit%menu/choice-yes.xpm%" FuncSmartQuit
 + ""                     Nop
 + "Start &TWM%mini.twm.xpm%"        Restart twm
-+ "Start &KDE%mini.kde.xpm%"       Restart startkde
-+ "&Just an XTerm%mini.xterm.xpm%"    Restart xterm -n '"X Console"' -T '"X Console"'
++ "Start &KDE%mini.kde.xpm%"        Restart startkde
++ "&Just an XTerm%mini.xterm.xpm%"  Restart xterm -n '"X Console"' -T '"X Console"'
 
 DestroyMenu MenuGotoDesktop
 AddToMenu MenuGotoDesktop "*mini.desktop.xpm*" Title
@@ -1138,8 +1204,13 @@ AddToFunc FuncCustomWebBrowser
 
 DestroyFunc FuncSmartWebBrowser
 AddToFunc FuncSmartWebBrowser
-+ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo $*|tr -d ' \t\n\r\f'`" ;; *) echo "$*"; exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo \"$*\"|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e s/\'/%27/g`" ;; esac
++ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo "$*"|tr -d ' \t\n\r\f'`" ;; *) echo "$*"; exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo \"$*\"|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e s/\'/%27/g`" ;; esac
 + I FuncFindWebBrowser
+
+DestroyFunc FuncCloseXmms
+AddToFunc FuncCloseXmms
++ I All (xmms) Close
++ I All (beep-media-player) Close
 
 DestroyFunc FuncIrcScreenSshXterm
 AddToFunc FuncIrcScreenSshXterm
@@ -1165,7 +1236,34 @@ AddToFunc FuncExec
 + I Next ($0, AcceptsFocus) Focus
 + I None ($0) Exec $1
 # }}}2
-# Headline Functions {{{2
+# Menu Functions {{{2
+DestroyFunc FuncMusicPlay
+AddToFunc FuncMusicPlay
++ I PipeRead 'if [ -x "`which beep-media-player 2>/dev/null`" ]; then \
+        echo Exec exec beep-media-player \\""$0"\\"; \
+    elif [ -x "`which xmms 2>/dev/null`" ]; then \
+        echo Exec exec xmms \\""$0"\\"; \
+    fi'
+
+DestroyFunc FuncMenuMusic
+AddToFunc FuncMenuMusic
++ I PipeRead 'case "$0" in \
+        *MenuCDTracks*) echo FuncFvwmMenuTracks $0 ;; \
+        *) $[HOME]/media/fvwm-menu-music "$0" ;; esac'
+
+# By blitz3
+DestroyFunc FuncFvwmMenuTracks
+AddToFunc FuncFvwmMenuTracks
++ I DestroyMenu "$0"
++ I AddToMenu "$0"
++ I + DynamicPopDownAction DestroyMenu "$0"
++ I PipeRead ' \
+	cdcd info| grep Album| sed -e s/\\"/\\\\\\\\\\"/g -e "s#Album .*:[ ]*\\(.*\\)#+ \\"%music_card.png%\\1\\" Exec exec cdcd stop#g"; \
+	echo + \\"\\" Nop; \
+	cdcd tracks |sed -n -e "/^[ 0-9]/p" | sed -e s/\\"/\\\\\\\\\\"/g -e "s#[ ]*\\([0-9]*\\):[ ]*\\([ >]\\)[ ]*\\[.*\\][ ]*\\(.*\\)#+ \\"\\2\\1: \\3\\" Exec exec cdcd play \\1#g"| sed -e "s#>#%menu/disk-cd.png% #"'
+#+ I + "" Nop
+#+ I + "Stop" Exec exec cdcd stop
+
 DestroyFunc FuncMenuHeadlines
 AddToFunc   FuncMenuHeadlines
 + I PipeRead "fvwm-menu-headlines --site $0 --wm-icons --exec='sensible-browser %u'"

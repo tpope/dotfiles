@@ -81,19 +81,19 @@ export LD_PRELOAD
 
 xsetroot -solid '#002020'
 
-if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
-    width="`xwininfo -root|grep Width:|awk '{print $2}'`"
-    height="`xwininfo -root|grep Height:|awk '{print $2}'`"
-    depth="`xwininfo -root|grep Depth:|awk '{print $2}'`"
-    Xwnc -ac -depth "$depth" -geometry "${width}x$height" :7 &
-    xterm -title Metisse -e metisse-start-fvwm -wd :7 -wp abc123
-    pkill Xwnc
-    exit 0
-fi
+#if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
+#    width="`xwininfo -root|grep Width:|awk '{print $2}'`"
+#    height="`xwininfo -root|grep Height:|awk '{print $2}'`"
+#    depth="`xwininfo -root|grep Depth:|awk '{print $2}'`"
+#    Xwnc -ac -depth "$depth" -geometry "${width}x$height" :7 &
+#    xterm -title Metisse -e metisse-start-fvwm -wd :7 -wp abc123
+#    pkill Xwnc
+#    exit 0
+#fi
 
-if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
-    exec $sshagent $wm
-fi
+#if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
+#    exec $sshagent gnome-session
+#fi
 
 for wm in fvwm2 startkde blackbox wmaker afterstep enlightenment mwm twm xterm; do
     [ -x "`which $wm`" ] && exec $sshagent $wm

@@ -7,6 +7,63 @@ rcd=/etc/init.d
 [ -d "$rcd" ] || rcd=/etc/rc.d
 [ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
 
+mediaaction() {
+    if [ -x "/usr/bin/cdcd" ]; then
+	[ -f "$HOME/.cdcdrc" ] || \
+	    echo "device=/dev/cdrom" > "$HOME/.cdcdrc"
+	if [ "`cdcd info 2>/dev/null`" != "No disc in drive" ]; then
+	case "$1" in
+	    [Ss]top) cdcd stop ;;
+	    [Pp]ause) cdcd pause ;;
+	    [Rr]esume|[Uu]npause) cdcd resume ;;
+	    [Nn]ext) cdcd next ;;
+	    [Pp]rev) cdcd prev ;;
+	    [Pp]lay|[Tt]oggle)
+	    if cdcd info 2>/dev/null|grep Playing >/dev/null; then
+		cdcd pause
+	    elif cdcd info 2>/dev/null|grep Paused >/dev/null; then
+		cdcd resume
+	    else
+		cdcd play
+	    fi ;;
+	esac
+	return 0
+	fi
+    fi
+    if ps ax|grep -v grep|grep xmms >/dev/null && [ -x /usr/bin/xmms-shell ]; then
+	exec >/dev/null
+	case "$1" in
+	    [Ss]top)   xmms-shell -e stop & ;;
+	    [Pp]lay|[Uu]npause|[Rr]esume) xmms-shell -e play & ;;
+	    [Pp]ause)  xmms-shell -e pause & ;;
+	    [Tt]oggle) xmms-shell -e pause & ;;
+	    [Nn]ext)   xmms-shell -e forward & ;;
+	    [Pp]rev)   xmms-shell -e backward & ;;
+	esac
+	return 0
+    elif [ -n "$DISPLAY" ]; then
+	xlsclients|grep xmms >/dev/null && player=xmms
+	xlsclients|grep beep-media-player >/dev/null && player=beep-media-player
+	if [ -n "$player" ]; then
+	    exec >/dev/null
+	    case "$1" in
+		[Ss]top)   $player -s & ;;
+		[Pp]lay|[Uu]npause|[Rr]esume) $player -p & ;;
+		[Pp]ause)  $player -u & ;;
+		[Tt]oggle) $player -t & ;;
+		[Nn]ext)   $player -f & ;;
+		[Pp]rev)   $player -r & ;;
+	    esac
+	    return 0
+	fi
+    fi
+    if [ "`hostname`" = lisa ] && ping -c 1 mona >/dev/null 2>&1; then
+	hostinfo -S mona -ax DISPLAY=:0 "$HOME/bin/tpope" media "$@"
+	return
+    fi
+    return 1
+}
+
 case "$basename" in
 
     aliases)
@@ -15,7 +72,7 @@ case "$basename" in
     
     activity|away)
 	if [ "`hostname`" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
-	    [ "$#" = 1 -a -z "$1" ] && exec ssh -ax marge tpope $basename -c
+	    [ "$#" = 1 -a -z "$1" ] && exec hostinfo -S marge -ax tpope $basename -c
 	    exec ssh -ax marge tpope $basename "$@"
 	fi
 	if [ "$#" = 0 ]; then
@@ -120,6 +177,7 @@ case "$basename" in
 	for daemon in "$@"; do
 	    $sudo "$rcd/$daemon" "$basename"
 	done
+	[ -z "$*" -a "$basename" = stop ] && mediaaction stop && exit 0
 	[ "$*" ]
 	exit
     ;;
@@ -137,6 +195,11 @@ case "$basename" in
 	ver=`ls "$HOME/.openoffice"|tail -1`
 	exec "$HOME/.openoffice/$ver/soffice" "$@"
 	;;
+
+    media) mediaaction "$@"; exit ;;
+    
+    Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Uu]npause|[Tt]oggle|[Nn]ext|[Pp]rev)
+	mediaaction "$basename" "$@"; exit ;;
 
     sursync|suscp)
     for arg in "$@"; do
