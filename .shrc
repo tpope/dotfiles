@@ -47,7 +47,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     PAGER='less'
     [ -x /usr/bin/lesspipe ] && LESSOPEN='|lesspipe %s'
     RSYNC_RSH='ssh -a -x'
-    CVSROOT=':ext:bart.simpson:/home/tpope/.cvs'
+    CVSROOT=':ext:rebelongto.us:/home/tpope/.cvs'
     [ "$hostname" = bart ] && CVSROOT="$HOME/.cvs"
 
     umask 022

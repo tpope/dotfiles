@@ -41,7 +41,7 @@ setenv BROWSER "$HOME/bin/sensible-browser"
 setenv LESSOPEN '|lesspipe %s'
 setenv RSYNC_RSH 'ssh -a -x'
 set hostname = `hostname|sed -e 's/[.].*//'`
-setenv CVSROOT ':ext:bart.simpson:/home/tpope/.cvs'
+setenv CVSROOT ':ext:rebelongto.us:/home/tpope/.cvs'
 if ( $hostname == bart ) setenv CVSROOT "$HOME/.cvs"
 # }}}
 # Prompt {{{1
