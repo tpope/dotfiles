@@ -81,15 +81,26 @@ MenuStyle Screens MenuColorset 43, ActiveFore White, HilightBack DarkGreen
 
 DefaultFont 7x13
 TitleStyle      Height 18
+ButtonStyle     1 -- MwmDecorMenu
 ButtonStyle     1 -- UseTitleStyle
 #AddButtonStyle  1 CGradient 16 White grey20
 AddButtonStyle  1 MiniIcon -- flat
 AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
 AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
 AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
-ButtonStyle 2 17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1
+ButtonStyle 2 - !MwmDecorMax
+ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
+ButtonStyle 4 - MwmDecorMax !MwmDecorMin
 ButtonStyle 4 Default 2
+ButtonStyle 6 - MwmDecorMin MwmDecorShade
 ButtonStyle 6 Default 4
+
+#ButtonStyle 2 17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1 - !MwmDecorMax
+#ButtonStyle 2 - !MwmDecorMax
+#ButtonStyle 4 Default 2 - MwmDecorMax !MwmDecorMin
+#ButtonStyle 4 - MwmDecorMax
+#ButtonStyle 6 Default 4 - MwmDecorMin
+#ButtonStyle 6 - MwmDecorMin
 
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
@@ -113,14 +124,18 @@ AddToDecor Terminal
 + AddTitleStyle Inactive   ( HGradient 192 3 grey30 20 grey12 60 grey12 20 grey30 )
 + AddTitleStyle ActiveUp   ( HGradient 192 3 grey16 20 grey8  60 grey8  20 grey16 )
 + AddTitleStyle ActiveDown ( HGradient 192 3 grey12 20 grey4  60 grey4  20 grey12 )
++ ButtonStyle     1 -- MwmDecorMenu
 + ButtonStyle     1 -- UseTitleStyle
 + AddButtonStyle  1 CGradient 16 grey90 black
 + AddButtonStyle  1 Inactive   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1) Inactive (CGradient 16 grey90 grey10)
 + AddButtonStyle  1 ActiveUp   (5 01x01@1 99x01@1 99x99@0 01x99@0 01x01@1)
 + AddButtonStyle  1 ActiveDown (5 01x01@0 99x01@0 99x99@1 01x99@1 01x01@0)
 + AddButtonStyle  1 MiniIcon -- flat
-+ ButtonStyle 2 17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1
++ ButtonStyle 2 - !MwmDecorMax
++ ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
++ ButtonStyle 4 - MwmDecorMax !MwmDecorMin
 + ButtonStyle 4 Default 2
++ ButtonStyle 6 - MwmDecorMin MwmDecorShade
 + ButtonStyle 6 Default 4
 
 Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm, SloppyFocus
