@@ -2,13 +2,15 @@
 # Author: Tim Pope
 
 # Common {{{1
-if ( { test -t 1 } && $?TERM ) test "$TERM" = Eterm && echo -n \
-"]I.kde/share/icons/`hostname|sed -e 's/[.].*//'`.xpm\" # "
+if ( { test -t 1 } && $?TERM ) then
+    test "$TERM" = Eterm && echo -n \
+    "]I.kde/share/icons/`hostname|sed -e 's/[.].*//'`.xpm\" # "
+endif
 
 foreach dir ( /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin" )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
-foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin )
+foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin /usr/etc )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
@@ -70,6 +72,7 @@ if ( $?tcsh ) then
 	set hostletter = ``
 	set hostcode = `y`
     endif
+    if ( ! $?TERM ) setenv TERM vt220
     set oldterm = "$TERM"
     if ( $?OLDTERM ) then
 	set oldterm = "$OLDTERM"
@@ -161,6 +164,11 @@ alias rm "$HOME/bin/tpope libtrash rm"
 alias j 'jobs'
 
 if ( -x /usr/bin/vim || -x /usr/local/bin/vim || -x /opt/sfw/bin/vim ) then
+    alias vi 'vim'
+    setenv VISUAL 'vim'
+endif
+
+if ( -x /usr/bin/gvim || -x /usr/local/bin/gvim || -x /opt/sfw/bin/gvim ) then
     alias vi 'vim -X'
     setenv VISUAL 'vim -X'
 endif

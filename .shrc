@@ -6,14 +6,20 @@
 # .zshrc, .bashrc, and .profile, respectively.
 
 for dir in /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin"; do
-    if [ ! -d "$dir" ] || echo "$PATH"|grep "$dir" >/dev/null; then :; else
-	PATH="$dir$PATH"
+    if [ -d "$dir" ]; then
+	case "$PATH" in
+	    *"$dir"*) ;;
+	    *) PATH="$dir$PATH" ;;
+	esac
     fi
 done
 
-for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin; do
-    if [ ! -d "$dir" ] || echo "$PATH"|grep ":$dir" >/dev/null; then :; else
-	PATH="$PATH$dir"
+for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin /usr/etc; do
+    if [ -d "$dir" ]; then
+	case "$PATH" in
+	    *"$dir"*) ;;
+	    *) PATH="$PATH$dir" ;;
+	esac
     fi
 done
 
@@ -94,11 +100,11 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	promptchar='#'
     else
 	promptchar='$'
-	[ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "`whoami`" ] && \
+	[ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "$LOGNAME" ] && \
 	umask 002
     fi
 
-    PS1="`whoami`@$hostname `basename $execbin`$promptchar "
+    PS1="$LOGNAME@$hostname `basename $execbin`$promptchar "
 
     #case `basename $execbin` in
     #*ksh*)
@@ -119,6 +125,8 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	[ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && \
 	    alias apt-get='sudo apt-get'
 	[ -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
+	    alias vi='vim' && VISUAL='vim'
+	[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
 	    alias vi='vim -X' && VISUAL='vim -X'
 
 	if [ -x "`which dircolors 2>/dev/null`" ]; then
@@ -164,3 +172,4 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 fi
 unset promptchar interactive execbin hostname oldterm dir mtime atime
 fi
+
