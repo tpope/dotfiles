@@ -1,0 +1,137 @@
+# ~/.fvwm/FvwmScript-Alert
+# $Id$
+
+WindowTitle {FvwmScript-Status}
+WindowSize 36 20
+BackColor {PaleTurquoise}
+#ShadowColor {PaleTurquoise}
+#HilightColor {PaleTurquoise}
+ForeColor {Black}
+
+WindowPosition -3000 -3000
+
+Init
+ Begin
+  Set $font = (GetOutput {exec echo "$fvwm_alertfont"} 1 -1)
+  ChangeFont 1 $font
+  Set $title ={mini/game.xpm}
+  ChangeTitle 1 {:)}
+  Set $activity ={}
+# ChangeIcon 1 $title
+  Set $color ={White}
+  Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+ End
+
+PeriodicTasks
+ Begin
+  If (RemainderOfDiv (Add (GetTime) -25) 1200)==0 Then
+   Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+  If (RemainderOfDiv (GetTime) 60)==20 Then
+  Begin
+   Set $activity =(GetOutput {tpope activity} 1 1)
+   Set $away =(GetOutput {tpope away} 1 1)
+  End
+  If (RemainderOfDiv (GetTime) 5)==0 Then
+  Begin
+   Set $newtitle =$temp
+   Set $newforecolor =DarkGreen
+   If $activity=={} Then
+   Begin
+   End
+   Else
+   Begin
+    Set $newforecolor =Orange
+    If $activity=={Playing} Then
+     Set $newtitle =mini/game.xpm
+    Else
+     Set $newtitle ={!}
+   End
+#   If $away=={Out} Then
+#   Begin
+#    Set $newforecolor =Orange
+#    Set $newtitle =mini.connect.xpm
+#   End
+   Set $load =(Div (GetOutput {uptime|sed -e 's/^.*average: //' -e 's/ .*$//' -e 's/\.//'} 1 -1) 10)
+   If 19 < $load Then
+   Begin
+    Set $newtitle =(Div $load 10) {.} (RemainderOfDiv $load 10)
+    Set $newforecolor =Blue
+   End
+   Set $cell =(GetOutput {if [ -f /tmp/.phone-status ]; then . /tmp/.phone-status; if [ "$is_active" = 1 ]; then date +%s; elif [ "$is_active" = 0 ]; then echo 0; else cat $HOME/.blue/last_slh 2>/dev/null || date +%s; fi; else cat $HOME/.blue/last_slh 2>/dev/null || date +%s; fi} 1 1)
+   If (Add (GetTime) (Mult -1 $cell)) > 420 Then
+   Begin
+    Set $newforecolor =Orange
+    Set $newtitle =mini.connect.xpm
+   End
+   Set $mail =(GetOutput {finger $LOGNAME 2>/dev/null|grep '^New mail' 2>/dev/null} 1 2)
+   If $mail=={mail} Then
+   Begin
+    Set $newforecolor =Purple
+    Set $newtitle =mini/mail.xpm
+   End
+   Else
+   Begin
+   End
+   Set $apm =(GetOutput {if [ -x /usr/bin/apm ]; then power=`/usr/bin/apm | sed -e 's/^.* \([0-9]*\)%.*$/\1/' -e 's/.....*/100/'`; echo $power; elif [ -f /tmp/.phone-status ]; then . /tmp/.phone-status; [ "$battery" -a "$source" = 0 ] || battery=101; echo $battery; else echo 101; fi} 1 -1)
+   If $apm < 31 Then
+   Begin
+    Set $newtitle =$apm {%}
+    Set $newforecolor =Red
+   End
+   If $newtitle=={} Then
+   Begin
+    Set $newtitle =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
+    Set $newforecolor =Brown
+   End
+   If $newtitle=={--°} Then
+   Begin
+    Set $newtitle =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
+    Set $newforecolor =Brown
+   End
+   If $newtitle==$title Then
+   Begin
+    If $newforecolor==$forecolor Then
+    Begin
+    End
+    Else
+    Begin
+     Set $forecolor =$newforecolor
+     ChangeForeColor 1 $forecolor
+    End
+   End
+   Else
+   Begin
+    Set $title =$newtitle
+    Set $forecolor =$newforecolor
+    ChangeTitle 1 $title
+    ChangeIcon 1 $title
+    ChangeForeColor 1 $forecolor
+   End
+  End
+ End
+
+Widget 1
+Property
+ Position 0 0
+ Size 36 20
+ Type ItemDraw
+ Flags Center
+ Title {A}
+ Font xft:Sans:pixelsize=14
+Main
+ Case message of
+  SingleClic:
+  Begin
+   If $forecolor=={DarkGreen} Then
+   Begin
+    Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+   End
+   If $forecolor=={Orange} Then
+   Begin
+    If $title=={mini/game.xpm} Then
+     Do {Exec pkill -INT ut2004-bin >/dev/null 2>&1}
+    Set $activity =(GetOutput {tpope activity} 1 1)
+    Set $away =(GetOutput {tpope away} 1 1)
+   End
+  End
+End
