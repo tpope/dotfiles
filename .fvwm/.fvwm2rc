@@ -536,7 +536,7 @@ Key Grave   A   C       FuncIrcScreenSshXterm
 Key Grave   A   SC      FuncIrcScreenSshXtermShared
 Key 0       A   CM      Exec exec favorite-app
 Key 1       A   CM      Exec exec sensible-browser http://www.google.com/
-Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && $[sudo] /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && $[sudo] /sbin/cardctl eject
+Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
 Key 3       A   CM      FuncExec gaim "exec gaim"
 Key 4       A   CM      FuncIrcScreenSshXterm
 Key 6       A   CM      Exec exec xpenguins --nice .8 3
@@ -791,13 +791,16 @@ if [ -x "`which $2 2>/dev/null`" ]; then \
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
 FuncAddIfExists MenuFvwmPrograms "&UT2004%/usr/local/games/ut2004/ut2004.xpm%" ut2004
+FuncAddIfExists MenuFvwmPrograms "&Doom 3%doomface.xpm%" doom3
+FuncAddIfExists MenuFvwmPrograms "&Quake 3%/usr/local/games/quake3/quake3.xpm%" quake3
 Test (x /usr/local/bin/armyops) + "&America's Army%/usr/local/games/armyops/ArmyOps.xpm%" Exec exec armyops
-FuncAddIfExists MenuFvwmPrograms  "&Quake 3%/usr/local/games/quake3/quake3.xpm%" quake3
-FuncAddIfExists MenuFvwmPrograms "&Enemy Territory%/usr/local/games/enemy-territory/ET.xpm%" et
+FuncAddIfExists MenuFvwmPrograms "Enemy Territory%/usr/local/games/enemy-territory/ET.xpm%" et
 Test (f /home/games) + "" Nop
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
-FuncAddIfExists MenuFvwmPrograms "GpsDrive%gpsicon.png%" gpsdrive
+Test (x ethereal) + "&Ethereal%eicon3d32.xpm%" Exec exec $[sudo] ethereal
+FuncAddIfExists MenuFvwmPrograms "&GpsDrive%gpsicon.png%" gpsdrive
+FuncAddIfExists MenuFvwmPrograms "&MLDonkey%mlgui.xpm%" mlgui
 # }}}2
 # Utilities {{{2
 DestroyMenu MenuFvwmUtilities
@@ -985,16 +988,15 @@ PipeRead 'for i in `seq 0 26`; do echo + \\"\\&\
 DestroyMenu MenuHeadlines
 AddToMenu   MenuHeadlines "Headlines" Title
 + MissingSubmenuFunction FuncMenuHeadlines
-Test (f $[HOME]/.fvwm/.fvwm-menu-headlines/extension.pl) + "SexyGeek"   Popup sexygeek
-+ "Slashdot"   Popup slashdot
-+ "Kuro5hin"   Popup kuro5hin
-+ "BBSpot"     Popup bbspot
-+ "FreshMeat"  Popup freshmeat
-+ "LinuxToday" Popup linuxtoday
-#+ "KDE News"   Popup kde-news
-+ "CNN"        Popup cnn
+Test (f $[HOME]/.fvwm/.fvwm-menu-headlines/extension.pl) + "SexyGeek%sexygeek.png%"   Popup sexygeek
++ "Slashdot%slashdot.png%"     Popup slashdot
++ "Kuro5hin%kuro5hin.png%"     Popup kuro5hin
++ "BBSpot%bbspot.png%"         Popup bbspot
++ "FreshMeat%freshmeat.png%"   Popup freshmeat
++ "LinuxToday%linuxtoday.png%" Popup linuxtoday
++ "CNN%cnn.png%"               Popup cnn
 + ""           Nop
-+ "Reset all"  FuncResetHeadlines
++ "Reset all%menu/restart.xpm%" FuncResetHeadlines
 
 # Window Operations Menu {{{2
 DestroyMenu MenuFvwmWindowOps
