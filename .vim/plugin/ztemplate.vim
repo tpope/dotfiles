@@ -48,7 +48,7 @@ fun! FTSubstituteClassData()
     silent! execute "%s/@COURSE@/" .  s:course . "/g"
     silent! execute "%s/@INSTRUCTOR@/" .  s:instructor . "/g"
     silent! execute "%s/@DATE@/" .  s:date . "/g"
-  if expand("<afile>:e") == "tex"
+  if expand("%:e") == "tex"
     silent! execute "%s/\\\\today/" .  s:date . "/g"
     silent! %s/\\\(instructor\|date\|course\){\([^}.]*\)\. \([^}]*\)}/\\\1{\2.\\ \3}/eg
     silent! %s/^%\\\(instructor\|date\|course\)/\\\1/e
@@ -58,8 +58,7 @@ fun! FTSubstituteClassData()
     else
       let foo=expand("%:p:h") . "/." . s:raw . ".vim"
     endif
-    /^\\title/
-    norm f{l
+    /^\\title/norm f{l
   endif
   if filereadable(expand("%:p:h") . "/." . expand("%:e") . ".vim")
     exe "source ".expand("%:p:h") . "/." . expand("%:e") . ".vim"

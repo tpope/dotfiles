@@ -101,6 +101,14 @@ endif
 " if filereadable(expand("~/.vim/mappings.vim"))
 "     source ~/.vim/mappings.vim
 " endif
+fun! Make()
+  wa
+  if expand("%:e") == "tex"
+    exe "!rubber ".expand("%:r")." && xdvi ".expand("%:r")."&"
+  else
+    !Eterm -t White -T 'make test' --pause -e make -s test
+  endif
+endfun
 
 map Q       gq        " Don't use Ex mode; use Q for formatting
 " Make p in Visual mode replace the selected text with the "" register.
@@ -109,9 +117,9 @@ map <F3>    :call Invert()<CR>
 map <F4>    :cprev<CR>
 map <F5>    :cc<CR>
 map <F6>    :cnext<CR>
-map <F7>    :wa<BAR>!Eterm -t White -T 'make test' --pause -e make -s test<CR>
-map <F8>    :wa<BAR>make<CR>
-map <F9>    :wa<BAR>make clean<CR>
+map <F7>    :wa<BAR>make<CR>
+map <F8>    :call Make()<CR><CR>
+map <F9>    :wa<BAR>make %<CR>
 map <F10>   :wa<BAR>make 
 map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
 imap <F12> <C-O>:![ -z "$STY" ] \|\| screen<CR><CR>
@@ -227,7 +235,7 @@ autocmd BufNewFile */init.d/* if filereadable("/etc/init.d/skeleton") | 0r /etc/
  autocmd FileType java set efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
  autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
  autocmd FileType html set isk+=:,~ sts=2 sw=2
- autocmd FileType tex set sw=2 sts=2 efm=%E!\ LaTeX\ %trror:\ %m,
+ autocmd FileType tex set makeprg=latex\ \\\\nonstopmode\ \\\\input\\{$*\\} sw=2 sts=2 efm=%E!\ LaTeX\ %trror:\ %m,
 	\%+WLaTeX\ %.%#Warning:\ %.%#line\ %l%.%#,
 	\%+W%.%#\ at\ lines\ %l--%*\\d,
 	\%WLaTeX\ %.%#Warning:\ %m,
