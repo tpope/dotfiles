@@ -70,7 +70,7 @@ bind generic 0 next-page
 
 # Section: Macros {{{1
 # --------------------
-#macro pager \ef "|view-x-face\n" "Show X-Face"
+macro generic <f12> "<shell-escape>[ -z \"$STY\" ] || screen\n"
 macro pager \ef "<enter-command>set nopipe_decode\n<pipe-message>sed -ne '/\^X-Face:/,/\^[\^ \\t]/ p'|sed -ne 's/\^X-Face://' -e '/\^[ \\t]/ p'|sed -e 's/\^[ \\t]\+//'|{ echo '/* Width=48, Height=48 */'; uncompface; }|icontopbm|{ xli -fork -title 'X-Face' stdin || aview; }\n<enter-command>set nopipe_decode" "Show X-Face"
 macro pager \cb "<enter-command>set pipe_decode\n<pipe-message>urlview\n<enter-command>set nopipe_decode\n" 'call urlview to extract URLs out of a message'
 macro index \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as spam'

@@ -113,6 +113,8 @@ map <F7>    :wa<BAR>!Eterm -t White -T 'make test' --pause -e make -s test<CR>
 map <F8>    :wa<BAR>make<CR>
 map <F9>    :wa<BAR>make clean<CR>
 map <F10>   :wa<BAR>make 
+map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
+imap <F12> <C-O>:![ -z "$STY" ] \|\| screen<CR><CR>
 "map <t_%9>  :hardcopy<CR>         " Print Screen
 
 map <C-Z>   :shell<CR>

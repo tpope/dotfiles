@@ -148,6 +148,14 @@ change-first-word() {
 }
 zle -N change-first-word
 bindkey "\eE" change-first-word
+
+new-screen() {
+    [ -z "$STY" ] || screen < "$TTY"
+}
+zle -N new-screen
+bindkey "$terminfo[kf12]" new-screen
+bindkey -s "$terminfo[kf11]" "^Ascreen ^E\n"
+
 ;;
 esac
 
