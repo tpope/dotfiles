@@ -7,7 +7,7 @@
 
 hostinfo=`basename $0`
 PATH="/bin:/usr/bin:/usr/local/bin"
-hosts="maggie bart clancy abe left homer right fry carl lisa marge barney mona ralph patty sarah snowball otto lenny"
+hosts="maggie bart clancy abe left homer right fry carl lisa marge barney mona ralph patty sarah snowball otto lenny griffin"
 menuhosts="maggie bart marge lisa homer abe mona - snowball - clancy sarah ralph"
 
 gethost() {
@@ -17,6 +17,7 @@ gethost() {
     [Cc]|clancy*) echo clancy ;;
     [Ee]|abe*) echo abe ;;
     [Ff]|left*) echo left ;;
+    [Gg]|griffin*) echo griffin ;;
     [Hh]|homer*) echo homer ;;
     [Ii]|right*) echo right ;;
     [Jj]|fry*) echo fry ;;
@@ -55,8 +56,9 @@ patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
 barney()   { hterm="01;33"; hscrn="+b Y"; hrgb="#F7F67F"; hltr=N; hdom=simpson;}
 otto()     { hterm="01;35"; hscrn="+b Y"; hrgb="#FF7FFF"; hltr=T; hdom=wiggum; }
 fry()      { hterm="01;33"; hscrn="+b Y"; hrgb="#F7F67F"; hltr=J; hdom=wiggum; }
-left()     { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=F; hdom=springfield; }
+left()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=F; hdom=springfield; }
 right()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=I; hdom=springfield;}
+griffin()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=G; hdom=simpson;}
 unknown()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr= ; hdom=;}
 getinfo() {
     $1 2>/dev/null || unknown
