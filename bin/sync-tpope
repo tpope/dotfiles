@@ -28,8 +28,7 @@ GUI_FILES="\
  .gnupg/pubring.gpg .libtrash .irssi .pork/porkrc .pork/scract.pl \
  .fvwm/.fvwm-menu-headlines/extension.pl .vim/.plugin .vim/syntax"
 
-SSH="ssh -a -x -oStrictHostKeyChecking=no -oBatchMode=yes -oSetupTimeOut=20 -oConnectTimeOut=20"
-RSYNC_RSH="$SSH"
+RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20 -oConnectTimeOut=20"
 RSYNC="rsync -urlptRC --exclude='.*.sw?' --exclude='.*.lock' --exclude='*.local'"
 export RSYNC_RSH
 
