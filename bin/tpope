@@ -19,7 +19,7 @@ rcd=/etc/init.d
 [ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
 
 mediaaction() {
-    if ps ax|grep -v grep|grep mplayer >/dev/null && [ -p "$HOME/.mplayer/mplayer" ]; then
+    if ps x|grep -v grep|grep ' g*mplayer' >/dev/null && [ -p "$HOME/.mplayer/mplayer" ]; then
 	exec > "$HOME/.mplayer/mplayer"
 	case "$1" in
 	    [Qq]uit)   echo quit ;;
@@ -33,7 +33,7 @@ mediaaction() {
 	    [Rr]ew)    echo seek -${2:-5} ;;
 	esac
 	return 0
-    elif ps ax|grep -v grep|egrep "[0-9][0-9] (xmms|beep-media-player)" \
+    elif ps x|grep -v grep|egrep "[0-9][0-9] (xmms|beep-media-player)" \
 	>/dev/null && [ -x /usr/bin/xmms-shell ]; then
 	case "$2" in *:[0-9][0-9]) time="$(expr 60 \* $(echo $2|sed -e 's/:.*//') + $(echo $2|sed -e 's/.*://'))" ;; *) time="${2:-5}" ;; esac
 	exec >/dev/null
@@ -55,11 +55,13 @@ mediaaction() {
 	exec >/dev/null 2>&1
 	case "$1" in
 	    [Ss]top|[Qq]uit)   tvtime-command QUIT & ;;
-	    [Pp]lay|[Rr]esume) tvtime-command TOGGLE_MUTE & ;;
-	    [Pp]ause)  tvtime-command TOGGLE_MUTE & ;;
+	    [Pp]lay|[Rr]esume) tvtime-command PICTURE & ;;
+	    [Pp]ause|[Rr]esume)  tvtime-command TOGGLE_MUTE & ;;
 	    [Tt]oggle) tvtime-command TOGGLE_MUTE & ;;
 	    [Nn]ext)   tvtime-command CHANNEL_UP & ;;
 	    [Pp]rev)   tvtime-command CHANNEL_DOWN & ;;
+	    [Ff]fwd)   tvtime-command PICTURE_UP & ;;
+	    [Rr]ew)    tvtime-command PICTURE_DOWN & ;;
 	esac
 	return 0
     elif [ -n "$DISPLAY" ]; then
@@ -121,11 +123,13 @@ mediaaction() {
     if [ "`hostname`" = lisa ] && ping -c 1 mona >/dev/null 2>&1; then
 	hostinfo --batch-ssh mona DISPLAY=:0 "$HOME/bin/tpope" media "$@"
 	return
-    elif lsdvd >/dev/null 2>&1; then
+    fi
+    LONGEST="`lsdvd 2>/dev/null|tail -1|sed -e 's/Longest track: //'`"
+    if [ "$LONGEST" ]; then
 	case "$1" in
 	    [Qq]uit) eject /dev/dvd ;;
 	    [Pp]lay|[Tt]oggle)
-		gmplayer -af volume=10 dvd:// >/dev/null 2>&1 </dev/null &
+		gmplayer -af volume=10 dvd://$LONGEST >/dev/null 2>&1 </dev/null &
 		if [ -p "$HOME/.mplayer/mplayer" ]; then
 		    sleep 5
 		    #echo "vo_fullscreen" > "$HOME/.mplayer/mplayer"
