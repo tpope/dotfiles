@@ -22,15 +22,47 @@ fi
 
 rcd=/etc/init.d
 [ -d "$rcd" ] || rcd=/etc/rc.d
-[ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
 
 hostname="`hostname|sed -e 's/[.].*//'`"
+[ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
+
+inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
+
+root_init() {
+    if [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
+	if inpath sudo && sudo -l >/dev/null 2>&1; then
+	    as_root() {
+		if [ "$1" = exec ]; then ex="exec"; shift; fi
+		$ex sudo "$@"
+	    }
+	else
+	    echo "Warning: sudo not installed or not configured" >&2
+	    as_root() {
+		if [ "$1" = exec ]; then ex="exec"; shift; fi
+		$ex su -c "$*"
+	    }
+	fi
+    else
+	as_root() { "$@" ; }
+    fi
+}
 
 no_links() {
     if [ -h "$HOME/bin/$basename" ]; then
 	echo "Error: this alias cannot be a symlink." >&2
 	echo "Remove $HOME/bin/$basename and try again." >&2
 	exit 1
+    fi
+}
+
+most_recent() {
+    prog="$1"
+    shift
+    file="`ls -1t "$@" 2>/dev/null|head -1`"
+    if [ -f "$file" ]; then
+	exec "$prog" "$file"
+    else
+	exec "$prog"
     fi
 }
 
@@ -55,7 +87,7 @@ do_clean() {
 	else
 	    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
 		    xargs -r0 rmdir >/dev/null 2>&1; }
-	    if [ -x "`which wipe 2>/dev/null`" ]; then
+	    if inpath wipe; then
 		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
 			xargs -r0 wipe -fcsq >/dev/null 2>&1; }
 	    else
@@ -71,7 +103,7 @@ do_clean() {
 	unset LD_PRELOAD
 	PROTECT_TRASH=NO
 	export PROTECT_TRASH
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) -atime +`expr $unit \* 30`
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -atime +`expr $unit \* 30` -o -user root -atime +1 \)
 	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -atime +`expr $unit \* 30`
 	FIND "$HOME/.trash" -atime +`expr $unit \* 15`
 	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` -size +8192k
@@ -80,7 +112,7 @@ do_clean() {
 	if [ ! -d "$HOME/.trash" ]; then
 	    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
 	fi
-	rm -f "$HOME/bin/ruptime" "$HOME/bin/rwho" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep"
+	rm -f "$HOME/bin/ruptime" "$HOME/bin/rwho" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit"
 	return 0
 }
 
@@ -95,7 +127,7 @@ do_install() {
 	touch "$HOME/.hushlogin"
 	hidden=1
     fi
-    if [ -x "`which mplayer 2>/dev/null`" -a ! -d "$HOME/.mplayer" ]; then
+    if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
 	mkdir "$HOME/.mplayer"
 	mkfifo "$HOME/.mplayer/mplayer"
 	cat > "$HOME/.mplayer/config" <<-EOF
@@ -159,18 +191,32 @@ do_install() {
 	    done
 	done
     done
+    if [ -d "$HOME/.kde/share" -a ! -h "$HOME/.kde/share/icons" ]; then
+	rm -rf "$HOME/.kde/share/icons" # A bad idea?
+	ln -s ../../.pixmaps "$HOME/.kde/share/icons"
+	links=1
+    fi
+    if [ ! -h "$HOME/.bash_logout" ]; then
+	ln -s .zlogout "$HOME/.bash_logout"
+    fi
     if [ ! -f "$HOME/bin/sdplay" ]; then
-	if [ -x "`which rplay 2>/dev/null`" ] && pidof rplayd >/dev/null 2>&1; then
+	if inpath rplay && pidof rplayd >/dev/null 2>&1; then
 	    ln -s "`which rplay`" "$HOME/bin/sdplay"
-	elif [ -x "`which esdplay 2>/dev/null`" ] && pidof esd >/dev/null 2>&1; then
+	elif inpath esdplay && pidof esd >/dev/null 2>&1; then
 	    ln -s "`which esdplay`" "$HOME/bin/sdplay"
-	elif [ -x "`which artsplay 2>/dev/null`" ] && pidof artsd >/dev/null 2>&1; then
+	elif inpath artsplay && pidof artsd >/dev/null 2>&1; then
 	    ln -s "`which artsplay`" "$HOME/bin/sdplay"
-	elif [ -x "`which play 2>/dev/null`" ]; then
+	elif inpath play; then
 	    ln -s "`which play`" "$HOME/bin/sdplay"
 	fi
 	[ ! -h "$HOME/bin/sdplay" ] || links=1
     fi
+    for bin in sensible-editor sensible-pager; do
+	if [ ! -f "$HOME/bin/$bin" ]; then
+	    ln -s tpope "$HOME/bin/$bin"
+	    links=1
+	fi
+    done
     if [ -f "$HOME/.pixmaps/unknown.xpm" -a ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
 	ln -sf unknown.xpm "$HOME/.pixmaps/.localhost.xpm"
 	links=1
@@ -187,7 +233,7 @@ do_install() {
 	links=1
     fi
     [ -z "$links" ] || echo "Creating symlinks."
-    if [ -x "`which crontab 2>/dev/null`" ]; then
+    if inpath crontab; then
     crontab -l >/tmp/crontab.original.$$ 2>/dev/null
     cron="$?"
     if [ "$cron" = 0 ]; then
@@ -204,15 +250,16 @@ do_install() {
 	cronmsg="Installing skeleton crontab."
     fi
     if [ "$cron" = 0 -o "$cron" = 1 ]; then
-	shell=/bin/sh
-	env=ENV
 	if [ -x /bin/bash ]; then
 	    shell=/bin/bash
 	    env=BASH_ENV
+	else
+	    shell=/bin/sh
+	    env=ENV
 	fi
 	cat >/tmp/crontab.template.$$ <<EOF
+# -*- crontab -*- vim:set ft=crontab:
 # crontab for $LOGNAME@$hostname
-# -*- crontab -*- vim: ft=crontab
 SHELL=$shell
 $env=$HOME/.shrc
 CLASSPATH=.:$HOME/.java:$HOME/java
@@ -220,7 +267,7 @@ PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
 PERL5LIB=$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
-05   4 * * *	tpope cron
+20 */4 * * *	tpope cron
 EOF
 	cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
 	if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
@@ -247,24 +294,24 @@ EOF
     fi
     if [ "$1" = "--root" ]; then
 	# ugh, how complicated
-	if [ -x "`which sudo 2>/dev/null`" ]; then
+	if inpath sudo; then
 	    if sudo -l >/dev/null 2>&1; then
-		sudo "$HOME/bin/tpope" _root_install $LOGNAME
+		sudo "$HOME/bin/tpope" _root_installer $LOGNAME
 	    else
 		if [ -f /etc/sudoers ]; then
 		    su -c "echo $LOGNAME ALL=(ALL) ALL >> /etc/sudoers"
 		    echo "Adding to sudoers."
 		    if sudo -l >/dev/null 2>&1; then
-			sudo "$HOME/bin/tpope" _root_install $LOGNAME
+			sudo "$HOME/bin/tpope" _root_installer $LOGNAME
 		    else
-			su -c "$HOME/bin/tpope _root_install $LOGNAME"
+			su -c "$HOME/bin/tpope _root_installer $LOGNAME"
 		    fi
 		else
-		    su -c "$HOME/bin/tpope _root_install $LOGNAME"
+		    su -c "$HOME/bin/tpope _root_installer $LOGNAME"
 		fi
 	    fi
 	else
-	    su -c "$HOME/bin/tpope _root_install $LOGNAME"
+	    su -c "$HOME/bin/tpope _root_installer $LOGNAME"
 	fi
     fi
 }
@@ -293,10 +340,13 @@ display_manage() {
 case "$basename" in
 
     aliases)
-	echo launch lt lv dm pg sb sursync ruptime rwho \
+	aliases="launch lt lv dm pg sb sursync ruptime rwho installer \
 	rclink rc start stop restart reload force-reload \
-	media tomorrow vnc word emerge aptitude whois xscc mpl mpa \
-	aumix feh rsync
+	tomorrow vnc word xssc mpl mpa mount shutdown whois"
+	for app in apt-get aptitude emerge cardctl aumix feh rsync rubber xdvi xpdf gv; do
+	    inpath $app && [ ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
+	done
+	echo $aliases
 	exit 0 ;;
     
     activity|away)
@@ -340,15 +390,6 @@ case "$basename" in
     mpl) display_manage mplayer -fs -loop 0 "$@" ;;
     mpa) DISPLAY=  mplayer -quiet -vo fb,aa "$@" ;;
 
-    emerge|aptitude)
-	no_links
-	if [ "$1" = search ]; then
-	    exec "$basename" "$@"
-	else
-	    exec $sudo "$basename" "$@"
-	fi
-	;;
-
     launch)
 	exec >/dev/null 2>&1 </dev/null
 	if [ "$1" = "-dm" -o "$1" = "-md" ]; then
@@ -378,9 +419,14 @@ case "$basename" in
 
     logview|lv)
 	[ "$PAGER" ] || PAGER=more
-	# Pager should already be "less" or something is wrong
+	# Pager should already be set or something is wrong
 	cd /var/log
-	exec $PAGER +G "$@"
+	root=
+	for file in "$@"; do
+	    [ -f "$file" -a ! -r "$file" ] && root=as_root
+	done
+	[ -z "$root" ] || root_init
+	$root exec $PAGER +G "$@"
 	;;
 
     ps-grep|pg)
@@ -398,6 +444,7 @@ case "$basename" in
 		echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
 		exit 1
 	fi
+	root_init
 	sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
 	    2>/dev/null |read run start stop trash
 	[ "$stop" ] || run=2345 start=20 stop=20
@@ -405,33 +452,88 @@ case "$basename" in
 	[ -z "$3" ] || start="$3" stop="$3"
 	[ -z "$4" ] || stop="$4"
 	for i in 0 1 2 3 4 5 6; do
-	    $sudo rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
+	    as_root rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
 	    case $run in
 		[Xx])   ;;
-		*$i*) $sudo ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
-		*)    $sudo ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
+		*$i*) as_root ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
+		*)    as_root ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
 	    esac
 	done
 	exit 0
     ;;
 
-    runcontrol|rc)
+    runcontrol|rc) root_init
 	if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
 		echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
 		exit 1
 	fi
 	while [ "$#" -gt 0 ]; do
-	    $sudo "$rcd/$2" "$1"
+	    as_root "$rcd/$2" "$1"
 	    shift 2
 	done
 	exit 0
     ;;
 
     sensible-browser|sb) exec "$HOME/bin/sensible-browser" "$@" ;;
+    sensible-pager|sp)
+	term=exec
+	if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" ]; then
+	    term="x-terminal-emulator -title Pager -e"
+	    if [ -z "$1" -o "$1" = - ]; then
+		tempfile=/tmp/sensible-pager.$$
+		cat > $tempfile
+		#if inpath lesspipe; then
+		#    echo FUCK >&2
+		#    lesspipe $tempfile > $tempfile.2
+		#    [ -s $tempfile.2 ] && mv $tempfile.2 $tempfile
+		#    rm -f $tempfile.2
+		#fi
+		[ "$1" = - ] && shift
+	    fi
+	fi
+	if inpath less; then
+	    inpath lesspipe && LESSOPEN='|lesspipe %s'
+	    export LESSOPEN
+	    pager="less -R"
+	elif inpath more; then
+	    pager="more"
+	elif inpath pg; then
+	    pager="pg"
+	else
+	    pager="cat"
+	fi
+	if [ ! "$tempfile" ]; then
+	    $term $pager "$@"
+	else
+	    $term $pager "$tempfile"
+	    rm "$tempfile"
+	fi
+	;;
+    
+    sensible-editor|se)
+	term=exec
+	if [ "$DISPLAY" -a ! -t 0 ]; then
+	    inpath gvim && exec gvim -f "$@"
+	    term="exec x-terminal-emulator -title Editor -e"
+	fi
+	if inpath gvim; then
+	    $term vim -X "$@"
+	elif inpath vim; then
+	    $term vim "$@"
+	elif inpath vi; then
+	    $term vi "$@"
+	elif inpath nano; then
+	    $term nano "$@"
+	else
+	    echo 'No editor found!' >&2
+	    exit 1
+	fi ;;
 
-    start|stop|restart|reload|force-reload)
+    x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+
+    start|stop|restart|reload|force-reload) root_init
 	for daemon in "$@"; do
-	    $sudo "$rcd/$daemon" "$basename"
+	    as_root "$rcd/$daemon" "$basename"
 	done
 	[ -z "$*" -a "$basename" = stop ] && do_media stop && exit 0
 	[ "$*" ]
@@ -445,17 +547,17 @@ case "$basename" in
 
     libtrash|lt) try_libtrash "$@" ;;
 
-    install) do_install "$@" ;;
+    install|installer) do_install "$@" ;;
 
-    _root_install)
+    _root_installer)
 	[ "$1" ] || exit 1
 	PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
-	for group in adm src dip dialout floppy cdrom video audio; do
+	for group in adm src dip dialout floppy cdrom video audio disk; do
 	    line="`grep ^$group: /etc/group`"
 	    case "$line" in
 		'') ;;
 		*"$1"*) ;;
-		*) adduser $1 $group >/dev/null 2>&1 && didgroup=1 ;;
+		*) adduser "$1" $group >/dev/null 2>&1 && didgroup=1 ;;
 	    esac
 	done
 	[ -z "$didgroup" ] || echo "Added to groups."
@@ -529,31 +631,65 @@ case "$basename" in
     exit 1
     ;;
 
-    whois)
-    if [ "$1" != "-H" ]; then
-	exec whois -H "$@"
-    else
-	exec /usr/bin/whois "$@"
-    fi
-    ;;
-
     word) cat /usr/share/dict/words | egrep "$@" ;;
     xauth-get) exec hostinfo --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
-    x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
-    xscc)
+    xssc|xscc)
 	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
 	export DISPLAY
 	exec xscreensaver-command "$@" ;;
 
+    mount|cdrecord|shutdown) no_links
+	case "$1" in
+	    '') exec "$basename" "$@" ;;
+	    *) root_init; as_root exec "$basename" "$@" ;;
+	esac ;;
+    emerge|aptitude) no_links
+	case "$1" in
+	    search) exec "$basename" "$@" ;;
+	    *) root_init; as_root exec "$basename" "$@" ;;
+	esac ;;
+    apt-get) no_links
+	case "$1" in
+	    source) exec "$basename" "$@" ;;
+	    *) root_init; as_root exec "$basename" "$@" ;;
+	esac ;;
+    cardctl) no_links
+	case "$1" in
+	    status|config|ident|info|'') exec "$basename" "$@" ;;
+	    *) root_init; as_root exec "$basename" "$@" ;;
+	esac ;;
+
     aumix) no_links
 	if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
-    feh) no_links; try_libtrash feh -Z "$@" ;;
-    rsync) no_links; exec rsync -uCP "$@" ;;
-    rm)
+    feh) no_links
+	try_libtrash feh -Z "$@" ;;
+    rsync) no_links
+	exec rsync -uCP "$@" ;;
+    rubber) no_links
+	if [ '*.tex' != "`echo *.tex`" ]; then
+	    exec rubber *.tex
+	else
+	    exec rubber
+	fi;;
+    xdvi) no_links
+	[ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
+    xpdf) no_links
+	[ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/dl/*.pdf;;
+    gv) no_links
+	[ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
+    rm) no_links
 	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
 	    try_libtrash rm "$@"
 	else
 	    exec rm -i "$@"
+	fi ;;
+
+    whois)
+	#no_links
+	if [ "$1" != "-H" ]; then
+	    exec whois -H "$@"
+	else
+	    exec /usr/bin/whois "$@"
 	fi ;;
 
     '') echo "Usage: `basename $0` <command> [options]" ;;
