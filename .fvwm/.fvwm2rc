@@ -703,7 +703,8 @@ AddToMenu Gnome-sys
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
 +       "&UT2004%menu/game-action.xpm%"     Exec exec ut2004
-+       "&IRC%menu/chat.xpm%"     FuncFvwmIrcScreenSshXterm
++       "&IRC%menu/chat.xpm%"        FuncFvwmIrcScreenSshXterm
++       "OpenOffice &Writer%menu/word-processor.xpm%" Exec exec oowriter
 
 DestroyMenu MenuFvwmUtilities
 AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
@@ -714,7 +715,7 @@ AddToMenu MenuFvwmUtilities@side.utilities.xpm@^White^ "Utilities" Title
 +       ""                           Nop
 +       "G&vim%mini.vim.xpm%"        Exec exec vim -g
 +       "M&utt%mutt.mini.xpm%"       Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
-+       "Ga&im%mini.gaim.xpm%"       Exec exec gaim
++       "Ga&im%mini.gaim.xpm%"       FuncFvwmExec gaim "exec gaim"
 +       "X&awtv%menu/video.xpm%"     Exec xawtv || exec tvtime
 +       "&Gimp%menu/gimp.xpm%"       FuncFvwmExec gimp* "gimp-2.0 || exec gimp"
 +       ""                           Nop
@@ -993,19 +994,25 @@ AddToFunc FuncTakeToPrevDeskAndPage
 DestroyFunc FuncFvwmXterm
 AddToFunc FuncFvwmXterm
 + I Exec exec x-terminal-emulator -T localhost -n localhost
+
 DestroyFunc FuncFvwmScreenXterm
 AddToFunc FuncFvwmScreenXterm
-+ I Next (screen@localhost) Iconify off
++ I Next (screen@localhost, AcceptsFocus) Iconify off
 + I Next (screen@localhost, AcceptsFocus) Focus
-+ I None (screen@localhost) Exec exec x-terminal-emulator -T screen@localhost -n screen@localhost -e screen -RR
++ I Next (screen@localhost, AcceptsFocus) WarpToWindow 25p 7p
++ I None (screen@localhost, AcceptsFocus) Exec exec x-terminal-emulator -T screen@localhost -n screen@localhost -e screen -RR
+
 DestroyFunc FuncFvwmSshXterm
 AddToFunc FuncFvwmSshXterm
 + I Exec exec x-terminal-emulator -ut -T ssh@$0 -n ssh@$0 -e hostinfo -S $0 -t
+
 DestroyFunc FuncFvwmScreenSshXterm
 AddToFunc FuncFvwmScreenSshXterm
-+ I Next (screen-ssh@$0) Iconify off
++ I Next (screen-ssh@$0, AcceptsFocus) Iconify off
 + I Next (screen-ssh@$0, AcceptsFocus) Focus
-+ I None (screen-ssh@$0) Exec exec x-terminal-emulator -ut -T screen-ssh@$0 -n screen-ssh@$0 -e hostinfo -S $0 -t screen -RR
++ I Next (screen-ssh@$0, AcceptsFocus) WarpToWindow 25p 7p
++ I None (screen-ssh@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-ssh@$0 -n screen-ssh@$0 -e hostinfo -S $0 -t screen -RR
+
 DestroyFunc FuncFvwmXtermSsh
 AddToFunc FuncFvwmXtermSsh
 + I Exec exec ssh -X $0 xterm
@@ -1015,7 +1022,7 @@ DestroyFunc FuncFvwmFindWebBrowser
 AddToFunc FuncFvwmFindWebBrowser
 + I Next (WWW-Browser*, AcceptsFocus) Focus
 + I Next (*Mozilla*, AcceptsFocus) Focus
-+ I Next (Firefox-bin) Iconify off
++ I Next (Firefox-bin, AcceptsFocus) Iconify off
 + I Next (Firefox-bin, AcceptsFocus) Focus
 
 DestroyFunc FuncFvwmWebBrowser
@@ -1037,9 +1044,9 @@ AddToFunc FuncFvwmSmartWebBrowser
 
 DestroyFunc FuncFvwmIrcScreenSshXterm
 AddToFunc FuncFvwmIrcScreenSshXterm
-+ I Next (screen-irc@mona) Iconify off
++ I Next (screen-irc@mona, AcceptsFocus) Iconify off
 + I Next (screen-irc@mona, AcceptsFocus) Focus
-+ I None (screen-irc@mona) Exec exec x-terminal-emulator -ut -T screen-irc@mona -n screen-irc@mona -e hostinfo -S mona -t sh -c "'DISPLAY=:0.0 exec screen -xRR irc irssi'"
++ I None (screen-irc@mona, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@mona -n screen-irc@mona -e hostinfo -S mona -t sh -c "'DISPLAY=:0.0 exec screen -dRR irc irssi'"
 
 DestroyFunc FuncFvwmIrcScreenIrcXterm
 AddToFunc FuncFvwmIrcScreenXterm

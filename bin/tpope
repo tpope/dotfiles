@@ -108,6 +108,15 @@ case "$basename" in
     rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
     ssh)      exec "$HOME/bin/hostinfo" -S "$@" ;;
 
+    soffice)
+	if [ ! -d "$HOME/.openoffice" ]; then
+	    echo "Sorry, OpenOffice.org not installed." >&2
+	    exit 1
+	fi
+	ver=`ls "$HOME/.openoffice"|tail -1`
+	exec "$HOME/.openoffice/$ver/soffice" "$@"
+	;;
+
     sursync|suscp)
     for arg in "$@"; do
 	case "$arg" in
