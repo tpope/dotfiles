@@ -78,6 +78,11 @@ PeriodicTasks
     Set $newtitle =$apm {%}
     Set $newforecolor =Red
    End
+   If $newtitle=={} Then
+   Begin
+    Set $newtitle =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
+    Set $newforecolor =Brown
+   End
    If $newtitle=={--°} Then
    Begin
     Set $newtitle =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
