@@ -291,7 +291,7 @@ Style xdvi      MiniIcon mini/printing.xpm
 Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, UsePPosition
 Style VCLSalFrame GrabFocusOff, UsePPosition
 Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
-Style SDL_App   BorderWidth 0, HandleWidth 0, NoTitle, MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
+Style SDL_App   BorderWidth 0, HandleWidth 0, MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
 
 # }}}2
 # }}}1
@@ -550,7 +550,7 @@ Key 2       A   SCM     Exec sleep 1; xscreensaver-command -lock || exec xlock
 Key 3       A   SCM     Exec exec gaim -a
 Key 4       A   SCM     FuncIrcScreenXterm
 Key 6       A   SCM     Exec exec xpenguins -t "Big Penguins" --nice .8 3
-Key 7       A   SCM     Exec exec pkill -U $[USER] xpenguins
+Key 7       A   SCM     Exec exec pkill -U $[LOGNAME] xpenguins
 Key 9       A   SCM     Exec tvtime || exec xawtv
 Key Space   A   SCM     FuncXterm
 Key G       A   SCM     Exec exec gaim -a
@@ -721,7 +721,7 @@ AddToFunc StartFunction
 + I UnsetEnv fvwm_titlefont
 + I UnsetEnv fvwm_iconfont 
 + I UnsetEnv fvwm_smallfont
-+ I UnsetEnv sudo
+#+ I UnsetEnv sudo
 
 DestroyFunc InitFunction
 AddToFunc InitFunction
@@ -740,13 +740,13 @@ AddToFunc SessionInitFunction
 + I exec xsetroot -solid '#003030'
 + I DestroyFunc FuncSmartQuit
 + I AddToFunc FuncSmartQuit I QuitSession
-+ I AddToFunc FuncSmartQuit I Exec exec pkill -TERM -U $[USER] xsm >/dev/null 2>&1
++ I AddToFunc FuncSmartQuit I Exec exec pkill -TERM -U $[LOGNAME] xsm >/dev/null 2>&1
 + I Exec test -x /usr/bin/ssh-add -a -S "$SSH_AUTH_SOCK" && exec /usr/bin/ssh-add
 
 AddToFunc SessionRestartFunction
 + I DestroyFunc FuncSmartQuit
 + I AddToFunc FuncSmartQuit I QuitSession
-+ I AddToFunc FuncSmartQuit I Exec exec pkill -TERM -U $[USER] xsm >/dev/null 2>&1
++ I AddToFunc FuncSmartQuit I Exec exec pkill -TERM -U $[LOGNAME] xsm >/dev/null 2>&1
 
 # }}}1
 # Menus {{{1
@@ -760,12 +760,13 @@ AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
 + "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens
 + ""              Nop
 + "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
+Test (f /home/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames
 + "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
 + "N&etwork%menu/network.xpm%"           Popup MenuFvwmNetwork
 + "&Multimedia%menu/multimedia.xpm%"     Popup MenuFvwmMultimedia
 + ""              Nop
 PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian'
-PipeRead 'test -e /usr/share/gnome/apps && echo + \\"\\&GNOME%menu/gnome.xpm%\\" Popup Gnome-sys'
+PipeRead 'test -e /usr/share/gnome/apps && echo + \\"G\\&NOME%menu/gnome.xpm%\\" Popup Gnome-sys'
 PipeRead 'test -e "$KDEDIR" -o -e /usr/share/applnk && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
 + ""              Nop
 + "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
@@ -788,14 +789,18 @@ if [ -x "`which $2 2>/dev/null`" ]; then \
     echo "AddToMenu $0 \\"$1\\" Exec exec $2 $3 $4 $5"; fi'
 
 # Programs {{{2
+DestroyMenu MenuFvwmGames
+AddToMenu MenuFvwmGames "Games" Title
+FuncAddIfExists MenuFvwmGames "&UT2004%/usr/local/games/ut2004/ut2004.xpm%" ut2004
+FuncAddIfExists MenuFvwmGames "&Doom 3%doomface.xpm%" doom3
+FuncAddIfExists MenuFvwmGames "&Quake 3%/usr/local/games/quake3/quake3.xpm%" quake3
+Test (x /usr/local/bin/armyops) + "&America's Army%/usr/local/games/armyops/ArmyOps.xpm%" Exec exec armyops
+FuncAddIfExists MenuFvwmGames "&Enemy Territory%/usr/local/games/enemy-territory/ET.xpm%" et
+FuncAddIfExists MenuFvwmGames "&Pydance%pydance.png%" pydance
+FuncAddIfExists MenuFvwmGames "&Stepmania%/usr/local/games/stepmania/NoteSkins/dance/note/Down Hold Head Active 64th.png%" stepmania
+
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
-FuncAddIfExists MenuFvwmPrograms "&UT2004%/usr/local/games/ut2004/ut2004.xpm%" ut2004
-FuncAddIfExists MenuFvwmPrograms "&Doom 3%doomface.xpm%" doom3
-FuncAddIfExists MenuFvwmPrograms "&Quake 3%/usr/local/games/quake3/quake3.xpm%" quake3
-Test (x /usr/local/bin/armyops) + "&America's Army%/usr/local/games/armyops/ArmyOps.xpm%" Exec exec armyops
-FuncAddIfExists MenuFvwmPrograms "Enemy Territory%/usr/local/games/enemy-territory/ET.xpm%" et
-Test (f /home/games) + "" Nop
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
 Test (x ethereal) + "&Ethereal%eicon3d32.xpm%" Exec exec $[sudo] ethereal
@@ -955,11 +960,11 @@ AddToMenu MenuFvwmQuitVerify "Really Quit Fvwm?" Title
 
 DestroyMenu MenuHalt
 AddToMenu MenuHalt "Halt?" Title
-+ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec $[sudo] halt
++ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec sudo /sbin/shutdown -h now "Called by $[LOGNAME] from menu"
 
 DestroyMenu MenuReboot
 AddToMenu MenuReboot "Reboot?" Title
-+ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec $[sudo] reboot
++ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec sudo /sbin/shutdown -r now "Called by $[LOGNAME] from menu"
 
 DestroyFunc FuncSmartQuitExec
 AddToFunc FuncSmartQuitExec
@@ -1396,7 +1401,7 @@ DestroyModuleConfig FvwmButtons: *
 *FvwmButtons: (8x6, Padding 1 0, Back black, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineA" "Module FvwmPager FvwmPagerInlineA 0")
 *FvwmButtons: (4x6, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineB" "Module FvwmPager FvwmPagerInlineB 1 2")
 *FvwmButtons: (End)
-*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
+*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[LOGNAME], Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
 *FvwmButtons: (4x6, Padding 1 5, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
 # }}}2
 # FvwmButtonsGkrellm Config {{{2
