@@ -5,27 +5,37 @@
 // This file configures everything from Netscape 4 to Firefox
 
 with (PrefConfig) {
+user_pref("accessibility.typeaheadfind.autostart", false);
 user_pref("advanced.system.supportDDEExec", false);
 user_pref("browser.blink_allowed", false);
 user_pref("browser.block.target_new_window", true);
+user_pref("browser.download.defaultFolder", "~/dl");
+user_pref("browser.download.dir", "~/dl");
+user_pref("browser.download.manager.closeWhenDone", true);
 user_pref("browser.download.manager.retention", 1);
 user_pref("browser.enable_automatic_image_resizing", false);
-user_pref("browser.startup.homepage", "about:blank");
+user_pref("browser.startup.homepage", "http://www.sexygeek.org/home/");
 user_pref("browser.tabs.autoHide", false);
-user_pref("browser.tabs.extensions.default.type", 1);
+user_pref("browser.tabs.extensions.default.type", 2);
 user_pref("browser.tabs.extensions.direction_of_focusing", 3);
 user_pref("browser.tabs.extensions.last_tab_closing", 1);
+user_pref("browser.tabs.extensions.loadInBackgroundMiddleClick", true);
 user_pref("browser.tabs.extensions.open_tab_in", 2);
 user_pref("browser.tabs.extensions.prevent_same_uri_tab", true);
 user_pref("browser.tabs.extensions.show_item.moveLeft", true);
 user_pref("browser.tabs.extensions.show_item.moveRight", true);
 user_pref("browser.tabs.extensions.slow_down_autoreload_in_background.enabled", true);
-user_pref("browser.tabs.extensions.window_hook_mode", 1);
+user_pref("browser.tabs.extensions.view_source_tab", true);
+user_pref("browser.tabs.extensions.window_hook_mode", 2);
 user_pref("browser.tabs.opentabfor.windowopen", true);
+user_pref("browser.tabs.loadInBackground", false);
 user_pref("browser.throbber.url","http://www.sexyeek.org/");
 user_pref("content.notify.backoffcount", 200);
 user_pref("content.notify.interval", 120000);
 user_pref("content.notify.ontimer", true);
+user_pref("ctxextensions.default.type", 1);
+user_pref("ctxextensions.enable.navigations_advanced", true);
+user_pref("ctxextensions.enable.navigations_collectLinks", true);
 user_pref("dom.disable_open_click_delay", 0);
 user_pref("dom.disable_open_during_load", true);
 user_pref("dom.disable_window_flip", true);
@@ -43,6 +53,7 @@ user_pref("network.http.pipelining", true);
 user_pref("network.http.proxy.pipelining", true);
 user_pref("network.http.pipelining.maxrequests", 100);
 user_pref("nglayout.initialpaint.delay", 50);
-//user_pref("privacy.popups.firstTime", false);
-//user_pref("security.warn_submit_insecure", false);
+user_pref("security.warn_submit_insecure", false);
+user_pref("view_source.wrap_long_lines", true);
+user_pref("extensions.disabledObsolete", true);
 }
