@@ -226,7 +226,7 @@ fun! FTCheck_asmsyntax()
   endif
 endfun
 
-autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if exists("*LoadTemplateFileConfirm") | if filereadable(expand($HOME . "/.vim/templates/skel.sh")) | call LoadTemplateFileConfirm($HOME . "/.vim/templates/skel.sh") | endif | endif | exe 'norm G'
+autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if exists("*LoadTemplateFileConfirm") | if filereadable(expand($HOME . "/.vim/templates/skel.sh")) | call LoadTemplateFileConfirm($HOME . "/.vim/templates/skel.sh") | endif | endif | set ft=sh | exe 'norm G'
  autocmd BufNewFile,BufRead *.txt			set tw=78 linebreak
  autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*	set ft=simpsons
  autocmd BufNewFile,BufRead *Fvwm*			set ft=fvwm
