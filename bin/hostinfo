@@ -100,7 +100,7 @@ hostinfo)
 	exec ssh "$host`suffix $host`" "$@" ;;
     -b|--batch-ssh)
 	case "$2" in
-	    *.*) host="$2";;
+	    *.*|-*) host="$2";;
 	    *) host=`gethost ${2:-$host}` ;;
 	esac
 	shift; shift
@@ -187,9 +187,13 @@ EOF
 	;;
     ?)	[ -n "$STY" ] && SCREEN="screen -ln"
 	exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
-    ssh|sssh)
-	host="`gethost $1`"
-	shift
-	exec ssh "$host`suffix $host`" "$@" ;;
+    batch-ssh)
+	case "$2" in
+	    *.*|-*) host="$2";;
+	    *) host=`gethost ${2:-$host}` ;;
+	esac
+	shift; shift
+	exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
+
 	*) echo WARNING ;;
 esac
