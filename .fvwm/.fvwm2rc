@@ -1014,8 +1014,10 @@ AddToFunc FuncFvwmXtermSsh
 DestroyFunc FuncFvwmWebBrowser
 AddToFunc FuncFvwmWebBrowser
 + I Exec exec sensible-browser $*
-+ I Next (*Mozilla*) Iconify off
++ I Next (WWW-Browser*, AcceptsFocus) Focus
 + I Next (*Mozilla*, AcceptsFocus) Focus
++ I Next (Firefox-bin) Iconify off
++ I Next (Firefox-bin, AcceptsFocus) Focus
 
 DestroyFunc FuncFvwmIrcScreenSshXterm
 AddToFunc FuncFvwmIrcScreenSshXterm
@@ -1137,7 +1139,7 @@ DestroyModuleConfig FvwmButtons: *
 #    then echo 'glbiff `Exec exec glbiff -geometry -3000-3000`)'; \
 #    else echo 'xbiff `Exec exec xbiff -shape -geometry -3000-3000`)'; fi"
 #*FvwmButtons: (6x6, Frame 0, Padding 0 0, Container(Font fixed, Rows 1, Columns 1, Frame 0, Padding 0 0 ))
-*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action FuncFvwmWebBrowser "`xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'`")
+*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action (Mouse 2) FuncFvwmWebBrowser "`xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'`")
 #*FvwmButtons: (4x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "xload" "Exec exec xload -bg PaleTurquoise -fg black -hl blue -update 5 -nolabel -jumpscroll 1 -g -3000-3000")
 *FvwmButtons: (4x6, Padding 1 5, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
 #*FvwmButtons: (4x3, Frame 0, Swallow(UseOld) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 2")
