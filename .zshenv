@@ -5,7 +5,7 @@ typeset -U path
 for dir in /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin"; do
     [ -d "$dir" ] && path=($dir $path)
 done
-for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/local/sbin /usr/sbin /sbin; do
+for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/local/sbin /usr/sbin /sbin /usr/etc; do
     [ -d "$dir" ] && path=($path $dir)
 done
 path=($HOME/bin $path /usr/bin /bin /usr/bin/X11 /usr/games /usr/local/sbin /usr/sbin /sbin)
