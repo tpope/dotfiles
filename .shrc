@@ -122,8 +122,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
 	alias j='jobs'
 
-	[ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && \
-	    alias apt-get='sudo apt-get'
 	[ -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
 	    alias vi='vim' && VISUAL='vim'
 	[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
@@ -146,8 +144,13 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	    LESSCHARSET='iso8859'
 	fi
 
+	unalias stop >/dev/null 2>&1
 	for cmd in `tpope aliases`; do
-	    alias $cmd="tpope $cmd"
+	    if [ -x "`which $cmd 2>/dev/null`" ]; then
+		eval "${cmd}() { tpope $cmd \"\$@\"; }"
+	    else
+		alias $cmd="$HOME/bin/tpope $cmd"
+	    fi
 	done
 
 	if [ -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
