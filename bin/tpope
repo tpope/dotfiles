@@ -146,7 +146,7 @@ mediaaction() {
 case "$basename" in
 
     aliases)
-	echo launch pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media tomorrow vnc word emerge aptitude
+	echo launch lt lv pg sb sursync rclink rc start stop restart reload force-reload ruptime rwho media tomorrow vnc word emerge aptitude
 	exit 0 ;;
     
     activity|away)
@@ -172,21 +172,28 @@ case "$basename" in
 
     clean)
 	if [ "$1" = -v ]; then
-	    FIND() { find "$@" ! -type d -print 2>/dev/null; }
+	    FIND()    { find "$@" ! -type d -print 2>/dev/null; }
+	    FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
 	    shift
 	else
-	    FIND() { find "$@" ! -type d -print0 2>/dev/null | \
+	    FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
 		    PROTECT_TRASH=NO xargs -r0 rm >/dev/null 2>&1; }
+	    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
+		    PROTECT_TRASH=NO xargs -r0 rmdir >/dev/null 2>&1; }
 	fi
 	case "${1:-3}" in 1|2|3|4|5) unit=${1:-3} ;;
 	    *) echo "Usage: $tpope$basename [-v] [1-5]" >&2; exit 1 ;;
 	esac
 	unset LD_PRELOAD
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name "*.aux" -o -name "*.blg" \) -atime +`expr $unit \* 30`
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" \) -atime +`expr $unit \* 30`
 	if [ -d "$HOME/.trash" ]; then
 	    FIND "$HOME/.trash" -atime +`expr $unit \* 15`
 	    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` -size +8192k
 	    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 5` -size +65536k
+	    FINDDIR "$HOME/.trash" -mtime +`expr $unit \* 1` -empty
+	    if [ ! -d "$HOME/.trash" ]; then
+		mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
+	    fi
 	fi
 	exit 0
 	;;
@@ -209,6 +216,13 @@ case "$basename" in
 	"$@" &
 	exit 0
     ;;
+
+    logview|lv)
+	[ "$PAGER" ] || PAGER=more
+	# Pager should already be "less" or something is wrong
+	cd /var/log
+	exec $PAGER +G "$@"
+	;;
 
     ps-grep|pg)
     if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
@@ -277,6 +291,108 @@ case "$basename" in
     ruptime)  exec "$HOME/bin/hostinfo" -u "$@" ;;
     rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
     ssh)      exec "$HOME/bin/hostinfo" --ssh "$@" ;;
+
+    install)
+	[ "$1" != "--cron" ] || exec >/dev/null
+	if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
+	    touch "$HOME/. tpope"
+	    chmod 0000 "$HOME/. tpope"
+	    hidden=1
+	fi
+	if [ ! -f "$HOME/.hushlogin" ]; then
+	    touch "$HOME/.hushlogin"
+	    hidden=1
+	fi
+	if [ ! -d "$HOME/.trash" ]; then
+	    mkdir "$HOME/.trash"
+	    chmod 0700 "$HOME/.trash"
+	    hidden=1
+	fi
+	[ -z "$hidden" ] || echo "Creating hidden files."
+	for dir in .firefox/default .phoenix/default .mozilla/$LOGNAME; do
+	    [ -d "$HOME/$dir" ] || continue
+	    subdir="`ls -1 "$HOME/$dir"|head -n 1`"
+	    [ -d "$subdir" ] || continue
+	    if [ ! -L "$subdir/user.js" ]; then
+		ln -s ../../../.netscape/user.js "$subdir/user.js"
+		links=1
+	    fi
+	done
+	if [ ! -e "$HOME/bin/sdplay" ]; then
+	    if [ -x "`which rplay 2>/dev/null`" ] && pidof rplayd >/dev/null 2>&1; then
+		ln -s "`which rplay`" "$HOME/bin/sdplay"
+	    elif [ -x "`which esdplay 2>/dev/null`" ] && pidof esd >/dev/null 2>&1; then
+		ln -s "`which esdplay`" "$HOME/bin/sdplay"
+	    elif [ -x "`which artsplay 2>/dev/null`" ] && pidof artsd >/dev/null 2>&1; then
+		ln -s "`which artsplay`" "$HOME/bin/sdplay"
+	    elif [ -x "`which play 2>/dev/null`" ]; then
+		ln -s "`which play`" "$HOME/bin/sdplay"
+	    fi
+	    [ ! -L "$HOME/bin/sdplay" ] || links=1
+	fi
+	if [ ! -e "$HOME/.pixmaps/.localhost.xpm" ]; then
+	    if [ -f "$HOME/.pixmaps/`hostname`.xpm" ]; then
+		ln -s "`hostname`.xpm" "$HOME/.pixmaps/.localhost.xpm"
+		links=1
+	    fi
+	fi
+	[ -z "$links" ] || echo "Creating symlinks."
+	if [ -x "`which crontab 2>/dev/null`" ]; then
+	crontab -l >/tmp/crontab.original.$$ 2>/dev/null
+	cron="$?"
+	if [ "$cron" = 0 ]; then
+	    if grep 'tpope install' /tmp/crontab.original.$$ >/dev/null; then
+		sed -ne '/tpope install/,$p' /tmp/crontab.original.$$ | \
+		sed -ne '2,$p' > /tmp/crontab.custom.$$
+		cronmsg="Updating skeleton crontab."
+	    else
+		cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
+		cronmsg="Inserting skeleton crontab."
+	    fi
+	elif [ "$cron" = 1 ]; then
+	    cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
+	    cronmsg="Installing skeleton crontab."
+	fi
+	if [ "$cron" = 0 -o "$cron" = 1 ]; then
+	    shell=/bin/sh
+	    env=ENV
+	    if [ -x /bin/bash ]; then
+		shell=/bin/bash
+		env=BASH_ENV
+	    fi
+	    cat >/tmp/crontab.template.$$ <<EOF
+# crontab for `whoami`@`hostname`
+# -*- crontab -*- vim: ft=crontab
+SHELL=$shell
+$env=$HOME/.shrc
+CLASSPATH=.:$HOME/.java:$HOME/java
+PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
+PERL5LIB=$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl
+RSYNC_RSH=ssh -axqoBatchMode=yes
+
+05   4 * * *	tpope install --cron; tpope clean 5
+EOF
+	    cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
+	    if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
+		echo "$cronmsg"
+		crontab - < /tmp/crontab.template.$$
+	    fi
+	    rm /tmp/crontab.template.$$ /tmp/crontab.custom.$$
+	fi
+	rm /tmp/crontab.original.$$
+	fi
+	if [ ! -f "$HOME/.ssh/id_rsa" ]; then
+	    echo "Generating ssh key."
+	    ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N ""
+	    cat "$HOME/.ssh/id_rsa.pub" >> "$HOME/.ssh/authorized_keys2"
+	fi
+	zsh="`grep 'zsh$' /etc/shells|head -n 1`"
+	if [ -x "$zsh" ] && grep "^`whoami`:" /etc/passwd >/dev/null && \
+		! grep "^`whoami`:.*zsh" /etc/passwd >/dev/null ; then
+	    echo "Changing login shell."
+	    chsh -s "$zsh"
+	fi
+    ;;
 
     soffice)
 	if [ ! -d "$HOME/.openoffice" ]; then

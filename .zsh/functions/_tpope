@@ -1,12 +1,12 @@
-#compdef tpope launch x-terminal-emulator xauth-get sursync sync-tpope
+#compdef tpope launch x-terminal-emulator logview lv xauth-get sursync sync-tpope
 
 local tmp
 
 case $service in
 tpope)
 if [[ $CURRENT = 2 ]]; then
-    tmp=($(tpope aliases) activity away start stop restart reload force-reload 'runcontrol:start or stop daemons' rclink 'launch:start and disown a process' 'media:multimedia functions' 'sensible-browser:web browser' 'x-terminal-emulator:X terminal emulator' 'xauth-get:retrieve X authorization' 'ruptime:remote uptime' 'rwho:remote who' 'ps-grep:search processes' 'clean:clean up temporary and backup files' 'sursync:rsync as root' 'temperature:display local temperature' "tomorrow:tomorrow\'s MHC schedule" 'word:grep /usr/share/dict/words')
-    _describe -t commands 'tpope command' tmp -- && ret=0
+    tmp=($(tpope aliases) activity away start stop restart reload force-reload 'runcontrol:start or stop daemons' rclink 'launch:start and disown a process' 'media:multimedia functions' 'sensible-browser:web browser' 'x-terminal-emulator:X terminal emulator' 'xauth-get:retrieve X authorization' 'ruptime:remote uptime' 'rwho:remote who' 'ps-grep:search processes' 'clean:clean up temporary and backup files' 'sursync:rsync as root' 'temperature:display local temperature' "tomorrow:tomorrow\'s MHC schedule" 'word:grep /usr/share/dict/words' 'logview:View system logs' install)
+    _describe -t commands 'tpope command' tmp --
 else
     shift words
     (( CURRENT-- ))
@@ -16,8 +16,13 @@ else
     [[ $words[1] = sursync ]] && words[1]=rsync
     [[ $words[1] = tomorrow ]] && words[1]=today
     [[ $words[1] = pg || $words[1] = ps-grep ]] && words[1]=grep
+    [[ $words[1] = launch ]] && shift words && (( CURRENT-- ))
     _normal
 fi ;;
+logview|lv)
+_description files expl 'log file'
+_files "$@" "$expl[@]" -W /var/log -g "*~*.(gz|old|*[0-9])(-.)"
+;;
 x-terminal-emulator)
     words[1]=xterm
     _normal ;;
