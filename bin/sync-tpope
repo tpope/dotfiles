@@ -12,10 +12,11 @@
 FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
  .profile .bashrc .bash_profile .bash_logout .screenrc .terminfo .dir_colors \
- .vimrc .vim/colors .vim/after .muttrc .urlview .mailcap .procmailrc \
- .imaprc .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
- .gnupg/gpg.conf .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .fvwm/.fvwm2rc \
- .fvwm/icons/* .fvwm/FvwmScript-* .pixmaps/[^_]* .netscape/user.js \
+ .vimrc .vim/colors .vim/after .vim/templates .vim/plugin \
+ .muttrc .urlview .mailcap .procmailrc .imaprc .gnupg/gpg.conf \
+ .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
+ .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js \
+ .fvwm/.fvwm2rc .fvwm/icons/* .fvwm/FvwmScript-* .pixmaps/[^_]* \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
  bin/sync-tpope bin/qdist \
  "
@@ -25,7 +26,7 @@ GUI_FILES="\
  .kde/share/config/kdeglobals .kde/share/apps/konqueror/bookmarks.xml \
  .kde/share/apps/konsole .kde/share/icons .gkrellm .gkrellm2/[^l]* .qt \
  .gnupg/pubring.gpg .libtrash .irssi .pork/porkrc .pork/scract.pl \
- .fvwm/.fvwm-menu-headlines/extension.pl .vim/plugin .vim/syntax .vim/templates"
+ .fvwm/.fvwm-menu-headlines/extension.pl .vim/.plugin .vim/syntax"
 
 SSH="ssh -a -x -oStrictHostKeyChecking=no -oBatchMode=yes -oSetupTimeOut=20 -oConnectTimeOut=20"
 RSYNC_RSH="$SSH"
