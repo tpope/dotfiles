@@ -14,7 +14,7 @@ elif [ "$1" = "-E" ]; then
 fi
 
 [ -x "$XTERM" ] && exec "$XTERM" "$@"
-if [ -x "`which Eterm`" ]; then
+if [ -x "`which Eterm 2>/dev/null`" ]; then
     if [ "$1" = -ut ]; then
 	shift
 	exec Eterm --utmp-logging=false "$@"
@@ -26,8 +26,8 @@ fi
 [ -x /opt/sfw/bin/xterm ] && exec /opt/sfw/bin/xterm "$@"
 [ -x /usr/local/bin/xterm ] && exec /usr/local/bin/xterm "$@"
 [ -x /usr/X11R6/bin/xterm ] && exec /usr/X11R6/bin/xterm "$@"
-for term in Eterm rxvt aterm konsole gnome-multi-terminal gnome-terminal dtterm; do
-    [ -x "`which $term`" ] && exec $term "$@"
+for term in rxvt aterm konsole gnome-multi-terminal gnome-terminal dtterm; do
+    [ -x "`which $term 2>/dev/null`" ] && exec $term "$@"
 done
 
 echo "No terminal emulators found." >&2
