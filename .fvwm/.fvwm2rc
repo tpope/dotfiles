@@ -1064,6 +1064,7 @@ AddToFunc FuncFvwmExec
 DestroyFunc FuncMenuHeadlines
 AddToFunc   FuncMenuHeadlines
 + I PipeRead "fvwm-menu-headlines --site $0 --wm-icons --exec='sensible-browser %u'"
++ I Schedule 600000 DestroyMenu $0
 
 DestroyFunc FuncResetHeadlines
 AddToFunc   FuncResetHeadlines
