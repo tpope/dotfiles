@@ -7,12 +7,18 @@
 # and this script is modified to call that file instead.
 
 # Of particular interest here is the start/restart/etc functions, which call
-# the appropriate script in /etc/init.d.
+# the appropriate script in /etc/init.d, the install function, which does
+# various tasks involved with moving in (such as setting up a crontab and
+# changing my login shell), and the cron function, which calls install, cleans
+# up temp files, and optionally downloads my latest set of configuration files.
 
 [ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
 
 basename="`basename $0`"
-[ "$basename" = tpope ] && tpope='tpope ' basename="$1" && shift
+if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
+    tpope="$basename " basename="$1"
+    shift
+fi
 
 rcd=/etc/init.d
 [ -d "$rcd" ] || rcd=/etc/rc.d
@@ -20,8 +26,25 @@ rcd=/etc/init.d
 
 hostname="`hostname|sed -e 's/[.].*//'`"
 
-mediaaction() {
+no_links() {
+    if [ -h "$HOME/bin/$basename" ]; then
+	echo "Error: this alias cannot be a symlink." >&2
+	echo "Remove $HOME/bin/$basename and try again." >&2
+	exit 1
+    fi
+}
+
+do_media() {
     exec "$HOME/bin/media" "$@"
+}
+
+try_libtrash() {
+	case "$LD_PRELOAD" in *libtrash*) ;; *)
+	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+	   LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+	   export LD_PRELOAD
+	fi ;; esac
+	"$@"
 }
 
 do_clean() {
@@ -74,13 +97,26 @@ do_install() {
     fi
     if [ -x "`which mplayer 2>/dev/null`" -a ! -d "$HOME/.mplayer" ]; then
 	mkdir "$HOME/.mplayer"
-	cat > "$HOME/.mplayer/config" <<EOF
-# ~/.mplayer/config
-vo=xv,x11,fb,aa
-alang=en
-slang=en
-framedrop=yes
-EOF
+	mkfifo "$HOME/.mplayer/mplayer"
+	cat > "$HOME/.mplayer/config" <<-EOF
+	# ~/.mplayer/config
+	vo=xv,x11,fb,aa
+	alang=en
+	slang=en
+	framedrop=yes
+	input=file=$HOME/.mplayer/mplayer
+	EOF
+	hidden=1
+    fi
+    if [ -f /usr/lib/libtrash/libtrash.so -a ! -f "$HOME/.libtrash" ]; then
+	cat > "$HOME/.libtrash" <<-EOF
+	# ~/.libtrash
+	TRASH_CAN = .trash
+	IGNORE_EXTENSIONS = o;log;aux;bbl;blg;ent;toc;swp;swo;viminfo
+	IGNORE_HIDDEN = NO
+	GLOBAL_PROTECTION = NO
+	LIBTRASH_CONFIG_FILE_UNREMOVABLE = NO
+	EOF
 	hidden=1
     fi
     [ -z "$hidden" ] || echo "Creating hidden files."
@@ -95,13 +131,6 @@ EOF
 	    ln -s dl "$HOME/downloads"
 	    chmod 0755 "$HOME/dl"
 	    directories=1
-	    for file in "$HOME/.elinks/elinks.conf" "$HOME/.pork/porkrc" "$HOME/.irssi/config"; do
-		if [ -f "$file" ] && grep /downloads "$file" >/dev/null; then
-		    cp "$file" /tmp/.install.$$
-		    sed -e 's,/downloads,/dl,g' < /tmp/.install.$$ > "$file"
-		    rm /tmp/.install.$$
-		fi
-	    done
 	elif [ -d "$HOME/.mozilla" -o -d "$HOME/.irssi" ]; then
 	    mkdir "$HOME/dl"
 	    chmod 0755 "$HOME/dl"
@@ -153,15 +182,10 @@ EOF
 	    links=1
 	fi
     fi
-#    if [ "`uname`" = Linux ] && [ ! "$HOME/.pixmaps/.localhost.xpm" -ef "$HOME/.pixmaps/$hostname.xpm" ] || [ ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
-#	if [ -f "$HOME/.pixmaps/$hostname.xpm" ]; then
-#	    ln -sf "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
-#	    links=1
-#	elif [ ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
-#	    ln -s "unknown.xpm" "$HOME/.pixmaps/.localhost.xpm"
-#	    links=1
-#	fi
-#    fi
+    if [ -x /usr/etc/renice -a ! -x "$HOME/bin/renice" ]; then
+	ln -s /usr/etc/renice "$HOME/bin/renice"
+	links=1
+    fi
     [ -z "$links" ] || echo "Creating symlinks."
     if [ -x "`which crontab 2>/dev/null`" ]; then
     crontab -l >/tmp/crontab.original.$$ 2>/dev/null
@@ -221,6 +245,28 @@ EOF
 	    chsh -s "$zsh"
 	fi
     fi
+    if [ "$1" = "--root" ]; then
+	# ugh, how complicated
+	if [ -x "`which sudo 2>/dev/null`" ]; then
+	    if sudo -l >/dev/null 2>&1; then
+		sudo "$HOME/bin/tpope" _root_install $LOGNAME
+	    else
+		if [ -f /etc/sudoers ]; then
+		    su -c "echo $LOGNAME ALL=(ALL) ALL >> /etc/sudoers"
+		    echo "Adding to sudoers."
+		    if sudo -l >/dev/null 2>&1; then
+			sudo "$HOME/bin/tpope" _root_install $LOGNAME
+		    else
+			su -c "$HOME/bin/tpope _root_install $LOGNAME"
+		    fi
+		else
+		    su -c "$HOME/bin/tpope _root_install $LOGNAME"
+		fi
+	    fi
+	else
+	    su -c "$HOME/bin/tpope _root_install $LOGNAME"
+	fi
+    fi
 }
 
 display_manage() {
@@ -229,7 +275,7 @@ display_manage() {
     xset=xset
     [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
     dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
-    case "$dmps" in
+    case "$dpms" in
 	on|standby|suspend|off) ;;
 	*) dpms=on ;;
     esac
@@ -249,7 +295,8 @@ case "$basename" in
     aliases)
 	echo launch lt lv dm pg sb sursync ruptime rwho \
 	rclink rc start stop restart reload force-reload \
-	media tomorrow vnc word emerge aptitude whois xscc mpl mpa
+	media tomorrow vnc word emerge aptitude whois xscc mpl mpa \
+	aumix feh rsync
 	exit 0 ;;
     
     activity|away)
@@ -276,9 +323,10 @@ case "$basename" in
     clean) do_clean "$@" ;;
 
     cron)
-	[ ! -x "`which renice 2>/dev/null`" ] || renice 12 -p $$ >/dev/null 2>&1
+	[ ! -x "`which renice 2>/dev/null`" ] || renice 12 $$ >/dev/null 2>&1
 	if [ "$1" = --login ]; then
-	    (find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
+	    [ ! -x "`which nice 2>/dev/null`" ] || nice="nice"
+	    ($nice find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || $nice find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
 	    # The part after the || is for versions of find that don't support
 	    # -maxdepth, such as busybox
 	    exit 0
@@ -293,6 +341,7 @@ case "$basename" in
     mpa) DISPLAY=  mplayer -quiet -vo fb,aa "$@" ;;
 
     emerge|aptitude)
+	no_links
 	if [ "$1" = search ]; then
 	    exec "$basename" "$@"
 	else
@@ -337,10 +386,10 @@ case "$basename" in
     ps-grep|pg)
     if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
 	ps uf|head -1
-	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|grep "$@"
+	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|egrep "$@"
     else
 	/usr/bin/ps -f|head -1
-	exec /usr/bin/ps -ef|grep -v '\<grep\>'|sed -ne '2,$p'|grep "$@"
+	exec /usr/bin/ps -ef|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|egrep "$@"
     fi
     ;;
 
@@ -384,7 +433,7 @@ case "$basename" in
 	for daemon in "$@"; do
 	    $sudo "$rcd/$daemon" "$basename"
 	done
-	[ -z "$*" -a "$basename" = stop ] && mediaaction stop && exit 0
+	[ -z "$*" -a "$basename" = stop ] && do_media stop && exit 0
 	[ "$*" ]
 	exit
     ;;
@@ -394,16 +443,23 @@ case "$basename" in
     rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
     ssh)      exec "$HOME/bin/hostinfo" --ssh "$@" ;;
 
-    libtrash|lt)    
-	case "$LD_PRELOAD" in *libtrash*) ;; *)
-	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
-	   LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-	   export LD_PRELOAD
-	fi ;; esac
-	"$@"
-	;;
+    libtrash|lt) try_libtrash "$@" ;;
 
     install) do_install "$@" ;;
+
+    _root_install)
+	[ "$1" ] || exit 1
+	PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+	for group in adm src dip dialout floppy cdrom video audio; do
+	    line="`grep ^$group: /etc/group`"
+	    case "$line" in
+		'') ;;
+		*"$1"*) ;;
+		*) adduser $1 $group >/dev/null 2>&1 && didgroup=1 ;;
+	    esac
+	done
+	[ -z "$didgroup" ] || echo "Added to groups."
+	;;
 
     soffice)
 	if [ ! -d "$HOME/.openoffice" ]; then
@@ -414,9 +470,9 @@ case "$basename" in
 	exec "$HOME/.openoffice/$ver/soffice" "$@"
 	;;
 
-    media) mediaaction "$@"; exit ;;
+    media) do_media "$@"; exit ;;
     
-    [Qq]uit|Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Tt]oggle|[Nn]ext|[Pp]rev|[Ff]fwd|[Rr]ew) mediaaction "$basename" "$@"; exit ;;
+    [Qq]uit|Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Tt]oggle|[Nn]ext|[Pp]rev|[Ff]fwd|[Rr]ew) do_media "$basename" "$@"; exit ;;
 
     sursync|suscp)
     for arg in "$@"; do
@@ -424,6 +480,7 @@ case "$basename" in
 	    [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
 	esac
     done
+    args=-uCP
     [ "$basename" = suscp ] && args=-P
     exec sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
     ;;
@@ -487,6 +544,17 @@ case "$basename" in
 	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
 	export DISPLAY
 	exec xscreensaver-command "$@" ;;
+
+    aumix) no_links
+	if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
+    feh) no_links; try_libtrash feh -Z "$@" ;;
+    rsync) no_links; exec rsync -uCP "$@" ;;
+    rm)
+	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+	    try_libtrash rm "$@"
+	else
+	    exec rm -i "$@"
+	fi ;;
 
     '') echo "Usage: `basename $0` <command> [options]" ;;
     *) echo "$basename: unknown command." >&2 ;;
