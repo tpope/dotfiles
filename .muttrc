@@ -11,8 +11,9 @@ set nopipe_decode
 set nowait_key
 set record==sent
 set postponed==postponed
-set index_format="%4C %Z %{%b %d} %-15.15F (%?l?%4l&%4c?) %s"
+set index_format="%4C %Z %(%b %d %H:%M) %-15.15F (%?l?%4l&%4c?) %s"
 set sort=threads
+set sort_aux=date-received
 set sort_browser=reverse-date
 set mime_forward=ask-no
 set status_format="-%r-Mutt@%h:%f [Msgs:%?M?%M/?%m%?n? New:%n?%?o? Old:%o?%?d? Del:%d?%?F? Flag:%F?%?t? Tag:%t?%?p? Post:%p?%?b? Inc:%b?%?l? %l?]---(%s/%S)-%>-(%P)---"
@@ -28,6 +29,7 @@ set realname="Tim Pope"
 `if mutt -v|head -n 1|egrep '1.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
 set reverse_name
 set reverse_realname
+set query_command="lbdbq %s 2>/dev/null"
 `[ -d "$HOME/.smime/certificates" ] && echo set smime_default_key=$(hostname).pem || echo set`
 `[ -x /usr/bin/muttprint ] && echo set print_command=muttprint || echo set`
 
@@ -44,6 +46,7 @@ hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc:
 
 my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
 my_hdr X-All-Your-Base-Are-Belong-To: Us
+my_hdr X-URL: http://www.sexygeek.org/
 #
 # More header weeding
 #
@@ -87,10 +90,22 @@ message-hook '~A' 'unignore X-Face; ignore X-Spam-Status'
 message-hook '~P|~h ^X-All-Your-Base-Are-Belong-To:' 'ignore X-Face X-Spam-Status'
 message-hook '~h X-Spam-Level:\ \\*' 'unignore X-Face X-Spam-Status'
 save-hook '~h X-Spam-Level:\ \\*\\*\\*' =spam
-#message-hook '~h X-Face:' 'push \ef'
+#save-hook '~H .' =spam
 #reply-hook . 'set pgp_autosign=yes; set pgp_create_traditional=ask-no'
 #reply-hook '~h ^X-Mailer: (Internet Mail Service|AOL|Microsoft Outlook)' 'set pgp_create_traditional=ask-yes'
 #reply-hook '~h ^User-Agent: (Mutt)' 'set pgp_create_traditional=no'
+
+#spam "X-Spam-Status: Yes, hits=([0-9][0-9][0-9]+)" "%1S"
+#spam "X-Spam-Status: Yes, hits=([0-9][0-9])\." "%1SA"
+#spam "X-Spam-Status: (Yes|No), hits=([3-9])\." "0%2SA"
+
+score '~A' 50
+score '~p' 10
+score '~N' 4
+score '~O' 2
+score '~D' -3
+#score "~H ^0" -20
+#score "~H ^[1-9]" -40
 
 # Section: Colors {{{1
 # --------------------

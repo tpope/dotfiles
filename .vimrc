@@ -207,8 +207,9 @@ fun! FTCheck_asmsyntax()
 endfun
 
 autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] if filereadable(expand($HOME . "/.vim/templates/skel.sh")) | execute "0r " . $HOME . "/.vim/templates/skel.sh" | silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/g" | endif | set ft=sh | $
+"autocmd BufWritePost *bin/*,*/init.d/* silent! execute "!chmod +x %"
 autocmd BufNewFile */init.d/* if filereadable("/etc/init.d/skeleton") | 0r /etc/init.d/skeleton | $d | silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/g" | endif | set ft=sh | 1
- autocmd BufNewFile,BufRead *.txt			set tw=78 linebreak
+ autocmd BufNewFile,BufRead *.txt			set tw=78 linebreak nolist
  autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*	set ft=simpsons
  autocmd BufNewFile,BufRead *Fvwm*			set ft=fvwm
  autocmd BufNewFile,BufRead *.cl[so]			set ft=tex

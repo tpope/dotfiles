@@ -35,7 +35,7 @@ fi
 ) >/dev/null 2>&1 &
 
 xset m 3 3
-[ "`hostname`" = lisa ] && xset m 4 3
+[ "`hostname`" = lisa ] && xset m 4 2
 #[ "`hostname`" = mona ] && xset m 3 20
 xset r rate 600 30
 xset b 40 440 60
@@ -86,6 +86,7 @@ wait
 [ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 &
 [ ! -x "`which imwheel 2>/dev/null`" ] || imwheel -k -b 000067 2>/dev/null &
 [ ! -f "$HOME/.lircrc" ] || irexec &
+[ ! -f "$HOME/.lircrc" ] || irxevent &
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
 [ "$GPG_AGENT_INFO" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
 
@@ -96,7 +97,7 @@ export LD_PRELOAD
 
 xsetroot -solid '#002020'
 
-#if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
+if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
 #    width="`xwininfo -root|grep Width:|awk '{print $2}'`"
 #    height="`xwininfo -root|grep Height:|awk '{print $2}'`"
 #    depth="`xwininfo -root|grep Depth:|awk '{print $2}'`"
@@ -104,7 +105,10 @@ xsetroot -solid '#002020'
 #    xterm -title Metisse -e metisse-start-fvwm -wd :7 -wp abc123
 #    pkill Xwnc
 #    exit 0
-#fi
+    xset m 2 4
+    exec x-terminal-emulator
+    exec gamelaunch doom3
+fi
 
 #if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
 #    exec $sshagent gnome-session
