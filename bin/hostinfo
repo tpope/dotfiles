@@ -7,57 +7,56 @@
 
 hostinfo=`basename $0`
 PATH="/bin:/usr/bin:/usr/local/bin"
-hosts="maggie bart chief bender abe left homer right fry lisa marge barney mona patty carl snowball otto grex lenny"
-menuhosts="maggie bart marge lisa homer abe mona - snowball - chief otto"
+hosts="maggie bart clancy abe left homer right fry carl lisa marge barney mona ralph patty sarah snowball otto lenny"
+menuhosts="maggie bart marge lisa homer abe mona - snowball - clancy sarah ralph"
 
 gethost() {
     case "$1" in
     [Aa]|maggie*) echo maggie ;;
     [Bb]|bart*) echo bart ;;
-    [Cc]|chief*) echo chief ;;
-    [Dd]|bender*) echo bender ;;
+    [Cc]|clancy*) echo clancy ;;
     [Ee]|abe*) echo abe ;;
     [Ff]|left*) echo left ;;
     [Hh]|homer*) echo homer ;;
     [Ii]|right*) echo right ;;
     [Jj]|fry*) echo fry ;;
+    [Kk]|carl*) echo carl ;;
     [Ll]|lisa*) echo lisa ;;
     [Mm]|marge*) echo marge ;;
     [Nn]|barney*) echo barney ;;
     [Oo]|mona*) echo mona ;;
-    [Pp]|patty*) echo patty ;;
-    [Rr]|carl*) echo carl ;;
+    [Pp]|ralph*) echo ralph ;;
+    [Qq]|patty*) echo patty ;;
+    [Rr]|sarah*) echo sarah ;;
     [Ss]|snowball*) echo snowball ;;
     [Tt]|otto*) echo otto ;;
-    [Vv]|nvcunix*) echo nvcunix ;;
-    [Xx]|grex*) echo grex ;;
     [Yy]|lenny*) echo lenny ;;
     ?) echo localhost ;;
     *) echo "$1" ;;
 esac
 }
 
-maggie()   { hterm="01;36"; hscrn="+b C"; hrgb="#80FFFF"; hltr=A; hdom=simpson;}
+maggie()   { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=A; hdom=simpson;}
 bart()     { hterm="01;31"; hscrn="+b R"; hrgb="#FFA1A1"; hltr=B; hdom=simpson;}
 marge()    { hterm="01;32"; hscrn="+b G"; hrgb="#A2FFA1"; hltr=M; hdom=simpson;}
 lisa()     { hterm="00;31"; hscrn="   r"; hrgb="#D57F7F"; hltr=L; hdom=simpson;}
-homer()    { hterm="00;33"; hscrn="   y"; hrgb="#D5AA90"; hltr=H; hdom=simpson;}
-abe()      { hterm="00;36"; hscrn="   c"; hrgb="#80D4D4"; hltr=E; hdom=simpson;}
+homer()    { hterm="00;33"; hscrn="   y"; hrgb="#D5AA7F"; hltr=H; hdom=simpson;}
+abe()      { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=E; hdom=simpson;}
 mona()     { hterm="00;35"; hscrn="   m"; hrgb="#D57FD4"; hltr=O; hdom=simpson;}
 snowball() { hterm="01;30"; hscrn="+b K"; hrgb="#BCBBBB"; hltr=S; hdom=simpson;
 		test "$TERM" = dtterm && hscrn=d && hterm="00;37" || /bin/true;}
-lenny()    { hterm="01;34"; hscrn="+b B"; hrgb="#A2FFFF"; hltr=Y; hdom=simpson;}
-carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2FFFF"; hltr=R; hdom=simpson;}
-patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=P; hdom=simpson;}
-barney()   { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=N; hdom=simpson;}
-chief()    { hterm="00;34"; hscrn="   b"; hrgb="#807FD4"; hltr=C; hdom=wiggum; }
-otto()     { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=T; hdom=wiggum; }
-bender()   { hterm="00;37"; hscrn="   w"; hrgb="#D5D4D4"; hltr=D; hdom=wiggum; }
+clancy()   { hterm="00;34"; hscrn="   b"; hrgb="#7F7FD4"; hltr=C; hdom=simpson;}
+sarah()    { hterm="01;35"; hscrn="+b m"; hrgb="#FF7FFF"; hltr=R; hdom=simpson;}
+ralph()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=P; hdom=simpson;}
+
+lenny()    { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=Y; hdom=simpson;}
+carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=K; hdom=simpson;}
+patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
+barney()   { hterm="01;33"; hscrn="+b Y"; hrgb="#F7F67F"; hltr=N; hdom=simpson;}
+otto()     { hterm="01;35"; hscrn="+b Y"; hrgb="#FF7FFF"; hltr=T; hdom=wiggum; }
 fry()      { hterm="01;33"; hscrn="+b Y"; hrgb="#F7F67F"; hltr=J; hdom=wiggum; }
 left()     { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=F; hdom=springfield; }
-right()    { hterm="00;32"; hscrn="   g"; hrgb="#80D47F"; hltr=I; hdom=springfield;}
-grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#F7F6F6"; hltr=X; hdom=springfield;}
-nvcunix()  { hterm="01;33"; hscrn="+b Y"; hrgb="#FFBFFF"; hltr=V; hdom=springfield;}
+right()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=I; hdom=springfield;}
 unknown()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr= ; hdom=;}
 getinfo() {
     $1 2>/dev/null || unknown
@@ -74,7 +73,6 @@ suffix() {
 	suffix=".iling"
 #    elif [ -x /usr/local/bin/connect ]; then
 #	suffix=".proxy"
-#	[ "$1" = grex ] && suffix=.cyberspace.org
     else
 	getinfo "$1"
 	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
@@ -92,6 +90,7 @@ hostinfo)
     -l|--letter) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hltr; exit 0 ;;
     -h|--hostname) echo `gethost ${2:-$host}`; exit 0 ;;
     -s|--screen-code) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hscrn; exit 0 ;;
+    -r|--rgb) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hrgb; exit 0 ;;
     -S|--ssh)
 	case "$2" in
 	    *.*) host="$2";;
@@ -186,7 +185,6 @@ EOF
 	esac
 	exit 2
 	;;
-#   [Vv]|nvcunix*) netkit-rsh -l grillo5 nvcunix.springfield "$@" ;;
     ?)	[ -n "$STY" ] && SCREEN="screen -ln"
 	exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
     ssh|sssh)

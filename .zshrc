@@ -33,7 +33,7 @@ for host in $off; do
     : ~$host
 done
 
-friends=($family snowball.simpson chief.wiggum carl.simpson lenny.simpson patty.simpson grex.springfield right.springfield left.springfield)
+friends=($family snowball.simpson clancy.simpson sarah.simpson ralph.simpson carl.simpson lenny.simpson patty.simpson grex.springfield right.springfield left.springfield)
 
 for host in $domains; do
     off=(${off%.$host})

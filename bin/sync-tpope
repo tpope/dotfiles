@@ -74,7 +74,7 @@ fi
 [ -n "$ALL_HOSTS" ] || simpson=1
 if [ -n "$simpson" ]; then
 	MY_HOSTS="$MY_HOSTS maggie bart abe homer lisa mona marge"
-	ALL_HOSTS="$ALL_HOSTS maggie bart abe homer lisa mona marge snowball chief right left"
+	ALL_HOSTS="$ALL_HOSTS maggie bart abe homer lisa mona marge snowball clancy sarah ralph"
 	GUI_HOSTS="$GUI_HOSTS maggie bart abe homer lisa mona marge"
 fi
 
