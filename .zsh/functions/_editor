@@ -1,0 +1,6 @@
+#compdef emacs vi vim nano
+
+local expl
+
+_description files expl 'text file'
+_files "$expl[@]" -g "*.(#i)(txt|csv|tex|bib)"
