@@ -31,8 +31,10 @@ off=(maggie.simpson bart.simpson marge.simpson lisa.simpson homer.simpson mona.s
 for host in $off; do
     [ "${host%.simpson}" != `hostname` ] && family=($family $host)
     [ -d "$HOME/simpson" ] && typeset ${host%.simpson}=$HOME/simpson/${host%.simpson}
-    : ~$host
+    : ~${host%.simpson}
 done
+
+namedir() { export $1=$PWD; : ~$1 }
 
 friends=($family snowball.simpson clancy.simpson sarah.simpson ralph.simpson carl.simpson lenny.simpson patty.simpson grex.springfield right.springfield left.springfield)
 
@@ -118,6 +120,7 @@ linux) ;;
 esac
 
 unset _find_promptinit hostcolor hostletter hostcode usercolor usercode
+unset e
 # Section: Keybindings {{{1
 # -------------------------
 bindkey -e
