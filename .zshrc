@@ -5,6 +5,7 @@
 # -------------------------
 
 setopt rmstarsilent histignoredups
+setopt noclobber
 
 if [[ $ZSH_VERSION == 4.<->* ]]; then
     setopt histexpiredupsfirst histreduceblanks
@@ -26,10 +27,10 @@ interactive=1
 domains=(`grep ^search /etc/resolv.conf`)
 [[ -z $domains ]] || shift 1 domains
 
-off=(maggie.simpson bart.simpson marge.simpson lisa.simpson homer.simpson abe.simpson mona.simpson)
+off=(maggie.simpson bart.simpson marge.simpson lisa.simpson homer.simpson mona.simpson)
 for host in $off; do
-    [ "${host:s/.simpson//}" != `hostname` ] && family=($family $host)
-    [ -d "$HOME/simpson" ] && typeset ${host:s/.simpson//}=$HOME/simpson/${host:s/.simpson//}
+    [ "${host%.simpson}" != `hostname` ] && family=($family $host)
+    [ -d "$HOME/simpson" ] && typeset ${host%.simpson}=$HOME/simpson/${host%.simpson}
     : ~$host
 done
 
