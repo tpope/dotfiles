@@ -33,7 +33,7 @@ PeriodicTasks
  Begin
   If (RemainderOfDiv (GetTime) 60)==0 Then
    Set $time =(GetOutput {exec date '+%R'} 1 -1)
-  If (RemainderOfDiv (GetTime) 3600)==0 Then
+  If (RemainderOfDiv (GetTime) 600)==0 Then
    Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
   If (RemainderOfDiv (GetTime) 60)<10 Then
    Set $seconds ={:0} (RemainderOfDiv (GetTime) 60)
@@ -42,7 +42,7 @@ PeriodicTasks
   ChangeTitle 3 $seconds
   If (RemainderOfDiv (GetTime) 60)==0 Then
   ChangeTitle 2 $time
-  If (RemainderOfDiv (GetTime) 3600)==0 Then
+  If (RemainderOfDiv (GetTime) 600)==0 Then
   ChangeTitle 1 $date
  End
 
