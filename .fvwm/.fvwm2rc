@@ -995,6 +995,7 @@ Test (f $[HOME]/.fvwm/.fvwm-menu-headlines/extension.pl) + "SexyGeek%sexygeek.pn
 + "FreshMeat%freshmeat.png%"   Popup freshmeat
 + "LinuxToday%linuxtoday.png%" Popup linuxtoday
 + "CNN%cnn.png%"               Popup cnn
++ "BBC%bbc.png%"               Popup bbc
 + ""           Nop
 + "Reset all%menu/restart.xpm%" FuncResetHeadlines
 
