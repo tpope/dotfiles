@@ -1,7 +1,5 @@
 version 5.4
-" File:         $HOME/.vimrc
-" Purpose:      Initialization file for the editor vim
-" Author:       Tim Pope <timpope@sbcglobal.net>
+" $Id$
 " vim:tw=70 sw=2 sts=2 et
 
 " Section: Options {{{1
