@@ -1,3 +1,6 @@
+# ~/.gtkrc
+# $Id$
+
 include "/usr/share/themes/ThinIce/gtk/gtkrc"
 
 style "default" {

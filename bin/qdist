@@ -1,5 +1,5 @@
 #!/bin/bash
-# Author: Tim Pope
+# $Id$
 # -*- sh -*- vim: ft=sh sw=4 sts=4
 
 # A seldom used script to rapidly distribute a file to a large number of

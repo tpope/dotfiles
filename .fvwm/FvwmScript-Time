@@ -1,3 +1,6 @@
+# ~/.fvwm/FvwmScript-Time
+# $Id$
+
 WindowTitle {FvwmScript-Status}
 WindowSize 112 16
 BackColor {PaleTurquoise}

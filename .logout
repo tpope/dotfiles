@@ -1,6 +1,6 @@
 # ~/.logout
-# Author: Tim Pope
-# vim: ft=csh
+# $Id$
+# -*- csh -*- vim: ft=csh sw=4 sts=4
 
 #[ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && \
 #    [ `who|grep -c "^$USER\>"` -le 1 ] && sudo -k >& /dev/null

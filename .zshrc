@@ -1,5 +1,5 @@
 # ~/.zshrc
-# Author: Tim Pope
+# $Id$
 
 # Section: Environment {{{1
 # -------------------------

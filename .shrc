@@ -1,6 +1,6 @@
 # ~/.shrc
-# Author: Tim Pope
-# vim: ft=sh
+# $Id$
+# -*- sh -*- vim: ft=sh
 
 # This location of this file is normally in $ENV, so that it is sourced by the
 # bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from

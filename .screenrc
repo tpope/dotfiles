@@ -1,4 +1,5 @@
 # ~/.screenrc
+# $Id$
 
 startup_message off
 shell -$SHELL

@@ -1,3 +1,6 @@
+# ~/.procmailrc
+# $Id$
+
 PATH=/home/tpope/bin:/usr/local/bin:/usr/bin:/bin
 MAILDIR=$HOME/Mail
 #LOGFILE=$MAILDIR/.from

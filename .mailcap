@@ -1,5 +1,5 @@
 # ~/.mailcap
-# Author: Tim Pope
+# $Id$
 # -*- mailcap -*- vim: ft=mailcap
 
 text/html; sensible-browser '%s'; description="HTML Text"; nametemplate=%s.html

@@ -1,4 +1,5 @@
-#!/bin/zsh
+# ~/.zlogin
+# $Id$
 
 test -f "$HOME/.profile.local" && . "$HOME/.profile.local"
 which fortune >/dev/null && [ "$SHLVL" -le 1 -a \( -z "$SSH_TTY" -o "$TERMCAP" \) ] && fortune

@@ -1,5 +1,6 @@
 #!/bin/bash
-# Author: Tim Pope
+# $Id$
+# -*- sh -*- vim: ft=sh sw=4 sts=4
 
 PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
 [ -n "$ENV" ] || ENV="$HOME/.shrc"

@@ -1,3 +1,6 @@
+# ~/.fvwm/FvwmScript-Alert
+# $Id$
+
 WindowTitle {FvwmScript-Status}
 WindowSize 36 20
 BackColor {PaleTurquoise}

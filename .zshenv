@@ -1,5 +1,5 @@
 # ~/.zshenv
-# Author: Tim Pope
+# $Id$
 
 typeset -U path
 for dir in /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin"; do

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Author: Tim Pope
+# $Id$
 # -*- sh -*- vim: ft=sh sw=4 sts=4
 
 # This script analyzes what terminal emulators are installed and picks my

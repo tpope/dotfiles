@@ -1,5 +1,5 @@
 #!/bin/sh
-# Author: Tim Pope
+# $Id$
 # -*- sh -*- vim: ft=sh sw=4 sts=4
 
 # This is a multipurpose script that is easier to copy around than 30-odd
