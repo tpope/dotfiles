@@ -26,22 +26,22 @@ SetEnv SMALLXFTFONT "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true"
 
 DestroyFunc Fvwm24
 AddToFunc Fvwm24
-+ I SetEnv fvwm_titlefont "-adobe-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_iconfont  "-adobe-helvetica-medium-r-*--10-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_timefont "-adobe-helvetica-bold-r-*--14-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_alertfont "-adobe-helvetica-bold-r-*--17-*-*-*-*-*-*-*"
++ I SetEnv fvwm_titlefont "-adobe-helvetica-bold-r-*--12-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_iconfont  "-adobe-helvetica-medium-r-*--10-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_timefont "-adobe-helvetica-bold-r-*--14-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_alertfont "-adobe-helvetica-bold-r-*--17-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_smallfont "$[SMALLFONT]"
 + I DefaultFont 7x13
 
 DestroyFunc Fvwm25
 AddToFunc Fvwm25
-+ I SetEnv fvwm_titlefont "xft:Arial:style=Bold:pixelsize=12;-adobe-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=10;-adobe-helvetica-medium-r-*--10-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_datefont "xft:Arial:pixelsize=12;-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
++ I SetEnv fvwm_titlefont "xft:Arial:style=Bold:pixelsize=12;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
++ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=10;-adobe-helvetica-medium-r-*--10-*-*-*-p-*-*-*"
++ I SetEnv fvwm_datefont "xft:Arial:pixelsize=12;-adobe-helvetica-medium-r-*--12-*-*-*-p-*-*-*"
 #+ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_timefont "xft:Arial:Bold:pixelsize=15;-adobe-helvetica-bold-r-*--14-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=14;-adobe-helvetica-bold-r-*--17-*-*-*-*-*-*-*"
++ I SetEnv fvwm_timefont "xft:Arial:Bold:pixelsize=15;-adobe-helvetica-bold-r-*--14-*-*-*-p-*-*-*"
++ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=14;-adobe-helvetica-bold-r-*--17-*-*-*-p-*-*-*"
 + I SetEnv fvwm_smallfont "xft:$[SMALLXFTFONT];$[SMALLFONT]"
 + I DefaultFont "xft:Mono:pixelsize=11;7x13"
 
@@ -1014,8 +1014,8 @@ AddToFunc FuncFvwmXtermSsh
 DestroyFunc FuncFvwmWebBrowser
 AddToFunc FuncFvwmWebBrowser
 + I Exec exec sensible-browser $*
-+ I Next (Mozilla*) Iconify off
-+ I Next (Mozilla*, AcceptsFocus) Focus
++ I Next (*Mozilla*) Iconify off
++ I Next (*Mozilla*, AcceptsFocus) Focus
 
 DestroyFunc FuncFvwmIrcScreenSshXterm
 AddToFunc FuncFvwmIrcScreenSshXterm
@@ -1122,7 +1122,7 @@ DestroyModuleConfig FvwmButtons: *
 *FvwmButtons: (28x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
 #*FvwmButtons: (16x2, Padding 1 2, Frame 1, Swallow(UseOld,NoHints,Respawn) "xclock" "Exec xclock -d -padding 0 -fn $[SMALLFONT] -fa '$[SMALLXFTFONT]' -update 1 -bg PaleTurquoise -fg black -g -3000-3000 >/dev/null || exec xclock -d -padding 1 -fn $[SMALLFONT] -update 1 -bg PaleTurquoise -fg black -g -3000-3000")
 *FvwmButtons: (9x5, Padding 0 1, Frame 0, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
-*FvwmButtons: (4x6, Padding 1 6, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
+*FvwmButtons: (4x6, Padding 1 5, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
 #*FvwmButtons: (4x2, Padding 1 1, Panel(up, indicator, position Button mtb mlr right 0 -2p, UseOld, NoClose) gkrellm "Exec exec gkrellm -g -0+0")
 *FvwmButtons: (24x12, Frame 0, Padding 0 0, Container(Rows 6, Columns 12, Frame 0, Padding 0 0, Fore black, Back black))
 *FvwmButtons: (8x6, Padding 1 0, Back black, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineA" "Module FvwmPager FvwmPagerInlineA 0")
@@ -1137,9 +1137,9 @@ DestroyModuleConfig FvwmButtons: *
 #    then echo 'glbiff `Exec exec glbiff -geometry -3000-3000`)'; \
 #    else echo 'xbiff `Exec exec xbiff -shape -geometry -3000-3000`)'; fi"
 #*FvwmButtons: (6x6, Frame 0, Padding 0 0, Container(Font fixed, Rows 1, Columns 1, Frame 0, Padding 0 0 ))
-*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action FuncFvwmWebBrowser http://www.google.com/)
+*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[USER], Action FuncFvwmWebBrowser "`xsel 2>/dev/null|sed -e 's,^ *$,http://www.google.com,'`")
 #*FvwmButtons: (4x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "xload" "Exec exec xload -bg PaleTurquoise -fg black -hl blue -update 5 -nolabel -jumpscroll 1 -g -3000-3000")
-*FvwmButtons: (4x6, Padding 1 6, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
+*FvwmButtons: (4x6, Padding 1 5, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
 #*FvwmButtons: (4x3, Frame 0, Swallow(UseOld) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 2")
 # }}}2
 # FvwmButtonsGkrellm Config {{{2
@@ -1191,8 +1191,7 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *TitleButton	    flat PaleTurquoise PaleTurquoise
 *FvwmIconMan: *DontShow icon=Untitled resource=Untitled
 *FvwmIconMan: *DrawIcons always
-*FvwmIconMan: *ButtonGeometry  188x21
-#*FvwmIconMan: *ButtonGeometry  228x21
+*FvwmIconMan: *ButtonGeometry  216x21
 *FvwmIconMan: *ManagerGeometry 1x3+3000+3000
 # }}}2
 # FvwmPager Config {{{2
