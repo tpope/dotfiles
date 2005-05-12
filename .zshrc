@@ -5,7 +5,7 @@
 # -------------------------
 
 setopt rmstarsilent histignoredups
-setopt noclobber
+setopt noclobber nonomatch
 
 if [[ $ZSH_VERSION == 4.<->* ]]; then
     setopt histexpiredupsfirst histreduceblanks
