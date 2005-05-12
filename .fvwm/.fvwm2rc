@@ -15,6 +15,7 @@ MoveThreshold 2
 OpaqueMoveSize 21
 XorPixmap resize.rainbow.xpm
 ClickTime 750
+EwmhBaseStruts 0 0 0 40
 
 DeskTopSize 3x3
 #DeskTopSize 3x2
@@ -43,7 +44,7 @@ AddToFunc Fvwm25
 + I SetEnv fvwm_datefont "xft:Arial:pixelsize=12;-adobe-helvetica-medium-r-*--12-*-*-*-p-*-*-*"
 #+ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
 + I SetEnv fvwm_timefont "xft:Arial:Bold:pixelsize=15;-adobe-helvetica-bold-r-*--14-*-*-*-p-*-*-*"
-+ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=14;-adobe-helvetica-bold-r-*--17-*-*-*-p-*-*-*"
++ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=15;-adobe-helvetica-bold-r-*--17-*-*-*-p-*-*-*"
 + I SetEnv fvwm_smallfont "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true;-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
 + I DefaultFont "xft:Mono:pixelsize=11;7x13"
 
@@ -148,10 +149,11 @@ Style *         HilightFore white, HilightBack #008000
 Style *         BorderWidth 5, HandleWidth 5
 Style *         MwmFunctions, MwmDecor, MwmButtons, HintOverride
 Style *         DecorateTransient, NoPPosition
-Style *         IconBox 0 -10 -280 -1
+#Style *         IconBox 0 -10 -280 -1
+Style *         IconBox -48 0 -0 -1
 Style *         SloppyFocus, GrabFocus, GrabFocusTransient
 Style *         TileCascadePlacement
-Style *         MinOverlapPlacement
+Style *         MinOverlapPercentPlacement, EwmhMaximizeIgnoreWorkingArea
 
 # }}}2
 # Terminal Emulator Styles {{{2
@@ -244,10 +246,14 @@ Style screen-irc* ForeColor #d0ff80, HilightFore #d0ff80
 # }}}2
 # Fvwm Module Styles {{{2
 
-Style Fvwm*     NoTitle,  Sticky, WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
+Style Fvwm*     WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
+Style fvwm_menu WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
 Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
+Style fvwm_menu BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
 Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
+Style fvwm_menu HilightFore white, HilightBack violetred, Color white/#785070
 Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff
+Style fvwm_menu ClickToFocus, GrabFocusOff
 #, UseDecor
 Style FvwmConsole  Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, BorderWidth 5, HandleWidth 5
 Style FvwmForm*    Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, NoButton 4
@@ -256,7 +262,7 @@ Style FvwmAmetista Slippery, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTra
 Style FvwmPager*   BorderWidth 2, NoHandles
 Style FvwmBanner   StaysOnTop
 Style FvwmIconMan  NeverFocus, BorderWidth 2, HandleWidth 2, Color White/PaleTurquoise
-Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 2, NoHandles, Color White/PaleTurquoise
+Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 0, NoHandles, Color White/PaleTurquoise
 
 # }}}2
 # Common Program Styles {{{2
@@ -289,9 +295,12 @@ Style xpdf      MiniIcon mini.pdf.xpm
 Style gv        MiniIcon mini/ghostview.xpm
 Style xdvi      MiniIcon mini/printing.xpm
 Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, UsePPosition
-Style VCLSalFrame GrabFocusOff, UsePPosition
 Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
-Style SDL_App   BorderWidth 0, HandleWidth 0, MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
+Style VCLSalFrame GrabFocusOff, UsePPosition
+Style Game      MiniIcon mini/game-action.xpm, StartsOnPage 0 2 2
+Style SDL_App   UseStyle Game, HandleWidth 0
+Style mupen64   UseStyle Game
+Style *Snes9*   UseStyle Game
 
 # }}}2
 # }}}1
@@ -346,15 +355,15 @@ Key Down        A       C5    Direction South [CurrentDesk] FuncFlipFocusWindow
 
 # }}}2
 
-Key F1          A       4       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key F1          A       4       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
 Key F2          A       4       FvwmForm FvwmForm-Run
 Key F2          A       S4      Read .FvwmForm-RunLast Quiet
 Key F3          A       4       Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F3          A       S4      FvwmForm FvwmForm-Talk
 
-Key Escape      A       C       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key Escape      A       C       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
 Key Escape      A       S       Menu MenuFvwmWindowOps Interior 0 0 Nop
-Key F1          A       M       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key F1          A       M       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
 Key F1          A       SM      Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F2          A       M       FvwmForm FvwmForm-Run
 Key F2          A       SM      Read .FvwmForm-RunLast Quiet
@@ -372,7 +381,7 @@ Key F8          A       M       Resize
 Key F8          A       SM      FuncRecaptureWindow
 Key F9          A       M       Iconify
 Key F9          A       SM      Module FvwmIdent
-Key F10         A       M       Maximize 100 -72p
+Key F10         A       M       Maximize 100 100
 Key F10         A       SM      Maximize 0 100
 Silent Key F11  A       M       Stick
 Silent Key SunF36 A     M       Stick
@@ -392,7 +401,7 @@ Key 1           A       4       FuncWindowWarp 25 25
 Key 2           A       4       FuncWindowWarp 75 25
 Key 3           A       4       FuncWindowWarp 25 75
 Key 4           A       4       FuncWindowWarp 75 75
-Key 5           A       4       Menu MenuFvwmRoot Root 0 +100-100m-72p Nop
+Key 5           A       4       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
 Key 6           A       4       FvwmForm FvwmForm-Run
 Key 6           A       S4      Read .FvwmForm-RunLast Quiet
 Key 7           A       4       Menu MenuFvwmUtilities
@@ -603,7 +612,7 @@ Mouse 3 1       A       Menu MenuFvwmWindowOps Resize 80c 24c
 Mouse 1 2       A       FuncClose
 Mouse 2 2       A       FuncDestroy
 Mouse 3 2       A       FuncDelete
-Mouse 1 4       A       Maximize  100 -72p
+Mouse 1 4       A       Maximize  100 -40p
 Mouse 2 4       A       Maximize  100  100
 Mouse 3 4       A       Maximize grow grow
 Mouse 1 6       A       FuncUnshadeAndIconify
@@ -714,7 +723,7 @@ AddToFunc StartFunction
 + I Module FvwmAnimate
 + I Module FvwmAuto 1500
 + I Module FvwmBacker
-+ I Module FvwmButtons
++ I Module FvwmButtons FvwmButtonsLong
 + I Module FvwmCommandS
 + I Module FvwmEvent
 + I Module FvwmProxy
@@ -754,20 +763,21 @@ DestroyMenu MenuFvwmRoot
 AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
 + "X &Terminal%menu/terminal.xpm%"       FuncScreenXterm
 + "&Web Browser%menu/www.xpm%"           Exec sensible-browser http://www.google.com/
++ "&Chat%menu/chat.xpm%"                 FuncIrcScreenSshXterm
 + "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
 + ""              Nop
 + "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins
 + "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens
 + ""              Nop
 + "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
-Test (f /home/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames
+Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames
 + "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
 + "N&etwork%menu/network.xpm%"           Popup MenuFvwmNetwork
 + "&Multimedia%menu/multimedia.xpm%"     Popup MenuFvwmMultimedia
 + ""              Nop
 PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian'
 PipeRead 'test -e /usr/share/gnome/apps && echo + \\"G\\&NOME%menu/gnome.xpm%\\" Popup Gnome-sys'
-PipeRead 'test -e "$KDEDIR" -o -e /usr/share/applnk && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
+PipeRead 'test \( -e "$KDEDIR" -o -e /usr/share/applnk \) -a ! -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
 + ""              Nop
 + "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
 + "Fvwm Config &Ops%menu/configuration.xpm%" Popup MenuFvwmConfig
@@ -794,13 +804,16 @@ AddToMenu MenuFvwmGames "Games" Title
 FuncAddIfExists MenuFvwmGames "&UT2004%/usr/local/games/ut2004/ut2004.xpm%" ut2004
 FuncAddIfExists MenuFvwmGames "&Doom 3%doomface.xpm%" doom3
 FuncAddIfExists MenuFvwmGames "&Quake 3%/usr/local/games/quake3/quake3.xpm%" quake3
-Test (x /usr/local/bin/armyops) + "&America's Army%/usr/local/games/armyops/ArmyOps.xpm%" Exec exec armyops
 FuncAddIfExists MenuFvwmGames "&Enemy Territory%/usr/local/games/enemy-territory/ET.xpm%" et
+Test (x /usr/local/bin/armyops) + "&America's Army%/usr/local/games/armyops/ArmyOps.xpm%" Exec exec armyops
+FuncAddIfExists MenuFvwmGames "&GSnes9x%gsnes9x-icon.xpm%" GSnes9x
+FuncAddIfExists MenuFvwmGames "&ZSNES%zsnes.xpm%" zsnes
 FuncAddIfExists MenuFvwmGames "&Pydance%pydance.png%" pydance
 FuncAddIfExists MenuFvwmGames "&Stepmania%/usr/local/games/stepmania/NoteSkins/dance/note/Down Hold Head Active 64th.png%" stepmania
 
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
+Test (x rox-filer) + "&ROX-Filer%/usr/share/rox-filer/.DirIcon%" Exec exec tpope libtrash rox-filer
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
 Test (x ethereal) + "&Ethereal%eicon3d32.xpm%" Exec exec $[sudo] ethereal
@@ -821,7 +834,7 @@ AddToMenu MenuFvwmUtilities "Utilities" Title
 DestroyMenu MenuFvwuNetwork
 AddToMenu MenuFvwmNetwork "Network" Title
 + "&Headlines%menu/news.xpm%"   Popup MenuHeadlines
-+ "&IRC%menu/chat.xpm%"         FuncIrcScreenSshXterm
++ "&Chat%menu/chat.xpm%"        FuncIrcScreenSshXterm
 + "M&utt%mutt.mini.xpm%"        Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
 #Test (x /usr/bin/gaim) + "&Gaim%mini.gaim.xpm%" FuncExec gaim "exec gaim"
 PipeRead 'if [ -x "`which gaim 2>/dev/null`" ]; then \
@@ -882,16 +895,16 @@ AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
 + "&Screenshot%mini.camera.xpm%" Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 + "Reset X &Resources%mini.x.xpm%" Exec exec xrdb -load $[HOME]/.Xresources
 + "" Nop
-+ "&Fvwm Decor%mini.fvwm.xpm%"                Style * UseDecor MWM, FvwmBorder
-+ "&Mwm Decor%mini.mwm.xpm%"                  Style * UseDecor MWM, MwmBorder
-+ "&Flat Decor%menu/window.xpm%"              Style * UseDecor Flat, MwmBorder
++ "F&vwm Decor%mini.fvwm.xpm%"                Style * UseDecor MWM, FvwmBorder
++ "M&wm Decor%mini.mwm.xpm%"                  Style * UseDecor MWM, MwmBorder
++ "F&lat Decor%menu/window.xpm%"              Style * UseDecor Flat, MwmBorder
 #+ "" Nop
 #+ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
 #+ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
 #+ "&Focus Follows Mouse"    FuncFocusPolicyChange FocusFollowsMouse
 + "" Nop
-+ "Co&lormap Follows Mouse%mini.mouse.xpm%"   ColormapFocus FollowsMouse
-+ "Colormap Follows F&ocus%mini.windows.xpm%" ColormapFocus FollowsFocus
++ "Colorma&p Follows Mouse%mini.mouse.xpm%"   ColormapFocus FollowsMouse
++ "C&olormap Follows Focus%mini.windows.xpm%" ColormapFocus FollowsFocus
 + "" Nop
 + "&All Paging OFF%mini.rball.xpm%"           EdgeScroll 0 0
 + "F&ull Paging%mini.gball.xpm%"              EdgeScroll 100 100
@@ -1053,12 +1066,12 @@ AddToFunc FuncMoveOrRaise
 + D Lower
 # }}}3
 # FuncMaximize {{{3
-DestroyFunc FuncMaximize
-AddToFunc FuncMaximize
-+ M Maximize   0 100
-+ H Maximize   0 100
-+ C Maximize 100  90
-+ D Maximize 100 100
+#DestroyFunc FuncMaximize
+#AddToFunc FuncMaximize
+#+ M Maximize   0 100
+#+ H Maximize   0 100
+#+ C Maximize 100  90
+#+ D Maximize 100 100
 # }}}3
 # FuncMoveOrIconify {{{3
 DestroyFunc FuncMoveOrIconify
@@ -1135,6 +1148,10 @@ AddToFunc FuncFlipFocusWindow
 + I FlipFocus
 + I Raise
 + I WarpToWindow 25p 7p
+
+DestroyFunc FuncDoubleClickFocusWindow
+AddToFunc FuncDoubleClickFocusWindow
++ D WarpToWindow 25p 7p
 # }}}3
 # FuncRecaptureWindow {{{3
 DestroyFunc FuncRecaptureWindow
@@ -1376,6 +1393,38 @@ DestroyModuleConfig FvwmBacker: *
 Read FvwmBacker-Fancy Quiet
 
 # }}}2
+# FvwmButtonsLong Config {{{2
+#+-----------------+-----+
+#|YYYY-MM-DD  hh:mm|Alert|
+#+-----------+-----+     |
+#|           | 2nd +-----+
+#|   First   |     | o o |
+#|           +-----+  >  |
+#|   Pager   | 3rd | \_/ |
+#|           |     |tpope|
+#+-----------+-----+-----+
+KillModule FvwmButtons FvwmButtonsLong
+DestroyModuleConfig FvwmButtonsLong: *
+*FvwmButtonsLong: ButtonGeometry 2x2+0-0
+*FvwmButtonsLong: Back Black
+*FvwmButtonsLong: Fore Black
+*FvwmButtonsLong: Rows 20
+*FvwmButtonsLong: Font $[fvwm_smallfont]
+*FvwmButtonsLong: Padding 0 0
+*FvwmButtonsLong: (18x20, Frame 2, Padding 0 0, Back PaleTurquoise, Icon $[HOST].xpm, Action (Mouse 1) Menu MenuFvwmRoot Context 0 +100-100m-40p Nop, Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
+PipeRead 'echo SetEnv width `expr $[vp.width] / 2 - 135`'
+*FvwmButtonsLong: ($[width]x20, Frame 0, Padding 0 1, Container(Columns 1, Rows 1, Frame 0, Padding 0 0))
+*FvwmButtonsLong: (1x1, Back PaleTurquoise, Swallow(UseOld, NoHints, Respawn) "FvwmIconMan" "Module FvwmIconMan")
+*FvwmButtonsLong: (End)
+UnsetEnv width
+*FvwmButtonsLong: (117x20, Frame 0, Padding 1 1, Container(Columns 116, Rows 19, Frame 0, Padding 0 0, Back PaleTurquoise))
+*FvwmButtonsLong: (72x19, Frame 0, Padding 0 0, Back PaleTurquoise, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 2")
+*FvwmButtonsLong: (8x8, Padding 0 4, Frame 2, Back PaleTurquoise, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
+*FvwmButtonsLong: (36x8, Padding 0 0, Frame 0, Back PaleTurquoise, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Date" "Module FvwmScript FvwmScript-Date")
+*FvwmButtonsLong: (20x11, Padding 0 0, Frame 0, Back PaleTurquoise, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
+*FvwmButtonsLong: (24x11, Padding 0 0, Frame 0, Back PaleTurquoise, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
+*FvwmButtonsLong: (End)
+# }}}2
 # FvwmButtons Config {{{2
 #+-----------------+-----+
 #|YYYY-MM-DD  hh:mm|Alert|
@@ -1440,7 +1489,7 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *Foreground  black
 *FvwmIconMan: *Format      "%t"
 *FvwmIconMan: *Font        "$[fvwm_iconfont]"
-*FvwmIconMan: *Action      Mouse   1 A sendcommand "FlipFocus"
+*FvwmIconMan: *Action      Mouse   1 A sendcommand "FuncDeiconifyAndRearrange", sendcommand "FlipFocus", sendcommand "Raise", sendcommand "FuncDoubleClickFocusWindow"
 *FvwmIconMan: *Action      Mouse   2 A sendcommand "Iconify"
 *FvwmIconMan: *Action      Mouse   3 A sendcommand "Menu MenuFvwmWindowOps Nop"
 *FvwmIconMan: *FollowFocus true
@@ -1453,8 +1502,8 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *TitleButton	    flat PaleTurquoise PaleTurquoise
 *FvwmIconMan: *DontShow icon=Untitled resource=Untitled
 *FvwmIconMan: *DrawIcons always
-*FvwmIconMan: *ButtonGeometry  218x21
-*FvwmIconMan: *ManagerGeometry 1x3+3000+3000
+*FvwmIconMan: *ButtonGeometry  200x19
+*FvwmIconMan: *ManagerGeometry 3x2+3000+3000
 # }}}2
 # FvwmPager Config {{{2
 
@@ -1515,6 +1564,26 @@ DestroyModuleConfig FvwmPagerSubPanel: *
 
 *FvwmPager: Geometry 400x300
 *FvwmPager: Font none
+# }}}2
+# FvwmPagerInline Config {{{2
+
+DestroyModuleConfig FvwmPagerInline: *
+*FvwmPagerInline: Rows 1
+*FvwmPagerInline: Columns 3
+*FvwmPagerInline: Geometry 144x38-3000-3000
+*FvwmPagerInline: Font none
+*FvwmPagerInline: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
+#*FvwmPagerInline: SmallFont micro
+*FvwmPagerInline: Hilight White
+*FvwmPagerInline: DeskColor 0 #00FCFC
+*FvwmPagerInline: DeskPixmap 0 cyan_47x38.xpm
+*FvwmPagerInline: DeskColor 1 #FCFC00
+*FvwmPagerInline: DeskPixmap 1 yellow_47x38.xpm
+*FvwmPagerInline: DeskColor 2 #FC00FC
+*FvwmPagerInline: DeskPixmap 2 magenta_47x38.xpm
+*FvwmPagerInline: Label 0 "_ABCDEFGH"
+*FvwmPagerInline: Label 1 "IJKLMNOPQ"
+*FvwmPagerInline: Label 2 "RSTUVWXYZ"
 # }}}2
 # Fvwm Modules Misc Config {{{2
 

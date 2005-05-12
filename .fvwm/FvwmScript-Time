@@ -2,7 +2,7 @@
 # $Id$
 
 WindowTitle {FvwmScript-Status}
-WindowSize 112 16
+WindowSize 46 22
 BackColor {PaleTurquoise}
 #ShadowColor {PaleTurquoise}
 #HilightColor {PaleTurquoise}
@@ -15,18 +15,16 @@ WindowPosition 30000 30000
 Init
  Begin
   Set $font =(GetOutput {exec echo "$fvwm_datefont"} 1 -1)
-  ChangeFont 1 $font
-  ChangeFont 3 $font
-  Set $font =(GetOutput {exec echo "$fvwm_timefont"} 1 -1)
   ChangeFont 2 $font
+  Set $font =(GetOutput {exec echo "$fvwm_alertfont"} 1 -1)
+  ChangeFont 1 $font
   Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
   Set $time =(GetOutput {exec date '+%R'} 1 -1)
   If (RemainderOfDiv (GetTime) 60)<10 Then
    Set $seconds ={:0} (RemainderOfDiv (GetTime) 60)
   Else
    Set $seconds ={:} (RemainderOfDiv (GetTime) 60)
-  ChangeTitle 1 $date
-  ChangeTitle 2 $time
+  ChangeTitle 1 $time
  End
 
 PeriodicTasks
@@ -39,20 +37,18 @@ PeriodicTasks
    Set $seconds ={:0} (RemainderOfDiv (GetTime) 60)
   Else
    Set $seconds ={:} (RemainderOfDiv (GetTime) 60)
-  ChangeTitle 3 $seconds
+  ChangeTitle 2 $seconds
   If (RemainderOfDiv (GetTime) 60)==0 Then
-  ChangeTitle 2 $time
-  If (RemainderOfDiv (GetTime) 600)==0 Then
-  ChangeTitle 1 $date
+  ChangeTitle 1 $time
  End
 
 Widget 1
 Property
  Position 0 0
- Size 70 16
+ Size 46 22
  Type ItemDraw
- Flags Center NoReliefString
- Title {YYYY-mm-dd}
+ Flags Center
+ Title {HH:MM}
 Main
  Case message of
   SingleClic :
@@ -62,22 +58,8 @@ End
 
 Widget 2
 Property
- Position 68 0
- Size 44 16
- Type ItemDraw
- Flags Right
- Title {HH:MM}
-Main
- Case message of
-  SingleClic :
-  Begin
-  End
-End
-
-Widget 3
-Property
- Position 116 0
- Size 20 16
+ Position 48 0
+ Size 20 20
  Type ItemDraw
  Flags Left NoReliefString
  Title {:SS}

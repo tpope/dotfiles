@@ -2,13 +2,13 @@
 # $Id$
 
 WindowTitle {FvwmScript-Status}
-WindowSize 36 20
+WindowSize 40 22
 BackColor {PaleTurquoise}
 #ShadowColor {PaleTurquoise}
 #HilightColor {PaleTurquoise}
 ForeColor {Black}
 
-WindowPosition -3000 -3000
+WindowPosition 30000 30000
 
 Init
  Begin
@@ -113,11 +113,10 @@ PeriodicTasks
 Widget 1
 Property
  Position 0 0
- Size 36 20
+ Size 40 22
  Type ItemDraw
  Flags Center
  Title {A}
- Font xft:Sans:pixelsize=14
 Main
  Case message of
   SingleClic:
