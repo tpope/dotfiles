@@ -192,6 +192,8 @@ XDvi.mainTranslations: #override \
 	<Btn1Down>: do-href()magnifier(*1)\n\
 	<Btn2Down>: do-href-newwindow()source-special()\n\
 	<Btn3Down>: magnifier(*3)\n
+!Technically  for xfig
+Fig.inches: true
 ! }}}1
 !## XSCREENSAVER {{{1
 XScreenSaver.dpmsEnabled: true

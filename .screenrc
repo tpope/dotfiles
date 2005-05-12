@@ -19,7 +19,7 @@ windowlist string "%3n %{= dd}%?%h%:%t%?%=%f%{-}"
 caption    string "%?%F%{y}%?%3n %{= wk}%?%h%:%t%?%{-}"
 activity "Activity in window %n (%t)^G^G"
 bell_msg "Bell in window %n (%t)^G"
-setenv LD_PRELOAD "$LD_PRELOAD_SCREEN"
+#setenv LD_PRELOAD "$LD_PRELOAD_SCREEN"
 bind `  select 0
 bind  e screen -ln vim
 bind ^E screen -ln vim
