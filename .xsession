@@ -5,37 +5,32 @@
 PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
 [ -n "$ENV" ] || ENV="$HOME/.shrc"
 . "$ENV"
-[ -x /bin/zsh ] && export SHELL=/bin/zsh
+[ ! -x /bin/zsh ] || SHELL=/bin/zsh
 unset STY
 
 xsetroot -solid '#001010'
 
 hosts="marge bart maggie lisa homer mona"
-dpy=`echo ${DISPLAY:-:0.0} | sed -e 's/localhost//'`
+dpy=`echo ${DISPLAY:-':0.0'} | sed -e 's/localhost//'`
 if echo $dpy|grep '^:' >/dev/null; then
-	hname=`hostname`
+    hname=`hostname`
 else
-	hname=`echo $dpy|cut -d: -f 1`
-	dpy=":`echo $dpy|cut -d: -f 2`"
+    hname=`echo $dpy|cut -d: -f 1`
+    dpy=":`echo $dpy|cut -d: -f 2`"
 fi
 echo "I believe $DISPLAY is actually $hname $dpy."
 
 if ! xauth list "$hname$dpy" >/dev/null; then
-	echo "Warning: $hname$dpy not found in xauth list!" >&2
+    echo "Warning: $hname$dpy not found in xauth list!" >&2
 fi
 
 if /sbin/ifconfig | grep '172\.28\.6' >/dev/null; then
-	for host in $hosts; do
-		xauth -i extract - $hname$dpy | ssh -axqoBatchmode=yes $host xauth merge - &
-	done
+    for host in $hosts; do
+	xauth -i extract - $hname$dpy | ssh -axqoBatchmode=yes $host xauth merge - &
+    done
 fi
 
-#( [ -d /KNOPPIX ] && ping -c 1 www.sexygeek.org && \
-#  wget -qO- -T10 http://www.sexygeek.org/tpope.tar.gz|gzip -dc|tar xpC "$HOME" -f - || true
-#) >/dev/null 2>&1 &
-
 xset m 3 3
-#[ "`hostname`" = lisa ] && xset m 4 2
 xset r rate 600 30
 xset b 40 440 60
 
@@ -55,8 +50,10 @@ if [ ! -f "$HOME/.xmodmap" -a ! -f "$HOME/.Xmodmap" ] && \
     xmodmap -e "add Mod4 = Hyper_L Hyper_R"
 fi
 
-export ESPEAKER="$hname" RPLAY_HOST="$hname"
-export WINDOW_MANAGER="fvwm2"
+ESPEAKER="$hname"
+RPLAY_HOST="$hname"
+WINDOW_MANAGER="fvwm2"
+export ESPEAKER RPLAY_HOST WINDOW_MANAGER
 
 hostname="`hostname|sed -e 's/[.].*//'`"
 if [ ! -f "$HOME/. tpope" ]; then
@@ -67,15 +64,13 @@ tpope cron --login
 
 #xrdb -merge $HOME/.Xresources
 
-[ ! -x /usr/bin/ssh-askpass ] || export SSH_ASKPASS=/usr/bin/ssh-askpass
+#[ ! -x /usr/bin/ssh-askpass ] || export SSH_ASKPASS=/usr/bin/ssh-askpass
 
 if [ -x /usr/bin/ssh-agent -a -z "$SSH_AUTH_SOCK" ]; then
     sshagent="/usr/bin/ssh-agent --"
 fi
 
 [ ! -x /bin/pidof ] || [ -z "`pidof q-agent`" ] || kill `pidof q-agent`
-
-[ -f "$HOME/.xsession-local" ] && . "$HOME/.xsession-local"
 
 wait
 
@@ -86,21 +81,11 @@ wait
 [ ! -f "$HOME/.lircrc" ] || irexec &
 [ ! -f "$HOME/.lircrc" ] || irxevent &
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
-[ "$GPG_AGENT_INFO" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
+[ "$GPG_AGENT_INFO" -o -z "$AGENT_SOCKET" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
 
 xsetroot -solid '#002020'
 
-if [ "$DISPLAY" = ":1" -a "`hostname`" = mona ]; then
-#    width="`xwininfo -root|grep Width:|awk '{print $2}'`"
-#    height="`xwininfo -root|grep Height:|awk '{print $2}'`"
-#    depth="`xwininfo -root|grep Depth:|awk '{print $2}'`"
-#    Xwnc -ac -depth "$depth" -geometry "${width}x$height" :7 &
-#    xterm -title Metisse -e metisse-start-fvwm -wd :7 -wp abc123
-#    pkill Xwnc
-#    exit 0
-    xset m 2 4
-    exec x-terminal-emulator
-fi
+[ -f "$HOME/.xsession.local" ] && . "$HOME/.xsession.local"
 
 #if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
 #    exec $sshagent gnome-session
