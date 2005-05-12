@@ -25,6 +25,8 @@ setenv CVS_RSH 'ssh'
 
 unset dir
 
+limit maxproc 256 >&/dev/null
+
 if ( $?prompt == 0 ) exit
 if ( "$prompt" == "" ) exit
 # }}}1
@@ -73,11 +75,11 @@ if ( $?tcsh ) then
 	set hostcode = `y`
     endif
     if ( ! $?TERM ) setenv TERM vt220
-    set oldterm = "$TERM"
-    if ( $?OLDTERM ) then
-	set oldterm = "$OLDTERM"
-    endif
-    switch ($oldterm)
+    #set oldterm = "$TERM"
+    #if ( $?OLDTERM ) then
+	#set oldterm = "$OLDTERM"
+    #endif
+    switch ($TERM)
 
     case screen*:
     case vt220*:

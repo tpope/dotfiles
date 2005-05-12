@@ -44,6 +44,8 @@ CVSROOT=':ext:rebelongto.us:/home/tpope/.cvs'
 [ "`hostname`" = bart ] && CVSROOT="$HOME/.cvs"
 export RSYNC_RSH CVS_RSH CVSROOT
 
+ulimit -u 256 >/dev/null 2>/dev/null
+
 if [ -t 1 ]; then
 
 RSYNC_RSH='ssh -ax'
@@ -63,9 +65,9 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     umask 022
     stty -ixon
 
-    oldterm="$TERM"
-    [ "$OLDTERM" ] && oldterm="$OLDTERM"
-    case "$oldterm" in
+    #oldterm="$TERM"
+    #[ "$OLDTERM" ] && oldterm="$OLDTERM"
+    case "$TERM" in
 	screen*|vt220*)
 	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
 	    echo -n "k`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname\\"
@@ -74,8 +76,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	    echo -n "k$hostname\\"
 	    echo -n "]1;$hostname"
 	fi
-	[ "`hostname`" = grex.cyberspace.org ] && TERM=vt220 && OLDTERM=screen && \
-	export OLDTERM
 	;;
 	xterm*|rxvt*|kterm*|dtterm*)
 	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
@@ -89,8 +89,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	else
 	    echo -n "]1;$hostname"
 	fi
-	[ "`hostname`" = grex.cyberspace.org ] && TERM=xterm && \
-	    OLDTERM=Eterm && export OLDTERM
 	;;
     esac
 
@@ -128,12 +126,10 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	    alias vi='vim -X' && VISUAL='vim -X'
 
 	if [ -x "`which dircolors 2>/dev/null`" ]; then
-	    eval `dircolors -b $HOME/.dir_colors`
-	    #alias ls="LS_COLORS=\"$LS_COLORS\" ls -F --color=auto"
+	    eval `dircolors -b "$HOME/.dir_colors"`
 	    alias ls="ls -F --color=auto"
 	elif [ -x "`which gdircolors 2>/dev/null`" ]; then
-	    eval `gdircolors -b $HOME/.dir_colors`
-	    #alias ls="LS_COLORS=\"$LS_COLORS\" gls -F --color=auto"
+	    eval `gdircolors -b "$HOME/.dir_colors"`
 	    alias ls="gls -F --color=auto"
 	fi
 
