@@ -28,8 +28,10 @@ set modelines=5
 set grepprg=grep\ -nH\ $*
 let spell_auto_type = "mail"
 let spell_insert_mode = 0
-let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let c_comment_strings=1
+let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
+let g:Imap_PlaceHolderStart="\xab"
+let g:Imap_PlaceHolderEnd="\xbb"
 
 set background=dark
 if has ("gui_running")
