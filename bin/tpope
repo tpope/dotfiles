@@ -23,10 +23,16 @@ fi
 rcd=/etc/init.d
 [ -d "$rcd" ] || rcd=/etc/rc.d
 
+words="cat /usr/share/dict/words"
+Words="cat /usr/share/dict/words"
+[ -f "$HOME/text/scrabble" ] && words="cat $HOME/text/scrabble"
+
 hostname="`hostname|sed -e 's/[.].*//'`"
 [ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
 
 inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
+
+wordtrans() { echo "$1"|sed -e 's/-/[-A-Za-z0-9]/g'; }
 
 root_init() {
     if [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
@@ -103,16 +109,16 @@ do_clean() {
 	unset LD_PRELOAD
 	PROTECT_TRASH=NO
 	export PROTECT_TRASH
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -atime +`expr $unit \* 30` -o -user root -atime +1 \)
-	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -atime +`expr $unit \* 30`
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 30` -o -user root -ctime +1 \)
+	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 30`
 	FIND "$HOME/.trash" -atime +`expr $unit \* 15`
-	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` -size +8192k
+	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` \( -size +8192k -o -name '*.jpg' \)
 	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 5` -size +65536k
 	FINDDIR "$HOME/.trash" -mtime +`expr $unit \* 1` -empty
 	if [ ! -d "$HOME/.trash" ]; then
 	    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
 	fi
-	rm -f "$HOME/bin/ruptime" "$HOME/bin/rwho" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit"
+	rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit"
 	return 0
 }
 
@@ -138,6 +144,20 @@ do_install() {
 	framedrop=yes
 	input=file=$HOME/.mplayer/mplayer
 	EOF
+	hidden=1
+    fi
+    if inpath rox-filer && [ ! -d "$HOME/.rox_choices" ]; then
+	mkdir "$HOME/.rox_choices"
+	mkdir "$HOME/.rox_choices/MIME-types"
+	cat > "$HOME/.rox_choices/MIME-types/text" <<-EOF
+	#!/bin/sh
+	# Installed by tpope installer
+	exec see "\$@"
+	EOF
+	chmod a+x "$HOME/.rox_choices/MIME-types/text"
+	for link in application audio image message model multipart text_html video; do
+	    ln -s text "$HOME/.rox_choices/MIME-types/$link"
+	done
 	hidden=1
     fi
     if [ -f /usr/lib/libtrash/libtrash.so -a ! -f "$HOME/.libtrash" ]; then
@@ -236,6 +256,7 @@ do_install() {
     if inpath crontab; then
     crontab -l >/tmp/crontab.original.$$ 2>/dev/null
     cron="$?"
+    crontab -l 2>&1 >/dev/null | grep "no crontab" >/dev/null && cron=n
     if [ "$cron" = 0 ]; then
 	if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
 	    sed -ne '/\<tpope\>.*\<cron\>/,$p' /tmp/crontab.original.$$ | \
@@ -245,11 +266,11 @@ do_install() {
 	    cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
 	    cronmsg="Inserting skeleton crontab."
 	fi
-    elif [ "$cron" = 1 ]; then
+    elif [ "$cron" = n ]; then
 	cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
 	cronmsg="Installing skeleton crontab."
     fi
-    if [ "$cron" = 0 -o "$cron" = 1 ]; then
+    if [ "$cron" = 0 -o "$cron" = n ]; then
 	if [ -x /bin/bash ]; then
 	    shell=/bin/bash
 	    env=BASH_ENV
@@ -342,7 +363,8 @@ case "$basename" in
     aliases)
 	aliases="launch lt lv dm pg sb sursync ruptime rwho installer \
 	rclink rc start stop restart reload force-reload \
-	tomorrow vnc word xssc mpl mpa mount shutdown whois"
+	tomorrow vnc xssc mpl mpa mount shutdown whois char \
+	word ord wor or Word Ord Wor Or"
 	for app in apt-get aptitude emerge cardctl aumix feh rsync rubber xdvi xpdf gv; do
 	    inpath $app && [ ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
 	done
@@ -369,6 +391,12 @@ case "$basename" in
 	    exit
 	fi
 	;;
+
+    char) case "$1" in
+	?) perl -e 'print ord('"'$1'"'), "\n"' ;;
+	[0-9]?*) perl -e 'print chr('"$1"'), "\n"' ;;
+	*) exit 1 ;;
+    esac ;;
 
     clean) do_clean "$@" ;;
 
@@ -631,7 +659,15 @@ case "$basename" in
     exit 1
     ;;
 
-    word) cat /usr/share/dict/words | egrep "$@" ;;
+    word) w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w\$" "$@" ;;
+    ord)  w="`wordtrans "$1"`"; shift; $words | egrep -i "$w\$" "$@" ;;
+    wor)  w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w" "$@" ;;
+    or)   w="`wordtrans "$1"`"; shift; $words | egrep -i "$w" "$@" ;;
+    Word) w="`wordtrans "$1"`"; shift; $Words | egrep "^$w\$" "$@" ;;
+    Ord)  w="`wordtrans "$1"`"; shift; $Words | egrep "$w\$" "$@" ;;
+    Wor)  w="`wordtrans "$1"`"; shift; $Words | egrep "^$w" "$@" ;;
+    Or)   w="`wordtrans "$1"`"; shift; $Words | egrep "$w" "$@" ;;
+
     xauth-get) exec hostinfo --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
     xssc|xscc)
 	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
@@ -666,7 +702,9 @@ case "$basename" in
     rsync) no_links
 	exec rsync -uCP "$@" ;;
     rubber) no_links
-	if [ '*.tex' != "`echo *.tex`" ]; then
+	if [ "$*" ]; then
+	    exec rubber "$@"
+	elif [ '*.tex' != "`echo *.tex`" ]; then
 	    exec rubber *.tex
 	else
 	    exec rubber
