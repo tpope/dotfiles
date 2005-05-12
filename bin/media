@@ -85,7 +85,7 @@ mediaaction() {
     if [ -x "/usr/bin/cdcd" ]; then
 	[ -f "$HOME/.cdcdrc" ] || \
 	    echo "device=/dev/cdrom" > "$HOME/.cdcdrc"
-	if [ "`cdcd info 2>/dev/null`" != "No disc in drive" -a -n "`cdcd info 2>/dev/null`" ]; then
+	if [ "`cdcd status 2>/dev/null`" != "No disc in drive" -a -n "`cdcd status 2>/dev/null`" ]; then
 	case "$1" in
 	    [Qq]uit) cdcd open ;;
 	    [Ss]top) cdcd stop ;;
@@ -96,9 +96,9 @@ mediaaction() {
 	    [Ff]fwd) cdcd ff "${2:-5}" ;;
 	    [Rr]fwd) cdcd rew "${2:-5}" ;;
 	    [Pp]lay|[Tt]oggle)
-	    if cdcd info 2>/dev/null|grep Playing >/dev/null; then
+	    if cdcd status 2>/dev/null|grep Playing >/dev/null; then
 		cdcd pause
-	    elif cdcd info 2>/dev/null|grep Paused >/dev/null; then
+	    elif cdcd status 2>/dev/null|grep Paused >/dev/null; then
 		cdcd resume
 	    else
 		cdcd play

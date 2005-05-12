@@ -1,12 +1,13 @@
 #!/bin/sh
 # $Id$
-# -*- sh -*- vim: ft=sh sw=4 sts=4
+# -*- sh -*- vim:set ft=sh sw=4 sts=4:
 
 # As the name suggests, picks a sensible web browser based on what's installed
 # and what environment we're in.  The -T option forces a terminal browser, -G
 # a gui browser, and -dump a formatted dump of the website.
 
 [ "$PATH" ] || PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
+ulimit -u 128 >/dev/null 2>/dev/null
 
 if [ "$1" = "-T" ]; then
     shift
@@ -40,8 +41,8 @@ if [ "$DISPLAY" -a -z "$terminal" ]; then
     esac
     if [ -e "$url" ]; then
 	case "$url" in
-	    /*) ;;
-	    *) url="`pwd`/$url" ;;
+	    /*) url="file://$url" ;;
+	    *) url="file://`pwd`/$url" ;;
 	esac
     fi
     case "$gui$url" in
@@ -67,17 +68,17 @@ if [ "$DISPLAY" -a -z "$terminal" ]; then
 		sleep 20
 		if [ "$new" -a -d "$dir" ]; then
 		    if killall $browser-bin 2>/dev/null; then
-			echo 'Performing an initial "tpope install"'
+			echo 'Performing an initial "tpope installer"'
 			sleep 5
 			find "$dir" \( -name "localstore.rdf" -o -name "bookmarks.html" \) -exec rm {} \;
-			tpope install
+			tpope installer
 			echo 'Restarting browser so changes will take effect'
 			nohup $browser "$@" >/dev/null 2>/dev/null &
 			disown >/dev/null 2>&1
 			sleep 20
 		    else
-			echo 'Performing an initial "tpope install"'
-			tpope install
+			echo 'Performing an initial "tpope installer"'
+			tpope installer
 		    fi
 		fi
 		sleep 5
