@@ -7,8 +7,8 @@
 
 hostinfo=`basename $0`
 PATH="/bin:/usr/bin:/usr/local/bin"
-hosts="maggie bart clancy abe left homer right fry carl lisa marge barney mona ralph patty sarah snowball otto lenny griffin"
-menuhosts="maggie bart marge lisa homer abe mona - snowball - clancy sarah ralph"
+hosts="maggie bart clancy abe left homer right fry carl lisa marge barney mona ralph patty sarah snowball otto lenny griffin grex"
+menuhosts="maggie bart marge lisa homer mona - snowball - clancy sarah ralph"
 
 gethost() {
     case "$1" in
@@ -17,7 +17,6 @@ gethost() {
     [Cc]|clancy*) echo clancy ;;
     [Ee]|abe*) echo abe ;;
     [Ff]|left*) echo left ;;
-    [Gg]|griffin*) echo griffin ;;
     [Hh]|homer*) echo homer ;;
     [Ii]|right*) echo right ;;
     [Jj]|fry*) echo fry ;;
@@ -30,7 +29,9 @@ gethost() {
     [Qq]|patty*) echo patty ;;
     [Rr]|sarah*) echo sarah ;;
     [Ss]|snowball*) echo snowball ;;
-    [Tt]|otto*) echo otto ;;
+    [Tt]|peter*) echo peter ;;
+    [Uu]|otto*) echo otto ;;
+    [Xx]|grex*) echo grex ;;
     [Yy]|lenny*) echo lenny ;;
     ?) echo localhost ;;
     *) echo "$1" ;;
@@ -45,7 +46,7 @@ homer()    { hterm="00;33"; hscrn="   y"; hrgb="#D5AA7F"; hltr=H; hdom=simpson;}
 abe()      { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=E; hdom=simpson;}
 mona()     { hterm="00;35"; hscrn="   m"; hrgb="#D57FD4"; hltr=O; hdom=simpson;}
 snowball() { hterm="01;30"; hscrn="+b K"; hrgb="#BCBBBB"; hltr=S; hdom=simpson;
-		test "$TERM" = dtterm && hscrn=d && hterm="00;37" || /bin/true;}
+		test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
 clancy()   { hterm="00;34"; hscrn="   b"; hrgb="#7F7FD4"; hltr=C; hdom=simpson;}
 sarah()    { hterm="01;35"; hscrn="+b m"; hrgb="#FF7FFF"; hltr=R; hdom=simpson;}
 ralph()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=P; hdom=simpson;}
@@ -54,11 +55,12 @@ lenny()    { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=Y; hdom=simpson;}
 carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=K; hdom=simpson;}
 patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
 barney()   { hterm="01;33"; hscrn="+b Y"; hrgb="#F7F67F"; hltr=N; hdom=simpson;}
-otto()     { hterm="01;35"; hscrn="+b Y"; hrgb="#FF7FFF"; hltr=T; hdom=wiggum; }
-fry()      { hterm="01;33"; hscrn="+b Y"; hrgb="#F7F67F"; hltr=J; hdom=wiggum; }
+otto()     { hterm="01;35"; hscrn="+b Y"; hrgb="#FF7FFF"; hltr=U; hdom=wiggum; }
 left()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=F; hdom=springfield; }
 right()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=I; hdom=springfield;}
+peter()    { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=T; hdom=simpson;}
 griffin()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=G; hdom=simpson;}
+grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=X; hdom=springfield;}
 unknown()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr= ; hdom=;}
 getinfo() {
     $1 2>/dev/null || unknown
@@ -86,7 +88,7 @@ case "$hostinfo" in
 tpope) return ;;
 ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
 hostinfo)
-    : ${host:=`hostname`}
+    : ${host:="`hostname`"}
     case "$1" in
     -c|--host-color) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hterm; exit 0 ;;
     -l|--letter) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hltr; exit 0 ;;
@@ -158,8 +160,8 @@ EOF
     -u|-w|--ruptime|--rwho)
     PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
     command="$1"; shift
-    [ "$command" = -w -o "$command" = "--rwho"    ] && command=rwho
-    [ "$command" = -u -o "$command" = "--ruptime" ] && command=ruptime
+    [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
+    [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
     if [ "$1" = "-p" ]; then
 	RUPTIME=cat
 	shift
@@ -173,7 +175,7 @@ EOF
     [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
     [ -t 1 ] && TERMINAL=1
     if [ "$TERMINAL" ]; then
-	$RUPTIME "$@"|grep -v '^\[sexygeek\.org\]'|awk "$AWK"|while read host line; do
+	$RUPTIME "$@"|grep -v '^\[sexygeek\.org'|awk "$AWK"|while read host line; do
 	    "$host" 2>/dev/null || hterm="01;37"
 	    echo "$line"|sed -e 's/\<'$host'\>\(:\{0,1\}\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
 	done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/\<tpope\>/\[01;33mtpope\[00m/g' -e 's/\<root\>/\[01;37mroot\[00m/g'
