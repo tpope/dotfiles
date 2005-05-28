@@ -30,9 +30,9 @@ SetEnv SMALLXFTFONT "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true"
 DestroyFunc Fvwm24
 AddToFunc Fvwm24
 + I SetEnv fvwm_titlefont "-adobe-helvetica-bold-r-*--12-*-*-*-p-*-iso8859-1"
-+ I SetEnv fvwm_iconfont  "-adobe-helvetica-medium-r-*--10-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_iconfont  "-adobe-helvetica-medium-r-*--11-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-p-*-iso8859-1"
-+ I SetEnv fvwm_timefont "-adobe-helvetica-bold-r-*--14-*-*-*-p-*-iso8859-1"
+#+ I SetEnv fvwm_timefont "-adobe-helvetica-bold-r-*--14-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_alertfont "-adobe-helvetica-bold-r-*--17-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_smallfont "-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
 + I DefaultFont 7x13
@@ -40,10 +40,9 @@ AddToFunc Fvwm24
 DestroyFunc Fvwm25
 AddToFunc Fvwm25
 + I SetEnv fvwm_titlefont "xft:Arial:style=Bold:pixelsize=12;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
-+ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=10;-adobe-helvetica-medium-r-*--10-*-*-*-p-*-*-*"
++ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=11;-adobe-helvetica-medium-r-*--11-*-*-*-p-*-*-*"
 + I SetEnv fvwm_datefont "xft:Arial:pixelsize=12;-adobe-helvetica-medium-r-*--12-*-*-*-p-*-*-*"
-#+ I SetEnv fvwm_datefont "-adobe-helvetica-medium-r-*--12-*-*-*-*-*-*-*"
-+ I SetEnv fvwm_timefont "xft:Arial:Bold:pixelsize=15;-adobe-helvetica-bold-r-*--14-*-*-*-p-*-*-*"
+#+ I SetEnv fvwm_timefont "xft:Arial:Bold:pixelsize=15;-adobe-helvetica-bold-r-*--14-*-*-*-p-*-*-*"
 + I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=15;-adobe-helvetica-bold-r-*--17-*-*-*-p-*-*-*"
 + I SetEnv fvwm_smallfont "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true;-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
 + I DefaultFont "xft:Mono:pixelsize=11;7x13"
@@ -71,7 +70,7 @@ DestroyModuleConfig FvwmTheme: *
 # }}}2
 # Menu Styles {{{2
 MenuStyle * Foreground black, Background SteelBlue, Greyed grey40, Animation
-MenuStyle * ActiveFore white, HilightBack navy, PopupOffset -16 100
+MenuStyle * ActiveFore white, HilightBack navy, PopupOffset -4 100
 MenuStyle * MenuFace DGradient 256 LightSteelBlue SteelBlue
 MenuStyle * Font "$[fvwm_titlefont]"
 CopyMenuStyle * Logins
@@ -230,6 +229,7 @@ Style Mozilla*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsO
 Style MozillaFirebird*  UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
 Style Firefox*          UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
 Style Netscape*         UseStyle www-browser, MiniIcon mini.netscape.xpm, StartsOnPage 1 0
+Style dillo*            UseStyle www-browser, StartsOnPage 1 0
 #2 1
 Style links             UseStyle www-browser
 Style w3m               UseStyle www-browser
@@ -248,21 +248,21 @@ Style screen-irc* ForeColor #d0ff80, HilightFore #d0ff80
 
 Style Fvwm*     WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
 Style fvwm_menu WindowListSkip, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
-Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
-Style fvwm_menu BorderWidth 5, HandleWidth 5, CirculateSkipIcon, CirculateSkip
-Style Fvwm*     HilightFore white, HilightBack violetred, Color white/#785070
-Style fvwm_menu HilightFore white, HilightBack violetred, Color white/#785070
-Style Fvwm*     NoTitle, Sticky, ClickToFocus, GrabFocusOff
-Style fvwm_menu ClickToFocus, GrabFocusOff
-#, UseDecor
+Style Fvwm*     BorderWidth 5, HandleWidth 5, CirculateSkip
+Style fvwm_menu BorderWidth 2, NoHandles, NoButton 4, CirculateSkip
+Style Fvwm*     HilightBack violetred, Color white/#785070
+Style fvwm_menu HilightBack violetred, Color white/BlueViolet
+Style Fvwm*     ClickToFocus, GrabFocusOff, NoTitle, Sticky
+Style fvwm_menu ClickToFocus, GrabFocusOff, TitleAtLeft, UsePPosition
+Style FvwmScript-Hidden UsePPosition, NoHandles, BorderWidth 0
 Style FvwmConsole  Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, BorderWidth 5, HandleWidth 5
 Style FvwmForm*    Slippery, Title, WindowListHit, CirculateHit, CirculateHitIcon, SloppyFocus, GrabFocus, NoButton 4
 Style FvwmForm-Run Slippery, Title, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient, NoButton 4, MiniIcon mini.run.xpm, Icon run.xpm
 Style FvwmAmetista Slippery, WindowListHit, SloppyFocus, GrabFocus, GrabFocusTransient
 Style FvwmPager*   BorderWidth 2, NoHandles
 Style FvwmBanner   StaysOnTop
-Style FvwmIconMan  NeverFocus, BorderWidth 2, HandleWidth 2, Color White/PaleTurquoise
-Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 0, NoHandles, Color White/PaleTurquoise
+Style FvwmIconMan  NeverFocus, BorderWidth 2, HandleWidth 2, Color White/LightSteelBlue
+Style FvwmButtons  Icon toolbox.xpm, NeverFocus, BorderWidth 0, NoHandles, Color White/LightSteelBlue
 
 # }}}2
 # Common Program Styles {{{2
@@ -288,7 +288,7 @@ Style Xawtv     Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style Gimp      HilightBack #FF2222, BackColor #786060, MiniIcon mini/gimp.xpm
 Style feh       HilightBack #FF4000, BackColor #80625C, SloppyFocus, GrabFocus, Icon norm/image-viewer.xpm, MiniIcon mini/image-viewer.xpm
-Style MPlayer   HilightBack #FF4000, BackColor #80625C, Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm, UsePPosition
+Style MPlayer   HilightBack #FF4000, BackColor #80625C, Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm, NoPPosition
 Style xmms      HilightBack #FF4000, BackColor #80625C, Icon norm/music.xpm, MiniIcon mini/music.xpm
 Style *etri*    Icon norm/game-logic.xpm, MiniIcon mini/game-logic.xpm
 Style xpdf      MiniIcon mini.pdf.xpm
@@ -305,6 +305,7 @@ Style *Snes9*   UseStyle Game
 # }}}2
 # }}}1
 # Key Bindings {{{1
+# Keys are in /usr/include/X11/keysymdef.h
 
 IgnoreModifiers 2
 # Ignore Caps Lock and two alternate Num Locks
@@ -355,15 +356,15 @@ Key Down        A       C5    Direction South [CurrentDesk] FuncFlipFocusWindow
 
 # }}}2
 
-Key F1          A       4       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
+Key F1          A       4       FuncMenuFvwmRoot
 Key F2          A       4       FvwmForm FvwmForm-Run
 Key F2          A       S4      Read .FvwmForm-RunLast Quiet
 Key F3          A       4       Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F3          A       S4      FvwmForm FvwmForm-Talk
 
-Key Escape      A       C       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
+Key Escape      A       C       FuncMenuFvwmRoot
 Key Escape      A       S       Menu MenuFvwmWindowOps Interior 0 0 Nop
-Key F1          A       M       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
+Key F1          A       M       FuncMenuFvwmRoot
 Key F1          A       SM      Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F2          A       M       FvwmForm FvwmForm-Run
 Key F2          A       SM      Read .FvwmForm-RunLast Quiet
@@ -381,8 +382,9 @@ Key F8          A       M       Resize
 Key F8          A       SM      FuncRecaptureWindow
 Key F9          A       M       Iconify
 Key F9          A       SM      Module FvwmIdent
-Key F10         A       M       Maximize 100 100
-Key F10         A       SM      Maximize 0 100
+Key F10         A       M       Maximize 100 -40p
+Key F10         A       SM      Maximize 0 -40p
+Key F10         A       CM      Maximize grow grow
 Silent Key F11  A       M       Stick
 Silent Key SunF36 A     M       Stick
 Silent Key F11  A       SM      Module FvwmScroll 2 2
@@ -401,7 +403,7 @@ Key 1           A       4       FuncWindowWarp 25 25
 Key 2           A       4       FuncWindowWarp 75 25
 Key 3           A       4       FuncWindowWarp 25 75
 Key 4           A       4       FuncWindowWarp 75 75
-Key 5           A       4       Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
+Key 5           A       4       FuncMenuFvwmRoot
 Key 6           A       4       FvwmForm FvwmForm-Run
 Key 6           A       S4      Read .FvwmForm-RunLast Quiet
 Key 7           A       4       Menu MenuFvwmUtilities
@@ -421,6 +423,8 @@ Key Down        A       4       GotoPage 0p +1p
 Key Down        A       4       Scroll  0 100000
 Key Next        A       4       GotoDesk +1 0 2
 Key Prior       A       4       GotoDesk -1 0 2
+Key minus       A       4       FuncMoveButtonsToTop
+Key equal       A       4       FuncMoveButtonsToBottom
 
 Key Left        A       CM      GotoPage -1p 0p
 Key Right       A       CM      GotoPage +1p 0p
@@ -720,10 +724,12 @@ Stroke 0        3 R     A WindowList
 
 AddToFunc StartFunction
 + I ModuleSynchronous Timeout 5 FvwmTheme
++ I FuncMoveButtonsToBottom
 + I Module FvwmAnimate
 + I Module FvwmAuto 1500
++ I Module FvwmAuto 1 -passid -menterleave "Silent SelectiveRaiseLower Raise" "Silent SelectiveRaiseLower Lower"
 + I Module FvwmBacker
-+ I Module FvwmButtons FvwmButtonsLong
+#+ I Module FvwmButtons FvwmButtonsBottom
 + I Module FvwmCommandS
 + I Module FvwmEvent
 + I Module FvwmProxy
@@ -760,37 +766,39 @@ AddToFunc SessionRestartFunction
 # }}}1
 # Menus {{{1
 DestroyMenu MenuFvwmRoot
-AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^  "Root Menu"             Title
-+ "X &Terminal%menu/terminal.xpm%"       FuncScreenXterm
+AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^
++ "&Terminal%menu/terminal.xpm%"         FuncScreenXterm
 + "&Web Browser%menu/www.xpm%"           Exec sensible-browser http://www.google.com/
 + "&Chat%menu/chat.xpm%"                 FuncIrcScreenSshXterm
 + "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
 + ""              Nop
-+ "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins
-+ "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens
++ "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins item 100-4p c
++ "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens item 100-4p c
 + ""              Nop
-+ "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms
-Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames
-+ "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities
-+ "N&etwork%menu/network.xpm%"           Popup MenuFvwmNetwork
-+ "&Multimedia%menu/multimedia.xpm%"     Popup MenuFvwmMultimedia
++ "Progr&ams%menu/programs.xpm%"         Popup MenuFvwmPrograms item 100-4p c
+Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames item 100-4p c
++ "&Utilities%menu/utility.xpm%"         Popup MenuFvwmUtilities item 100-4p c
++ "&Network%menu/network.xpm%"           Popup MenuFvwmNetwork item 100-4p c
++ "&Multimedia%menu/multimedia.xpm%"     Popup MenuFvwmMultimedia item 100-4p c
 + ""              Nop
-PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian'
-PipeRead 'test -e /usr/share/gnome/apps && echo + \\"G\\&NOME%menu/gnome.xpm%\\" Popup Gnome-sys'
-PipeRead 'test \( -e "$KDEDIR" -o -e /usr/share/applnk \) -a ! -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys'
+PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian item 100-4p c'
+PipeRead 'test -e /usr/share/gnome/apps && echo + \\"GNOM\\&E%menu/gnome.xpm%\\" Popup Gnome-sys item 100-4p c'
+PipeRead 'test -e /usr/share/applnk -a -x /usr/bin/kstart -o -e "$KDEDIR" && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys item 100-4p c'
 + ""              Nop
-+ "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps
-+ "Fvwm Config &Ops%menu/configuration.xpm%" Popup MenuFvwmConfig
++ "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps item 100-4p c
++ "Fvwm Config &Ops%menu/configuration.xpm%" Popup MenuFvwmConfig item 100-4p c
 + ""              Nop
-+ "E&xit Fvwm%menu/quit.xpm%"         Popup MenuFvwmQuitVerify
++ "E&xit Fvwm%menu/quit.xpm%"         Popup MenuFvwmQuitVerify item 100-4p 0
 
-DestroyMenu Kde-sys
-AddToMenu Kde-sys
-+ DynamicPopupAction PipeRead '[ -z "$KDEDIR" ] && export KDEDIR=/usr; LANG=C PATH=":$PATH" fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --mini-icons-path "" --destroy-type dynamic'
+PipeRead '[ -z "$KDEDIR" -a -e /usr/share/applnk ] && export KDEDIR=/usr; [ -e "$KDEDIR" ] && LANG=C PATH=":$PATH" fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --mini-icons-path ""'
+#DestroyMenu Kde-sys
+#AddToMenu Kde-sys
+#+ DynamicPopupAction PipeRead '[ -z "$KDEDIR" ] && export KDEDIR=/usr; LANG=C PATH=":$PATH" fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --mini-icons-path "" --destroy-type dynamic'
 
-DestroyMenu Gnome-sys
-AddToMenu Gnome-sys
-+ DynamicPopupAction PipeRead 'PATH=":$PATH" fvwm-menu-desktop --desktop gnome-sys --merge-user-menu --enable-mini-icons --mini-icons-path "" --destroy-type dynamic'
+PipeRead '[ -e /usr/share/gnome/apps ] && PATH=":$PATH" fvwm-menu-desktop --desktop gnome-sys --merge-user-menu --enable-mini-icons --mini-icons-path ""'
+#DestroyMenu Gnome-sys
+#AddToMenu Gnome-sys
+#+ DynamicPopupAction PipeRead 'PATH=":$PATH" fvwm-menu-desktop --desktop gnome-sys --merge-user-menu --enable-mini-icons --mini-icons-path "" --destroy-type dynamic'
 
 DestroyFunc FuncAddIfExists
 AddToFunc FuncAddIfExists
@@ -845,7 +853,8 @@ FuncAddIfExists MenuFvwmNetwork "&Blog%menu/editor.xpm%" BloGTK
 + ""                            Nop
 FuncAddIfExists MenuFvwmNetwork "&Firefox%mozilla.mini.xpm%" firefox
 FuncAddIfExists MenuFvwmNetwork "&Firebird%mozilla.mini.xpm%" mozilla-firebird
-FuncAddIfExists MenuFvwmNetwork "&Konqueror%mini.kde.xpm%"   Exec exec konqueror about:blank
+FuncAddIfExists MenuFvwmNetwork "&Konqueror%mini.kde.xpm%" konqueror about:blank
+FuncAddIfExists MenuFvwmNetwork "&Dillo%menu/www.xpm%" dillo
 Test (!x /usr/bin/firefox) Test (!x /usr/bin/mozilla-firebird) FuncAddIfExists MenuFvwmNetwork "M&ozilla%mozilla.mini.xpm%" mozilla
 Test (x /usr/bin/firefox) Test (x /usr/lib/mozilla/run-mozilla.sh) FuncAddIfExists MenuFvwmNetwork "M&ozilla%mozilla.mini.xpm%" mozilla
 FuncAddIfExists MenuFvwmNetwork "&Netscape%mini.netscape.xpm%" netscape
@@ -887,7 +896,7 @@ PipeRead "$HOME/bin/hostinfo --fvwm-menus"
 
 DestroyMenu MenuFvwmConfig
 AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
-+ "Fvwm &Modules%mini.fvwm.xpm%"              Popup MenuFvwmModules
++ "Fvwm &Modules%mini.modules.xpm%"           Popup MenuFvwmModules
 + "Stop Fvwm Mo&dule%mini.crosbone.xpm%"      Popup MenuFvwmStopModule
 + "" Nop
 + "Re&fresh Screen%menu/refresh.xpm%"         Refresh
@@ -902,6 +911,9 @@ AddToMenu MenuFvwmConfig "Fvwm Config Ops" Title
 #+ "&Sloppy Focus"           FuncFocusPolicyChange SloppyFocus
 #+ "&Click To Focus"         FuncFocusPolicyChange ClickToFocus
 #+ "&Focus Follows Mouse"    FuncFocusPolicyChange FocusFollowsMouse
++ "" Nop
++ "Buttons at &Top%menu/window-raise.xpm%"    Schedule 10 FuncMoveButtonsToTop
++ "Buttons at &Bottom%menu/window-lower.xpm%" Schedule 10 FuncMoveButtonsToBottom
 + "" Nop
 + "Colorma&p Follows Mouse%mini.mouse.xpm%"   ColormapFocus FollowsMouse
 + "C&olormap Follows Focus%mini.windows.xpm%" ColormapFocus FollowsFocus
@@ -1202,6 +1214,42 @@ AddToFunc FuncTakeToPrevDeskAndPage
 + I MoveToDesk prev
 + I GotoPage prev
 + I GotoDesk prev
+
+DestroyFunc FuncMenuFvwmRoot
+AddToFunc FuncMenuFvwmRoot
++ I Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
+
+DestroyFunc FuncMoveButtonsToBottom
+AddToFunc FuncMoveButtonsToBottom
++ I EwmhBaseStruts 0 0 0 40
++ I Key F10         A       M       Maximize 100 -40p
++ I Key F10         A       MS      Maximize 0 -40p
++ I Mouse 1         4       A       Maximize 100 -40p
++ I Style * EWMHMaximizeIgnoreWorkingArea
++ I DestroyFunc FuncMenuFvwmRoot
++ I AddToFunc FuncMenuFvwmRoot I Menu MenuFvwmRoot Root 0 100-100m-40p Nop
++ I EdgeCommand Top
++ I EdgeCommand Bottom All (FvwmButtons) Raise
++ I KillModule FvwmButtons
++ I Module FvwmButtons FvwmButtonsBottom
+
+DestroyFunc FuncMoveButtonsToTop
+AddToFunc FuncMoveButtonsToTop
++ I EwmhBaseStruts 0 0 40 0
++ I Key F10         A       M       Maximize 100 100
++ I Key F10         A       M       Maximize 0 100
++ I Mouse 1         4       A       Maximize 100 100
++ I Style * EWMHMaximizeUseWorkingArea
++ I DestroyFunc FuncMenuFvwmRoot
++ I AddToFunc FuncMenuFvwmRoot I Menu MenuFvwmRoot Root 0 +40p Nop
++ I EdgeCommand Top All (FvwmButtons) Raise
++ I EdgeCommand Bottom
++ I KillModule FvwmButtons
++ I Module FvwmButtons FvwmButtonsTop
+
+DestroyFunc SelectiveRaiseLower
+AddToFunc SelectiveRaiseLower
++ I WindowId $1 (FvwmButtons) $0
 # }}}2
 # Xterm Functions {{{2
 DestroyFunc FuncXterm
@@ -1393,65 +1441,59 @@ DestroyModuleConfig FvwmBacker: *
 Read FvwmBacker-Fancy Quiet
 
 # }}}2
-# FvwmButtonsLong Config {{{2
-#+-----------------+-----+
-#|YYYY-MM-DD  hh:mm|Alert|
-#+-----------+-----+     |
-#|           | 2nd +-----+
-#|   First   |     | o o |
-#|           +-----+  >  |
-#|   Pager   | 3rd | \_/ |
-#|           |     |tpope|
-#+-----------+-----+-----+
-KillModule FvwmButtons FvwmButtonsLong
-DestroyModuleConfig FvwmButtonsLong: *
-*FvwmButtonsLong: ButtonGeometry 2x2+0-0
-*FvwmButtonsLong: Back Black
-*FvwmButtonsLong: Fore Black
-*FvwmButtonsLong: Rows 20
-*FvwmButtonsLong: Font $[fvwm_smallfont]
-*FvwmButtonsLong: Padding 0 0
-*FvwmButtonsLong: (18x20, Frame 2, Padding 0 0, Back PaleTurquoise, Icon $[HOST].xpm, Action (Mouse 1) Menu MenuFvwmRoot Context 0 +100-100m-40p Nop, Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
+# FvwmButtonsBottom Config {{{2
+#+-----+-----~-----+-------+-------+-------+--+----------+
+#| O O |FvwmIconMan|  1st  |  2nd  |  3rd  |/\|YYYY-MM-DD|
+#|  >  +-----~-----+ Pager | Pager | Pager +--+          |
+#| \_/ |FvwmIconMan|       |       |       |Alert   hh:mm|
+#+-----+-----~-----+-------+-------+-------+-------------+
+DestroyModuleConfig FvwmButtonsBottom: *
+*FvwmButtonsBottom: ButtonGeometry 2x2+0-0
+*FvwmButtonsBottom: Back Black
+*FvwmButtonsBottom: Fore Black
+*FvwmButtonsBottom: Rows 20
+*FvwmButtonsBottom: Font $[fvwm_smallfont]
+*FvwmButtonsBottom: Padding 0 0
+*FvwmButtonsBottom: (18x20, Frame 2, Padding 0 0, Back LightSteelBlue, Icon $[HOST].xpm, Action (Mouse 1) FuncMenuFvwmRoot, Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
 PipeRead 'echo SetEnv width `expr $[vp.width] / 2 - 135`'
-*FvwmButtonsLong: ($[width]x20, Frame 0, Padding 0 1, Container(Columns 1, Rows 1, Frame 0, Padding 0 0))
-*FvwmButtonsLong: (1x1, Back PaleTurquoise, Swallow(UseOld, NoHints, Respawn) "FvwmIconMan" "Module FvwmIconMan")
-*FvwmButtonsLong: (End)
+*FvwmButtonsBottom: ($[width]x20, Frame 0, Padding 0 1, Container(Columns 1, Rows 1, Frame 0, Padding 0 0))
+*FvwmButtonsBottom: (1x1, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmIconMan" "Module FvwmIconMan")
+*FvwmButtonsBottom: (End)
 UnsetEnv width
-*FvwmButtonsLong: (117x20, Frame 0, Padding 1 1, Container(Columns 116, Rows 19, Frame 0, Padding 0 0, Back PaleTurquoise))
-*FvwmButtonsLong: (72x19, Frame 0, Padding 0 0, Back PaleTurquoise, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 2")
-*FvwmButtonsLong: (8x8, Padding 0 4, Frame 2, Back PaleTurquoise, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
-*FvwmButtonsLong: (36x8, Padding 0 0, Frame 0, Back PaleTurquoise, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Date" "Module FvwmScript FvwmScript-Date")
-*FvwmButtonsLong: (20x11, Padding 0 0, Frame 0, Back PaleTurquoise, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
-*FvwmButtonsLong: (24x11, Padding 0 0, Frame 0, Back PaleTurquoise, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
-*FvwmButtonsLong: (End)
+*FvwmButtonsBottom: (117x20, Frame 0, Padding 1 1, Container(Columns 116, Rows 19, Frame 0, Padding 0 0, Back LightSteelBlue))
+*FvwmButtonsBottom: (72x19, Frame 0, Padding 0 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 2")
+*FvwmButtonsBottom: (8x8, Padding 2 2, Frame 2, Back LightSteelBlue, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
+*FvwmButtonsBottom: (36x8, Padding 0 0, Frame 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Date" "Module FvwmScript FvwmScript-Date")
+*FvwmButtonsBottom: (20x11, Padding 0 0, Frame 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
+*FvwmButtonsBottom: (24x11, Padding 0 0, Frame 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
+*FvwmButtonsBottom: (End)
 # }}}2
-# FvwmButtons Config {{{2
-#+-----------------+-----+
-#|YYYY-MM-DD  hh:mm|Alert|
-#+-----------+-----+     |
-#|           | 2nd +-----+
-#|   First   |     | o o |
-#|           +-----+  >  |
-#|   Pager   | 3rd | \_/ |
-#|           |     |tpope|
-#+-----------+-----+-----+
-KillModule FvwmButtons
-DestroyModuleConfig FvwmButtons: *
-*FvwmButtons: ButtonGeometry 4x4-0-0
-*FvwmButtons: Back PaleTurquoise
-*FvwmButtons: Fore Black
-*FvwmButtons: Rows 16
-*FvwmButtons: Font $[fvwm_smallfont]
-*FvwmButtons: Padding 0 0
-*FvwmButtons: (28x4, Padding 0 0, Frame 0, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
-*FvwmButtons: (9x5, Padding 0 1, Frame 0, Swallow(UseOld,NoHints,Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
-*FvwmButtons: (4x6, Padding 1 5, Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
-*FvwmButtons: (24x12, Frame 0, Padding 0 0, Container(Rows 6, Columns 12, Frame 0, Padding 0 0, Fore black, Back black))
-*FvwmButtons: (8x6, Padding 1 0, Back black, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineA" "Module FvwmPager FvwmPagerInlineA 0")
-*FvwmButtons: (4x6, Swallow(UseOld, NoHints, Respawn) "FvwmPagerInlineB" "Module FvwmPager FvwmPagerInlineB 1 2")
-*FvwmButtons: (End)
-*FvwmButtons: (9x11, Frame 0, Padding 0 0, Icon $[HOST].xpm, Title $[LOGNAME], Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
-*FvwmButtons: (4x6, Padding 1 5, Panel(left, indicator, position Module mtb bottom, steps 0) FvwmIconMan "Module FvwmIconMan")
+# FvwmButtonsTop Config {{{2
+#+-----+-----~-----+-------+-------+-------+--+----------+
+#| O O |FvwmIconMan|  1st  |  2nd  |  3rd  |/\|YYYY-MM-DD|
+#|  >  +-----~-----+ Pager | Pager | Pager +--+          |
+#| \_/ |FvwmIconMan|       |       |       |Alert   hh:mm|
+#+-----+-----~-----+-------+-------+-------+-------------+
+DestroyModuleConfig FvwmButtonsTop: *
+*FvwmButtonsTop: ButtonGeometry 2x2+0+0
+*FvwmButtonsTop: Back Black
+*FvwmButtonsTop: Fore Black
+*FvwmButtonsTop: Rows 20
+*FvwmButtonsTop: Font $[fvwm_smallfont]
+*FvwmButtonsTop: Padding 0 0
+*FvwmButtonsTop: (18x20, Frame 2, Padding 0 0, Back LightSteelBlue, Icon $[HOST].xpm, Action (Mouse 1) FuncMenuFvwmRoot, Action (Mouse 2) PipeRead 'echo FuncSmartWebBrowser `xsel 2>/dev/null`', Action (Mouse 3) FuncScreenXterm)
+PipeRead 'echo SetEnv width `expr $[vp.width] / 2 - 135`'
+*FvwmButtonsTop: ($[width]x20, Frame 0, Padding 0 1, Container(Columns 1, Rows 1, Frame 0, Padding 0 0))
+*FvwmButtonsTop: (1x1, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmIconMan" "Module FvwmIconMan")
+*FvwmButtonsTop: (End)
+UnsetEnv width
+*FvwmButtonsTop: (117x20, Frame 0, Padding 1 1, Container(Columns 116, Rows 19, Frame 0, Padding 0 0, Back LightSteelBlue))
+*FvwmButtonsTop: (72x19, Frame 0, Padding 0 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 2")
+*FvwmButtonsTop: (20x11, Padding 0 0, Frame 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
+*FvwmButtonsTop: (24x11, Padding 0 0, Frame 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
+*FvwmButtonsTop: (8x8, Padding 2 2, Frame 2, Back LightSteelBlue, Panel(down, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 2")
+*FvwmButtonsTop: (36x8, Padding 0 0, Frame 0, Back LightSteelBlue, Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Date" "Module FvwmScript FvwmScript-Date")
+*FvwmButtonsTop: (End)
 # }}}2
 # FvwmButtonsGkrellm Config {{{2
 #*FvwmButtonsGkrellm: Geometry 360x331-0+0
@@ -1485,62 +1527,36 @@ DestroyModuleConfig FvwmEvent: *
 DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *numManagers 1
 *FvwmIconMan: *Resolution  page
-*FvwmIconMan: *Background  PaleTurquoise
+*FvwmIconMan: *Background  LightSteelBlue
 *FvwmIconMan: *Foreground  black
 *FvwmIconMan: *Format      "%t"
 *FvwmIconMan: *Font        "$[fvwm_iconfont]"
-*FvwmIconMan: *Action      Mouse   1 A sendcommand "FuncDeiconifyAndRearrange", sendcommand "FlipFocus", sendcommand "Raise", sendcommand "FuncDoubleClickFocusWindow"
+*FvwmIconMan: *Action      Mouse   1 A sendcommand "FuncDeiconifyAndRearrange", sendcommand "Focus", sendcommand "Raise", sendcommand "FuncDoubleClickFocusWindow"
 *FvwmIconMan: *Action      Mouse   2 A sendcommand "Iconify"
 *FvwmIconMan: *Action      Mouse   3 A sendcommand "Menu MenuFvwmWindowOps Nop"
 *FvwmIconMan: *FollowFocus true
-*FvwmIconMan: *Sort        none
-*FvwmIconMan: *PlainButton          flat black LightSkyBlue
-*FvwmIconMan: *IconButton           flat black LightSteelBlue
-*FvwmIconMan: *SelectButton         flat black LightSlateBlue
-*FvwmIconMan: *FocusButton          flat yellow NavyBlue
-*FvwmIconMan: *FocusAndSelectButton flat yellow Blue
-*FvwmIconMan: *TitleButton	    flat PaleTurquoise PaleTurquoise
+*FvwmIconMan: *Sort        weighted
+*FvwmIconMan: *SortWeight   1 resource=screen@*
+*FvwmIconMan: *SortWeight   2 resource=*localhost
+*FvwmIconMan: *SortWeight   4 resource=screen-irc@*
+*FvwmIconMan: *SortWeight   5 resource=screen-ssh@*
+*FvwmIconMan: *SortWeight   7 resource=ssh@*
+*FvwmIconMan: *SortWeight  50
+*FvwmIconMan: *PlainButton          up   black LightSteelBlue
+#LightSkyBlue PaleTurquoise
+*FvwmIconMan: *IconButton           up   DimGrey LightSteelBlue
+*FvwmIconMan: *SelectButton         up   blue  LightSteelBlue
+*FvwmIconMan: *FocusButton          down black LightBlue2
+*FvwmIconMan: *FocusAndSelectButton down blue  LightBlue2
+#*FvwmIconMan: *FocusButton          down yellow NavyBlue
+#*FvwmIconMan: *FocusAndSelectButton down yellow Blue
+*FvwmIconMan: *TitleButton          flat LightSteelBlue LightSteelBlue
 *FvwmIconMan: *DontShow icon=Untitled resource=Untitled
 *FvwmIconMan: *DrawIcons always
 *FvwmIconMan: *ButtonGeometry  200x19
 *FvwmIconMan: *ManagerGeometry 3x2+3000+3000
 # }}}2
 # FvwmPager Config {{{2
-
-DestroyModuleConfig FvwmPagerInlineA: *
-*FvwmPagerInlineA: Rows 1
-*FvwmPagerInlineA: Columns 1
-*FvwmPagerInlineA: Geometry 144x48-3000-3000
-*FvwmPagerInlineA: Font none
-*FvwmPagerInlineA: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
-#*FvwmPagerInlineA: SmallFont micro
-*FvwmPagerInlineA: Hilight White
-*FvwmPagerInlineA: DeskColor 0 #00FCFC
-*FvwmPagerInlineA: DeskPixmap 0 cyan_62x47.xpm
-*FvwmPagerInlineA: DeskColor 1 #FCFC00
-*FvwmPagerInlineA: DeskPixmap 1 yellow_62x47.xpm
-*FvwmPagerInlineA: DeskColor 2 #FC00FC
-*FvwmPagerInlineA: DeskPixmap 2 magenta_62x47.xpm
-*FvwmPagerInlineA: Label 0 "_ABCDEFGH"
-*FvwmPagerInlineA: Label 1 "IJKLMNOPQ"
-*FvwmPagerInlineA: Label 2 "RSTUVWXYZ"
-
-DestroyModuleConfig FvwmPagerInlineB: *
-*FvwmPagerInlineB: Rows 2
-*FvwmPagerInlineB: Columns 1
-*FvwmPagerInlineB: Geometry 144x48-3000-3000
-*FvwmPagerInlineB: Font none
-*FvwmPagerInlineB: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
-#*FvwmPagerInlineB: SmallFont micro
-*FvwmPagerInlineB: Hilight White
-*FvwmPagerInlineB: DeskColor 0 #00FCFC
-*FvwmPagerInlineB: DeskPixmap 0 cyan_32x23.xpm
-*FvwmPagerInlineB: DeskColor 1 #FCFC00
-*FvwmPagerInlineB: DeskPixmap 1 yellow_32x23.xpm
-*FvwmPagerInlineB: DeskColor 2 #FC00FC
-*FvwmPagerInlineB: DeskPixmap 2 magenta_32x23.xpm
-*FvwmPagerInlineB: Label 1 "IJKLMNOPQ"
-*FvwmPagerInlineB: Label 2 "RSTUVWXYZ"
 
 DestroyModuleConfig FvwmPagerSubPanel: *
 *FvwmPagerSubPanel: Rows 1
@@ -1584,6 +1600,41 @@ DestroyModuleConfig FvwmPagerInline: *
 *FvwmPagerInline: Label 0 "_ABCDEFGH"
 *FvwmPagerInline: Label 1 "IJKLMNOPQ"
 *FvwmPagerInline: Label 2 "RSTUVWXYZ"
+
+DestroyModuleConfig FvwmPagerInlineA: *
+*FvwmPagerInlineA: Rows 1
+*FvwmPagerInlineA: Columns 1
+*FvwmPagerInlineA: Geometry 144x48-3000-3000
+*FvwmPagerInlineA: Font none
+*FvwmPagerInlineA: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
+#*FvwmPagerInlineA: SmallFont micro
+*FvwmPagerInlineA: Hilight White
+*FvwmPagerInlineA: DeskColor 0 #00FCFC
+*FvwmPagerInlineA: DeskPixmap 0 cyan_62x47.xpm
+*FvwmPagerInlineA: DeskColor 1 #FCFC00
+*FvwmPagerInlineA: DeskPixmap 1 yellow_62x47.xpm
+*FvwmPagerInlineA: DeskColor 2 #FC00FC
+*FvwmPagerInlineA: DeskPixmap 2 magenta_62x47.xpm
+*FvwmPagerInlineA: Label 0 "_ABCDEFGH"
+*FvwmPagerInlineA: Label 1 "IJKLMNOPQ"
+*FvwmPagerInlineA: Label 2 "RSTUVWXYZ"
+
+DestroyModuleConfig FvwmPagerInlineB: *
+*FvwmPagerInlineB: Rows 2
+*FvwmPagerInlineB: Columns 1
+*FvwmPagerInlineB: Geometry 144x48-3000-3000
+*FvwmPagerInlineB: Font none
+*FvwmPagerInlineB: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
+#*FvwmPagerInlineB: SmallFont micro
+*FvwmPagerInlineB: Hilight White
+*FvwmPagerInlineB: DeskColor 0 #00FCFC
+*FvwmPagerInlineB: DeskPixmap 0 cyan_32x23.xpm
+*FvwmPagerInlineB: DeskColor 1 #FCFC00
+*FvwmPagerInlineB: DeskPixmap 1 yellow_32x23.xpm
+*FvwmPagerInlineB: DeskColor 2 #FC00FC
+*FvwmPagerInlineB: DeskPixmap 2 magenta_32x23.xpm
+*FvwmPagerInlineB: Label 1 "IJKLMNOPQ"
+*FvwmPagerInlineB: Label 2 "RSTUVWXYZ"
 # }}}2
 # Fvwm Modules Misc Config {{{2
 
