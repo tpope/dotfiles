@@ -550,7 +550,7 @@ Key Grave   A   SC      FuncIrcScreenSshXtermShared
 Key 0       A   CM      Exec exec favorite-app
 Key 1       A   CM      Exec exec sensible-browser http://www.google.com/
 Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
-Key 3       A   CM      FuncExec gaim "exec gaim"
+Key 3       A   CM      Exec sleep 1; xscreensaver-command -lock || exec xlock
 Key 4       A   CM      FuncIrcScreenSshXterm
 Key 6       A   CM      Exec exec xpenguins --nice .8 3
 Key 7       A   CM      Module FvwmConsole
@@ -559,8 +559,8 @@ Key 9       A   CM      Exec exec aumix
 Key Space   A   CM      FuncScreenXterm
 
 Key 1       A   SCM     Exec exec sensible-browser
-Key 2       A   SCM     Exec sleep 1; xscreensaver-command -lock || exec xlock
-Key 3       A   SCM     Exec exec gaim -a
+Key 2       A   SCM     Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && (sudo ifdown eth0; sudo /sbin/cardctl eject)
+Key 3       A   SCM     Exec sleep 1; xscreensaver-command -activate || exec xlock
 Key 4       A   SCM     FuncIrcScreenXterm
 Key 6       A   SCM     Exec exec xpenguins -t "Big Penguins" --nice .8 3
 Key 7       A   SCM     Exec exec pkill -U $[LOGNAME] xpenguins
@@ -1312,15 +1312,15 @@ DestroyFunc FuncIrcScreenSshXterm
 AddToFunc FuncIrcScreenSshXterm
 + I Next (screen-irc@marge, AcceptsFocus) Iconify off
 + I Next (screen-irc@marge, AcceptsFocus) Focus
-+ I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e hostinfo -S marge -t sh -c "'DISPLAY=mona:0.0 exec screen -c $HOME/.irssi/screenrc -dRR irc'"
++ I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e tpope chat
 
 DestroyFunc FuncIrcScreenSshXtermShared
 AddToFunc FuncIrcScreenSshXtermShared
 + I Next (screen-irc@marge, AcceptsFocus) Iconify off
 + I Next (screen-irc@marge, AcceptsFocus) Focus
-+ I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e hostinfo -S marge -t sh -c "'DISPLAY=mona:0.0 exec screen -c $HOME/.irssi/screenrc -xRR irc'"
++ I None (screen-irc@marge, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@marge -n screen-irc@marge -e tpope chat -x"
 
-DestroyFunc FuncIrcScreenIrcXterm
+DestroyFunc FuncIrcScreenXterm
 AddToFunc FuncIrcScreenXterm
 + I Next (screen-irc@localhost) Iconify off
 + I Next (screen-irc@localhost, AcceptsFocus) Focus
