@@ -9,8 +9,9 @@
 # Of particular interest here is the start/restart/etc functions, which call
 # the appropriate script in /etc/init.d, the install function, which does
 # various tasks involved with moving in (such as setting up a crontab and
-# changing my login shell), and the cron function, which calls install, cleans
-# up temp files, and optionally downloads my latest set of configuration files.
+# changing my login shell), and the cron function, which calls my installer
+# script, cleans up temp files, and optionally downloads my latest set of
+# configuration files.
 
 [ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
 
@@ -123,218 +124,7 @@ do_clean() {
 }
 
 do_install() {
-    [ "$1" != "--cron" ] || exec >/dev/null
-    if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
-	touch "$HOME/. tpope"
-	chmod 0000 "$HOME/. tpope"
-	hidden=1
-    fi
-    if [ ! -f "$HOME/.hushlogin" ]; then
-	touch "$HOME/.hushlogin"
-	hidden=1
-    fi
-    if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
-	mkdir "$HOME/.mplayer"
-	mkfifo "$HOME/.mplayer/mplayer"
-	cat > "$HOME/.mplayer/config" <<-EOF
-	# ~/.mplayer/config
-	vo=xv,x11,fb,aa
-	alang=en
-	slang=en
-	framedrop=yes
-	input=file=$HOME/.mplayer/mplayer
-	EOF
-	hidden=1
-    fi
-    if inpath rox-filer && [ ! -d "$HOME/.rox_choices" ]; then
-	mkdir "$HOME/.rox_choices"
-	mkdir "$HOME/.rox_choices/MIME-types"
-	cat > "$HOME/.rox_choices/MIME-types/text" <<-EOF
-	#!/bin/sh
-	# Installed by tpope installer
-	exec see "\$@"
-	EOF
-	chmod a+x "$HOME/.rox_choices/MIME-types/text"
-	for link in application audio image message model multipart text_html video; do
-	    ln -s text "$HOME/.rox_choices/MIME-types/$link"
-	done
-	hidden=1
-    fi
-    if [ -f /usr/lib/libtrash/libtrash.so -a ! -f "$HOME/.libtrash" ]; then
-	cat > "$HOME/.libtrash" <<-EOF
-	# ~/.libtrash
-	TRASH_CAN = .trash
-	IGNORE_EXTENSIONS = o;log;aux;bbl;blg;ent;toc;swp;swo;viminfo
-	IGNORE_HIDDEN = NO
-	GLOBAL_PROTECTION = NO
-	LIBTRASH_CONFIG_FILE_UNREMOVABLE = NO
-	EOF
-	hidden=1
-    fi
-    [ -z "$hidden" ] || echo "Creating hidden files."
-    if [ ! -d "$HOME/.trash" ]; then
-	mkdir "$HOME/.trash"
-	chmod 0700 "$HOME/.trash"
-	directories=1
-    fi
-    if [ ! -d "$HOME/dl" ]; then
-	if [ -d "$HOME/downloads" ]; then
-	    mv "$HOME/downloads" "$HOME/dl"
-	    ln -s dl "$HOME/downloads"
-	    chmod 0755 "$HOME/dl"
-	    directories=1
-	elif [ -d "$HOME/.mozilla" -o -d "$HOME/.irssi" ]; then
-	    mkdir "$HOME/dl"
-	    chmod 0755 "$HOME/dl"
-	    directories=1
-	fi
-    fi
-    [ -z "$directories" ] || echo "Creating directories."
-    for dir in .firefox/default .phoenix/default .mozilla/default .mozilla/$LOGNAME .mozilla/firefox; do
-	[ -d "$HOME/$dir" ] || continue
-	if [ -f "$HOME/$dir/profiles.ini" ]; then
-	    subdirs="`cat "$HOME/$dir/profiles.ini"|grep '^Path='|sed -e 's/^Path=//'`"
-	else
-	    subdirs="`ls -1 "$HOME/$dir"`"
-	fi
-	for subdir in $subdirs; do
-	    subdir="$HOME/$dir/$subdir"
-	    [ -d "$subdir" ] || continue
-	    if [ ! -L "$subdir/user.js" ]; then
-		ln -s ../../../.netscape/user.js "$subdir/user.js"
-		links=1
-	    fi
-	    for file in localstore.rdf ctxextensions.rdf bookmarks.html; do
-		if [ -f "$HOME/.netscape/$file" -a ! -s "$subdir/$file" ]; then
-		    cp "$HOME/.netscape/$file" "$subdir/$file"
-		fi
-	    done
-	done
-    done
-    if [ -d "$HOME/.kde/share" -a ! -h "$HOME/.kde/share/icons" ]; then
-	rm -rf "$HOME/.kde/share/icons" # A bad idea?
-	ln -s ../../.pixmaps "$HOME/.kde/share/icons"
-	links=1
-    fi
-    if [ ! -h "$HOME/.bash_logout" ]; then
-	ln -s .zlogout "$HOME/.bash_logout"
-    fi
-    if [ ! -f "$HOME/bin/sdplay" ]; then
-	if inpath rplay && pidof rplayd >/dev/null 2>&1; then
-	    ln -s "`which rplay`" "$HOME/bin/sdplay"
-	elif inpath esdplay && pidof esd >/dev/null 2>&1; then
-	    ln -s "`which esdplay`" "$HOME/bin/sdplay"
-	elif inpath artsplay && pidof artsd >/dev/null 2>&1; then
-	    ln -s "`which artsplay`" "$HOME/bin/sdplay"
-	elif inpath play; then
-	    ln -s "`which play`" "$HOME/bin/sdplay"
-	fi
-	[ ! -h "$HOME/bin/sdplay" ] || links=1
-    fi
-    for bin in sensible-editor sensible-pager; do
-	if [ ! -f "$HOME/bin/$bin" ]; then
-	    ln -s tpope "$HOME/bin/$bin"
-	    links=1
-	fi
-    done
-    if [ -f "$HOME/.pixmaps/unknown.xpm" -a ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
-	ln -sf unknown.xpm "$HOME/.pixmaps/.localhost.xpm"
-	links=1
-    fi
-    if [ -f "$HOME/.pixmaps/$hostname.xpm" ]; then
-	unknown="`find "$HOME/.pixmaps" -maxdepth 1 -name .localhost.xpm -lname unknown.xpm -print 2>/dev/null`"
-	if [ "$unknown" ]; then
-	    ln -sf "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
-	    links=1
-	fi
-    fi
-    if [ -x /usr/etc/renice -a ! -x "$HOME/bin/renice" ]; then
-	ln -s /usr/etc/renice "$HOME/bin/renice"
-	links=1
-    fi
-    [ -z "$links" ] || echo "Creating symlinks."
-    if inpath crontab; then
-    crontab -l >/tmp/crontab.original.$$ 2>/dev/null
-    cron="$?"
-    crontab -l 2>&1 >/dev/null | grep "no crontab" >/dev/null && cron=n
-    if [ "$cron" = 0 ]; then
-	if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
-	    sed -ne '/\<tpope\>.*\<cron\>/,$p' /tmp/crontab.original.$$ | \
-	    sed -ne '2,$p' > /tmp/crontab.custom.$$
-	    cronmsg="Updating skeleton crontab."
-	else
-	    cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
-	    cronmsg="Inserting skeleton crontab."
-	fi
-    elif [ "$cron" = n ]; then
-	cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
-	cronmsg="Installing skeleton crontab."
-    fi
-    if [ "$cron" = 0 -o "$cron" = n ]; then
-	if [ -x /bin/bash ]; then
-	    shell=/bin/bash
-	    env=BASH_ENV
-	else
-	    shell=/bin/sh
-	    env=ENV
-	fi
-	cat >/tmp/crontab.template.$$ <<EOF
-# -*- crontab -*- vim:set ft=crontab:
-# crontab for $LOGNAME@$hostname
-SHELL=$shell
-$env=$HOME/.shrc
-CLASSPATH=.:$HOME/.java:$HOME/java
-PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
-PERL5LIB=$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl
-RSYNC_RSH=ssh -axqoBatchMode=yes
-
-20 */4 * * *	tpope cron
-EOF
-	cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
-	if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
-	    echo "$cronmsg"
-	    crontab - < /tmp/crontab.template.$$
-	fi
-	rm /tmp/crontab.template.$$ /tmp/crontab.custom.$$
-    fi
-    rm /tmp/crontab.original.$$
-    fi
-    if [ ! -f "$HOME/.ssh/id_rsa" ]; then
-	ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N "" >/dev/null 2>&1 &&
-	cat "$HOME/.ssh/id_rsa.pub" >> "$HOME/.ssh/authorized_keys2" &&
-	echo "Generating ssh key."
-    fi
-    zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
-    if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null; then
-	if grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
-	    :
-	else
-	    echo "Changing login shell."
-	    chsh -s "$zsh"
-	fi
-    fi
-    if [ "$1" = "--root" ]; then
-	# ugh, how complicated
-	if inpath sudo; then
-	    if sudo -l >/dev/null 2>&1; then
-		sudo "$HOME/bin/tpope" _root_installer $LOGNAME
-	    else
-		if [ -f /etc/sudoers ]; then
-		    su -c "echo $LOGNAME ALL=(ALL) ALL >> /etc/sudoers"
-		    echo "Adding to sudoers."
-		    if sudo -l >/dev/null 2>&1; then
-			sudo "$HOME/bin/tpope" _root_installer $LOGNAME
-		    else
-			su -c "$HOME/bin/tpope _root_installer $LOGNAME"
-		    fi
-		else
-		    su -c "$HOME/bin/tpope _root_installer $LOGNAME"
-		fi
-	    fi
-	else
-	    su -c "$HOME/bin/tpope _root_installer $LOGNAME"
-	fi
-    fi
+    "$HOME/bin/installer" "$@"
 }
 
 display_manage() {
@@ -371,24 +161,23 @@ case "$basename" in
 	echo $aliases
 	exit 0 ;;
     
-    activity|away)
+    rehash) if [ "$hostname" = marge ]; then
+	pkill -HUP away-tpope 2>/dev/null || away-tpope -d
+    else
+	exec hostinfo -S marge -ax tpope $basename
+    fi ;;
+    activity|away|out|status)
 	if [ "$hostname" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
 	    [ "$#" = 1 -a -z "$1" ] && exec hostinfo -S marge -ax tpope $basename -c
 	    exec hostinfo --batch-ssh marge tpope $basename "$@"
-	fi
-	if [ "$#" = 0 ]; then
+	elif [ "$#" = 0 ]; then
+	    [ "$basename" = out ] && basename=away
 	    cat "$HOME/.$basename" 2>/dev/null
 	    exit
-	elif [ "$1" = "-c" -o "$1" = "" ]; then
-	    rm -f "$HOME/.$basename"
-	    exit 0
-	elif [ "$1" = "-" ]; then
-	    cat > "$HOME/.$basename"
-	    [ -s "$HOME/.$basename" ] || rm -f "$HOME/.$basename"
-	    exit
+	elif [ -x "$HOME/bin/away-tpope" -a $basename != status ]; then
+	    exec away-tpope $basename "$@"
 	else
-	    echo "$@" > "$HOME/.$basename"
-	    exit
+	    exit 2
 	fi
 	;;
 
@@ -397,6 +186,12 @@ case "$basename" in
 	[0-9]?*) perl -e 'print chr('"$1"'), "\n"' ;;
 	*) exit 1 ;;
     esac ;;
+
+    chat) if [ -z "$*" ]; then
+	    exec hostinfo -S marge -t '$HOME/.irssi/Chat-script' $hostname
+	else
+	    exec hostinfo -S marge -t '$HOME/.irssi/Chat-script' "$@"
+	fi ;;
 
     clean) do_clean "$@" ;;
 
@@ -673,6 +468,38 @@ case "$basename" in
 	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
 	export DISPLAY
 	exec xscreensaver-command "$@" ;;
+
+    lock)
+	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
+	export DISPLAY
+	xset=xset
+	[ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
+	xscreensaver-command -version >/dev/null||exit 1
+	if xscreensaver-command -time 2>/dev/null|egrep 'non-blanked|no saver status|locked' >/dev/null; then
+	    :
+	else
+	    xscreensaver-command -lock
+	    xset dpms force off
+	fi
+	;;
+
+    unlock)
+	case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
+	export DISPLAY
+	xset=xset
+	[ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
+	xscreensaver-command -version >/dev/null||exit 1
+	if xscreensaver-command -time 2>/dev/null|egrep 'locked' >/dev/null; then
+	    dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
+	    [ "$dpms" = on ] && $xset dpms force standby
+	    skill xscreensaver
+	    xscreensaver -no-splash >/dev/null 2>&1 &
+	    xscreensaver-command -activate >/dev/null 2>&1 &
+	    xscreensaver-command -throttle >/dev/null 2>&1 &
+	    [ "$dpms" = on ] && sleep 2 && $xset dpms force $dpms
+	fi
+	exit 0
+	;;
 
     mount|cdrecord|shutdown) no_links
 	case "$1" in

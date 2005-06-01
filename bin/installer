@@ -1,0 +1,233 @@
+#!/bin/sh
+# $Id$
+# -*- sh -*- vim:set ft=sh sw=4 sts=4:
+
+# This does various tasks involved with moving in (such as setting up a crontab
+# and changing my login shell).
+
+[ "$1" != "--cron" ] || exec >/dev/null
+if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
+    touch "$HOME/. tpope"
+    chmod 0000 "$HOME/. tpope"
+    hidden=1
+fi
+if [ ! -f "$HOME/.hushlogin" ]; then
+    touch "$HOME/.hushlogin"
+    hidden=1
+fi
+if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
+    mkdir "$HOME/.mplayer"
+    mkfifo "$HOME/.mplayer/mplayer"
+    cat > "$HOME/.mplayer/config" <<-EOF
+    # ~/.mplayer/config
+    vo=xv,x11,fb,aa
+    alang=en
+    slang=en
+    framedrop=yes
+    input=file=$HOME/.mplayer/mplayer
+    EOF
+    hidden=1
+fi
+if inpath dillo && [ ! -d "$HOME/.dillo" ]; then
+    mkdir "$HOME/.dillo"
+    cat > "$HOME/.dillo/dillorc" <<-EOF
+    # ~/.dillo/dillorc
+    start_page="http://www.sexygeek.org/home"
+    home="http://www.sexygeek.org/home"
+    contrast_visited_color=NO
+    enterpress_forces_submit=YES
+    show_extra_warnings=YES
+    geometry=790x532
+    EOF
+    echo "DEFAULT ACCEPT" > "$HOME/.dillo/cookiesrc"
+    hidden=1
+fi
+if inpath rox-filer && [ ! -d "$HOME/.rox_choices" ]; then
+    mkdir "$HOME/.rox_choices"
+    mkdir "$HOME/.rox_choices/MIME-types"
+    cat > "$HOME/.rox_choices/MIME-types/text" <<-EOF
+    #!/bin/sh
+    # Installed by tpope installer
+    exec see "\$@"
+    EOF
+    chmod a+x "$HOME/.rox_choices/MIME-types/text"
+    for link in application audio image message model multipart text_html video; do
+	ln -s text "$HOME/.rox_choices/MIME-types/$link"
+    done
+    hidden=1
+fi
+if [ -f /usr/lib/libtrash/libtrash.so -a ! -f "$HOME/.libtrash" ]; then
+    cat > "$HOME/.libtrash" <<-EOF
+    # ~/.libtrash
+    TRASH_CAN = .trash
+    IGNORE_EXTENSIONS = o;log;aux;bbl;blg;ent;toc;swp;swo;viminfo
+    IGNORE_HIDDEN = NO
+    GLOBAL_PROTECTION = NO
+    LIBTRASH_CONFIG_FILE_UNREMOVABLE = NO
+    EOF
+    hidden=1
+fi
+[ -z "$hidden" ] || echo "Creating hidden files."
+if [ ! -d "$HOME/.trash" ]; then
+    mkdir "$HOME/.trash"
+    chmod 0700 "$HOME/.trash"
+    directories=1
+fi
+if [ ! -d "$HOME/dl" ]; then
+    if [ -d "$HOME/downloads" ]; then
+	mv "$HOME/downloads" "$HOME/dl"
+	ln -s dl "$HOME/downloads"
+	chmod 0755 "$HOME/dl"
+	directories=1
+    elif [ -d "$HOME/.mozilla" -o -d "$HOME/.irssi" ]; then
+	mkdir "$HOME/dl"
+	chmod 0755 "$HOME/dl"
+	directories=1
+    fi
+fi
+[ -z "$directories" ] || echo "Creating directories."
+for dir in .firefox/default .phoenix/default .mozilla/default .mozilla/$LOGNAME .mozilla/firefox; do
+    [ -d "$HOME/$dir" ] || continue
+    if [ -f "$HOME/$dir/profiles.ini" ]; then
+	subdirs="`cat "$HOME/$dir/profiles.ini"|grep '^Path='|sed -e 's/^Path=//'`"
+    else
+	subdirs="`ls -1 "$HOME/$dir"`"
+    fi
+    for subdir in $subdirs; do
+	subdir="$HOME/$dir/$subdir"
+	[ -d "$subdir" ] || continue
+	if [ ! -L "$subdir/user.js" ]; then
+	    ln -s ../../../.netscape/user.js "$subdir/user.js"
+	    links=1
+	fi
+	for file in localstore.rdf ctxextensions.rdf bookmarks.html; do
+	    if [ -f "$HOME/.netscape/$file" -a ! -s "$subdir/$file" ]; then
+		cp "$HOME/.netscape/$file" "$subdir/$file"
+	    fi
+	done
+    done
+done
+if [ -d "$HOME/.kde/share" -a ! -h "$HOME/.kde/share/icons" ]; then
+    rm -rf "$HOME/.kde/share/icons" # A bad idea?
+    ln -s ../../.pixmaps "$HOME/.kde/share/icons"
+    links=1
+fi
+if [ ! -h "$HOME/.bash_logout" ]; then
+    ln -s .zlogout "$HOME/.bash_logout"
+fi
+if [ ! -f "$HOME/bin/sdplay" ]; then
+    if inpath rplay && pidof rplayd >/dev/null 2>&1; then
+	ln -s "`which rplay`" "$HOME/bin/sdplay"
+    elif inpath esdplay && pidof esd >/dev/null 2>&1; then
+	ln -s "`which esdplay`" "$HOME/bin/sdplay"
+    elif inpath artsplay && pidof artsd >/dev/null 2>&1; then
+	ln -s "`which artsplay`" "$HOME/bin/sdplay"
+    elif inpath play; then
+	ln -s "`which play`" "$HOME/bin/sdplay"
+    fi
+    [ ! -h "$HOME/bin/sdplay" ] || links=1
+fi
+for bin in sensible-editor sensible-pager; do
+    if [ ! -f "$HOME/bin/$bin" ]; then
+	ln -s tpope "$HOME/bin/$bin"
+	links=1
+    fi
+done
+if [ -f "$HOME/.pixmaps/unknown.xpm" -a ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
+    ln -sf unknown.xpm "$HOME/.pixmaps/.localhost.xpm"
+    links=1
+fi
+if [ -f "$HOME/.pixmaps/$hostname.xpm" ]; then
+    unknown="`find "$HOME/.pixmaps" -maxdepth 1 -name .localhost.xpm -lname unknown.xpm -print 2>/dev/null`"
+    if [ "$unknown" ]; then
+	ln -sf "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
+	links=1
+    fi
+fi
+if [ -x /usr/etc/renice -a ! -x "$HOME/bin/renice" ]; then
+    ln -s /usr/etc/renice "$HOME/bin/renice"
+    links=1
+fi
+[ -z "$links" ] || echo "Creating symlinks."
+if inpath crontab; then
+crontab -l >/tmp/crontab.original.$$ 2>/dev/null
+cron="$?"
+crontab -l 2>&1 >/dev/null | grep "no crontab" >/dev/null && cron=n
+if [ "$cron" = 0 ]; then
+    if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
+	sed -ne '/\<tpope\>.*\<cron\>/,$p' /tmp/crontab.original.$$ | \
+	sed -ne '2,$p' > /tmp/crontab.custom.$$
+	cronmsg="Updating skeleton crontab."
+    else
+	cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
+	cronmsg="Inserting skeleton crontab."
+    fi
+elif [ "$cron" = n ]; then
+    cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
+    cronmsg="Installing skeleton crontab."
+fi
+if [ "$cron" = 0 -o "$cron" = n ]; then
+    if [ -x /bin/bash ]; then
+	shell=/bin/bash
+	env=BASH_ENV
+    else
+	shell=/bin/sh
+	env=ENV
+    fi
+    cat >/tmp/crontab.template.$$ <<EOF
+# -*- crontab -*- vim:set ft=crontab:
+# crontab for $LOGNAME@$hostname
+SHELL=$shell
+$env=$HOME/.shrc
+CLASSPATH=.:$HOME/.java:$HOME/java
+PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
+PERL5LIB=$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl
+RSYNC_RSH=ssh -axqoBatchMode=yes
+
+20 */4 * * *	tpope cron
+EOF
+    cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
+    if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
+	echo "$cronmsg"
+	crontab - < /tmp/crontab.template.$$
+    fi
+    rm /tmp/crontab.template.$$ /tmp/crontab.custom.$$
+fi
+rm /tmp/crontab.original.$$
+fi
+if [ ! -f "$HOME/.ssh/id_rsa" ]; then
+    ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N "" >/dev/null 2>&1 &&
+    cat "$HOME/.ssh/id_rsa.pub" >> "$HOME/.ssh/authorized_keys2" &&
+    echo "Generating ssh key."
+fi
+zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
+if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null; then
+    if grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
+	:
+    else
+	echo "Changing login shell."
+	chsh -s "$zsh"
+    fi
+fi
+if [ "$1" = "--root" ]; then
+    # ugh, how complicated
+    if inpath sudo; then
+	if sudo -l >/dev/null 2>&1; then
+	    sudo "$HOME/bin/tpope" _root_installer $LOGNAME
+	else
+	    if [ -f /etc/sudoers ]; then
+		su -c "echo $LOGNAME ALL=(ALL) ALL >> /etc/sudoers"
+		echo "Adding to sudoers."
+		if sudo -l >/dev/null 2>&1; then
+		    sudo "$HOME/bin/tpope" _root_installer $LOGNAME
+		else
+		    su -c "$HOME/bin/tpope _root_installer $LOGNAME"
+		fi
+	    else
+		su -c "$HOME/bin/tpope _root_installer $LOGNAME"
+	    fi
+	fi
+    else
+	su -c "$HOME/bin/tpope _root_installer $LOGNAME"
+    fi
+fi

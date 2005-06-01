@@ -18,7 +18,7 @@ FILES="\
  .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js \
  .fvwm/.fvwm2rc .fvwm/icons/* .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
- bin/sync-tpope bin/media \
+ bin/sync-tpope bin/media bin/installer \
  "
 # bin/ps-grep bin/rwho bin/ruptime bin/launch bin/runcontrol \
 # bin/start bin/stop bin/restart bin/reload bin/force-reload \
