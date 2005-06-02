@@ -151,7 +151,7 @@ display_manage() {
 case "$basename" in
 
     aliases)
-	aliases="launch lt lv dm pg sb sursync ruptime rwho installer \
+	aliases="launch lt lv dm pg sb sursync ruptime rwho \
 	rclink rc start stop restart reload force-reload \
 	tomorrow vnc xssc mpl mpa mount shutdown whois char \
 	word ord wor or Word Ord Wor Or"
@@ -371,20 +371,6 @@ case "$basename" in
     libtrash|lt) try_libtrash "$@" ;;
 
     install|installer) do_install "$@" ;;
-
-    _root_installer)
-	[ "$1" ] || exit 1
-	PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
-	for group in adm src dip dialout floppy cdrom video audio disk; do
-	    line="`grep ^$group: /etc/group`"
-	    case "$line" in
-		'') ;;
-		*"$1"*) ;;
-		*) adduser "$1" $group >/dev/null 2>&1 && didgroup=1 ;;
-	    esac
-	done
-	[ -z "$didgroup" ] || echo "Added to groups."
-	;;
 
     soffice)
 	if [ ! -d "$HOME/.openoffice" ]; then

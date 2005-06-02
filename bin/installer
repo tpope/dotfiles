@@ -5,7 +5,25 @@
 # This does various tasks involved with moving in (such as setting up a crontab
 # and changing my login shell).
 
-[ "$1" != "--cron" ] || exec >/dev/null
+hostname="`hostname|sed -e 's/[.].*//'`"
+
+if [ "$1" = "--cron" ]; then exec >/dev/null; shift; fi
+inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
+
+if [ "$1" = "--root-only" ]; then
+	[ "$2" ] || exit 1
+	PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+	for group in adm src dip dialout floppy cdrom video audio disk; do
+	    line="`grep ^$group: /etc/group`"
+	    case "$line" in
+		'') ;;
+		*"$2"*) ;;
+		*) adduser "$2" $group >/dev/null 2>&1 && didgroup=1 ;;
+	    esac
+	done
+	[ -z "$didgroup" ] || echo "Added to groups."
+    exit 0
+fi
 if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
     touch "$HOME/. tpope"
     chmod 0000 "$HOME/. tpope"
@@ -19,26 +37,26 @@ if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
     mkdir "$HOME/.mplayer"
     mkfifo "$HOME/.mplayer/mplayer"
     cat > "$HOME/.mplayer/config" <<-EOF
-    # ~/.mplayer/config
-    vo=xv,x11,fb,aa
-    alang=en
-    slang=en
-    framedrop=yes
-    input=file=$HOME/.mplayer/mplayer
-    EOF
+	# ~/.mplayer/config
+	vo=xv,x11,fb,aa
+	alang=en
+	slang=en
+	framedrop=yes
+	input=file=$HOME/.mplayer/mplayer
+	EOF
     hidden=1
 fi
 if inpath dillo && [ ! -d "$HOME/.dillo" ]; then
     mkdir "$HOME/.dillo"
     cat > "$HOME/.dillo/dillorc" <<-EOF
-    # ~/.dillo/dillorc
-    start_page="http://www.sexygeek.org/home"
-    home="http://www.sexygeek.org/home"
-    contrast_visited_color=NO
-    enterpress_forces_submit=YES
-    show_extra_warnings=YES
-    geometry=790x532
-    EOF
+	# ~/.dillo/dillorc
+	start_page="http://www.sexygeek.org/home"
+	home="http://www.sexygeek.org/home"
+	contrast_visited_color=NO
+	enterpress_forces_submit=YES
+	show_extra_warnings=YES
+	geometry=790x532
+	EOF
     echo "DEFAULT ACCEPT" > "$HOME/.dillo/cookiesrc"
     hidden=1
 fi
@@ -46,10 +64,10 @@ if inpath rox-filer && [ ! -d "$HOME/.rox_choices" ]; then
     mkdir "$HOME/.rox_choices"
     mkdir "$HOME/.rox_choices/MIME-types"
     cat > "$HOME/.rox_choices/MIME-types/text" <<-EOF
-    #!/bin/sh
-    # Installed by tpope installer
-    exec see "\$@"
-    EOF
+	#!/bin/sh
+	# Installed by tpope installer
+	exec see "\$@"
+	EOF
     chmod a+x "$HOME/.rox_choices/MIME-types/text"
     for link in application audio image message model multipart text_html video; do
 	ln -s text "$HOME/.rox_choices/MIME-types/$link"
@@ -58,13 +76,13 @@ if inpath rox-filer && [ ! -d "$HOME/.rox_choices" ]; then
 fi
 if [ -f /usr/lib/libtrash/libtrash.so -a ! -f "$HOME/.libtrash" ]; then
     cat > "$HOME/.libtrash" <<-EOF
-    # ~/.libtrash
-    TRASH_CAN = .trash
-    IGNORE_EXTENSIONS = o;log;aux;bbl;blg;ent;toc;swp;swo;viminfo
-    IGNORE_HIDDEN = NO
-    GLOBAL_PROTECTION = NO
-    LIBTRASH_CONFIG_FILE_UNREMOVABLE = NO
-    EOF
+	# ~/.libtrash
+	TRASH_CAN = .trash
+	IGNORE_EXTENSIONS = o;log;aux;bbl;blg;ent;toc;swp;swo;viminfo
+	IGNORE_HIDDEN = NO
+	GLOBAL_PROTECTION = NO
+	LIBTRASH_CONFIG_FILE_UNREMOVABLE = NO
+	EOF
     hidden=1
 fi
 [ -z "$hidden" ] || echo "Creating hidden files."
@@ -149,9 +167,10 @@ if [ -x /usr/etc/renice -a ! -x "$HOME/bin/renice" ]; then
     links=1
 fi
 [ -z "$links" ] || echo "Creating symlinks."
+
 if inpath crontab; then
-crontab -l >/tmp/crontab.original.$$ 2>/dev/null
-cron="$?"
+    crontab -l >/tmp/crontab.original.$$ 2>/dev/null
+    cron="$?"
 crontab -l 2>&1 >/dev/null | grep "no crontab" >/dev/null && cron=n
 if [ "$cron" = 0 ]; then
     if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
@@ -213,21 +232,21 @@ if [ "$1" = "--root" ]; then
     # ugh, how complicated
     if inpath sudo; then
 	if sudo -l >/dev/null 2>&1; then
-	    sudo "$HOME/bin/tpope" _root_installer $LOGNAME
+	    sudo "$HOME/bin/installer" --root-only $LOGNAME
 	else
 	    if [ -f /etc/sudoers ]; then
 		su -c "echo $LOGNAME ALL=(ALL) ALL >> /etc/sudoers"
 		echo "Adding to sudoers."
 		if sudo -l >/dev/null 2>&1; then
-		    sudo "$HOME/bin/tpope" _root_installer $LOGNAME
+		    sudo "$HOME/bin/tpope" --root-only $LOGNAME
 		else
-		    su -c "$HOME/bin/tpope _root_installer $LOGNAME"
+		    su -c "$HOME/bin/tpope --root-only $LOGNAME"
 		fi
 	    else
-		su -c "$HOME/bin/tpope _root_installer $LOGNAME"
+		su -c "$HOME/bin/tpope --root-only $LOGNAME"
 	    fi
 	fi
     else
-	su -c "$HOME/bin/tpope _root_installer $LOGNAME"
+	su -c "$HOME/bin/tpope --root-only $LOGNAME"
     fi
 fi
