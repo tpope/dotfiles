@@ -5,25 +5,78 @@
 # This does various tasks involved with moving in (such as setting up a crontab
 # and changing my login shell).
 
+[ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
+case "$PATH" in
+    "$HOME/bin:"*) ;;
+    *) PATH="$HOME/bin:$PATH" ;;
+esac
 hostname="`hostname|sed -e 's/[.].*//'`"
-
-if [ "$1" = "--cron" ]; then exec >/dev/null; shift; fi
 inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
 
-if [ "$1" = "--root-only" ]; then
-	[ "$2" ] || exit 1
+if [ "x$1" = "x--cron" -o "x$1" = "x--quiet" ]; then
+    quiet=1; exec >/dev/null; shift
+fi
+
+if [ ! -f "$HOME/. tpope" ]; then
+    case "`id`" in
+	'uid=1000(tpope)'*) touch "$HOME/.install-root" ;;
+	*) touch "$HOME/.autodl" ;;
+    esac
+fi
+
+if [ "x$1" = "x--root-only" -a -n "$2" ]; then
+	u="$2"
 	PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
-	for group in adm src dip dialout floppy cdrom video audio disk; do
-	    line="`grep ^$group: /etc/group`"
+	for group in adm src dip dialout floppy cdrom video audio disk camera; do
+	    line="`getent group $group 2>/dev/null || grep ^$group: /etc/group`"
 	    case "$line" in
 		'') ;;
-		*"$2"*) ;;
-		*) adduser "$2" $group >/dev/null 2>&1 && didgroup=1 ;;
+		*"$u"*) ;;
+		*) adduser "$u" $group >/dev/null 2>&1 && didgroup=1 ;;
 	    esac
 	done
 	[ -z "$didgroup" ] || echo "Added to groups."
-    exit 0
+	if [ -d /root/Trash -a ! -f /root/.libtrash ]; then
+	    ln -s "$HOME/.libtrash" /root/.libtrash
+	    rm -rf /root/Trash
+	    didroot=1
+	fi
+	[ -z "$didroot" ] || echo "Did root related tasks."
+	[ ! -f "$HOME/.install-root" ] || touch "$HOME/.install-root"
+	exit 0
 fi
+
+if [ "$1" = "--root" -o "$1" = "--root-only" ] && [ -n "$LOGNAME" ]; then
+    # ugh, how complicated
+    if [ -n "$quiet" -o ! -t 0 ]; then
+	if inpath sudo && sudo -l >/dev/null 2>&1; then
+	    sudo -p '' -S "$HOME/bin/installer" --root-only $LOGNAME </dev/null 2>/dev/null
+	fi
+    elif inpath sudo; then
+	if sudo -l >/dev/null 2>&1; then
+	    sudo "$HOME/bin/installer" --root-only $LOGNAME
+	else
+	    if [ -f /etc/sudoers ]; then
+		su -c "echo $LOGNAME 'ALL=(ALL)' ALL >> /etc/sudoers"
+		echo "Adding to sudoers."
+		if sudo -l >/dev/null 2>&1; then
+		    sudo "$HOME/bin/installer" --root-only $LOGNAME
+		else
+		    su -c "$HOME/bin/installer --root-only $LOGNAME"
+		fi
+	    else
+		su -c "$HOME/bin/installer --root-only $LOGNAME"
+	    fi
+	fi
+    else
+	su -c "$HOME/bin/installer --root-only $LOGNAME"
+    fi
+fi
+
+if [ "x$1" = "x--root-only" ]; then
+    exit
+fi
+
 if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
     touch "$HOME/. tpope"
     chmod 0000 "$HOME/. tpope"
@@ -31,6 +84,25 @@ if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
 fi
 if [ ! -f "$HOME/.hushlogin" ]; then
     touch "$HOME/.hushlogin"
+    hidden=1
+fi
+if [ ! -f "$HOME/.imaprc" ]; then
+    cat > "$HOME/.imaprc" <<-EOF
+	I accept the risk
+	set mail-subdirectory Mail
+	EOF
+    hidden=1
+fi
+if inpath cvs && [ ! -f "$HOME/.cvsrc" ]; then
+    cat > "$HOME/.cvsrc" <<-EOF
+	# ~/.cvsrc
+	cvs -z2
+	update -dP
+	tag -c
+	diff -uN
+	rdiff -u
+	release -d
+	EOF
     hidden=1
 fi
 if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
@@ -43,6 +115,84 @@ if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
 	slang=en
 	framedrop=yes
 	input=file=$HOME/.mplayer/mplayer
+	EOF
+    hidden=1
+fi
+if inpath dcop && [ ! -f "$HOME/.kde/share/config/kdeglobals" ]; then
+    mkdir -p "$HOME/.kde/share/config"
+    cat > "$HOME/.kde/share/config/kdeglobals" <<-EOF
+	[General]
+	TerminalApplication=\$HOME/bin/x-terminal-emulator
+	
+	[Paths]
+	Trash=\$HOME/.trash/
+	EOF
+    hidden=1
+fi
+if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
+    globalcfg="`lynx -dump lynxcfg: 2>/dev/null|sed -ne '/^References/,$p'|grep 'file://localhost/'|tail -1|sed -e 's,.*file://localhost,,'`"
+    [ -n "$globalcfg" ] || \
+    for f in /usr/local/lib/lynx.cfg /usr/local/etc/lynx.cfg /etc/lynx.cfg; do
+	[ ! -f "$f" ] || globalcfg="$f"
+    done
+    cat > "$HOME/.lynx.cfg" <<-EOF
+	# ~/.lynx.cfg
+	INCLUDE:$globalcfg
+	ACCEPT_ALL_COOKIES:TRUE
+	DEFAULT_EDITOR:sensible-editor
+	DEFAULT_USER_MODE:INTERMEDIATE
+	EMACS_KEYS_ALWAYS_ON:TRUE
+	EXTERNAL:http:sensible-browser %s:TRUE
+	EXTERNAL:file:sensible-browser %s:TRUE
+	SAVE_SPACE:~/dl
+	STARTFILE:http://www.sexygeek.org/home
+	EOF
+    hidden=1
+fi
+if inpath elinks && [ ! -d "$HOME/.elinks" ]; then
+    mkdir "$HOME/.elinks"
+    cat > "$HOME/.elinks/elinks.conf" <<-EOF
+	# ~/.elinks/elinks.conf
+	set terminal.xterm.colors = 1
+	set terminal.Eterm.colors = 1
+	set terminal.screen.colors = 1
+	set terminal.screen.block_cursor = 1
+	set terminal.screen.underline = 1
+	set terminal.screen.type = 1
+	set document.colors.use_document_colors = 1
+	set document.colors.vlink = "fuchsia"
+	set document.download.directory = "~/dl"
+	set document.plain.display_links = 1
+	EOF
+    hidden=1
+elif inpath links && [ ! -d "$HOME/.links" -a ! -d "$HOME/.elinks" ]; then
+    mkdir "$HOME/.links"
+    cat > "$HOME/.links/links.cfg" <<-EOF
+	# ~/.links/links.cfg
+	terminal "xterm" 0 0 1 us-ascii
+	terminal "Eterm" 0 0 1 us-ascii
+	terminal "screen" 0 0 1 us-ascii
+	download_dir "~/dl"
+EOF
+    hidden=1
+fi
+if inpath konqueror && [ ! -f "$HOME/.kde/share/config/konquerorrc" ]; then
+    mkdir -p "$HOME/.kde/share/config"
+    cat > "$HOME/.kde/share/config/konquerorrc" <<-EOF
+	[FMSettings]
+	AlwaysNewWin=false
+	AlwaysTabbedMode=true
+	HomeURL=http://www.sexygeek.org/home
+	KonquerorTabforExternalURL=true
+	MMBOpensTab=true
+	NewTabsInFront=false
+	OpenAfterCurrentPage=true
+	PopupsWithinTabs=true
+	TabCloseActivatePrevious=true
+	
+	[KonqMainWindow Toolbar bookmarkToolBar]
+	IconSize=16
+	IconText=IconTextRight
 	EOF
     hidden=1
 fi
@@ -97,14 +247,14 @@ if [ ! -d "$HOME/dl" ]; then
 	ln -s dl "$HOME/downloads"
 	chmod 0755 "$HOME/dl"
 	directories=1
-    elif [ -d "$HOME/.mozilla" -o -d "$HOME/.irssi" ]; then
+    elif [ -d "$HOME/.mozilla" -o -f "$HOME/.lynx.cfg" ]; then
 	mkdir "$HOME/dl"
 	chmod 0755 "$HOME/dl"
 	directories=1
     fi
 fi
 [ -z "$directories" ] || echo "Creating directories."
-for dir in .firefox/default .phoenix/default .mozilla/default .mozilla/$LOGNAME .mozilla/firefox; do
+for dir in .firefox/default .phoenix/default .mozilla/default .mozilla/$LOGNAME .mozilla/firefox .galeon/mozilla; do
     [ -d "$HOME/$dir" ] || continue
     if [ -f "$HOME/$dir/profiles.ini" ]; then
 	subdirs="`cat "$HOME/$dir/profiles.ini"|grep '^Path='|sed -e 's/^Path=//'`"
@@ -196,6 +346,7 @@ if [ "$cron" = 0 -o "$cron" = n ]; then
     cat >/tmp/crontab.template.$$ <<EOF
 # -*- crontab -*- vim:set ft=crontab:
 # crontab for $LOGNAME@$hostname
+CRON=1
 SHELL=$shell
 $env=$HOME/.shrc
 CLASSPATH=.:$HOME/.java:$HOME/java
@@ -226,27 +377,5 @@ if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null; then
     else
 	echo "Changing login shell."
 	chsh -s "$zsh"
-    fi
-fi
-if [ "$1" = "--root" ]; then
-    # ugh, how complicated
-    if inpath sudo; then
-	if sudo -l >/dev/null 2>&1; then
-	    sudo "$HOME/bin/installer" --root-only $LOGNAME
-	else
-	    if [ -f /etc/sudoers ]; then
-		su -c "echo $LOGNAME ALL=(ALL) ALL >> /etc/sudoers"
-		echo "Adding to sudoers."
-		if sudo -l >/dev/null 2>&1; then
-		    sudo "$HOME/bin/tpope" --root-only $LOGNAME
-		else
-		    su -c "$HOME/bin/tpope --root-only $LOGNAME"
-		fi
-	    else
-		su -c "$HOME/bin/tpope --root-only $LOGNAME"
-	    fi
-	fi
-    else
-	su -c "$HOME/bin/tpope --root-only $LOGNAME"
     fi
 fi
