@@ -24,7 +24,7 @@ if ! xauth list "$hname$dpy" >/dev/null; then
     echo "Warning: $hname$dpy not found in xauth list!" >&2
 fi
 
-if /sbin/ifconfig | grep '172\.28\.6' >/dev/null; then
+if /sbin/ifconfig 2>/dev/null | grep '172\.28\.6' >/dev/null; then
     for host in $hosts; do
 	xauth -i extract - $hname$dpy | ssh -axqoBatchmode=yes $host xauth merge - &
     done
@@ -58,7 +58,7 @@ export ESPEAKER RPLAY_HOST WINDOW_MANAGER
 hostname="`hostname|sed -e 's/[.].*//'`"
 if [ ! -f "$HOME/. tpope" ]; then
     echo 'Performing an initial "tpope install"'
-    "$HOME/bin/tpope" install
+    tpope installer
 fi
 tpope cron --login
 
@@ -74,9 +74,19 @@ fi
 
 wait
 
-[ ! -x "`which xscreensaver 2>/dev/null`" ] || nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
+if [ -x "`which xscreensaver 2>/dev/null`" ]; then
+    nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
+    case "$hname$dpy" in mona:0|lisa:0|homer:0|sarah:0)
+	(xscreensaver-command -watch|while read trash; do
+	    case "$trash" in
+		BLANK*|LOCK*|UNBLANK*) tpope status check "$hname" ;;
+	    esac
+	done
+	) >/dev/null 2>&1 & ;;
+    esac
+fi
 #[ ! -x "`which btcid-launch 2>/dev/null`" ] || btcid-launch
-[ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 &
+[ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
 [ ! -x "`which imwheel 2>/dev/null`" ] || imwheel -k -b 000067 2>/dev/null &
 [ ! -f "$HOME/.lircrc" ] || irexec &
 [ ! -f "$HOME/.lircrc" ] || irxevent &
@@ -85,14 +95,16 @@ wait
 
 xsetroot -solid '#002020'
 
+tpope status rehash
+
 [ -f "$HOME/.xsession.local" ] && . "$HOME/.xsession.local"
 
 #if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
 #    exec $sshagent gnome-session
 #fi
 
-for wm in fvwm2 startkde blackbox wmaker afterstep enlightenment mwm twm xterm; do
-    [ -x "`which $wm`" ] && exec $sshagent $wm
+for wm in fvwm2 icewm startkde fluxbox enlightenment mwm twm xterm; do
+    [ -x "`which $wm 2>/dev/null`" ] && exec $sshagent $wm
 done
 
 #echo "Could not launch a window manager.  Aborting..." >&2
