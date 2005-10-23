@@ -15,6 +15,8 @@ else
     [[ $words[1] = link ]] && words[1]=rclink
     [[ $words[1] = sursync ]] && words[1]=rsync
     [[ $words[1] = tomorrow ]] && words[1]=today
+    [[ $words[1] = mpl ]] && words[1]=mplayer
+    [[ $words[1] = mpa ]] && words[1]=mplayer
     [[ $words[1] = pg || $words[1] = ps-grep ]] && words[1]=grep
     [[ $words[1] = launch ]] && shift words && (( CURRENT-- ))
     _normal
@@ -29,24 +31,19 @@ x-terminal-emulator)
 xauth-get)
     _hosts ;;
 sync-tpope)
-    case $words[CURRENT-1] in
-    -a) _tar_archive cf ;;
-    -z) _tar_archive cz ;;
-    -j) _tar_archive cj ;;
-    *)
     _arguments \
-	'-g[following should get GUI files]' \
-	'-G[following should not get GUI files]' \
-	'-t[following hosts are trusted]' \
-	'-T[following hosts are not trusted]' \
-	'-s[add simpson hosts]' \
-	'-a[archive to tar]' \
-	'-z[archive to tar.gz]' \
-	'-j[archive to tar.bz2]' \
-	'-A[pipe over ssh]' \
-	'-Z[pipe gzipped over ssh]' \
-	':host:_hosts'
-	;;
-    esac
+	'(-a -z -j -c -d)-g[following should get GUI files]' \
+	'(-a -z -j -c -d)-G[following should not get GUI files]' \
+	'(-a -z -j -c -d)-t[following hosts are trusted]' \
+	'(-a -z -j -c -d)-T[following hosts are not trusted]' \
+	'(-a -z -j -c -d)-s[add simpson hosts]' \
+	'(* -a -z -j -c -d)-a[archive to tar]:archive file: _tar_archive x' \
+	'(* -a -z -j -c -d)-z[archive to tar.gz]:archive file:_tar_archive xz' \
+	'(* -a -z -j -c -d)-j[archive to tar.bz2]:archive file:_tar_archive xj' \
+	'(-a -z -j -c -d)-A[pipe over ssh]' \
+	'(-a -z -j -c -d)-Z[pipe gzipped over ssh]' \
+	'-c[commit files to cvs]:*:files:_files -W ~' \
+	'-d[diff files in cvs]:*:files:_files -W ~' \
+	'*:host:_hosts'
     ;;
 esac
