@@ -17,7 +17,7 @@ video/*; mplayer '%s'; description="Video"; needsterminal; test=test -t 0
 audio/*; mplayer '%s'; description="Audio"; needsterminal; test=test -t 0
 video/*; gmplayer '%s'; description="Video"; test =test -n "$DISPLAY"
 audio/*; xmms '%s'; description="Audio"; test =test -n "$DISPLAY"
-image/*; feh -Z '%s'; edit=gimp '%s'; description=Image; test=test -n "$DISPLAY"
+image/*; feh -Z '%s'; edit=gimp-remote '%s'; description=Image; test=test -n "$DISPLAY"
 image/*; xv '%s';  description="Image"; test=test -n "$DISPLAY"
 image/*; anytopnm '%s' > '%s.pnm' && aview -driver curses '%s.pnm' && rm -f '%s.pnm';  description="Image"; needsterminal
 image/*; anytopnm '%s' | pnmscale -xysize 80 46 | ppmtopgm | pgmtopbm | pbmtoascii -1x2 2>&1 ; copiousoutput
