@@ -48,7 +48,7 @@ case $TERM in
 screen*|vt220*)
     PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e s,$HOME,~,`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${hostname}"'\033\\"'
 ;;
-xterm*|rxvt*|kterm*|dtterm*)
+xterm*|rxvt*|kterm*|dtterm*|cygwin*)
     # If this is an xterm set the title to user@host:dir [tty]
     PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${LOGNAME}@${hostname}"':`echo ${PWD}|sed -e s,$HOME,~,`'"${ttyslash}"'\007"'
     ;;

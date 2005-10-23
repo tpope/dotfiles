@@ -41,7 +41,7 @@ prompt_simpson_setup () {
 	[ $UID = '0' ] && usercolor="$fg_bold[white]"
 	#if [ "$TERM" = "linux" -o "$TERM" = "xterm" -o "$TERM" = "screen" -o "$TERM" = "screen-w" -o "$TERM" = "Eterm" ]
 	case "$TERM" in
-	linux*|screen*|xterm*|rxvt*|kterm*|Eterm*|dtterm*|vt220*)
+	linux*|screen*|xterm*|rxvt*|kterm*|Eterm*|dtterm*|vt220*|cygwin*)
 		PROMPT="%{$usercolor%}%n%{$reset_color%}@%{$hostcolor%}%m%{$reset_color%}:%{$fg_bold[blue]%}%20<...<%~%<<%{$reset_color%}%{$reset_color%}%# "
 		;;
 	*)

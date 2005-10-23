@@ -30,9 +30,10 @@ TERM rxvt
 TERM screen
 TERM screen-w
 TERM screen.linux
-TERM vt100
+#TERM vt100
 TERM Eterm
 TERM Eterm-xterm
+TERM cygwin
 
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
@@ -179,6 +180,7 @@ EXEC 01;32
 .so 00;33
 .o 00;33
 .a 00;33
+.dll 00;33
 
 # data and help files
 .dat 00;35
