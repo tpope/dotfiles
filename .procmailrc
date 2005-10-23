@@ -33,7 +33,7 @@ MAILDIR=$HOME/Mail
 :0 fw
 * < 256000
 #* Received: from pop\.pi\.sbcglobal\.net
-* ^Received: from (pop-sbc-.*\.yahoo\.com|pop\.hotpop\.com)
+* ^Received: from (pop-sbc-.*\.yahoo\.com|pop-sbc\.mail.*|pop\.hotpop\.com)
 | $HOME/bin/spamfilter
 
 # Work around procmail bug: any output on stderr will cause the "F" in "From"
@@ -49,7 +49,7 @@ MAILDIR=$HOME/Mail
 }
 
 :0
-* ^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*\*\*
+* ^X-Spam-Level: \*\*\*\*\*\*\*\*\*\*
 definitely-spam
 
 # All mail tagged as spam (eg. with a score higher than the set threshold)
@@ -64,9 +64,9 @@ spam
 
 # Mailing lists
 
-#:0
-#* ^Subject: .*\[Zaurus-general\]
-#zaurus
+:0
+* ^To: .*STUDENTS@tamuk\.edu
+tamuk
 
 :0
 * ^X-BeenThere: debian-knoppix@linuxtag\.org
