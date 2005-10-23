@@ -26,6 +26,7 @@ setenv CVS_RSH 'ssh'
 unset dir
 
 limit maxproc 256 >&/dev/null
+if ($?CRON == 1) limit maxproc 128 >&/dev/null
 
 if ( $?prompt == 0 ) exit
 if ( "$prompt" == "" ) exit
@@ -34,13 +35,14 @@ if ( "$prompt" == "" ) exit
 umask 022
 stty -ixon
 
-setenv VISUAL 'vi'
-setenv PAGER 'less'
+setenv VISUAL "$HOME/bin/sensible-editor"
+setenv PAGER "$HOME/bin/sensible-pager"
 setenv BROWSER "$HOME/bin/sensible-browser"
 setenv LESSOPEN '|lesspipe %s'
 set hostname = `hostname|sed -e 's/[.].*//'`
 setenv CVSROOT ':ext:rebelongto.us:/home/tpope/.cvs'
 if ( $hostname == bart ) setenv CVSROOT "$HOME/.cvs"
+setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
 # }}}
@@ -92,6 +94,7 @@ if ( $?tcsh ) then
     case rxvt*:
     case kterm*:
     case dtterm*:
+    case cygwin*:
 	alias precmd 'echo -n "]1;'"i${ttydash}${hostname}"']2;'"${USER}@${hostname}"':`echo $cwd|sed -e s,^$HOME,~,`'"${ttyslash}"'"'
 	#alias jobcmd 'echo -n "]2\;\!#"'
 	set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
@@ -159,18 +162,15 @@ alias j 'jobs'
 
 if ( -x /usr/bin/vim || -x /usr/local/bin/vim || -x /opt/sfw/bin/vim ) then
     alias vi 'vim'
-    setenv VISUAL 'vim'
 endif
 
 if ( -x /usr/bin/gvim || -x /usr/local/bin/gvim || -x /opt/sfw/bin/gvim ) then
     alias vi 'vim -X'
-    setenv VISUAL 'vim -X'
 endif
 
 if ( `uname` == Linux ) then
     alias less 'less -R'
     alias zless 'zless -R'
-    setenv PAGER 'less -R'
     setenv LESSCHARSET 'iso8859'
 endif
 
