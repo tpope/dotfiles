@@ -26,7 +26,7 @@ set nopgp_autosign
 set pgp_replysignencrypted
 set pgp_timeout=900
 set realname="Tim Pope"
-`if mutt -v|head -1|egrep '1.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
+`if mutt -v|head -1|egrep '1.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(kstrp00|timothy.pope)@tamuk\.edu|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
 set reverse_name
 set reverse_realname
 set query_command="lbdbq %s 2>/dev/null"
@@ -54,10 +54,11 @@ unignore Date User-Agent X-Mailer
 ignore Envelope-to X-OriginalArrivalTime X-ClientAddr X-Originating-IP X-UID
 ignore Importance X-Keywords Delivery-date X-Apparently-To X-Apparently-From
 ignore X-Authentication-Info List- Mailing-List X-IMAPbase Old-Content-Type
-ignore X-Message-Info X-gotmail-version X-Virus-Scanned
+ignore X-Message-Info X-gotmail-version X-Virus-Scanned Authentication-Results
 ignore X-Spam-Flag X-Spam-Level X-Spam-Checker-Version X-Spam-Prev
 ignore X-All-Your-Base-Are-Belong-To X-BFI X-HotPOP-Delivered-To X-Return-Path
 ignore X-eGroups- X-Yahoo-Profile X-Juno-Line-Breaks X-Mailman- X-BeenThere
+ignore X-YahooFilteredBulk X-Header-Overseas X-Header-NoReverseIP
 ignore Return-Path Message-ID Received Mime-Version Content-Disposition
 ignore Content-Type Content-Length Status Lines "From "
 
@@ -74,14 +75,14 @@ bind generic 0 next-page
 # Section: Macros {{{1
 # --------------------
 macro generic <f12> "<shell-escape>[ -z \"$STY\" ] || screen\n"
-macro pager \ef "<enter-command>set nopipe_decode\n<pipe-message>sed -ne '/\^X-Face:/,/\^[\^ \\t]/ p'|sed -ne 's/\^X-Face://' -e '/\^[ \\t]/ p'|sed -e 's/\^[ \\t]\+//'|{ echo '/* Width=48, Height=48 */'; uncompface; }|icontopbm|{ xli -fork -title 'X-Face' stdin || aview; }\n<enter-command>set nopipe_decode" "Show X-Face"
+macro pager \ef "<enter-command>set nopipe_decode\n<pipe-message>sed -ne '/\^X-Face:/,/\^[\^ \\t]/ p'|sed -ne 's/\^X-Face://' -e '/\^[ \\t]/ p'|sed -e 's/\^[ \\t]\+//'|{ echo '/* Width=48, Height=48 */'; uncompface; }|icontopbm|{ xli -fork -title 'X-Face' stdin || aview; }\n<enter-command>set nopipe_decode\n" "Show X-Face"
 macro pager \cb "<enter-command>set pipe_decode\n<pipe-message>urlview\n<enter-command>set nopipe_decode\n" 'call urlview to extract URLs out of a message'
-macro index \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
-macro index \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
-macro index \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
-macro pager \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
-macro pager \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
-macro pager \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --norebuild\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
+#macro index \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
+macro pager \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
+#macro index \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
+macro pager \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
+#macro index \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
+macro pager \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
 
 # Section: Hooks {{{1
 # -------------------
