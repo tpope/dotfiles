@@ -1,21 +1,16 @@
 # ~/.fvwm/FvwmScript-Time
 # $Id$
 
-WindowTitle {FvwmScript-Status}
-WindowSize 112 16
-BackColor {PaleTurquoise}
-#ShadowColor {PaleTurquoise}
-#HilightColor {PaleTurquoise}
+WindowTitle {FvwmScript-Hidden}
+WindowSize 72 16
 ForeColor {Black}
 
 # the following should be commented out if the Calendar is used outside
 # of FvwmButtons
-WindowPosition 30000 30000
+WindowPosition -71 -15
 
 Init
  Begin
-  Set $font =(GetOutput {exec echo "$fvwm_datefont"} 1 -1)
-  ChangeFont 1 $font
   Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
   ChangeTitle 1 $date
  End

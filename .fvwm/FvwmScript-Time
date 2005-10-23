@@ -1,24 +1,18 @@
 # ~/.fvwm/FvwmScript-Time
 # $Id$
 
-WindowTitle {FvwmScript-Status}
+WindowTitle {FvwmScript-Hidden}
 WindowSize 46 22
-BackColor {PaleTurquoise}
-#ShadowColor {PaleTurquoise}
-#HilightColor {PaleTurquoise}
 ForeColor {Black}
 
 # the following should be commented out if the Calendar is used outside
 # of FvwmButtons
-WindowPosition 30000 30000
+WindowPosition -45 -21
 
 Init
  Begin
-  Set $font =(GetOutput {exec echo "$fvwm_datefont"} 1 -1)
-  ChangeFont 2 $font
   Set $font =(GetOutput {exec echo "$fvwm_alertfont"} 1 -1)
   ChangeFont 1 $font
-  Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
   Set $time =(GetOutput {exec date '+%R'} 1 -1)
   If (RemainderOfDiv (GetTime) 60)<10 Then
    Set $seconds ={:0} (RemainderOfDiv (GetTime) 60)
@@ -29,17 +23,15 @@ Init
 
 PeriodicTasks
  Begin
-  If (RemainderOfDiv (GetTime) 60)==0 Then
+  If (RemainderOfDiv (GetTime) 30)==0 Then
    Set $time =(GetOutput {exec date '+%R'} 1 -1)
-  If (RemainderOfDiv (GetTime) 600)==0 Then
-   Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
   If (RemainderOfDiv (GetTime) 60)<10 Then
    Set $seconds ={:0} (RemainderOfDiv (GetTime) 60)
   Else
    Set $seconds ={:} (RemainderOfDiv (GetTime) 60)
   ChangeTitle 2 $seconds
-  If (RemainderOfDiv (GetTime) 60)==0 Then
-  ChangeTitle 1 $time
+  If (RemainderOfDiv (GetTime) 30)==0 Then
+   ChangeTitle 1 $time
  End
 
 Widget 1

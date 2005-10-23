@@ -3,7 +3,7 @@ $siteInfo->{"sexygeek"} = {
 	'host' => "www.sexygeek.org",
 	'path' => "/?q=node/feed",
 	'func' => \&processSexyGeek,
-	'flds' => 'title, link, description, pubDate',
+	'flds' => 'title, link, description, category, pubDate',
 };
 
 sub processSexyGeek () {

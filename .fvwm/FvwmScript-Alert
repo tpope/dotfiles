@@ -1,14 +1,11 @@
 # ~/.fvwm/FvwmScript-Alert
 # $Id$
 
-WindowTitle {FvwmScript-Status}
+WindowTitle {FvwmScript-Hidden}
 WindowSize 40 22
-BackColor {PaleTurquoise}
-#ShadowColor {PaleTurquoise}
-#HilightColor {PaleTurquoise}
 ForeColor {Black}
 
-WindowPosition 30000 30000
+WindowPosition -39 -21
 
 Init
  Begin
@@ -78,14 +75,15 @@ PeriodicTasks
     Set $newtitle =$apm {%}
     Set $newforecolor =Red
    End
+   Set $wistrength =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
    If $newtitle=={} Then
    Begin
-    Set $newtitle =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
+    Set $newtitle =$wistrength
     Set $newforecolor =Brown
    End
    If $newtitle=={--°} Then
    Begin
-    Set $newtitle =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
+    Set $newtitle =$wistrength
     Set $newforecolor =Brown
    End
    If $newtitle==$title Then
