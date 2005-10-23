@@ -14,6 +14,10 @@
 # configuration files.
 
 [ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
+case "$PATH" in
+    "$HOME/bin:"*) ;;
+    *) PATH="$HOME/bin:$PATH" ;;
+esac
 
 basename="`basename $0`"
 if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
@@ -93,38 +97,37 @@ do_clean() {
 	    shift
 	else
 	    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
-		    xargs -r0 rmdir >/dev/null 2>&1; }
+		    xargs -0 rmdir >/dev/null 2>&1; }
 	    if inpath wipe; then
 		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-			xargs -r0 wipe -fcsq >/dev/null 2>&1; }
+			xargs -0 wipe -fcsq >/dev/null 2>&1; }
 	    else
 		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-			xargs -r0 rm >/dev/null 2>&1; }
+			xargs -0 rm >/dev/null 2>&1; }
 	    fi
 	fi
 	case "$1" in
-	    1|2|3|4|5) unit=$1 ;;
-	    '') unit=4 ;;
-	    *) echo "Usage: $tpope$basename [-v] [1-5]" >&2; exit 1 ;;
+	    1|2|3|4) unit=$1 ;;
+	    5) unit=4 ;;
+	    '') unit=2 ;;
+	    *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
 	esac
 	unset LD_PRELOAD
 	PROTECT_TRASH=NO
 	export PROTECT_TRASH
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 30` -o -user root -ctime +1 \)
-	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 30`
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
+	FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
+	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30`
+	[ $unit = 4 ] && unit=6
 	FIND "$HOME/.trash" -atime +`expr $unit \* 15`
-	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 360` \( -size +8192k -o -name '*.jpg' \)
-	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* 5` -size +65536k
-	FINDDIR "$HOME/.trash" -mtime +`expr $unit \* 1` -empty
+	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
+	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
+	FINDDIR "$HOME/.trash" -atime +`expr $unit \* 1` -empty
 	if [ ! -d "$HOME/.trash" ]; then
 	    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
 	fi
-	rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit"
+	rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/simpson/abe"
 	return 0
-}
-
-do_install() {
-    "$HOME/bin/installer" "$@"
 }
 
 display_manage() {
@@ -148,10 +151,35 @@ display_manage() {
     return $?
 }
 
+status() {
+    if [ "$#" = 0 -a -f "$HOME/.status" ]; then
+	exec cat "$HOME/.status"
+    fi
+    if [ "$hostname" = marge ]; then
+	if [ "$1" = away -o "$1" = activity ] && [ "$#" = 1 ]; then
+	    exec cat "$HOME/.$1" 2>/dev/null
+	fi
+	case "$1" in
+	    '') exit 1 ;;
+	    away|activity|out|check) away-tpope "$@" ;;
+	    rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
+	    *) echo "Unknown status command $1" >&2 ;;
+	esac
+    elif ping -c 1 marge >/dev/null 2>&1; then
+	if [ "$#" = 2 -a -z "$2" ]; then
+	    exec hostinfo -b marge tpope status "$1" -c
+	else
+	    exec hostinfo -b marge tpope status "$@"
+	fi
+    else
+	exit 2
+    fi
+}
+
 case "$basename" in
 
     aliases)
-	aliases="launch lt lv dm pg sb sursync ruptime rwho \
+	aliases="launch lt lv dm pg sb sursync ruptime rwho status \
 	rclink rc start stop restart reload force-reload \
 	tomorrow vnc xssc mpl mpa mount shutdown whois char \
 	word ord wor or Word Ord Wor Or"
@@ -161,27 +189,12 @@ case "$basename" in
 	echo $aliases
 	exit 0 ;;
     
-    rehash) if [ "$hostname" = marge ]; then
-	pkill -HUP away-tpope 2>/dev/null || away-tpope -d
-    else
-	exec hostinfo -S marge -ax tpope $basename
-    fi ;;
-    activity|away|out|status)
-	if [ "$hostname" != marge ] && ping -c 1 marge >/dev/null 2>&1; then
-	    [ "$#" = 1 -a -z "$1" ] && exec hostinfo -S marge -ax tpope $basename -c
-	    exec hostinfo --batch-ssh marge tpope $basename "$@"
-	elif [ "$#" = 0 ]; then
-	    [ "$basename" = out ] && basename=away
-	    cat "$HOME/.$basename" 2>/dev/null
-	    exit
-	elif [ -x "$HOME/bin/away-tpope" -a $basename != status ]; then
-	    exec away-tpope $basename "$@"
-	else
-	    exit 2
-	fi
-	;;
+    status) status "$@" ;;
+    rehash|activity|away|out|check) status $basename "$@" ;;
 
     char) case "$1" in
+	\') echo 39 ;;
+	\\) echo 92 ;;
 	?) perl -e 'print ord('"'$1'"'), "\n"' ;;
 	[0-9]?*) perl -e 'print chr('"$1"'), "\n"' ;;
 	*) exit 1 ;;
@@ -204,7 +217,13 @@ case "$basename" in
 	    # -maxdepth, such as busybox
 	    exit 0
 	fi
-	do_install >/dev/null; do_clean 5
+	installer --cron
+	find "$HOME" -maxdepth 1 -name .install-root -mtime +15 -exec installer --cron --root-only \;
+	cl=4
+	for i in `df|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
+	    [ "$i" -gt 90 ] && cl=3
+	done
+	do_clean $cl
 	find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'sync-tpope -W && touch "$HOME/.autodl"' \; 2>/dev/null
 	touch "$HOME/. tpope"
     ;;
@@ -300,18 +319,12 @@ case "$basename" in
     sensible-browser|sb) exec "$HOME/bin/sensible-browser" "$@" ;;
     sensible-pager|sp)
 	term=exec
-	if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" ]; then
+	if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" ]; then
 	    term="x-terminal-emulator -title Pager -e"
-	    if [ -z "$1" -o "$1" = - ]; then
+	    if [ -z "$1" -o "x$1" = x- ]; then
 		tempfile=/tmp/sensible-pager.$$
 		cat > $tempfile
-		#if inpath lesspipe; then
-		#    echo FUCK >&2
-		#    lesspipe $tempfile > $tempfile.2
-		#    [ -s $tempfile.2 ] && mv $tempfile.2 $tempfile
-		#    rm -f $tempfile.2
-		#fi
-		[ "$1" = - ] && shift
+		[ "x$1" = x- ] && shift
 	    fi
 	fi
 	if inpath less; then
@@ -370,7 +383,7 @@ case "$basename" in
 
     libtrash|lt) try_libtrash "$@" ;;
 
-    install|installer) do_install "$@" ;;
+    install|installer) installer "$@" ;;
 
     soffice)
 	if [ ! -d "$HOME/.openoffice" ]; then
@@ -393,7 +406,12 @@ case "$basename" in
     done
     args=-uCP
     [ "$basename" = suscp ] && args=-P
-    exec sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
+    sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
+    ret="$?"
+    if [ "$ret" = 0 ]; then
+	nice find "$HOME" -maxdepth 1 -name .install-root -mtime +1 -exec installer --quiet --root-only \; &
+    fi
+    exit "$ret"
     ;;
 
     sync-tpope|sync) if [ "$#" = 0 ]; then
@@ -474,7 +492,7 @@ case "$basename" in
 	export DISPLAY
 	xset=xset
 	[ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-	xscreensaver-command -version >/dev/null||exit 1
+	xscreensaver-command -version >/dev/null 2>/dev/null ||exit 1
 	if xscreensaver-command -time 2>/dev/null|egrep 'locked' >/dev/null; then
 	    dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
 	    [ "$dpms" = on ] && $xset dpms force standby
@@ -500,6 +518,11 @@ case "$basename" in
     apt-get) no_links
 	case "$1" in
 	    source) exec "$basename" "$@" ;;
+	    install) root_init; as_root "$basename" "$@"
+		ret="$?"
+		[ "$ret" != 0 ] || installer --quiet &
+		exit $ret
+		;;
 	    *) root_init; as_root exec "$basename" "$@" ;;
 	esac ;;
     cardctl) no_links
@@ -521,7 +544,13 @@ case "$basename" in
 	    exec rubber *.tex
 	else
 	    exec rubber
-	fi;;
+	fi ;;
+    see) no_links;
+	if [ -f "$*" ]; then
+	    exec see "$*"
+	else
+	    exec see "$@"
+	fi ;;
     xdvi) no_links
 	[ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
     xpdf) no_links
