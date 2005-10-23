@@ -1,4 +1,4 @@
-! ~/.Xdefaults
+! ~/.Xresources
 ! $Id$
 ! vim600: foldmethod=marker
 
@@ -63,6 +63,11 @@ XTerm*colorBDMode: true
 XTerm*colorBD: #ffffff
 XTerm*cursorColor: #cccccc
 #if WIDTH > 1150
+XTerm*font: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
+XTerm*boldFont: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
+XTerm*font3: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm*fontMenu*font3*Label: Normal
+#elif WIDTH < 800
 XTerm*font: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
 XTerm*boldFont: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
 XTerm*font3: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
@@ -158,8 +163,11 @@ Dtsession*waitWmTimeout: 1
 XConsole*file: /dev/xconsole
 XConsole*verbose: true
 XConsole*saveLines: 128
-XConsole*geometry: 364x225-72-168
+XConsole*geometry: 364x225-90-40
 XConsole*font: 5x7
+!## XFM {{{1
+Xfm*defaultEditor: sensible-editor
+Xfm*defaultViewer: sensible-pager
 !## CLOCK {{{1
 Clock*hour: red
 Clock*minute: blue
