@@ -13,7 +13,7 @@ FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
  .profile .bashrc .bash_profile .screenrc .terminfo .dir_colors \
  .vimrc .vim/colors .vim/after .vim/templates .vim/plugin .pixmaps/* \
- .muttrc .urlview .mailcap .procmailrc .imaprc .gnupg/gpg.conf \
+ .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
  .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js \
  .fvwm/.fvwm2rc .fvwm/icons/* .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
@@ -100,10 +100,15 @@ if [ -n "$web" ]; then
     webget="curl -m8 -s -o"
     [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO"
     rm -f "$wtarfile"
-    $webget "$wtarfile" http://www.sexygeek.org/tpope.tar.gz >/dev/null 2>&1 || exit 1
-    gzip -dc "$wtarfile"|tar -xf - -C "$HOME"
-    [ "$web" = 2 ] && rm "$wtarfile"
-    exit 0
+    if $webget "$wtarfile" http://www.sexygeek.org/tpope.tar.gz >/dev/null 2>&1; then
+	gzip -dc "$wtarfile"|tar -xf - -C "$HOME"
+	[ "$web" = 2 ] && rm "$wtarfile"
+	exit 0
+    else
+	echo Download failed >&2
+	[ "$web" = 2 ] && rm "$wtarfile"
+	exit 1
+    fi
 fi
 
 if [ -n "$tarball" ]; then
