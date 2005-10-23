@@ -3,4 +3,4 @@
 local expl
 
 _description files expl 'text file'
-_files "$expl[@]" -g "*.(#i)(txt|csv|tex|bib)"
+_files "$expl[@]" -g "*(#i)[^~]~*.(aux|bbl|blg|ent|log|toc|dvi|ps|pdf)"
