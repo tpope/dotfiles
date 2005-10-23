@@ -15,9 +15,11 @@ set pastetoggle=<F2>
 set nostartofline
 set splitbelow
 set list
+set visualbell
 set listchars=tab:»·,trail:·
 set wildmenu
 set wildmode=longest:full,full
+set backspace=2
 set showcmd     " Show (partial) command in status line.
 set showmatch   " Show matching brackets.
 set incsearch   " Incremental search
@@ -53,6 +55,7 @@ if has("dos16") || has("dos32") || has("gui_win32")
   set shell=bash
   set shellpipe=2>&1<BAR><SPACE>tee
   set shellslash
+  set guifont=Courier\ New:h11
 else
   " UNIX
 endif
@@ -225,6 +228,7 @@ autocmd BufNewFile */init.d/* if filereadable("/etc/init.d/skeleton") | 0r /etc/
  autocmd BufNewFile,BufRead *.cl[so]			set ft=tex
  autocmd BufNewFile,BufRead *.bbl			set ft=tex
  " autocmd BufNewFile,BufRead *.cfg			set ft=tex isk+=@
+ autocmd BufNewFile,BufRead /var/www/*.module		set ft=php
  autocmd BufNewFile,BufRead *named.conf*		set ft=named
  autocmd BufNewFile,BufRead *.bst			set ft=bst sw=2 sts=2 smartindent
  autocmd BufNewFile,BufRead,StdinReadPost *
@@ -233,11 +237,12 @@ autocmd BufNewFile */init.d/* if filereadable("/etc/init.d/skeleton") | 0r /etc/
 	\	|| getline(4) =~ '^!' || getline(5) =~ '^!') |
 	\   setf router |
 	\ endif
- autocmd FileType perl,php,sh,zsh,csh,c,cpp,vim,html,java set sw=4 sts=4 ai
+ autocmd FileType perl,php,sh,zsh,csh,c,cpp,vim,java set sw=4 sts=4 ai
+ autocmd FileType html,tex,css set sw=2 sts=2 ai
  autocmd FileType java set efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
  autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
- autocmd FileType html set isk+=:,~ sts=2 sw=2
- autocmd FileType tex set makeprg=latex\ \\\\nonstopmode\ \\\\input\\{$*\\} sw=2 sts=2 efm=%E!\ LaTeX\ %trror:\ %m,
+ autocmd FileType html set isk+=:,~
+ autocmd FileType tex set makeprg=latex\ \\\\nonstopmode\ \\\\input\\{$*\\} efm=%E!\ LaTeX\ %trror:\ %m,
 	\%+WLaTeX\ %.%#Warning:\ %.%#line\ %l%.%#,
 	\%+W%.%#\ at\ lines\ %l--%*\\d,
 	\%WLaTeX\ %.%#Warning:\ %m,
