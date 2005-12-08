@@ -1,6 +1,8 @@
-version 5.4
-" $Id$
-" vim:tw=70 sw=2 sts=2 et
+" Vim plugin
+" Maintainer:   Tim Pope <vim@rebelongto.us>
+" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/plugin/ztemplate.vim
+" Last Change:  2005 Dec 07
+" Version:      $Id$
 
 augroup ZTemplate
 
@@ -70,3 +72,4 @@ autocmd BufNewFile *.tex silent! %s/^\\title{\(.\)/\\title{\u\1/e | norm G{
 autocmd BufNewFile */[a-z][a-z][a-z][a-z][0-9][0-9][0-9][0-9]/* call FTSubstituteClassData()
 
 augroup END
+" vim:set ft=vim sts=2 sw=2:

@@ -1,12 +1,14 @@
 " Vim syntax file
-" Language:	A68k Assembler
-" Maintainer:	Tim Pope <tpope@hotpop.com>
-" Last Change:	2000 May 06
+" Language:     A68k Assembler
+" Maintainer:   Tim Pope <vim@rebelongto.us>
+" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/asm68a.vim
+" Last Change:  2005 Dec 07
+" Version:      $Id$
 
 " Remove any old syntax stuff hanging around
 if version < 600
   syn clear
-elseif exists("b:currentsyntax")
+elseif exists("b:current_syntax")
   finish
 endif
 

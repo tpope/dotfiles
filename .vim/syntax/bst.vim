@@ -1,77 +1,83 @@
 " Vim syntax file
-" Language:	BST configuration file
-" Maintainer:	Tim Pope <tpope@hotpop.com>
-" Last Change:	2003-Oct-03
+" Language:     BST configuration file
+" Maintainer:   Tim Pope <vim@rebelongto.us>
+" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/bst.vim
+" Last Change:  2005 Dec 07
+" Version:      $Id$
+
+" For version 5.x: Clear all syntax items
+" For version 6.x: Quit when a syntax file was already loaded
+if version < 600
+    syntax clear
+elseif exists("b:current_syntax")
+    finish
+endif
 
 if version < 600
-  set iskeyword=48-57,$,.,A-Z,a-z
+    set iskeyword=48-57,$,.,A-Z,a-z
 else
-  setlocal iskeyword=48-57,$,.,A-Z,a-z
+    setlocal iskeyword=48-57,$,.,A-Z,a-z
 endif
 
-  syn case ignore
+syn case ignore
 
-  syn region  bstString	start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=bstField,bstType
-  syn match   bstNumber		"#-\=\d\+\>"
-  syn keyword bstNumber		entry.max$ global.max$
-  syn match bstComment	"%.*"
+syn region  bstString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=bstField,bstType
+syn match   bstNumber         "#-\=\d\+\>"
+syn keyword bstNumber         entry.max$ global.max$
+syn match   bstComment        "%.*"
 
-  syn keyword bstCommand	ENTRY FUNCTION INTEGERS MACRO STRINGS
-  syn keyword bstCommand	READ EXECUTE ITERATE REVERSE SORT
-  syn match   bstBuiltIn	"\s[-<>=+*]\|\s:="
-  syn keyword bstBuiltIn	add.period$
-  syn keyword bstBuiltIn	call.type$ change.case$ chr.to.int$ cite$
-  syn keyword bstBuiltIn	duplicate$ empty$ format.name$
-  syn keyword bstBuiltIn	if$ int.to.chr$ int.to.str$
-  syn keyword bstBuiltIn	missing$
-  syn keyword bstBuiltIn	newline$ num.names$
-  syn keyword bstBuiltIn	pop$ preamble$ purify$ quote$
-  syn keyword bstBuiltIn	skip$ stack$ substring$ swap$
-  syn keyword bstBuiltIn	text.length$ text.prefix$ top$ type$
-  syn keyword bstBuiltIn	warning$ while$ width$ write$
-  syn match   bstIdentifier	"'\k*"
-  syn keyword bstType		article book booklet conference
-  syn keyword bstType		inbook incollection inproceedings
-  syn keyword bstType		manual mastersthesis misc
-  syn keyword bstType		phdthesis proceedings
-  syn keyword bstType		techreport unpublished
-  syn keyword bstField		abbr address annote author
-  syn keyword bstField		booktitle chapter crossref comment
-  syn keyword bstField		edition editor
-  syn keyword bstField		howpublished institution journal key month
-  syn keyword bstField		note number
-  syn keyword bstField		organization
-  syn keyword bstField		pages publisher
-  syn keyword bstField		school series
-  syn keyword bstField		title type
-  syn keyword bstField		volume year
-  
+syn keyword bstCommand        ENTRY FUNCTION INTEGERS MACRO STRINGS
+syn keyword bstCommand        READ EXECUTE ITERATE REVERSE SORT
+syn match   bstBuiltIn        "\s[-<>=+*]\|\s:="
+syn keyword bstBuiltIn        add.period$
+syn keyword bstBuiltIn        call.type$ change.case$ chr.to.int$ cite$
+syn keyword bstBuiltIn        duplicate$ empty$ format.name$
+syn keyword bstBuiltIn        if$ int.to.chr$ int.to.str$
+syn keyword bstBuiltIn        missing$
+syn keyword bstBuiltIn        newline$ num.names$
+syn keyword bstBuiltIn        pop$ preamble$ purify$ quote$
+syn keyword bstBuiltIn        skip$ stack$ substring$ swap$
+syn keyword bstBuiltIn        text.length$ text.prefix$ top$ type$
+syn keyword bstBuiltIn        warning$ while$ width$ write$
+syn match   bstIdentifier     "'\k*"
+syn keyword bstType           article book booklet conference
+syn keyword bstType           inbook incollection inproceedings
+syn keyword bstType           manual mastersthesis misc
+syn keyword bstType           phdthesis proceedings
+syn keyword bstType           techreport unpublished
+syn keyword bstField          abbr address annote author
+syn keyword bstField          booktitle chapter crossref comment
+syn keyword bstField          edition editor
+syn keyword bstField          howpublished institution journal key month
+syn keyword bstField          note number
+syn keyword bstField          organization
+syn keyword bstField          pages publisher
+syn keyword bstField          school series
+syn keyword bstField          title type
+syn keyword bstField          volume year
 
-  syn case match
+" Define the default highlighting.
+" For version 5.7 and earlier: only when not done already
+" For version 5.8 and later: only when an item doesn't have highlighting yet
+if version >= 508 || !exists("did_bst_syn_inits")
+    if version < 508
+        let did_bst_syn_inits = 1
+        command -nargs=+ HiLink hi link <args>
+    else
+        command -nargs=+ HiLink hi def link <args>
+    endif
 
-
-
-if !exists("did_bst_syntax_inits")
-  let did_bst_syntax_inits = 1
-
-" hi link bstDivider		PreProc
-" hi link bstSection		Type
-  hi link bstComment		Comment
-  hi link bstString		String
-  hi link bstCommand		PreProc
-  hi link bstBuiltIn		Statement
-  hi link bstField		Special
-  hi link bstNumber		Number
-  hi link bstType		Type
-  hi link bstIdentifier		Identifier
-  "Type Statement
-
-  " My default-color overrides:
-
-
-
+    HiLink bstComment           Comment
+    HiLink bstString            String
+    HiLink bstCommand           PreProc
+    HiLink bstBuiltIn           Statement
+    HiLink bstField             Special
+    HiLink bstNumber            Number
+    HiLink bstType              Type
+    HiLink bstIdentifier        Identifier
+    delcommand HiLink
 endif
 
-let b:current_syntax = "BST"
+let b:current_syntax = "bst"
 
-" vim: ts=8
+" vim:set ft=vim sts=4 sw=4:

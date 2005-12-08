@@ -1,8 +1,9 @@
-version 5.6
-" File:         $HOME/.vim/colors/tim.vim
-" Purpose:      Tim's colors for vim
-" Author:       Tim Pope <timpope@sbcglobal.net>
-" vim: tw=70 sw=2 sts=2 et
+" Vim color file
+" File:         ~/.vim/colors/tim.vim
+" Author:       Tim Pope <vim@rebelongto,us>
+" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/colors/tim.vim
+" Last Change:  2005 Dec 07
+" Version:      $Id$
 
 if version>600
   hi clear
@@ -32,6 +33,7 @@ if &background=="light"
   hi User2 ctermfg=LightGreen ctermbg=Black gui=bold guifg=Green guibg=Black
   hi User3 ctermfg=Yellow ctermbg=Black gui=bold guifg=Yellow guibg=Black
   hi User4 ctermfg=LightRed ctermbg=Black gui=bold guifg=IndianRed1 guibg=Black
+  hi User5 ctermfg=LightCyan ctermbg=Black gui=bold guifg=Cyan guibg=Black
   hi SpellErrors ctermfg=Red guifg=Red cterm=underline gui=underline term=reverse
   " }}}1
 else
@@ -50,6 +52,8 @@ else
   hi User2 term=bold,reverse cterm=reverse ctermfg=White ctermbg=DarkGreen gui=bold guifg=DarkGreen guibg=White
   hi User3 term=bold,reverse cterm=reverse ctermfg=White ctermbg=Brown gui=bold guifg=Brown guibg=White
   hi User4 term=bold,reverse cterm=reverse ctermfg=White ctermbg=Red gui=bold guifg=Red guibg=White
+  hi User5 term=bold,reverse cterm=reverse ctermfg=White ctermbg=DarkCyan gui=bold guifg=DarkCyan guibg=White
   hi SpellErrors ctermfg=LightRed guifg=Red cterm=underline gui=underline term=reverse
   " }}}1
 endif
+" vim:set ft=vim sts=2 sw=2:
