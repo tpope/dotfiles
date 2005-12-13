@@ -1,9 +1,10 @@
 " Vim syntax file
-" Language:     BST configuration file
+" Language:     BibTeX Bibliography Style
 " Maintainer:   Tim Pope <vim@rebelongto.us>
+" Last Change:  2005 Dec 13
+" Filenames:    *.bst
 " URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/bst.vim
-" Last Change:  2005 Dec 07
-" Version:      $Id$
+" $Id$
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
