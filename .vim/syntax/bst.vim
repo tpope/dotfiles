@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     BibTeX Bibliography Style
 " Maintainer:   Tim Pope <vim@rebelongto.us>
-" Last Change:  2005 Dec 13
+" Last Change:  2005 Dec 20
 " Filenames:    *.bst
 " URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/bst.vim
 " $Id$
@@ -15,10 +15,12 @@ elseif exists("b:current_syntax")
 endif
 
 if version < 600
-    set iskeyword=48-57,$,.,A-Z,a-z
+    command -nargs=1 SetIsk set iskeyword=<args>
 else
-    setlocal iskeyword=48-57,$,.,A-Z,a-z
+    command -nargs=1 SetIsk setlocal iskeyword=<args>
 endif
+SetIsk 48-57,#,$,',.,A-Z,a-z
+delcommand SetIsk
 
 syn case ignore
 
