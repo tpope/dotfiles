@@ -78,9 +78,9 @@ if [ "x$1" = "x--root-only" ]; then
 fi
 
 if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
+    [ -f "$HOME/. tpope" ] || hidden=1
     touch "$HOME/. tpope"
     chmod 0000 "$HOME/. tpope"
-    hidden=1
 fi
 if [ ! -f "$HOME/.hushlogin" ]; then
     touch "$HOME/.hushlogin"
@@ -145,7 +145,7 @@ if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
 	EXTERNAL:http:sensible-browser %s:TRUE
 	EXTERNAL:file:sensible-browser %s:TRUE
 	SAVE_SPACE:~/dl
-	STARTFILE:http://www.sexygeek.org/home
+	STARTFILE:http://www.google.com/
 	EOF
     hidden=1
 fi
@@ -182,7 +182,7 @@ if inpath konqueror && [ ! -f "$HOME/.kde/share/config/konquerorrc" ]; then
 	[FMSettings]
 	AlwaysNewWin=false
 	AlwaysTabbedMode=true
-	HomeURL=http://www.sexygeek.org/home
+	HomeURL=http://www.google.com/
 	KonquerorTabforExternalURL=true
 	MMBOpensTab=true
 	NewTabsInFront=false
@@ -200,8 +200,8 @@ if inpath dillo && [ ! -d "$HOME/.dillo" ]; then
     mkdir "$HOME/.dillo"
     cat > "$HOME/.dillo/dillorc" <<-EOF
 	# ~/.dillo/dillorc
-	start_page="http://www.sexygeek.org/home"
-	home="http://www.sexygeek.org/home"
+	start_page="http://www.google.com/
+	home="http://www.google.com/
 	contrast_visited_color=NO
 	enterpress_forces_submit=YES
 	show_extra_warnings=YES
@@ -296,6 +296,9 @@ if [ ! -f "$HOME/bin/sdplay" ]; then
     [ ! -h "$HOME/bin/sdplay" ] || links=1
 fi
 for bin in sensible-editor sensible-pager; do
+    if [ -f "$HOME/bin/$bin.lnk" -a ! -h "$HOME/bin/$bin.lnk" ]; then
+	rm -f "$HOME/bin/$bin.lnk"
+    fi
     if [ ! -f "$HOME/bin/$bin" ]; then
 	ln -s tpope "$HOME/bin/$bin"
 	links=1
@@ -343,15 +346,17 @@ if [ "$cron" = 0 -o "$cron" = n ]; then
 	shell=/bin/sh
 	env=ENV
     fi
+    [ -n "$PERL5LIB" ] || PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+    [ -n "$CLASSPATH" ] || CLASSPATH=".:$HOME/.java:$HOME/java"
     cat >/tmp/crontab.template.$$ <<EOF
 # -*- crontab -*- vim:set ft=crontab:
 # crontab for $LOGNAME@$hostname
 CRON=1
 SHELL=$shell
 $env=$HOME/.shrc
-CLASSPATH=.:$HOME/.java:$HOME/java
+CLASSPATH=$CLASSPATH
 PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
-PERL5LIB=$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl
+PERL5LIB=$PERL5LIB
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
 20 */4 * * *	tpope cron

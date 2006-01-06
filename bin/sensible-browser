@@ -35,7 +35,9 @@ else
     }
 fi
 
-if [ "$DISPLAY" -a -z "$terminal" ]; then
+if [ -x "`which cygstart 2>/dev/null`" -a -z "$terminal" ]; then
+    exec cygstart "$*"
+elif [ "$DISPLAY" -a -z "$terminal" ]; then
     url="$*"
     case "$DISPLAY" in
 	:*|localhost*:0*|127.0.0.1:*|`hostname`*:0*) gui=: ;;
@@ -109,7 +111,7 @@ elif [ -x "`which w3m 2>/dev/null`" ]; then
     if [ "$*" ]; then
 	launch w3m -T text/html "$@"
     else
-	launch w3m http://www.sexygeek.org/home
+	launch w3m http://www.google.com/
     fi
 elif [ -x "`which elinks 2>/dev/null`" ]; then
     launch elinks "$@"

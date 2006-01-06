@@ -1,6 +1,6 @@
 #!/bin/sh
 # $Id$
-# -*- sh -*- vim: ft=sh sw=4 sts=4
+# -*- sh -*- vim:set ft=sh sw=4 sts=4:
 
 # Keeps my configuration files in sync.  Also used to create a tarball of
 # them, and commit them to cvs.
@@ -12,20 +12,19 @@
 FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
  .profile .bashrc .bash_profile .screenrc .terminfo .dir_colors \
- .vimrc .vim/colors .vim/after .vim/templates .vim/plugin .pixmaps/* \
- .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
+ .vimrc .vim/[^l]* .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
- .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js \
+ .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js .pixmaps/* \
  .fvwm/.fvwm2rc .fvwm/icons/* .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
  bin/sync-tpope bin/media bin/installer \
  "
 # bin/ps-grep bin/rwho bin/ruptime bin/launch bin/runcontrol \
 # bin/start bin/stop bin/restart bin/reload bin/force-reload \
-GUI_FILES="\
+LOCAL_FILES="\
  .kde/share/apps/konsole .gkrellm .gkrellm2/[^l]* .qt \
  .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
- .vim/.plugin .vim/syntax"
+ .vim.local/*"
 
 RSYNC_RSH="ssh -ax"
 [ -t 0 ] || RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20"
@@ -33,7 +32,7 @@ RSYNC="rsync -urlptRC --exclude='.*.sw?' --exclude='.*.lock' --exclude='*.local'
 export RSYNC_RSH
 
 [ -z "$TPOPE_GET" ] || return
-NAME=`basename $0`
+NAME=`basename "$0"`
 
 output_progress() {
     echo -n "$1"
@@ -47,8 +46,8 @@ while [ "$#" -gt 0 ]; do
     case "$1" in
 	-t)    trusted=1;;
 	-T|+t) trusted= ;;
-	-g)    gui=1    ;;
-	-G|+g) gui=     ;;
+	-g)    loc=1    ;;
+	-G|+g) loc=     ;;
 	-s) simpson=1 ;;
 	-A) tarpipe=1 tgzpipe= ;;
 	-Z) tgzpipe=1 tarpipe= ;;
@@ -62,7 +61,7 @@ while [ "$#" -gt 0 ]; do
 	*)
 	ALL_HOSTS="$1 $ALL_HOSTS"
 	[ "$trusted" ] && MY_HOSTS="$1 $MY_HOSTS"
-	[ "$gui" ]    && GUI_HOSTS="$1 $GUI_HOSTS"
+	[ "$loc" ]    && LOCAL_HOSTS="$1 $LOCAL_HOSTS"
 	;;
     esac
     shift
@@ -76,7 +75,7 @@ fi
 if [ -n "$simpson" ]; then
 	MY_HOSTS="$MY_HOSTS maggie sarah bart homer lisa mona marge"
 	ALL_HOSTS="$ALL_HOSTS maggie sarah bart abe homer lisa mona marge clancy ralph"
-	GUI_HOSTS="$GUI_HOSTS maggie sarah bart homer lisa mona marge"
+	LOCAL_HOSTS="$LOCAL_HOSTS maggie sarah bart homer lisa mona marge"
 fi
 
 if [ -n "$cvs" ]; then
@@ -100,10 +99,10 @@ if [ -n "$web" ]; then
     webget="curl -m8 -s -o"
     [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO"
     rm -f "$wtarfile"
-    if $webget "$wtarfile" http://www.sexygeek.org/tpope.tar.gz >/dev/null 2>&1; then
-	gzip -dc "$wtarfile"|tar -xf - -C "$HOME"
-	[ "$web" = 2 ] && rm "$wtarfile"
-	exit 0
+    if $webget "$wtarfile" http://www.tpope.net/tpope.tar.gz >/dev/null 2>&1; then
+	# cygwin environments make it impossible to overwrite an open file, so
+	# so we'll try this hack instead
+	exec sh -c "gzip -dc \"$wtarfile\"|tar -xf - -C \"$HOME\"; [ \"$web\" != 2 ] || rm \"$wtarfile\""
     else
 	echo Download failed >&2
 	[ "$web" = 2 ] && rm "$wtarfile"
@@ -113,7 +112,7 @@ fi
 
 if [ -n "$tarball" ]; then
     ( cd "$HOME"
-    tar -cf - -X "$HOME/.cvsignore" --exclude='*~' $FILES ${gui:+$GUI_FILES})|\
+    tar -cf - -X "$HOME/.cvsignore" --exclude='*~' $FILES ${loc:+$LOCAL_FILES})|\
 	$tarball > "$tarfile"
     exit
 fi
@@ -124,17 +123,17 @@ if [ "$tarpipe" ]; then
 
     output_progress "Uploading base:   "
     for host in $ALL_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
 	tar cf - -X .cvsignore --exclude='*~' $FILES|\
 	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
     done
     output_newline
 
-    [ "$GUI_HOSTS" ] && output_progress "Uploading extra:  " && \
-    for host in $GUI_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
-	tar cf - -X .cvsignore --exclude='*~' $GUI_FILES|\
+    [ "$LOCAL_HOSTS" ] && output_progress "Uploading extra:  " && \
+    for host in $LOCAL_HOSTS; do
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
+	tar cf - -X .cvsignore --exclude='*~' $LOCAL_FILES|\
 	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
     done && \
@@ -147,18 +146,18 @@ if [ "$tgzpipe" ]; then
 
     output_progress "Uploading base:   "
     for host in $ALL_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
 	tar cf - -X .cvsignore --exclude='*~' \
 	    $FILES|gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
     done
     output_newline
 
-    [ "$GUI_HOSTS" ] && output_progress "Uploading extra:  " && \
-    for host in $GUI_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ] && \
-	tar cf - -X .cvsignore --exclude='*~' \
-	    $GUI_FILES|gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
+    [ "$LOCAL_HOSTS" ] && output_progress "Uploading extra:  " && \
+    for host in $LOCAL_HOSTS; do
+	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
+	tar cf - -X .cvsignore --exclude='*~' $LOCAL_FILES |\
+	    gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
     done && \
     output_newline
@@ -182,7 +181,7 @@ echo $$ > $HOME/.LCK..$NAME
 if [ "$MY_HOSTS" ]; then
 output_progress "Downloading base: "
 for host in $MY_HOSTS; do
-    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ]; then
+    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ]; then
 	$RSYNC_RSH $host $RSYNC "$FILES" `hostname`: 2>/dev/null &&
 	output_progress " $host"
     fi
@@ -192,27 +191,27 @@ fi
 
 output_progress "Uploading base:   "
 for host in $ALL_HOSTS; do
-    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ]; then
+    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ]; then
 	$RSYNC --delete $FILES $host: 2>/dev/null &&
 	output_progress " $host"
     fi
 done
 output_newline
 
-if [ "$GUI_HOSTS" ]; then
+if [ "$LOCAL_HOSTS" ]; then
 output_progress "Downloading extra:"
-for host in $GUI_HOSTS; do
-    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f`" ]; then
-	$RSYNC_RSH $host $RSYNC "$GUI_FILES" `hostname`: 2>/dev/null &&
+for host in $LOCAL_HOSTS; do
+    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ]; then
+	$RSYNC_RSH $host $RSYNC "$LOCAL_FILES" `hostname`: 2>/dev/null &&
 	output_progress " $host"
     fi
 done
 output_newline
 
 output_progress "Uploading extra:  "
-for host in $GUI_HOSTS; do
+for host in $LOCAL_HOSTS; do
     if [ "$host" != "`hostname`" ]; then
-	$RSYNC --delete $GUI_FILES $host: 2>/dev/null &&
+	$RSYNC --delete $LOCAL_FILES $host: 2>/dev/null &&
 	output_progress " $host"
     fi
 done

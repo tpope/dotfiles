@@ -5,9 +5,9 @@
 # This script handles everything to do with hostnames, particularly
 # colourizing them.
 
-hostinfo=`basename $0`
+hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin"
-hosts="maggie bart clancy abe left homer right carl lisa marge barney mona ralph patty sarah snowball otto lenny griffin grex"
+hosts="maggie bart clancy abe homer jmwaller carl lisa marge barney mona ralph patty sarah snowball otto lenny griffin grex netmon1"
 menuhosts="maggie bart marge lisa homer mona - snowball - clancy sarah ralph"
 
 gethost() {
@@ -16,9 +16,9 @@ gethost() {
     [Bb]|bart*) echo bart ;;
     [Cc]|clancy*) echo clancy ;;
     [Ee]|abe*) echo abe ;;
-    [Ff]|left*) echo left ;;
     [Hh]|homer*) echo homer ;;
-    [Ii]|right*) echo right ;;
+    [Ii]|netmon1*) echo netmon1 ;;
+    [Jj]|jmwaller*) echo jmwaller ;;
     [Kk]|carl*) echo carl ;;
     [Ll]|lisa*) echo lisa ;;
     [Mm]|marge*) echo marge ;;
@@ -55,8 +55,8 @@ carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=K; hdom=simpson;}
 patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
 barney()   { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=N; hdom=simpson;}
 otto()     { hterm="01;35"; hscrn="+b Y"; hrgb="#FF7FFF"; hltr=U; hdom=wiggum; }
-left()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=F; hdom=springfield; }
-right()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=I; hdom=springfield;}
+netmon1()  { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=I; hdom=;}
+jmwaller() { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=J; hdom=;}
 peter()    { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=T; hdom=simpson;}
 griffin()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=G; hdom=simpson;}
 grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=X; hdom=springfield;}
@@ -171,19 +171,19 @@ EOF
     elif [ -x "`which $command 2>/dev/null`" -a "`hostname`" != grex.cyberspace.org ]; then
 	RUPTIME="$command"
     else
-	RUPTIME="finger $command$1@sexygeek.org"
+	RUPTIME="finger $command$1@tpope.net"
 	[ -n "$1" ] && shift
     fi
     AWK='{print $1" "$0}'
     [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
     [ -t 1 ] && TERMINAL=1
     if [ "$TERMINAL" ]; then
-	$RUPTIME "$@"|grep -v '^\[sexygeek\.org'|awk "$AWK"|while read host line; do
+	$RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
 	    "$host" 2>/dev/null || hterm="01;37"
 	    echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
 	done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
     else
-	$RUPTIME "$@"|grep -v '^\[sexygeek\.org\]'
+	$RUPTIME "$@"|grep -v '^\[tpope\.net\]'
     fi
     exit 0
 	    ;;
