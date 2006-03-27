@@ -3,45 +3,9 @@
 " Maintainer:   Tim Pope <vim@rebelongto.us>
 " Last Change:  2006 Mar 27
 " Filenames:    *.vb
-" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/bst.vim
 " $Id$
 
-" 1.0 Keywords:
-"|AddHandler    |AddressOf     |Alias         |And            |
-"|AndAlso       |Ansi          |As            |Assembly       |
-"|Auto          |Boolean       |ByRef         |Byte           |
-"|ByVal         |Call          |Case          |Catch          |
-"|CBool         |CByte         |CChar         |CDate          |
-"|CDbl          |CDec          |Char          |CInt           |
-"|Class         |CLng          |CObj          |Const          |
-"|CShort        |CSng          |CStr          |CType          |
-"|Date          |Decimal       |Declare       |Default        |
-"|Delegate      |Dim           |DirectCast    |Do             |
-"|Double        |Each          |Else          |ElseIf         |
-"|End           |EndIf         |Enum          |Erase          |
-"|Error         |Event         |Exit          |False          |
-"|Finally       |For           |Friend        |Function       |
-"|Get           |GetType       |GoSub         |GoTo           |
-"|Handles       |If            |Implements    |Imports        |
-"|In            |Inherits      |Integer       |Interface      |
-"|Is            |Let           |Lib           |Like           |
-"|Long          |Loop          |Me            |Mod            |
-"|Module        |MustInherit   |MustOverride  |MyBase         |
-"|MyClass       |Namespace     |New           |Next           |
-"|Not           |Nothing       |NotInheritable|NotOverridable |
-"|Object        |On            |Option        |Optional       |
-"|Or            |OrElse        |Overloads     |Overridable    |
-"|Overrides     |ParamArray    |Preserve      |Private        |
-"|Property      |Protected     |Public        |RaiseEvent     |
-"|ReadOnly      |ReDim         |REM           |RemoveHandler  |
-"|Resume        |Return        |Select        |Set            |
-"|Shadows       |Shared        |Short         |Single         |
-"|Static        |Step          |Stop          |String         |
-"|Structure     |Sub           |SyncLock      |Then           |
-"|Throw         |To            |True          |Try            |
-"|TypeOf        |Unicode       |Until         |Variant        |
-"|Wend          |When          |While         |With           |
-"|WithEvents    |WriteOnly     |Xor           |               |
+" Loosely modeled after cs.vim
 
 " VB.net to C# cheat sheet:
 " MustInherit, MustOverride = abstract
@@ -64,7 +28,6 @@ endif
 " VB.net is case insensitive
 syn case ignore
 
-
 syn keyword vbnetType		Boolean Byte Char Date Decimal Double Single Integer Long Object Short String
 syn keyword vbnetCast		CBool CByte CChar CDate CDbl CDec Char CInt CLng CObj CShort CSng CStr CType DirectCast
 syn match   vbnetTypeSpecifier	"[a-zA-Z0-9][\$%&#]"ms=s+1
@@ -73,20 +36,21 @@ syn keyword vbnetStorage	Delegate AddressOf
 syn match   vbnetStorage	"\<\(End\s\+\)\=\(Class\|Enum\|Interface\|Namespace\|Structure\|Module\)\>"
 syn keyword vbnetRepeat		For To Step Each In GoTo Next Return Loop Do Until Exit Stop
 syn match   vbnetRepeat		"\<\(End\s\+\)\=While\>"
-syn keyword vbnetConditional	If Then ElseIf Else Select
-syn match   vbnetConditional	"\<End\s\+If\>"
-syn match   vbnetConditional	"\<Select\(\s\+Case\)\>"
+syn keyword vbnetConditional	Then ElseIf Else
+syn match   vbnetConditional	"\<\(End\s\+\)\=If\>"
+syn match   vbnetConditional	"\<\(Select\(\s\+Case\)\|End\s\+Select\)\>"
 syn keyword vbnetLabel		Case
 syn keyword vbnetArrayHandler	Erase Preserve ReDim
 syn keyword vbnetAccessModifier	Friend Private Protected Public
 syn keyword vbnetClassModifier	MustInherit NotInheritable Inherits Implements
 " TODO: categorize
 syn keyword vbnetModifier	MustOverride NotOverridable Overridable Overrides ReadOnly WriteOnly Shared Static Overloads Shadows Handles WithEvents Assembly Auto Unicode Ansi Default
-syn keyword vbnetConstant	False Nothing True
+syn keyword vbnetBoolean	False True
+syn keyword vbnetConstant	Nothing
 syn keyword vbnetException	Catch When Finally Resume Throw
 syn match   vbnetException	"\<\(On\s\+Error\|\(End\s\+\)\=Try\)\>"
-syn keyword vbnetFunction       Call Declare Alias Lib Get Set
-syn match   vbnetFunction	"\<\(End\s\+\)\=\(Sub\|Function\|Property\)\>"
+syn keyword vbnetFunction       Call Declare Alias Lib
+syn match   vbnetFunction	"\<\(End\s\+\)\=\(Sub\|Function\|Property\|Get\|Set\)\>"
 syn keyword vbnetOperator	And Or Not Xor Mod In Is Imp Eqv Like AndAlso OrElse GetType TypeOf
 syn keyword vbnetEvent		AddHandler RemoveHandler RaiseEvent Event
 
@@ -102,18 +66,23 @@ syn keyword vbnetError		EndIf GoSub Let Variant Wend
 syn region vbnetString		start=+"+ end=+"+ end=+$+ skip=+""+
 syn match  vbnetCharacter	+"\([^"]\|""\)"c+
 
-" TODO: Make these exhaustive and exclusive
-syn match  vbnetDate		"1\=\d\=\([-/]\)[123]\=\d\1\d\{3,4\}" contained
-syn match  vbnetDate		"\d\{1,2\}:\d\d\(:\d\d\)\=\([AP]M\)\=" contained
-syn region vbnetDateTime	matchgroup=vbnetDate start=".#"ms=e end="#" contains=vbnetDate
+" 2.4.6 Date literals
+syn match  vbnetDate		"1\=\d\([-/]\)[123]\=\d\1\d\{3,4\}" contained
+" For simplicity, require at least an hour and a minute in a time, and require
+" minutes and seconds to be two digits
+syn match  vbnetDate		"\<[12]\=\d:\d\d\(:\d\d\)\=\s*\([AP]M\)\=\>" contained
+syn match  vbnetDate		"\<_$"
+" Avoid matching #directives
+syn region vbnetDateGroup	matchgroup=vbnetDate start="\(\S\s*\)\@<=#" skip="\<_$" end="\(\S\s*\)\@<=#" end="$" contains=vbnetDate
 
-"syn region	vbnetOption	start="^\s*Option\>.*$" skip="\<_$" end="$"
 syn match	vbnetOption	"^\s*Option\s\+\(\(Explicit\|Strict\)\(\s\+On\|\s\+Off\)\=\|Compare\s\+\(Binary\|Text\)\)\s*$"
-" TODO: can #Directives really cross line breaks with '_'?
+syn region	vbnetDefine	start="^\s*#\s*Const\>" skip="\<_$" end="$"
+    \ contains=vbnetComment keepend
 syn region	vbnetPreCondit
-    \ start="^\s*#\s*\(Const\|\|If\|ElseIf\|Else\|End\s\+If\)\>"
-    \ skip="\<_$" end="$" contains=vbnetComment keepend
-syn region	vbnetRegion matchgroup=vbnetPreCondit start="^\s*#\s*Region\>.*$" end="^\s*#\s*End\s\+Region\>.*$" fold contains=TOP
+    \ start="^\s*#\s*\(If\|ElseIf\|Else\|End\s\+If\)\>" skip="\<_$" end="$"
+    \ contains=vbnetComment keepend
+"syn match	vbnetPreCondit "\(\s*#\s*\(Else\)\=If\>.*\)\@<=\<Then\>"
+syn region	vbnetRegion matchgroup=vbnetPreProc start="^\s*#\s*Region\>" end="^\s*#\s*End\s\+Region\>" fold contains=TOP
 
 syn match   vbnetNumber		"[+-]\=\(&O[0-7]*\|&H\x\+\|\<\d\+\)[SIL]\=\>"
 syn match   vbnetNumber		"[+-]\=\(\<\d\+\.\d*\|\.\d\+\)\([eE][-+]\=\d\+\)\=[FRD]\=\>"
@@ -131,6 +100,10 @@ if ! exists("vbnet_v1")
     syn keyword vbnetClassModifier	Partial
     syn keyword vbnetStatement		Of Global
     syn match   vbnetStatement		"\<\(End\s\+\)\=Using\>"
+
+    syn match   vbnetXmlCommentLeader	+'''+    contained
+    syn match   vbnetXmlComment		+'''.*$+ contains=vbnetXmlCommentLeader,@vbnetXml
+    syntax include @vbnetXml syntax/xml.vim
 endif
 
 " Define the default highlighting.
@@ -154,6 +127,7 @@ if version >= 508 || !exists("did_vbnet_syntax_inits")
 	HiLink vbnetClassModifier	StorageClass
 	HiLink vbnetAccessModifier	vbnetModifier
 	HiLink vbnetModifier		Keyword
+	HiLink vbnetBoolean		Boolean
 	HiLink vbnetConstant		Constant
 	HiLink vbnetException		Exception
 	HiLink vbnetEvent		Keyword
@@ -161,11 +135,16 @@ if version >= 508 || !exists("did_vbnet_syntax_inits")
 	HiLink vbnetError		Error
 
 	HiLink vbnetTodo		Todo
+	HiLink xmlRegion		vbnetXmlComment
+	HiLink vbnetXmlCommentLeader	vbnetXmlComment
+	HiLink vbnetXmlComment		vbnetComment
 	HiLink vbnetComment		Comment
 
 	HiLink vbnetString		String
+	HiLink vbnetDefine		Define
 	HiLink vbnetPreCondit		PreCondit
-	HiLink vbnetOption		PreProc
+	HiLink vbnetOption		vbnetPreProc
+	HiLink vbnetPreProc		PreProc
 	HiLink vbnetCharacter		Character
 	HiLink vbnetNumber		Number
 	HiLink vbnetDate		Constant
