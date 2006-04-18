@@ -1,4 +1,4 @@
-# ~/.fvwm/FvwmScript-Time
+# ~/.fvwm/FvwmScript-Date
 # $Id$
 
 WindowTitle {FvwmScript-Hidden}
@@ -13,6 +13,7 @@ Init
  Begin
   Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
   ChangeTitle 1 $date
+  ChangeFont  1 "-adobe-helvetica-medium-r-*--12-*-*-*-p-*-iso8859-1"
  End
 
 PeriodicTasks

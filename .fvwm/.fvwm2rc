@@ -170,8 +170,8 @@ Style *         MaxWindowSize 100 100, !AllowMaximizeFixedSize
 Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm
 Style Terminal  HilightBack rgb:30/40/50, BackColor rgb:52/55/58
 #Style Terminal  HandleWidth 5
-Style XTerm*    UseStyle Terminal, Icon rterm.xpm
-Style UXTerm*   UseStyle Terminal, Icon rterm.xpm
+Style XTerm*    UseStyle Terminal
+Style UXTerm*   UseStyle Terminal
 Style Eterm     UseStyle Terminal
 Style rxvt      UseStyle Terminal
 Style kterm     UseStyle Terminal
@@ -229,6 +229,7 @@ Style konqueror         UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPag
 Style kcmshell          UseStyle www-browser, MiniIcon mini.kde.xpm, StartsOnPage 1 0 
 Style Gecko             UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
 Style gecko             UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
+Style Firefox-bin       UseStyle www-browser, MiniIcon mozilla.mini.xpm, StartsOnPage 1 0
 Style Navigator         UseStyle www-browser, MiniIcon mini.netscape.xpm, StartsOnPage 1 0
 Style Opera             UseStyle www-browser, MiniIcon opera.xpm, StartsonPage 1 0
 Style Galeon            UseStyle www-browser, StartsOnPage 1 0
@@ -246,7 +247,7 @@ Style Gimp      UseStyle Media, HilightBack rgb:ff/22/22, BackColor rgb:78/60/60
 Style "The GIMP" UsePPosition
 Style "GIMP Startup" StartsOnPage 2 1 1
 Style feh       UseStyle Media, Icon norm/image-viewer.xpm, MiniIcon mini/image-viewer.xpm
-Style MPlayer   UseStyle Media, NoPPosition, MaxWindowSize, NoIcon
+Style MPlayer   UseStyle Media, NoPPosition, FixedPPosition, MaxWindowSize, NoIcon
 Style xmms      UseStyle Media, Icon norm/music.xpm, MiniIcon mini/music.xpm
 Style Xawtv     UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
@@ -255,11 +256,12 @@ Style tvtime    UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
 # Game Styles {{{2
 
 Style Game      Icon norm/game.xpm, MiniIcon mini/game.xpm, StartsOnPage 0 2 2, HilightFore white, ForeColor white, HilightBack rgb:00/a0/00, BackColor rgb:60/80/60
-Style SDL_App   UseStyle Game, FixedSize, NoButton 4, NoHandles, BorderWidth 2
+Style SDL_App   UseStyle Game, NoButton 4, NoHandles, BorderWidth 2
 Style mupen64   UseStyle Game
 Style *Snes9*   UseStyle Game
 Style *etris*   UseStyle Game, Icon norm/game-logic.xpm, MiniIcon mini/game-logic.xpm
 Style *etrinet* UseStyle Game, Icon norm/game-logic.xpm, MiniIcon mini/game-logic.xpm
+Style *MPlayer* StartsAnyWhere
 
 # }}}2
 # Common Program Styles {{{2
@@ -285,10 +287,10 @@ Style editres   Icon editres.xpm, MiniIcon mini.x2.xpm
 Style Xscreensaver* Icon norm/display.xpm, MiniIcon mini.monitor.xpm
 Style *font*    Icon norm/font.xpm, MiniIcon mini/font.xpm
 Style aumix     MiniIcon aumix.mini.xpm
-Style *OpenOffice* Icon norm/word-processor.xpm, MiniIcon mini/word-processor.xpm
+Style *OpenOffice* Icon norm/word-processor.xpm, MiniIcon mini/word-processor.xpm, MaxWindowSize 100 95
 Style mutt*     Icon mutt.xpm, MiniIcon mutt.mini.xpm
-Style xpdf      MiniIcon mini.pdf.xpm
-Style gv        MiniIcon mini/ghostview.xpm
+Style xpdf      MiniIcon mini.pdf.xpm, MaxWindowSize 100 95
+Style gv        MiniIcon mini/ghostview.xpm, MaxWindowSize 100 95
 Style xdvi      MiniIcon mini/printing.xpm
 Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, UsePPosition
 Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
@@ -347,18 +349,18 @@ Key Down        A       C5    Direction South (CurrentDesk) FuncFlipFocusWindow
 # }}}2
 
 Key F1          A       4       FuncMenuFvwmRoot
-Key F2          A       4       FvwmForm FvwmForm-Run
+Key F2          A       4       FuncFvwmFormRun
 Key F2          A       S4      Read .FvwmForm-RunLast Quiet
 Key F3          A       4       Menu MenuFvwmWindowOps Interior 0 0 Nop
-Key F3          A       S4      FvwmForm FvwmForm-Talk
+Key F3          A       S4      FuncFvwmForm FvwmForm-Talk
 
 Key Escape      A       C       FuncMenuFvwmRoot
 Key Escape      A       S       Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F1          A       M       FuncMenuFvwmRoot
 Key F1          A       SM      Menu MenuFvwmWindowOps Interior 0 0 Nop
-Key F2          A       M       FvwmForm FvwmForm-Run
+Key F2          A       M       FuncFvwmFormRun
 #Key F2          A       SM      Read .FvwmForm-RunLast Quiet
-Key F2          A       SM      FvwmForm FvwmForm-Talk
+Key F2          A       SM      FuncFvwmForm FvwmForm-Talk
 Key F3          A       M       Lower
 Key F3          A       SM      Layer -1 0
 Key F4          A       M       Close
@@ -394,12 +396,12 @@ Silent Key Print A      SC      Exec exec import -window root $[HOME]/root-`date
 Silent Key Print A      M       Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 Key Escape      A       SCM     EscapeFunc
 
-Key 1           A       4       FuncWindowWarp 25 25
-Key 2           A       4       FuncWindowWarp 75 25
-Key 3           A       4       FuncWindowWarp 25 75
-Key 4           A       4       FuncWindowWarp 75 75
+Key 1           A       4       FuncWindowWarp 25 20
+Key 2           A       4       FuncWindowWarp 75 20
+Key 3           A       4       FuncWindowWarp 25 65
+Key 4           A       4       FuncWindowWarp 75 65
 Key 5           A       4       FuncMenuFvwmRoot
-Key 6           A       4       FvwmForm FvwmForm-Run
+Key 6           A       4       FuncFvwmFormRun
 Key 6           A       S4      Read .FvwmForm-RunLast Quiet
 Key 7           A       4       Menu MenuFvwmUtilities
 Key 7           A       S4      Menu /Debian
@@ -527,24 +529,29 @@ Key X       A   5       Exec exec tpope media play
 Key C       A   5       Exec exec tpope media toggle
 Key V       A   5       Exec exec tpope media stop
 Key B       A   5       Exec exec tpope media next
-Key L       A   5       Exec exec xmms-shell -e jump
+#Key L       A   5       Exec exec xmms-shell -e jump
 Key P       A   5       Exec exec xmms-shell -e repeat
 Key S       A   5       Exec exec xmms-shell -e shuffle
-Key R       A   5       FvwmForm FvwmForm-Run
+Key L       A   5       Exec sleep 1; xscreensaver-command -lock || exec xlock
+Key R       A   5       FuncFvwmFormRun
 
-Key 7       A   5       Exec exec ssh homer br -n 1
-Key 8       A   5       Exec exec ssh homer br -f 1
-Key U       A   5       Exec exec ssh homer br -n 2
-Key I       A   5       Exec exec ssh homer br -f 2
-Key J       A   5       Exec exec ssh homer br -n 3
-Key K       A   5       Exec exec ssh homer br -f 3
-Key M       A   5       Exec exec ssh homer br -n 5
-Key Comma   A   5       Exec exec ssh homer br -f 5
+Key 7       A   5       Exec exec ssh lucille br -n 1
+Key 8       A   5       Exec exec ssh lucille br -f 1
+Key U       A   5       Exec exec ssh lucille br -n 2
+Key I       A   5       Exec exec ssh lucille br -f 2
+Key J       A   5       Exec exec ssh lucille br -n 3
+Key K       A   5       Exec exec ssh lucille br -f 3
+Key M       A   5       Exec exec ssh lucille br -n 5
+Key Comma   A   5       Exec exec ssh lucille br -f 5
 
 Key Execute A   A       Exec exec tpope media toggle
 Key Cancel  A   A       Exec exec tpope media stop
 Key leftanglebracket A A Exec exec tpope media prev
 Key rightanglebracket A A Exec exec tpope media next
+#Key XF86Back A  A       FakeKeypress modifiers 1 press Left
+#Key XF86Forward A  A    FakeKeypress modifiers 1 press Right
+XF86Back    A   A       Exec sleep .5; exec xte 'keydown Meta_L' 'key Left' 'keyup Meta_L'
+XF86Forward A   A       Exec sleep .5; exec xte 'keydown Meta_L' 'key Right' 'keyup Meta_L'
 
 PipeRead "$HOME/bin/hostinfo --fvwm-keys"
 Key Grave   A   C       FuncIrcScreenSshXterm
@@ -553,7 +560,7 @@ Key 0       A   CM      Exec exec favorite-app
 Key 1       A   CM      FuncWebBrowser http://www.google.com/
 Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
 Key 3       A   CM      Exec sleep 1; xscreensaver-command -lock || exec xlock
-Key 4       A   CM      FuncIrcScreenSshXterm
+#Key 4       A   CM      FuncIrcScreenSshXterm
 Key 6       A   CM      Exec exec xpenguins --nice .8 3
 Key 7       A   CM      Module FvwmConsole
 Key 8       A   CM      Exec if [ -x "`which beep-media-player 2>/dev/null`" ]; then exec beep-media-player; else exec xmms; fi
@@ -575,18 +582,18 @@ Key End     A   4       Exec exec aumix -w -5
 Key Home    A   5       Exec exec aumix -v +5
 Key End     A   5       Exec exec aumix -v -5
 
-Key KP_Home     A   4   Exec exec ssh homer br -n 1
-Key KP_Left     A   4   Exec exec ssh homer br -n 2
-Key KP_End      A   4   Exec exec ssh homer br -n 3
-Key KP_Insert   A   4   Exec exec ssh homer br -n 4
-Key KP_Up       A   4   Exec exec ssh homer br -f 1
-Key KP_Begin    A   4   Exec exec ssh homer br -f 2
-Key KP_Down     A   4   Exec exec ssh homer br -f 3
-Key KP_Prior    A   4   Exec exec ssh homer br -n 5
-Key KP_Right    A   4   Exec exec ssh homer br -f 5
-Key KP_Delete   A   4   Exec exec ssh homer br -F
-Key KP_Add      A   4   Exec exec ssh homer br -d +1
-Key KP_Subtract A   4   Exec exec ssh homer br -d -1
+Key KP_Home     A   4   Exec exec ssh lucille br -n 1
+Key KP_Left     A   4   Exec exec ssh lucille br -n 2
+Key KP_End      A   4   Exec exec ssh lucille br -n 3
+Key KP_Insert   A   4   Exec exec ssh lucille br -n 4
+Key KP_Up       A   4   Exec exec ssh lucille br -f 1
+Key KP_Begin    A   4   Exec exec ssh lucille br -f 2
+Key KP_Down     A   4   Exec exec ssh lucille br -f 3
+Key KP_Prior    A   4   Exec exec ssh lucille br -n 5
+Key KP_Right    A   4   Exec exec ssh lucille br -f 5
+Key KP_Delete   A   4   Exec exec ssh lucille br -F
+Key KP_Add      A   4   Exec exec ssh lucille br -d +1
+Key KP_Subtract A   4   Exec exec ssh lucille br -d -1
 
 # }}}1
 # Mouse Bindings {{{1
@@ -794,9 +801,9 @@ Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames item 100-4p
 + ""              Nop
 PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian item 100-4p c'
 PipeRead 'test -e /usr/share/gnome/apps && echo + \\"GNOM\\&E%menu/gnome.xpm%\\" Popup Gnome-sys item 100-4p c'
-PipeRead 'test -e /usr/share/applnk -a -x /usr/bin/kstart -o -e "$KDEDIR" && echo + \\"\\&KDE%menu/kde.xpm%\\" Popup Kde-sys item 100-4p c'
+PipeRead 'test -e /usr/share/applnk -a -x /usr/bin/kstart -o -e "$KDEDIR" && echo + \\"KD\\&E%menu/kde.xpm%\\" Popup Kde-sys item 100-4p c'
 + ""              Nop
-+ "&Run . . .%mini.run.xpm%"             FvwmForm FvwmForm-Run
++ "&Run . . .%mini.run.xpm%"             FuncFvwmFormRun
 + "E&xit Fvwm%menu/quit.xpm%"         Popup MenuFvwmQuitVerify item 100-4p 0
 
 PipeRead '[ -z "$KDEDIR" -a -e /usr/share/applnk ] && export KDEDIR=/usr; [ -e "$KDEDIR" ] && LANG=C PATH=":$PATH" fvwm-menu-desktop --desktop kde-sys --merge-user-menu --enable-mini-icons --mini-icons-path ""'
@@ -837,7 +844,7 @@ UnsetEnv games
 # Utilities {{{2
 DestroyMenu MenuFvwmUtilities
 AddToMenu MenuFvwmUtilities "Utilities" Title
-+ "&XTerm%mini.xterm.xpm%"      Exec exec xterm -T localhost -n localhost
++ "&XTerm%mini.xterm.xpm%"      Exec exec xterm -name localhost -T localhost
 FuncAddIfExists MenuFvwmUtilities "G&vim%vim-16.xpm%" gvim
 + "&Calculator%menu/calculator.xpm%" Exec exec xcalc
 Test (x xpenguins) + "&Penguins%mini.penguin.xpm%" Exec pkill '^xpenguins$' || exec xpenguins --nice .8 3
@@ -853,7 +860,7 @@ DestroyMenu MenuFvwmSystem
 AddToMenu MenuFvwmSystem "System" Title
 + "Fvwm&Console%mini.xterm.xpm%"            Module FvwmConsole
 + "FvwmScr&oll%mini.move2.xpm%"             NoWindow Module FvwmScroll 90p 95p
-+ "R&un Fvwm Command . . .%mini.run.xpm%"   FvwmForm FvwmForm-Talk
++ "R&un Fvwm Command . . .%mini.run.xpm%"   FuncFvwmForm FvwmForm-Talk
 + "" Nop
 + "Re&fresh Screen%menu/refresh.xpm%"       Refresh
 + "R&ecapture Screen%menu/display.xpm%"     Recapture
@@ -868,7 +875,7 @@ FuncAddIfExists MenuFvwmSystem "Configure &XScreenSaver%menu/colors.xpm%" xscree
 DestroyMenu MenuFvwuNetwork
 AddToMenu MenuFvwmNetwork "Network" Title
 #+ "&Chat%menu/chat.xpm%"        FuncIrcScreenSshXterm
-+ "M&utt%mutt.mini.xpm%"        Exec exec x-terminal-emulator -T Mutt -n mutt@localhost -e mutt
++ "M&utt%mutt.mini.xpm%"        Exec exec x-terminal-emulator -name mutt@localhost -T mutt -e mutt
 #Test (x /usr/bin/gaim) + "&Gaim%mini.gaim.xpm%" FuncExec gaim "exec gaim"
 PipeRead 'if [ -x "`which gaim 2>/dev/null`" ]; then \
 echo "+ \\"&Gaim%mini.gaim.xpm%\\" FuncExec gaim \\"exec gaim\\""; \
@@ -964,15 +971,15 @@ AddToMenu MenuFvwmQuitVerify "Really Quit Fvwm?" Title
 + ""                     Nop
 + "Start &TWM%mini.twm.xpm%"        Restart twm
 + "Start &KDE%mini.kde.xpm%"        Restart startkde
-+ "&Just an XTerm%mini.xterm.xpm%"  Restart xterm -n '"X Console"' -T '"X Console"'
++ "&Just an XTerm%mini.xterm.xpm%"  Restart xterm -name '"X Console"' -T '"X Console"'
 
 DestroyMenu MenuHalt
 AddToMenu MenuHalt "Halt?" Title
-+ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec sudo /sbin/shutdown -h now "Called by $[LOGNAME] from menu"
++ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec sudo /sbin/shutdown -h now "Requested by $[LOGNAME] from menu"
 
 DestroyMenu MenuReboot
 AddToMenu MenuReboot "Reboot?" Title
-+ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec sudo /sbin/shutdown -r now "Called by $[LOGNAME] from menu"
++ "Yes%menu/choice-yes.xpm%" FuncSmartQuitExec sudo /sbin/shutdown -r now "Requested by $[LOGNAME] from menu"
 
 DestroyFunc FuncSmartQuitExec
 AddToFunc FuncSmartQuitExec
@@ -1097,12 +1104,12 @@ AddToFunc FuncButtonsRestore
 # Maximization and Resize Functions {{{3
 DestroyFunc FuncRemaximize
 AddToFunc FuncRemaximize
-+ I All (State 5, !Maximized) WindowStyle Borders
-+ I All (State 6, !Maximized) WindowStyle Borders
+#+ I All (State 5, !Maximized) WindowStyle Borders
+#+ I All (State 6, !Maximized) WindowStyle Borders
 + I All (State 5, !Maximized) State 5 false
 + I All (State 6, !Maximized) State 5 false
-+ I All (State 5) WindowStyle !Borders
-+ I All (State 6) WindowStyle !Borders
+#+ I All (State 5) WindowStyle !Borders
+#+ I All (State 6) WindowStyle !Borders
 + I UpdateStyles
 #+ I All (State 5) Maximize false
 + I All (State 5) Maximize true
@@ -1115,8 +1122,8 @@ AddToFunc FuncMaximize
 + I Current (!Maximized, Maximizable) State 5 true
 + I Current (Maximized, Maximizable) State 5 false
 + I Current (Maximized, Maximizable) State 6 false
-+ I Current (!Maximized, Maximizable) WindowStyle !Borders
-+ I Current (Maximized, Maximizable) WindowStyle Borders
+#+ I Current (!Maximized, Maximizable) WindowStyle !Borders
+#+ I Current (Maximized, Maximizable) WindowStyle Borders
 + I UpdateStyles
 + I Maximize $*
 PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo '+ I Maximize 100 -40p'; fi"
@@ -1312,35 +1319,35 @@ AddToFunc SelectiveRaiseLower
 # Xterm Functions {{{2
 DestroyFunc FuncXterm
 AddToFunc FuncXterm
-+ I Exec exec x-terminal-emulator -T localhost -n localhost
++ I Exec exec x-terminal-emulator -name localhost -T localhost
 
 DestroyFunc FuncScreenXterm
 AddToFunc FuncScreenXterm
 + I Next (screen@localhost, AcceptsFocus) Iconify off
 + I Next (screen@localhost, AcceptsFocus) Focus
 + I Next (screen@localhost, AcceptsFocus) FuncWarpToTitle
-+ I None (screen@localhost, AcceptsFocus) Exec exec x-terminal-emulator -T screen@localhost -n screen@localhost -e screen -dRR $[HOST]
++ I None (screen@localhost, AcceptsFocus) Exec exec x-terminal-emulator -name screen@localhost -T screen@localhost -e screen -dRR $[HOST]
 
 DestroyFunc FuncSshXterm
 AddToFunc FuncSshXterm
-+ I Exec exec x-terminal-emulator -ut -T ssh@$0 -n ssh@$0 -e hostinfo -S $0 -t
++ I Exec exec x-terminal-emulator -ut -name ssh@$0 -T ssh@$0 -e hostinfo -S $0 -t
 
 DestroyFunc FuncScreenSshXterm
 AddToFunc FuncScreenSshXterm
 + I Next (screen-ssh@$0, AcceptsFocus) Iconify off
 + I Next (screen-ssh@$0, AcceptsFocus) Focus
 + I Next (screen-ssh@$0, AcceptsFocus) FuncWarpToTitle
-+ I None (screen-ssh@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-ssh@$0 -n screen-ssh@$0 -e hostinfo -S $0 -t screen -dRR $[HOST]
++ I None (screen-ssh@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -name screen-ssh@$0 -T screen-ssh@$0 -e hostinfo -S $0 -t screen -dRR $[HOST]
 
 DestroyFunc FuncXtermSsh
 AddToFunc FuncXtermSsh
-+ I Exec exec ssh -X $0 xterm
++ I Exec exec ssh -X $0 xterm -name xterm@$0 -T xterm@$0
 # }}}2
 # Application Functions {{{2
 DestroyFunc FuncFindWebBrowser
 AddToFunc FuncFindWebBrowser
-+ I Next ("WWW-Browser|Gecko|gecko|Galeon|Navigator|konqueror|dillo", AcceptsFocus) Iconify off
-+ I Next ("WWW-Browser|Gecko|gecko|Galeon|Navigator|konqueror|dillo", AcceptsFocus) Focus
++ I Next ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo", AcceptsFocus) Iconify off
++ I Next ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo", AcceptsFocus) Focus
 
 DestroyFunc FuncWebBrowser
 AddToFunc FuncWebBrowser
@@ -1354,7 +1361,7 @@ AddToFunc FuncCustomWebBrowser
 
 DestroyFunc FuncSmartWebBrowser
 AddToFunc FuncSmartWebBrowser
-+ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo "$*"|tr -d ' \t\n\r\f'`" ;; *) echo "$*"; exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo \"$*\"|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e s/\'/%27/g`" ;; esac
++ I Exec [ -e "$*" ] && exec "$HOME/bin/sensible-browser" "$*"; case "$*" in /*|./*) exec "$HOME/bin/sensible-browser" "$*" ;; *://*|*.*.*/*) exec "$HOME/bin/sensible-browser" "`echo "$*"|sed -e s/^+//|tr -d ' \t\n\r\f'`" ;; *) echo "$*"; exec "$HOME/bin/sensible-browser" "http://www.google.com/search?q=`echo \"$*\"|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e s/\'/%27/g`" ;; esac
 + I FuncFindWebBrowser
 
 DestroyFunc FuncCloseXmms
@@ -1365,26 +1372,39 @@ DestroyFunc FuncIrcScreenSshXterm
 AddToFunc FuncIrcScreenSshXterm
 + I Next (screen-irc@*, AcceptsFocus) Iconify off
 + I Next (screen-irc@*, AcceptsFocus) Focus
-+ I None (screen-irc@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@remote -n screen-irc@remote -e tpope chat
++ I None (screen-irc@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name screen-irc@remote -T screen-irc@remote -e tpope chat
 
 DestroyFunc FuncIrcScreenSshXtermShared
 AddToFunc FuncIrcScreenSshXtermShared
 + I Next (screen-irc@*, AcceptsFocus) Iconify off
 + I Next (screen-irc@*, AcceptsFocus) Focus
-+ I None (screen-irc@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -T screen-irc@remote -n screen-irc@remote -e tpope chat -x"
++ I None (screen-irc@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name screen-irc@remote -T screen-irc@remote -e tpope chat -x"
 
 DestroyFunc FuncIrcScreenXterm
 AddToFunc FuncIrcScreenXterm
 + I Next (screen-irc@localhost) Iconify off
 + I Next (screen-irc@localhost, AcceptsFocus) Focus
-+ I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -T screen-irc@localhost -n screen-irc@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
++ I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -name screen-irc@localhost -T screen-irc@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
 
 DestroyFunc FuncExec
 AddToFunc FuncExec
 + I Next ("$0") Iconify off
 + I Next ("$0", AcceptsFocus) Focus
 + I None ("$0") Exec $1
-# }}}2
+
+DestroyFunc FuncFvwmForm
+AddToFunc   FuncFvwmForm
++ I SetEnv LANG_ORIG $[LANG]
++ I UnsetEnv LANG
++ I FvwmForm $0
+#+ I SetEnv LANG $[LANG_ORIG]
++ I UnsetEnv LANG_ORIG
+PipeRead '[ -z "$[LANG]" ] || echo + I SetEnv LANG $[LANG]'
+
+DestroyFunc FuncFvwmFormRun
+AddToFunc   FuncFvwmFormRun
++ I FuncFvwmForm FvwmForm-Run
+# }}}2a
 # Menu Functions {{{2
 DestroyFunc FuncMusicPlay
 AddToFunc FuncMusicPlay
@@ -1728,7 +1748,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 *FvwmForm-Run: Input        Host           20      ""
 *FvwmForm-Run: Line         expand
 *FvwmForm-Run: Button       quit    "Run"           ^M
-*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -T screen-ssh@$(Host) -n screen-ssh@$(Host))$(Host!-T screen@localhost -n screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ;; *://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
+*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name screen-ssh@$(Host) -T screen-ssh@$(Host))$(Host!-name screen@localhost -T screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ;; *://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
 # Before saving the data, remove any previously saved data:
 *FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
 *FvwmForm-Run: Command !(                                      /bin/echo \
@@ -1737,11 +1757,11 @@ DestroyModuleConfig  FvwmForm-Run: *
 ) > ${FVWM_USERDIR}/.FvwmForm-Run
 *FvwmForm-Run: Command !(                                      /bin/echo \
   "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
- Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -T screen-ssh@$(Host) -n screen-ssh@$(Host))$(Host!-T screen@localhost -n screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ';; *://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
+ Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name screen-ssh@$(Host) -T screen-ssh@$(Host))$(Host!-name screen@localhost -T screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ';; *://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
 ) > ${FVWM_USERDIR}/.FvwmForm-RunLast
 
 *FvwmForm-Run: Button       quit    "In Terminal"           ^J
-*FvwmForm-Run: Command      Exec exec x-terminal-emulator $(Host?-ut) -name $(Host?ssh@$(Host)) $(Host!localhost) -n $(Host?ssh@$(Host)) $(Host!localhost) -e $(Host?ssh -Xt $(Host)) $(Program)
+*FvwmForm-Run: Command      Exec exec x-terminal-emulator $(Host?-ut) -name $(Host?ssh@$(Host)) $(Host!localhost) -T $(Host?ssh@$(Host)) $(Host!localhost) -e $(Host?ssh -Xt $(Host)) $(Program)
 # Before saving the data, remove any previously saved data:
 *FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
 *FvwmForm-Run: Command !(                                      /bin/echo \
@@ -1750,7 +1770,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 ) > ${FVWM_USERDIR}/.FvwmForm-Run
 *FvwmForm-Run: Command !(                                      /bin/echo \
   "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
-  Exec exec x-terminal-emulator $(Host?-ut) -name $(Host?ssh@$(Host)) $(Host!localhost) -n $(Host?ssh@$(Host)) $(Host!localhost) -e $(Host?ssh -Xt $(Host)) '$(Program)' \
+  Exec exec x-terminal-emulator $(Host?-ut) -name $(Host?ssh@$(Host)) $(Host!localhost) -T $(Host?ssh@$(Host)) $(Host!localhost) -e $(Host?ssh -Xt $(Host)) '$(Program)' \
 ) > ${FVWM_USERDIR}/.FvwmForm-RunLast
 *FvwmForm-Run: Button       restart "Reset"         F3
 *FvwmForm-Run: Button       quit    "Cancel"        ^[

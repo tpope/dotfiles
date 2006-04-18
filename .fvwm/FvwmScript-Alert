@@ -16,13 +16,15 @@ Init
   Set $activity ={}
 # ChangeIcon 1 $title
   Set $color ={White}
-  Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+# Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+  Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$//' -e 's/^ *//'} 1 -1)
  End
 
 PeriodicTasks
  Begin
   If (RemainderOfDiv (Add (GetTime) -25) 1200)==0 Then
-   Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+#  Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+   Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$//' -e 's/^ *//'} 1 -1)
   If (RemainderOfDiv (GetTime) 60)==20 Then
   Begin
    Set $activity =(GetOutput {tpope activity} 1 1)
@@ -69,19 +71,19 @@ PeriodicTasks
    Else
    Begin
    End
-   Set $apm =(GetOutput {if [ -x /usr/bin/apm ]; then power=`/usr/bin/apm | sed -e 's/^.* \([0-9]*\)%.*$/\1/' -e 's/.....*/100/'`; echo $power; elif [ -f /tmp/.phone-status ]; then . /tmp/.phone-status; [ "$battery" -a "$source" = 0 ] || battery=101; echo $battery; else echo 101; fi} 1 -1)
+   Set $apm =(GetOutput {if [ -x /usr/bin/acpi ]; then power=`/usr/bin/acpi | sed -e 's/%.*//' -e 's/.*, //'`; echo $power; elif [ -x /usr/bin/apm ]; then power=`/usr/bin/apm | sed -e 's/^.* \([0-9]*\)%.*$/\1/' -e 's/.....*/100/'`; echo $power; elif [ -f /tmp/.phone-status ]; then . /tmp/.phone-status; [ "$battery" -a "$source" = 0 ] || battery=101; echo $battery; else echo 101; fi} 1 -1)
    If $apm < 31 Then
    Begin
     Set $newtitle =$apm {%}
     Set $newforecolor =Red
    End
-   Set $wistrength =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth0 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,/.*,,'} 1 -1)
+   Set $wistrength =(GetOutput {[ -x /sbin/iwconfig ] && /sbin/iwconfig eth1 2>/dev/null|grep 'Link Quality'|sed -e 's/.*Link Quality[:=]//' -e 's,[/ ].*,,'} 1 -1)
    If $newtitle=={} Then
    Begin
     Set $newtitle =$wistrength
     Set $newforecolor =Brown
    End
-   If $newtitle=={--°} Then
+   If $newtitle=={--} Then
    Begin
     Set $newtitle =$wistrength
     Set $newforecolor =Brown
@@ -121,7 +123,7 @@ Main
   Begin
    If $forecolor=={DarkGreen} Then
    Begin
-    Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$/°/' -e 's/^ *//'} 1 -1)
+    Set $temp =(GetOutput {exec tpope temperature|sed -e 's/\..*//' -e 's/$//' -e 's/^ *//'} 1 -1)
    End
    If $forecolor=={Orange} Then
    Begin
