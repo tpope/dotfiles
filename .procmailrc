@@ -56,10 +56,10 @@ definitely-spam
 # is moved to "Spam".
 :0
 * ^X-Spam-Status: Yes
-spam
+probably-spam
 
 :0
-* ^From: domo <domo@tstar.net>
+* ^From: .*networkworld
 /dev/null
 
 # Mailing lists
@@ -81,5 +81,18 @@ debian-knoppix
 * ^Return-path: .*mutt-users.*@mutt\.org>$
 mutt-users
 
+:0
+* ^From: SPNET
+/dev/null
+
+:0
+* ^Content-Type:.* charset="iso-2022-jp"
+/dev/null
+
+:0
+* ^From: Arpwatch
+* ^Subject: flip flop
+/dev/null
+
 :0 ic
-| /usr/bin/Mailsound -h mona
+| /usr/bin/Mailsound -h tobias
