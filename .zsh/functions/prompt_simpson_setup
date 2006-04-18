@@ -14,26 +14,6 @@ prompt_simpson_setup () {
 	local hostname=${1:-`/bin/hostname`}
 	local hostcolor
 	case "$hostname" in
-		maggie*) hostletter=A
-			hostcolor="$fg_bold[cyan]"  ;;
-		bart*) hostletter=B
-			hostcolor="$fg_bold[red]"  ;;
-		lisa*) hostletter=L
-			hostcolor="$fg_no_bold[red]"  ;;
-		marge*) hostletter=M
-			hostcolor="$fg_bold[green]"  ;;
-		homer*) hostletter=H
-			hostcolor="$fg_no_bold[yellow]"  ;;
-		abe*) hostletter=E
-			hostcolor="$fg_no_bold[cyan]"  ;;
-		snowball*) hostletter=S
-			hostcolor="$fg_bold[black]"  ;;
-		carl*) hostletter=R
-			hostcolor="$fg_no_bold[magenta]"  ;;
-		lenny*) hostletter=Y
-			hostcolor="$fg_bold[blue]"  ;;
-		chief*|clancy*) hostletter=C
-			hostcolor="$fg_no_bold[blue]"  ;;
 		*) hostletter=`hostinfo -l`
 			hostcolor="`echo '\e'`[`hostinfo -c`m"  ;;
 	esac

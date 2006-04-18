@@ -14,7 +14,7 @@ FILES="\
  .profile .bashrc .bash_profile .screenrc .terminfo .dir_colors \
  .vimrc .vim/[^l]* .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
- .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js .pixmaps/* \
+ .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js .pixmaps/mi* \
  .fvwm/.fvwm2rc .fvwm/icons/* .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
  bin/sync-tpope bin/media bin/installer \
@@ -24,7 +24,7 @@ FILES="\
 LOCAL_FILES="\
  .kde/share/apps/konsole .gkrellm .gkrellm2/[^l]* .qt \
  .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
- .vim.local/*"
+ .vim.local/* .netscape/userContent.css"
 
 RSYNC_RSH="ssh -ax"
 [ -t 0 ] || RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20"
@@ -73,9 +73,9 @@ fi
 
 [ -n "$ALL_HOSTS" ] || simpson=1
 if [ -n "$simpson" ]; then
-	MY_HOSTS="$MY_HOSTS maggie sarah bart homer lisa mona marge"
-	ALL_HOSTS="$ALL_HOSTS maggie sarah bart abe homer lisa mona marge clancy ralph"
-	LOCAL_HOSTS="$LOCAL_HOSTS maggie sarah bart homer lisa mona marge"
+	MY_HOSTS="$MY_HOSTS gob oscar buster lindsay lucille tobias michael"
+	ALL_HOSTS="$ALL_HOSTS gob oscar buster lindsay lucille tobias michael maeby maggie barry lupe"
+	LOCAL_HOSTS="$LOCAL_HOSTS gob oscar buster lindsay lucille tobias michael"
 fi
 
 if [ -n "$cvs" ]; then

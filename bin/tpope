@@ -19,7 +19,7 @@ case "$PATH" in
     *) PATH="$HOME/bin:$PATH" ;;
 esac
 
-basename="`basename $0`"
+basename=`basename "$0"`
 if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
     tpope="$basename " basename="$1"
     shift
@@ -40,7 +40,9 @@ inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
 wordtrans() { echo "$1"|sed -e 's/-/[-A-Za-z0-9]/g'; }
 
 root_init() {
-    if [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
+    if inpath cygstart; then
+	as_root() { "$@"; }
+    elif [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
 	if inpath sudo && sudo -l >/dev/null 2>&1; then
 	    as_root() {
 		if [ "$1" = exec ]; then ex="exec"; shift; fi
@@ -101,6 +103,9 @@ do_clean() {
 	    if inpath wipe; then
 		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
 			xargs -0 wipe -fcsq >/dev/null 2>&1; }
+            elif inpath shred; then
+		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+			xargs -0 shred -fun 4 >/dev/null 2>&1; }
 	    else
 		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
 			xargs -0 rm >/dev/null 2>&1; }
@@ -115,7 +120,7 @@ do_clean() {
 	unset LD_PRELOAD
 	PROTECT_TRASH=NO
 	export PROTECT_TRASH
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
+	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" -o -name screen-exchange -o -name "*.stackdump" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
 	FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
 	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30`
 	[ $unit = 4 ] && unit=6
@@ -126,7 +131,7 @@ do_clean() {
 	if [ ! -d "$HOME/.trash" ]; then
 	    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
 	fi
-	rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/simpson/abe"
+	rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/.zsh/functions/_bibtex"
 	return 0
 }
 
@@ -155,7 +160,7 @@ status() {
     if [ "$#" = 0 -a -f "$HOME/.status" ]; then
 	exec cat "$HOME/.status"
     fi
-    if [ "$hostname" = marge ]; then
+    if [ "$hostname" = michael -o "$hostname" = marge ]; then
 	if [ "$1" = away -o "$1" = activity ] && [ "$#" = 1 ]; then
 	    exec cat "$HOME/.$1" 2>/dev/null
 	fi
@@ -165,11 +170,11 @@ status() {
 	    rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
 	    *) echo "Unknown status command $1" >&2 ;;
 	esac
-    elif ping -c 1 marge >/dev/null 2>&1; then
+    elif ping -c 1 michael >/dev/null 2>&1; then
 	if [ "$#" = 2 -a -z "$2" ]; then
-	    exec hostinfo -b marge tpope status "$1" -c
+	    exec hostinfo -b michael tpope status "$1" -c
 	else
-	    exec hostinfo -b marge tpope status "$@"
+	    exec hostinfo -b michael tpope status "$@"
 	fi
     else
 	exit 2
@@ -183,7 +188,7 @@ case "$basename" in
 	rclink rc start stop restart reload force-reload \
 	tomorrow vnc xssc mpl mpa mount shutdown whois char \
 	word ord wor or Word Ord Wor Or"
-	for app in apt-get aptitude emerge cardctl aumix feh rsync rubber xdvi xpdf gv; do
+	for app in apt-get aptitude emerge port cardctl aumix feh rsync rubber xdvi xpdf gv; do
 	    inpath $app && [ ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
 	done
 	echo $aliases
@@ -201,9 +206,9 @@ case "$basename" in
     esac ;;
 
     chat) if [ -z "$*" ]; then
-	    exec hostinfo -S marge -t '$HOME/.irssi/Chat-script' $hostname
+	    exec hostinfo -S michael -t '$HOME/.irssi/Chat-script' $hostname
 	else
-	    exec hostinfo -S marge -t '$HOME/.irssi/Chat-script' "$@"
+	    exec hostinfo -S michael -t '$HOME/.irssi/Chat-script' "$@"
 	fi ;;
 
     clean) do_clean "$@" ;;
@@ -251,11 +256,11 @@ case "$basename" in
 	    case "$arg" in
 		/*) [ -e "$arg" ] && dontcd=1 ;;
 		-*) [ -e "$arg" ] && dontcd=1 ;;
-		*) ;;
 	    esac
 	done
+        [ ! -x /usr/bin/setsid ] || setsid=/usr/bin/setsid
 	[ "$dontcd" ] || cd
-	$prefix "$@" &
+	$setsid $prefix "$@" &
 	exit 0
     ;;
 
@@ -272,7 +277,10 @@ case "$basename" in
 	;;
 
     ps-grep|pg)
-    if [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
+    if [ "`uname`" = Darwin ]; then
+        ps u|head -1
+        exec ps aux|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|egrep "$@"
+    elif [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
 	ps uf|head -1
 	exec ps auxf|egrep -v 'grep\>|\<pg\>'|sed -ne '2,$p'|egrep "$@"
     else
@@ -345,15 +353,15 @@ case "$basename" in
 	    rm "$tempfile"
 	fi
 	;;
-    
+
     sensible-editor|se)
-	term=exec
 	if [ "$DISPLAY" -a ! -t 0 ]; then
 	    inpath gvim && exec gvim -f "$@"
+            #exit
 	    term="exec x-terminal-emulator -title Editor -e"
 	fi
 	if inpath gvim; then
-	    $term vim -X "$@"
+	    $term vim "$@"
 	elif inpath vim; then
 	    $term vim "$@"
 	elif inpath vi; then
@@ -404,7 +412,7 @@ case "$basename" in
 	    [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
 	esac
     done
-    args=-uCP
+    args=-CP
     [ "$basename" = suscp ] && args=-P
     sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
     ret="$?"
@@ -510,7 +518,7 @@ case "$basename" in
 	    '') exec "$basename" "$@" ;;
 	    *) root_init; as_root exec "$basename" "$@" ;;
 	esac ;;
-    emerge|aptitude) no_links
+    emerge|aptitude|port) no_links
 	case "$1" in
 	    search) exec "$basename" "$@" ;;
 	    *) root_init; as_root exec "$basename" "$@" ;;
@@ -536,7 +544,7 @@ case "$basename" in
     feh) no_links
 	try_libtrash feh -Z "$@" ;;
     rsync) no_links
-	exec rsync -uCP "$@" ;;
+	exec rsync -CP "$@" ;;
     rubber) no_links
 	if [ "$*" ]; then
 	    exec rubber "$@"
@@ -572,6 +580,6 @@ case "$basename" in
 	    exec /usr/bin/whois "$@"
 	fi ;;
 
-    '') echo "Usage: `basename $0` <command> [options]" ;;
+    '') echo "Usage: `basename "$0"` <command> [options]" ;;
     *) echo "$basename: unknown command." >&2 ;;
 esac
