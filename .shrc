@@ -5,7 +5,7 @@
 # bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
 # .zshrc, .bashrc, and .profile, respectively.
 
-for dir in /usr/ucb /usr/local/bin /opt/sfw/bin; do
+for dir in /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
     if [ -d "$dir" ]; then
 	case "$PATH" in
 	    *"$dir"*) ;;
@@ -28,18 +28,36 @@ case "$PATH" in
     *) PATH="$HOME/bin:$PATH" ;;
 esac
 
+if [ -f "$HOME/.locale" -a -z "$LANG" -a -z "$LC_ALL" ]; then
+    LANG="`cat "$HOME/.locale"`"
+    export LANG
+fi
+
 CLASSPATH=.
 [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
 [ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
 
-PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+[ -d "$HOME/.ruby" ] && RUBYLIB="$HOME/.ruby"
 
-export PATH CLASSPATH PERL5LIB
+for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
+    case ":$PERL5LIB:" in
+        *:"$dir":*) ;;
+        *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB$dir"
+    esac
+done
+PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
+[ ! -f "$HOME/.perl/Echo.pm" ] || case "$PERL5OPT" in
+   *Echo*) ;;
+   '') PERL5OPT="-MEcho" ;;
+   *)  PERL5OPT="$PERL5OPT -MEcho" ;;
+esac
+
+export PATH CLASSPATH PERL5LIB PERL5OPT RUBYLIB RUBYOPT
 
 RSYNC_RSH='ssh -axqoBatchmode=yes'
 CVS_RSH='ssh'
-CVSROOT=':ext:rebelongto.us:/home/tpope/.cvs'
-[ "`hostname`" != bart ] || CVSROOT="$HOME/.cvs"
+CVSROOT=':ext:iling.us:/home/tpope/.cvs'
+[ "`hostname`" != gob ] || CVSROOT="$HOME/.cvs"
 LYNX_CFG="$HOME/.lynx.cfg"
 export RSYNC_RSH CVS_RSH CVSROOT LYNX_CFG
 
@@ -130,7 +148,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	[ -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
 	    alias vi='vim'
 	[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
-	    alias vi='vim -X'
+	    alias vi='vim' # -X
 
 	if [ -x "`which dircolors 2>/dev/null`" ]; then
 	    eval `dircolors -b "$HOME/.dir_colors"`
@@ -140,11 +158,14 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	    alias ls="gls -F --color=auto"
 	fi
 
+	if ! grep --color 2>&1 | grep unknown >/dev/null; then
+	    alias grep='grep --color=auto'
+	fi
+
 	if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
 	    alias less='less -R'
 	    alias zless='zless -R'
 	    #PAGER='less -R'
-	    LESSCHARSET='iso8859'
 	fi
 
 	unalias stop >/dev/null 2>&1
@@ -178,3 +199,5 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 fi
 unset promptchar interactive execbin hostname oldterm dir mtime atime
 fi
+
+test -f "$HOME/.shrc.local" && . "$HOME/.shrc.local"

@@ -268,6 +268,10 @@ for dir in .firefox/default .phoenix/default .mozilla/default .mozilla/$LOGNAME 
 	    ln -s ../../../.netscape/user.js "$subdir/user.js"
 	    links=1
 	fi
+	if [ -d "$subdir/chrome" -a ! -e "$subdir/chrome/userContent.css" -a ! -L "$subdir/chrome/userContent.css" ]; then
+	    ln -s ../../../../.netscape/userContent.css "$subdir/chrome/userContent.css"
+	    links=1
+	fi
 	for file in localstore.rdf ctxextensions.rdf bookmarks.html; do
 	    if [ -f "$HOME/.netscape/$file" -a ! -s "$subdir/$file" ]; then
 		cp "$HOME/.netscape/$file" "$subdir/$file"
@@ -346,7 +350,8 @@ if [ "$cron" = 0 -o "$cron" = n ]; then
 	shell=/bin/sh
 	env=ENV
     fi
-    [ -n "$PERL5LIB" ] || PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+    [ -n "$PERL5LIB" ]  || PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+    [ -n "$RUBYLIB" ]   || RUBYLIB="$HOME/.ruby"
     [ -n "$CLASSPATH" ] || CLASSPATH=".:$HOME/.java:$HOME/java"
     cat >/tmp/crontab.template.$$ <<EOF
 # -*- crontab -*- vim:set ft=crontab:
@@ -357,6 +362,7 @@ $env=$HOME/.shrc
 CLASSPATH=$CLASSPATH
 PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
 PERL5LIB=$PERL5LIB
+RUBYLIB=$RUBYLIB
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
 20 */4 * * *	tpope cron

@@ -7,26 +7,40 @@ if ( { test -t 1 } && $?TERM ) then
     "]I.kde/share/icons/`hostname|sed -e 's/[.].*//'`.xpm\" # "
 endif
 
-foreach dir ( /usr/ucb /usr/local/bin /opt/sfw/bin "$HOME/bin" )
+foreach dir ( /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/bin" )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin /usr/etc )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
+if ( -f "$HOME/.locale" && ! $?LANG && ! $?LC_ALL ) then
+    setenv LANG "`cat ~/.locale`"
+endif
+
 setenv ENV "$HOME/.shrc"
 setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java"
 if ( -d "$HOME/java" )  setenv CLASSPATH "${CLASSPATH}:$HOME/java"
+if ( -d "$HOME/.ruby" ) setenv RUBYLIB   "$HOME/.ruby"
 setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
+if ( -f "$HOME/.perl/Echo.pm" ) then
+    if ( $?PERL5OPT ) then
+        if ( "x$PERL5OPT" !~ *Echo* ) setenv PERL5OPT "$PERL5OPT -MEcho"
+    else
+        setenv PERL5OPT "-MEcho"
+    endif
+endif
 setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
 if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
 setenv CVS_RSH 'ssh'
 
 unset dir
 
-limit maxproc 256 >&/dev/null
-if ($?CRON == 1) limit maxproc 128 >&/dev/null
+if ( { limit maxproc 256 } ) then >&/dev/null
+    limit maxproc 256 >&/dev/null
+    if ($?CRON == 1) limit maxproc 128 >&/dev/null
+endif
 
 if ( $?prompt == 0 ) exit
 if ( "$prompt" == "" ) exit
@@ -40,8 +54,8 @@ setenv PAGER "$HOME/bin/sensible-pager"
 setenv BROWSER "$HOME/bin/sensible-browser"
 setenv LESSOPEN '|lesspipe %s'
 set hostname = `hostname|sed -e 's/[.].*//'`
-setenv CVSROOT ':ext:rebelongto.us:/home/tpope/.cvs'
-if ( $hostname == bart ) setenv CVSROOT "$HOME/.cvs"
+setenv CVSROOT ':ext:iling.us:/home/tpope/.cvs'
+if ( $hostname == gob ) setenv CVSROOT "$HOME/.cvs"
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
@@ -86,6 +100,7 @@ if ( $?tcsh ) then
     case screen*:
     case vt220*:
 	alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
+	#alias precmd ']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
 	#echo -n "k${ttydash}${hostname}\" # "
 	set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
 	breaksw
@@ -146,6 +161,8 @@ else
     alias ls 'ls -F'
 endif
 
+grep --color |& grep unknown >/dev/null || alias grep 'grep --color=auto'
+
 if ( -x /usr/bin/finger && -f "$HOME/.hushlogin" ) then
     /usr/bin/finger $USER | grep '^New mail' >&/dev/null && \
 	echo "You have new mail."
@@ -165,13 +182,12 @@ if ( -x /usr/bin/vim || -x /usr/local/bin/vim || -x /opt/sfw/bin/vim ) then
 endif
 
 if ( -x /usr/bin/gvim || -x /usr/local/bin/gvim || -x /opt/sfw/bin/gvim ) then
-    alias vi 'vim -X'
+    alias vi 'vim' # -X
 endif
 
 if ( `uname` == Linux ) then
     alias less 'less -R'
     alias zless 'zless -R'
-    setenv LESSCHARSET 'iso8859'
 endif
 
 foreach cmd ( `tpope aliases` )
