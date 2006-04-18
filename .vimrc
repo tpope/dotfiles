@@ -4,14 +4,17 @@ version 5.0
 
 " Section: Options {{{1
 " ---------------------
-set runtimepath^=~/.vim/local,~/.vim.local
-set runtimepath+=~/.vim.local/after,~/.vim/local/after
+set runtimepath^=~/.config/vim,~/.vim.local
+set runtimepath+=~/.vim.local/after,~/.config/vim/after
 
+set nocompatible
 set autoindent
 set autowrite       " Automatically save before commands like :next and :make
 set backspace=2
 set backup          " Do keep a backup file
+set backupskip+=*.tmp
 set cmdheight=2
+set copyindent
 set grepprg=grep\ -nH\ $*
 set incsearch       " Incremental search
 set joinspaces
@@ -39,28 +42,35 @@ set wildmenu
 set wildmode=longest:full,full
 set wildignore+=*~
 
+let treeExplVertical = 1
 let spell_auto_type = "mail"
 let spell_insert_mode = 0
 let c_comment_strings=1
+let g:EnhCommentifyBindInInsert='No'
 let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let g:Imap_PlaceHolderStart="\xab"
 let g:Imap_PlaceHolderEnd="\xbb"
 
 if has("gui_running")
   if has("unix")
-    set guifont=bitstream\ vera\ sans\ mono\ 11,fixed,-bitstream-bitstream\ vera\ sans\ mono-medium-r-normal-*-*-110-*-*-m-*-iso8859-1
+    set guifont=bitstream\ vera\ sans\ mono\ 11 ",fixed,-bitstream-bitstream\ vera\ sans\ mono-medium-r-normal-*-*-110-*-*-m-*-iso8859-1
     "set guioptions-=T guioptions-=m
   elseif has("win32")
-    set guifont=Courier\ New:h11
+    set guifont=Courier\ New:h10
+  elseif has("mac")
+    set guifont=Monaco:h12
   endif
   set background=light
-  set cmdheight=2 lines=25 columns=80
+  set cmdheight=2 lines=25 " columns=80
   set title
   map <S-Insert> <MiddleMouse>
   map! <S-Insert> <MiddleMouse>
+  if has("diff") && &diff
+    set columns=165
+  endif
 else
   set background=dark
-  set notitle
+  set notitle noicon
 endif
 
 if version>=600
@@ -90,6 +100,9 @@ endif
 " Section: Functions {{{1
 " -----------------------
 
+command! Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
+command! Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
+
 function! Invert()
   if &background=="light"
     set background=dark
@@ -101,6 +114,22 @@ function! Invert()
   endif
 endfunction
 command! Invert :call Invert()
+
+function! Fancy()
+  if &number
+    if has("gui_running")
+      let &columns=&columns-12
+    endif
+    set nonumber foldcolumn=0
+  else
+    if has("gui_running")
+      let &columns=&columns+12
+    endif
+    set number foldcolumn=4
+  endif
+endfunction
+command! Fancy :call Fancy()
+
 
 function! OpenURL(url)
   if has("win32")
@@ -120,7 +149,10 @@ function! Run()
     !perl -w %
   elseif &ft == "ruby"
     wa
-    !ruby -w %
+    !ruby %
+  elseif &ft == "python"
+    wa
+    !python %
   elseif &ft == "html" || &ft == "xhtml" || &ft == "php" || &ft == "aspvbs" || &ft == "aspperl"
     wa
     if !exists("b:url")
@@ -137,10 +169,14 @@ function! Run()
     normal "\ss"
   elseif expand("%:e") == "tex"
     wa
-    exe "normal :!rubber %:r && xdvi %:r &\<CR>"
+    exe "normal :!rubber -f %:r && xdvi %:r &\<CR>"
   else
     wa
-    make %
+    if &makeprg =~ "%"
+      make
+    else
+      make %
+    endif
     "exe "normal :!Eterm -t White -T 'make test' --pause -e make -s test &\<CR>"
   endif
 endfunction
@@ -161,9 +197,9 @@ function! InsertTabWrapper()
   endif
 endfunction
 if version >= 600
-  inoremap <silent> <Tab> <C-R>=InsertTabWrapper()<CR>
+  "inoremap <silent> <Tab> <C-R>=InsertTabWrapper()<CR>
 else
-  inoremap <Tab> <C-R>=InsertTabWrapper()<CR><C-O>:<Backspace>
+  "inoremap <Tab> <C-R>=InsertTabWrapper()<CR><C-O>:<Backspace>
 endif
 
 function! TemplateFileFunc_sh()
@@ -172,6 +208,10 @@ endfunction
 
 function! TemplateFileFunc_pl()
   $
+endfunction
+
+function! TemplateFileFunc_html()
+  norm k3w
 endfunction
 
 function! FTCheck_asmsyntax()
@@ -195,6 +235,7 @@ else
   runtime! macros/matchit.vim
 endif
 
+"
 " Section: Mappings {{{1
 " ----------------------
 
@@ -202,6 +243,7 @@ endif
 "     source ~/.vim/mappings.vim
 " endif
 
+inoremap <C-]> <Esc>`^
 if ! has("gui_running")
   map <Esc>[3^ <C-Del>
   map <Esc>[5^ <C-PageUp>
@@ -211,13 +253,20 @@ if ! has("gui_running")
   map <Esc>[6;5~ <C-PageDown>
 endif
 
-map Q       gq        " Don't use Ex mode; use Q for formatting
+" Don't use Ex mode; use Q for formatting
+map Q       gqq
+" open URL under cursor in browser
 map gb      :call OpenURL(expand("<cfile>"))<CR>
 " Run p in Visual mode replace the selected text with the "" register.
-vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
+"vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
 vnoremap <C-C> "+y
 imap <F1>   <C-O><F1>
 map <F1>    K<CR>
+if has("gui_running")
+  map <F2>  :Fancy<CR>
+else
+  " pastetoggle
+endif
 map <F3>    :Invert<CR>
 map <F4>    :cprev<CR>
 map <F5>    :cc<CR>
@@ -231,8 +280,9 @@ imap <F12> <C-O><F12>
 map <C-F4>  :bdelete<CR>
 "map <t_%9>  :hardcopy<CR>         " Print Screen
 
-map <C-Z> :shell<CR>
-map <Leader>at gg}jWdWWPX " Attribution Fixing
+"map <C-Z> :shell<CR>
+" Attribution Fixing
+map <Leader>at gg}jWdWWPX
 map <Leader>sa :!aspell -c --dont-backup "%"<CR>:e! "%"<CR><CR>
 map <Leader>si :!ispell "%"<CR>:e! "%"<CR><CR>
 "map <Leader>sh :so `sh /usr/share/doc/vim/tools/vimspell.sh %`<CR><CR>
@@ -240,21 +290,23 @@ map <Leader>sw :!echo "<cword>"\|aspell -a --<CR>
 map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
 map <Leader>fJ :% call Justify('',3,)<CR>
 map <Leader>fp gqap
-map <Leader>fd :!webster "<cword>" &<CR>
-map <Leader>ft :!thesaurus "<cword>" &<CR>
-map <Leader>v :so ~/.vimrc<CR>
+map <Leader>fd :!webster "<cword>"<CR>
+map <Leader>ft :!thesaurus "<cword>"<CR>
 " Merge consecutive empty lines
-map <Leader>Sj :g/^\s*$/,/\S/-j<CR>
+map <Leader>fm :g/^\s*$/,/\S/-j<CR>
+map <Leader>v :so ~/.vimrc<CR>
 " Wrap visual in parentheses
 vmap <Leader>( v`>a)<ESC>`<i(<ESC>
 ") <-- Fix syntax highlighting
+" EnhancedCommentify
+map <silent> \\      <Plug>Traditionalj
 
 " Emacs style mappings
 noremap! <C-A>    <Home>
-noremap! <C-B>    <Left>
+"noremap! <C-B>    <Left>
 cnoremap <C-D>    <Del>
 noremap! <C-E>    <End>
-noremap! <C-F>    <Right>
+"noremap! <C-F>    <Right>
 "noremap! <C-N>    <Down>
 "noremap! <C-P>    <Up>
 noremap! <M-a>    <C-O>(
@@ -269,6 +321,8 @@ if ! has("gui")
   cnoremap <Esc>f   <S-Right>
 endif
 
+map <M-,> :Smaller<CR>
+map <M-.> :Bigger<CR>
 noremap <C-PageUp> :bprevious<CR>
 noremap <C-PageDown> :bnext<CR>
 noremap <C-Del> :bdelete<CR>
@@ -344,7 +398,7 @@ if has("autocmd")
   else
     filetype on
   endif
-  augroup FTMisc
+  augroup FTMisc " {{{2
     autocmd!
     autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] 
           \ if filereadable(expand("~/.vim/templates/skel.sh")) |
@@ -361,21 +415,26 @@ if has("autocmd")
           \ set ft=sh | 1
     autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_new="+x"
     autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_new="+x"
-    autocmd BufNewFile */.netrc,*/.fetchmailrc let b:chmod_new="go-rwx"
+    autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
     autocmd BufWritePost,FileWritePost * if exists("b:chmod_new")|
           \ silent! execute "!chmod ".b:chmod_new." <afile>"|
           \ unlet b:chmod_new|
           \ endif
     autocmd BufWritePost,FileWritePost ~/.Xdefaults,~/.Xresources silent! !xrdb -load % >/dev/null 2>&1
-    autocmd BufWritePre,FileWritePre */.vim/*.vim,~/.vimrc* exe "normal msHmt" |
-          \ %s/^\(" Last [Cc]hange:\s\+\).*/\=submatch(1).strftime("%Y %b %d")/e |
-          \ exe "normal `tzt`s"
-    autocmd BufRead /usr/src/* setlocal patchmode=.org
+    autocmd BufWritePre,FileWritePre /etc/* if &ft == "dns" |
+          \ exe "normal msHmt" |
+          \ exe ":g/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
+          \ exe "normal `tzt`s" |
+          \ endif
+"    autocmd BufWritePre,FileWritePre */.vim/*.vim,*/.vim.*/*.vim,~/.vimrc* exe "normal msHmt" |
+"          \ %s/^\(" Last [Cc]hange:\s\+\).*/\=submatch(1).strftime("%Y %b %d")/e |
+"          \ exe "normal `tzt`s"
+    autocmd BufRead /usr/* setlocal patchmode=.org
     autocmd BufReadPre *.doc | setlocal readonly
     autocmd BufReadCmd *.doc execute "0read! antiword \"<afile>\""|$delete|1|set nomodifiable
     autocmd FileReadCmd *.doc execute "read! antiword \"<afile>\""
-  augroup END
-  augroup FTCheck
+  augroup END " }}}2
+  augroup FTCheck " {{{2
     autocmd!
     autocmd BufNewFile,BufRead *Fvwm*             set ft=fvwm
     autocmd BufNewFile,BufRead *.cl[so],*.bbl     set ft=tex
@@ -383,8 +442,10 @@ if has("autocmd")
     autocmd BufNewFile,BufRead /var/www/*.module  set ft=php
     autocmd BufNewFile,BufRead *named.conf*       set ft=named
     autocmd BufNewFile,BufRead *.bst              set ft=bst
+    autocmd BufNewFile,BufRead *.vb               set ft=vbnet
     autocmd BufNewFile,BufRead /var/www/*
           \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
+    autocmd BufNewFile,BufRead /etc/udev/*.rules set ft=udev
     autocmd BufNewFile,BufRead *.txt,README,INSTALL set ft=text
     autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*  set ft=simpsons
     autocmd BufRead * if expand("%") =~? '^https\=://.*/$'|setf html|endif
@@ -399,20 +460,25 @@ if has("autocmd")
     "else
       "autocmd FileType perl setlocal makeprg=perl\ -wc\ %
     "endif
-  augroup END
-  augroup FTOptions
+  augroup END " }}}2
+  augroup FTOptions " {{{2
     autocmd!
+    autocmd FileType c,cpp,cs,java          setlocal ai et sta sw=4 sts=4 cin
     autocmd FileType sh,csh,tcsh,zsh        setlocal ai et sta sw=4 sts=4
     autocmd FileType tcl,perl,python,ruby   setlocal ai et sta sw=4 sts=4
-    autocmd FileType c,cpp,cs,java          setlocal ai et sta sw=4 sts=4 cin
-    autocmd FileType php,aspperl,aspvbs     setlocal ai et sta sw=4 sts=4
-    autocmd FileType html,xhtml,tex,css     setlocal ai et sta sw=2 sts=2
+    autocmd FileType php,aspperl,aspvbs,vb  setlocal ai et sta sw=4 sts=4
+    autocmd FileType apache,sql,vbnet       setlocal ai et sta sw=4 sts=4
+    autocmd FileType html,xhtml,xml,tex,css setlocal ai et sta sw=2 sts=2
+    autocmd FileType eruby,yaml             setlocal ai et sta sw=2 sts=2
     autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8
-    autocmd FileType aspvbs runtime! indent/vb.vim | setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq " | unlet b:did_ftplugin|runtime! ftplugin/vb.vim
+    autocmd FileType cs,vbnet               setlocal foldmethod=syntax
+    autocmd FileType aspvbs,vbnet runtime! indent/vb.vim | setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
     autocmd FileType bst setlocal smartindent ai sta sw=2 sts=2
+    autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ %
+    autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
+    autocmd FileType html setlocal iskeyword+=:,~
     autocmd FileType java silent! compiler javac | setlocal makeprg=javac\ %
     autocmd FileType mail setlocal tw=70|if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
-    autocmd FileType html setlocal iskeyword+=:,~
     autocmd FileType perl silent! compiler perl | setlocal iskeyword+=: keywordprg=perl\ -e'$c=shift;exec\ q{perldoc\ }.($c=~/^[A-Z]\|::/?q{}:q{-f}).qq{\ $c}'
     autocmd FileType python setlocal keywordprg=pydoc
     autocmd FileType ruby silent! compiler ruby | setlocal makeprg=ruby\ -wc\ % keywordprg=ri
@@ -429,7 +495,7 @@ if has("autocmd")
           \ endif
     autocmd FileType vim  setlocal ai et sta sw=4 sts=4 keywordprg=:help
     "autocmd BufWritePost ~/.vimrc   so ~/.vimrc
-  augroup END
+  augroup END "}}}2
 endif " has("autocmd")
 
 " }}}1
