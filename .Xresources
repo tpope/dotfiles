@@ -53,6 +53,8 @@ Netscape*documentFonts.yResolution*iso-8859-1: 100
 
 !## XTERM {{{1
 #define FIXED -misc-fixed-medium-r
+#define ENC iso8859-1
+#define UTFENC iso10646-1
 !#define FIXED -jmk-neep-medium-r
 XTerm*VT100*background: #000000
 XTerm*VT100*foreground: #aaaaaa
@@ -61,47 +63,71 @@ XTerm*scrollBar: false
 !XTerm*backarrowKey: false
 XTerm*colorBDMode: true
 XTerm*colorBD: #ffffff
-XTerm*cursorColor: #cccccc
+XTerm*cursorColor: #c0c040
 #if WIDTH > 1150
-XTerm*font: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
-XTerm*boldFont: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
-XTerm*font3: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
-XTerm*fontMenu*font3*Label: Normal
+! nomral--13
+XTerm.VT100.font:                FIXED-normal--14-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font:     FIXED-normal--14-*-*-*-c-*-UTFENC
+XTerm.VT100.boldFont:            FIXED-normal--14-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.boldFont: FIXED-normal--14-*-*-*-c-*-UTFENC
+XTerm.VT100.font3:               FIXED-semicondensed--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font3:    FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm*fontMenu*font3*Label:      Normal
 #elif WIDTH < 800
-XTerm*font: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
-XTerm*boldFont: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
-XTerm*font3: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
-XTerm*fontMenu*font3*Label: Normal
+XTerm.VT100.font:                FIXED-normal--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font:     FIXED-normal--13-*-*-*-c-*-UTFENC
+XTerm.VT100.boldFont:            FIXED-normal--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.boldFont: FIXED-normal--13-*-*-*-c-*-UTFENC
+XTerm.VT100.font3:               FIXED-semicondensed--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font3:    FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm*fontMenu*font3*Label:      Normal
 #elif WIDTH < 1000
-XTerm*font: -misc-fixed-medium-r-normal--10-*-*-*-c-*-iso8859-1
-XTerm*boldFont: -misc-fixed-medium-r-normal--10-*-*-*-c-*-iso8859-1
-XTerm*font3: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
-XTerm*fontMenu*font3*Label: Normal
+XTerm.VT100.font:                FIXED-normal--10-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font:     FIXED-normal--10-*-*-*-c-*-UTFENC
+XTerm.VT100.boldFont:            FIXED-normal--10-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.boldFont: FIXED-normal--10-*-*-*-c-*-UTFENC
+XTerm.VT100.font3:               FIXED-semicondensed--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font3:    FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm*fontMenu*font3*Label:      Normal
 #else
-XTerm*font: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
-XTerm*boldFont: -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
-XTerm*font3: -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
-XTerm*fontMenu*font3*Label: Large
+XTerm.VT100.font:                FIXED-semicondensed--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font:     FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm.VT100.boldFont:            FIXED-semicondensed--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.boldFont: FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm.VT100.font3:               FIXED-normal--13-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font3:    FIXED-normal--13-*-*-*-c-*-UTFENC
+XTerm*fontMenu*font3*Label:      Large
 #endif
 XTerm*fontMenu*fontdefault*Label: Default
-XTerm*font1: -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
-XTerm*fontMenu*font1*Label: Tiny
-XTerm*font2: -misc-fixed-medium-r-normal--7-*-*-*-c-*-iso8859-1
-XTerm*fontMenu*font2*Label: Small
-XTerm*font4: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm.VT100.font1:           -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
+XTerm.VT100.utf8Fonts.font1:   FIXED-normal--6-*-*-*-c-*-UTFENC
+XTerm*fontMenu*font1*Label:   Tiny
+XTerm.VT100.font2:              FIXED-normal--7-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font2:   FIXED-normal--7-*-*-*-c-*-UTFENC
+XTerm*fontMenu*font2*Label:   Small
+XTerm.VT100.font4:              FIXED-normal--20-*-*-*-c-*-ENC
+XTerm.VT100.utf8Fonts.font4:   FIXED-normal--18-*-*-*-c-*-UTFENC
 XTerm*fontMenu*font4*Label: Huge
-XTerm*font5: -sony-fixed-medium-r-normal--24-*-*-*-c-*-iso8859-1
+XTerm.VT100.font5:              -sony-fixed-medium-r-normal--24-*-*-*-c-*-*-1
+XTerm*VT100.utf8Fonts.font5:   FIXED-normal--20-*-*-*-c-*-UTFENC
 XTerm*fontMenu*font5*Label: Gigantic
-XTerm*font6: -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
+XTerm.VT100.font6:              -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
+XTerm.VT100.utf8Fonts.font6:   -*-clean-medium-r-normal--12-*-*-*-c-*-UTFENC
 XTerm*fontMenu*font6*Label: VGA
 XTerm*faceSize: 10
 XTerm*visualBell: true
 XTerm*eightBitInput: false
 XTerm*modifyCursorKeys: 1
+XTerm*trimSelection: true
 XTerm*CharClass: 33:48,37-38:48,45-47:48,58:48,61:48,63-64:48,126:48,161-255:48
+XTerm*VT100.activeIcon: true
 XTerm*VT100*translations: #override \
 	Ctrl<Key>comma: smaller-vt-font() \n\
-	Ctrl<Key>period: larger-vt-font()
+	Ctrl<Key>period: larger-vt-font() \n\
+	<Key>XF86Back: string(0x1b) string("[1;2D") \n\
+	<Key>XF86Forward: string(0x1b) string("[1;2C") \n\
+	<Key>leftanglebracket: string(0x1b) string("[1;2D") \n\
+	<Key>rightanglebracket: string(0x1b) string("[1;2C")
 XTerm*VT100*color0: #000000
 XTerm*VT100*color1: #aa0000
 XTerm*VT100*color2: #00aa00
@@ -175,7 +201,7 @@ Clock*jewel: black
 Clock*BorderColor: darkgreen
 Clock*Background: white
 
-XClock*font: -misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1
+XClock*font: FIXED-normal--8-80-75-75-c-50-ENC
 ! }}}1
 !## XBIFF {{{1
 XBiff*volume: 80
@@ -192,10 +218,11 @@ XFaces.facedbPath:	.picons:/home/tpope/.picons:/usr/share/picons:/usr/share/pico
 XDvi.editor: vim -g --remote +%l %f
 !XDvi.editor: vim -c ":RemoteOpen +%l %f"
 XDvi.wwwBrowser: sensible-browser
-XDvi.geometry: 746x738+50+0
+XDvi.geometry: 746x700+50+0
 XDvi.shrinkFactor: 7
 XDvi.expert: true
 XDvi.Margin: 1in
+XDvi.paper: us
 XDvi.mainTranslations: #override \
 	<Btn1Down>: do-href()magnifier(*1)\n\
 	<Btn2Down>: do-href-newwindow()source-special()\n\
