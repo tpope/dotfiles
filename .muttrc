@@ -25,11 +25,13 @@ set pgp_replysign
 set nopgp_autosign
 set pgp_replysignencrypted
 set pgp_timeout=900
+set nouse_domain
+set nouse_from
 set realname="Tim Pope"
-`if mutt -v|head -1|egrep '1.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(kstrp00|timothy.pope)@tamuk\.edu|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@rebelongto\.us)$"
 set reverse_name
 set reverse_realname
 set query_command="lbdbq %s 2>/dev/null"
+`if mutt -v|head -1|egrep '1\.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(kstrp00|timothy\.pope)@tamuk\.edu|timothy\.pope@jmwaller\.com|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@(rebelongto\.us|tpope\.info|tpope\.net))$"
 `[ -d "$HOME/.smime/certificates" ] && echo set smime_default_key=$(hostname).pem || echo set`
 `[ -x /usr/bin/muttprint ] && echo set print_command=muttprint || echo set`
 
@@ -42,14 +44,14 @@ alternative_order text/enriched text/richtext text/plain text
 # Section: Headers {{{1
 # ---------------------
 unhdr_order *
-hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: User-Agent: X-Mailer: X-Editor: X-Operating-System: Subject: X-Spam-Status:
+hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: X-MimeOLE User-Agent: X-Mailer: X-Editor: X-Operating-System: Subject: X-Spam-Status:
 
 my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
 my_hdr X-All-Your-Base-Are-Belong-To: Us
-my_hdr X-URL: http://www.sexygeek.org/
-#
-# More header weeding
-#
+my_hdr X-URL: http://www.tpope.net/
+
+# Header weeding
+
 unignore Date User-Agent X-Mailer
 ignore Envelope-to X-OriginalArrivalTime X-ClientAddr X-Originating-IP X-UID
 ignore Importance X-Keywords Delivery-date X-Apparently-To X-Apparently-From
@@ -59,6 +61,7 @@ ignore X-Spam-Flag X-Spam-Level X-Spam-Checker-Version X-Spam-Prev
 ignore X-All-Your-Base-Are-Belong-To X-BFI X-HotPOP-Delivered-To X-Return-Path
 ignore X-eGroups- X-Yahoo-Profile X-Juno-Line-Breaks X-Mailman- X-BeenThere
 ignore X-YahooFilteredBulk X-Header-Overseas X-Header-NoReverseIP
+ignore X-MS- Thread- X-Priority X-ASG- X-ORBL X-Barracuda-Spam-
 ignore Return-Path Message-ID Received Mime-Version Content-Disposition
 ignore Content-Type Content-Length Status Lines "From "
 
@@ -71,6 +74,7 @@ bind pager > next-line
 bind pager + next-line
 bind pager 0 next-page
 bind generic 0 next-page
+bind index <Esc>N search-opposite
 
 # Section: Macros {{{1
 # --------------------
@@ -86,12 +90,17 @@ macro pager \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forg
 
 # Section: Hooks {{{1
 # -------------------
+charset-hook ^iso-8859-1$ cp1252
 #send-hook . 'set pgp_create_traditional=yes; unmy_hdr From:' #; set from='
+send-hook . 'unmy_hdr From:'
+send-hook ~C@jmwaller\.com 'my_hdr From: Tim Pope <timothy.pope@jmwaller.com>'
+send-hook ~C@tamuk\.edu 'my_hdr From: Tim Pope <kstrp00@tamuk.edu>'
+
 message-hook '~A' 'unignore X-Face; ignore X-Spam-Status'
 message-hook '~P|~h ^X-All-Your-Base-Are-Belong-To:' 'ignore X-Face X-Spam-Status'
 message-hook '~h X-Spam-Level:\ \\*' 'unignore X-Face X-Spam-Status'
-save-hook '~h X-Spam-Level:\ \\*\\*\\*' =spam
-#save-hook '~H .' =spam
+save-hook '~h X-Spam-Level:\ \\*\\*\\*' =definitely-spam
+#save-hook '~H .' =definitely-spam
 #reply-hook . 'set pgp_autosign=yes; set pgp_create_traditional=ask-no'
 #reply-hook '~h ^X-Mailer: (Internet Mail Service|AOL|Microsoft Outlook)' 'set pgp_create_traditional=ask-yes'
 #reply-hook '~h ^User-Agent: (Mutt)' 'set pgp_create_traditional=no'
@@ -110,7 +119,7 @@ score '~D' -3
 
 # Section: Colors {{{1
 # --------------------
-`mutt -v|grep +HAVE_COLOR >/dev/null && [ -f ~/.muttrc-color ] && echo source ~/.muttrc-color || echo set`
+#`mutt -v|grep +HAVE_COLOR >/dev/null && [ -f ~/.muttrc.color ] && echo source ~/.muttrc.color || echo set`
 color normal	white black
 color attachment brightwhite black
 color hdrdefault cyan black
@@ -155,7 +164,7 @@ color header    brightyellow    black   ^X-Editor:
 color header    brightyellow    black   ^X-Operating-System:
 color header    brightyellow    black   ^X-Accept-Language:
 color header    brightyellow    black   ^X-MSMail-
-color header    brightyellow    black   ^X-Priority:
+color header    brightyellow    black   ^(X-)?Priority:
 color header    brightblack     black   ^X-HotPOP-Delivered-To:
 color header    brightblack     black   ^X-Face:
 mono  header    bold                    ^From:
@@ -193,7 +202,7 @@ lists mutt-users speedseductionlist zaurus-general debian-knoppix
 # ------------------
 `mutt -v|grep +USE_IMAP >/dev/null && echo set imap_list_subscribed=yes || echo set`
 
-account-hook . 'unset imap_user imap_pass tunnel'; folder-hook . 'set folder="$HOME/Mail"'
+account-hook . 'unset imap_user imap_pass tunnel'; folder-hook . 'set folder="$HOME/Mail" record="=sent"'
 
 account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
 account-hook imap://bart/   'set tunnel="hostinfo -S bart -qx /usr/sbin/imapd"'; folder-hook imap://bart/ 'set folder=imap://bart/'
