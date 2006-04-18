@@ -12,3 +12,5 @@
 *.ent
 *.toc
 *.dvi
+*.class
+a.out
