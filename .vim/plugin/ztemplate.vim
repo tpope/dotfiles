@@ -68,7 +68,7 @@ fun! FTSubstituteClassData()
   silent! /NONEXISTENT\nPATTERN/
 endfun
 
-autocmd BufNewFile *.tex silent! %s/^\\title{\(.\)/\\title{\u\1/e | norm G{
+autocmd BufNewFile *.tex silent! %s/^\\title{\(.\)/\\title{\u\1/e | silent! %s/\%(^\\title{[^}]\{-\}\)\@<=[-_]\([a-z]\)/ \u\1/g | norm G{
 autocmd BufNewFile */[a-z][a-z][a-z][a-z][0-9][0-9][0-9][0-9]/* call FTSubstituteClassData()
 
 augroup END

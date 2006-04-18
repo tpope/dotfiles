@@ -2,7 +2,7 @@
 " Language:     68k Assembler (TI calculator specific)
 " Maintainer:   Tim Pope <vim@rebelongto.us>
 " URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/asm68k89.vim
-" Last Change:  2005 Dec 07
+" Last Change:  2006 Jan 12
 " Version:      $Id$
 
 if version < 600
@@ -16,7 +16,7 @@ if version < 600
     unlet b:current_syntax
     if filereadable(expand("<sfile>:p:h/ti89call.vim"))
         source <sfile>:p:h/ti89call.vim
-    end if
+    endif
 else
     runtime! syntax/asm68k.vim
     unlet b:current_syntax
