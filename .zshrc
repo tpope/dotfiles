@@ -6,6 +6,7 @@
 
 setopt rmstarsilent histignoredups
 setopt noclobber nonomatch
+setopt completeinword extendedglob
 
 if [[ $ZSH_VERSION == 4.<->* ]]; then
     setopt histexpiredupsfirst histreduceblanks
@@ -22,23 +23,31 @@ periodic() { rehash }
 export ENV="$HOME/.shrc"
 interactive=1
 . $ENV
-#hostname -f|grep -q '\.simpson$' && export PROXY=http://maggie.simpson:3128
-#export HTTP_PROXY=$PROXY
 #[ -f $HOME/mbox ] && export MAIL=$HOME/mbox
 
-domains=(`grep ^search /etc/resolv.conf`)
+domains=(`egrep '^(search|domain)' /etc/resolv.conf 2>/dev/null`)
 [[ -z $domains ]] || shift 1 domains
 
-off=(maggie.simpson bart.simpson marge.simpson lisa.simpson homer.simpson mona.simpson)
+off=(gob.tpope.us michael.tpope.us lucille.tpope.us tobias.tpope.us lindsay.tpope.us buster.tpope.us oscar.tpope.us)
 for host in $off; do
-    [ "${host%.simpson}" != `hostname` ] && family=($family $host)
-    [ -d "$HOME/simpson" ] && typeset ${host%.simpson}=$HOME/simpson/${host%.simpson}
-    : ~$host
+    [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
+    [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
+    : ~${host%.tpope.us}
 done
+
+if [ -n "$USERPROFILE" ] && which cygpath >/dev/null; then
+    #typeset tp="`echo -E "$USERPROFILE"|tr '\\\\' /|sed -e 's/^\([A-Za-z]\):/\/cygdrive\/\1/'`"
+    typeset home="`cygpath "$USERPROFILE"`"
+    typeset docs="$home/My Documents"
+    typeset desktop="`cygpath -D 2>/dev/null`"
+    [ -n "$APPDATA" ] || APPDATA="$USERPROFILE/Application Data"
+    typeset appdata="`cygpath "$APPDATA"`"
+    : ~home ~docs ~desktop ~appdata
+fi
 
 namedir() { export $1=$PWD; : ~$1 }
 
-friends=($family snowball.simpson clancy.simpson sarah.simpson ralph.simpson carl.simpson lenny.simpson patty.simpson grex.springfield right.springfield left.springfield)
+friends=($family barry.tpope.us maeby.tpope.us steve.tpope.us lupe.tpope.us grex.tpope.us tpope-486.jmwaller.com jwxkl81-1061.jmwaller.com tpope-1084.jmwaller.com netmon1.jmwaller.com images.jmwaller.com)
 
 for host in $domains; do
     off=(${off%.$host})
@@ -89,7 +98,7 @@ screen*|vt220*)
 		}
     #[ "`hostname`" = grex.cyberspace.org ] &&TERM=vt220 &&export OLDTERM=screen
     ;;
-xterm*|rxvt*|kterm*|dtterm*)
+xterm*|rxvt*|kterm*|dtterm*|cygwin*)
     precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
 		print -Pn "\e]1;$tty%m\a"
 		print -Pn "\e]2;%n@%m:%~ [%l]\a"
@@ -128,7 +137,9 @@ unset e
 bindkey -e
 bindkey "\e[3~" delete-char
 bindkey "\e[1~" beginning-of-line
+bindkey "\e[7~" beginning-of-line
 bindkey "\e[4~" end-of-line
+bindkey "\e[8~" end-of-line
 bindkey -r "^Q"
 
 case $ZSH_VERSION in
@@ -204,6 +215,7 @@ zmodload -i zsh/mathfunc
 autoload -U zrecompile
 autoload -U zmv
 autoload -U zsh-mime-setup
+
 # Section: Styles {{{1
 # ------------------------
 zstyle ':mime:*' x-browsers sensible-browser
@@ -215,29 +227,36 @@ zstyle ':completion:*' add-space true
 zstyle -e ':completion:*' completer '
 	if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]]; then
 	    _last_try="$HISTNO$BUFFER$CURSOR"
-	    reply=(_complete)
+	    reply=(_complete _ignored:complete _prefix _complete:full)
 	else
-	    reply=(_match _complete:ignored _prefix _correct _approximate)
+	    reply=(_complete _ignored:complete _prefix _complete:full _correct _approximate)
 	fi' #'
+zstyle ':completion::prefix:*' completer _complete _ignored:complete
 #zstyle ':completion:*' completer _complete _ignored _prefix
-zstyle ':completion:*' completions 1
+#zstyle ':completion:*' completions 1
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' glob 1
-zstyle ':completion:*:complete:*files' ignored-patterns '*\~'
-zstyle ':completion:*:complete:rm:*files' ignored-patterns
+zstyle ':completion::complete:*:(all-|)files' ignored-patterns '*\~' '(|*/)CVS'
+zstyle ':completion::complete:*:(local-|)directories' ignored-patterns '(|*/)CVS'
+zstyle ':completion::complete:*' ignore-parents parent pwd
+zstyle ':completion::complete:rm::(all-|)files' ignored-patterns
+zstyle ':completion::complete:rmdir::(local-|)directories' ignored-patterns
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' hosts localhost $friends sexygeek.us cunn.iling.us rebelongto.us
+zstyle ':completion:*' urls http://www.tpope.net/ http://www.google.com/
 zstyle ':completion:*' insert-unambiguous true
 # NO NO NO!!! This makes things SLOW
 #zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' list-colors no=00 fi=00 di=01\;34 pi=33 so=01\;35 bd=00\;35 cd=00\;34 or=00\;41 mi=00\;45 ex=01\;32
 zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
 zstyle ':completion:*' local localhost /var/www public_html
-zstyle ':completion:*:complete:*' matcher-list ''
-zstyle ':completion:*:ignored:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}'
+zstyle ':completion::full:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|[._-/]=* r:|=* l:|[._-/]=* l:|=*'
 #zstyle ':completion:*:hosts' hosts ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}} }
-zstyle ':completion:*' max-errors 1 numeric
-zstyle ':completion:*' menu select=1
+zstyle -e ':completion:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX+1)/3 )) numeric )'
+zstyle ':completion:*' menu select
+zstyle ':completion:*:(xdvi|xpdf|gv):*' menu yes select
+zstyle ':completion:*:(xdvi|xpdf|gv):*' file-sort time
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
 zstyle ':completion:*' substitute 1
@@ -246,9 +265,11 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 zstyle ':completion:*' users tpope root $USER ${watch/notme/}
 zstyle ':completion:*' verbose true
 zstyle ':completion:*:rm:*' ignore-line yes
-zstyle ':completion:*:rsync:*:files' command ssh -a -x '${words[CURRENT]%:*}' ls -d1F '${${:-${${${:-${words[CURRENT]#*:}-}:h}/${slash}(#e)/}/\*}/#.$slash/}' 2>/dev/null
+#zstyle ':completion:*:rsync:*:files' command ssh -a -x '${words[CURRENT]%:*}' ls -d1F '${${:-${${${:-${words[CURRENT]#*:}-}:h}/${slash}(#e)/}/\*}/#.$slash/}' 2>/dev/null
 zstyle :compinstall filename '/home/tpope/.zshrc'
 
 autoload -U compinit
 compinit -u
 # End of lines added by compinstall
+compdef 'local expl; _description files expl "LaTeX aux file"; _files "$expl[@]" -g "*.aux"' bibtex
+compdef 'local expl; _description files expl "picture file"; _files "$expl[@]" -g "*.(#i)(png|gif|jpeg|jpg|tiff|tif|pbm|pgm|ppm|xbm|xpm|ras(|t)|tga|rle|rgb|bmp|pcx|fits|pm)(-.)"' feh
