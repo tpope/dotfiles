@@ -10,19 +10,19 @@ text/xml; sensible-browser '%s'; description="XML Text"; nametemplate=%s.xml; te
 text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
 text/richtext; richtext -t; description="Rich Text"; copiousoutput
 text/x-vcalendar; korganizer '%s'; description="vCalendar File"; test=test -n "$DISPLAY"
-text/*; sensible-pager '%s'; edit=vim -X '%s'; needsterminal; test=test -t 0
+text/*; sensible-pager '%s'; edit=vim '%s'; needsterminal; test=test -t 0
 text/*; gvim -Rf '%s'; edit=gvim -f '%s'; test=test -n "$DISPLAY" -a ! -t 0
 video/*; mplayer -quiet -vo fb,fa '%s'; description="Video"; needsterminal; test=test -z "$DISPLAY" -a -t 0
 video/*; mplayer '%s'; description="Video"; needsterminal; test=test -t 0
 audio/*; mplayer '%s'; description="Audio"; needsterminal; test=test -t 0
-video/*; gmplayer '%s'; description="Video"; test =test -n "$DISPLAY"
-audio/*; xmms '%s'; description="Audio"; test =test -n "$DISPLAY"
+video/*; gmplayer '%s'; description="Video"; test=test -n "$DISPLAY"
+audio/*; xmms '%s'; description="Audio"; test=test -n "$DISPLAY"
 image/*; feh -Z '%s'; edit=gimp-remote '%s'; description=Image; test=test -n "$DISPLAY"
 image/*; xv '%s';  description="Image"; test=test -n "$DISPLAY"
 image/*; anytopnm '%s' > '%s.pnm' && aview -driver curses '%s.pnm' && rm -f '%s.pnm';  description="Image"; needsterminal
 image/*; anytopnm '%s' | pnmscale -xysize 80 46 | ppmtopgm | pgmtopbm | pbmtoascii -1x2 2>&1 ; copiousoutput
-image/x-xpm; vim -RX '%s'; edit=vim -X '%s'; description="XPM Image"; needsterminal
-application/msword; openoffice '%s'; description="Micro$oft Word Document"; test=test -n "$DISPLAY"
+image/x-xpm; vim -R '%s'; edit=vim '%s'; description="XPM Image"; needsterminal
+application/msword; openoffice '%s'; description="Micro$oft Word Document"; test=test -n "$DISPLAY" -a -x "`which openoffice 2>/dev/null`"
 application/msword; antiword '%s'; description="Micro$oft Word Document"; copiousoutput
 application/x-bittorrent; btget '%s'; description="BitTorrent File"; test=test -x "$HOME/bin/btget"
 #application/excel; openoffice %s
