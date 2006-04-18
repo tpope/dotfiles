@@ -6,13 +6,15 @@ shell -$SHELL
 #sorendition =s KW
 hardstatus on
 hardstatus lastline "%?%h%:%t%?"
-escape "^^^^"
+escape "^^^^" # Ctrl+^ (Ctrl+6) as escape command.
 bindkey ^Q command
 #bindkey ^A command
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* WS=\E[8;%d;%dt
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* ti@:te@:G0
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007
 termcapinfo Eterm* "XT:C8"
+termcapinfo rxvt*|Eterm* "" *7=\E[8$:%i=\E[c:#4=\E[d:#2=\E[7$
+termcapinfo xterm*      "" *7=\E[2F:%i=\E[2C:#4=\E[2D:#2=\E[2H
 defflow off
 #time "%c:%s %M %d %H%? %l%?"
 windowlist string "%3n %{= dd}%?%h%:%t%?%=%f%{-}"
@@ -28,9 +30,10 @@ bind ^Y colon "screen -ln ssh "
 bind  y colon "screen -ln ssh "
 bind  S eval "height 51" "hardstatus alwayslastline '%-Lw%{= WK}%34>%n*%f %t%{-}%+Lw %= %0c'" "split"
 bind  Q eval "hardstatus message %?%h%:%t%?" "only" "height 24"
-bind ^U screen -ln -fn -t uptime sh -c 'echo -ne "\e]0;UPTIME\a"; export TERMINAL=1; while clear >/tmp/ruptime.$$; do echo "HOST      STATUS       TIME        USERS   LOAD" >>/tmp/ruptime.$$; tpope ruptime >>/tmp/ruptime.$$; if [ `(cat /tmp/ruptime.$$; tpope rwho)|wc -l` -le 22 ]; then echo >>/tmp/ruptime.$$; tpope rwho >>/tmp/ruptime.$$; fi; cat /tmp/ruptime.$$; rm -f /tmp/ruptime.$$; sleep 15; done'
+bind ^U screen -ln -fn -t uptime sh -c 'echo -ne "\e]0;Uptime\a"; export TERMINAL=1; while clear >/tmp/ruptime.$$; do echo "HOST      STATUS       TIME        USERS   LOAD" >>/tmp/ruptime.$$; tpope ruptime >>/tmp/ruptime.$$; if [ `(cat /tmp/ruptime.$$; tpope rwho)|wc -l` -le 22 ]; then echo >>/tmp/ruptime.$$; tpope rwho >>/tmp/ruptime.$$; fi; cat /tmp/ruptime.$$; rm -f /tmp/ruptime.$$; sleep 15; done'
 bind ^B eval "hardcopy_append off" "hardcopy -h /tmp/.$LOGNAME-screen-urlview" "screen -fn -ln -t urlview urlview /tmp/.$LOGNAME-screen-urlview"
 
+# press <Insert>[Letter] to ssh to a given host
 bind -c ssh  " " screen
 bind -c ssh  "a" screen -ln -fn sh -c "exec ssh `hostinfo -h A`"
 bind -c ssh  "b" screen -ln -fn sh -c "exec ssh `hostinfo -h B`"
@@ -61,11 +64,13 @@ bind -c ssh  "z" screen -ln -fn sh -c "exec ssh `hostinfo -h Z`"
 
 bindkey -k kI command -c ssh
 
-bind -c shiftalt A copy
+bind -c shiftalt A copy  # Up
 bind -c shiftalt B colon
 bind -c shiftalt C next
 bind -c shiftalt D prev
-bind -c shiftalt P windowlist -b
+#bind -c shiftalt F <END>
+#bind -c shiftalt H <HOME>
+bind -c shiftalt P windowlist -b # F1
 bind -c shiftalt Q screen
 bind -c shiftalt R select 0
 bind -c shiftalt S select 1
@@ -79,25 +84,32 @@ bind -c shiftalt 4 stuff ^[[24
 bindkey -d -k kD
 bindkey -d -k kb
 bindkey ^[^[[	command -c shiftalt # PuTTY Alt
-bindkey ^[O2	command -c shiftalt # XTerm Shift
-bindkey ^[O3	command -c shiftalt # XTerm Alt
-bindkey ^[[2	command -c shiftalt # XTerm New Shift
-#bindkey ^[[3	command -c shiftalt # XTerm New Alt
-#bindkey ^[[1;2	command -c shiftalt # XTerm New Shift?
-#bindkey ^[[1;3	command -c shiftalt # XTerm New Alt?
 bindkey ^[^[O	command -c shiftalt # PuTTY Alt
+bindkey ^[O2	command -c shiftalt # XTerm F-Key Shift
+bindkey ^[O3	command -c shiftalt # XTerm F-Key Alt
+#bindkey ^[O5	command -c shiftalt # XTerm F-Key Ctrl
+bindkey ^[[2	command -c shiftalt # XTerm Arrow Shift
+#bindkey ^[[3	command -c shiftalt # XTerm Arrow Alt
+#bindkey ^[[5	command -c shiftalt # XTerm Arrow Ctrl
+bindkey ^[[1;2	command -c shiftalt # XTerm Newest Shift
+bindkey ^[[1;3	command -c shiftalt # XTerm Newest Alt
+#bindkey ^[[1;5	command -c shiftalt # XTerm Newest Ctrl
 
-bindkey ^[^?      other
+bindkey ^[^?      other # Alt+Backspace
 bindkey ^[^H      other
 bindkey "^[ "     other
-bindkey "^[^I"    focus
-bindkey ^[[Z      focus
-bindkey ^[[a      copy # RXVT/Eterm Shift
+bindkey "^[^I"    focus # Alt+Tab
+bindkey ^[[Z      focus # Shift+Tab
+bindkey ^[[a      copy  # RXVT/Eterm Shift
 bindkey ^[[b      colon
 bindkey ^[[c      next
 bindkey ^[[d      prev
-bindkey ^[^[[3~  detach
-bindkey ^[[3;3~  detach
+bindkey ^[Oa      copy  # Eterm Ctrl
+bindkey ^[Ob      colon
+bindkey ^[Oc      next
+bindkey ^[Od      prev
+bindkey ^[^[[3~   detach # Alt+Delete
+bindkey ^[[3;3~   detach
 
 #bindkey ^[[23~    windowlist -b
 #bindkey ^[O2P     windowlist -b
