@@ -7,62 +7,59 @@
 
 hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin"
-hosts="maggie bart clancy abe homer jmwaller carl lisa marge barney mona ralph patty sarah snowball otto lenny griffin grex netmon1"
-menuhosts="maggie bart marge lisa homer mona - snowball - clancy sarah ralph"
+hosts="maggie barry oscar gob lindsay maeby jwxkl81-1061 lucille michael tobias lupe buster steve grex images netmon1 tpope-486 tpope-1084"
+menuhosts="gob michael lucille oscar buster lindsay tobias - barry maeby lupe steve"
 
 gethost() {
     case "$1" in
     [Aa]|maggie*) echo maggie ;;
-    [Bb]|bart*) echo bart ;;
-    [Cc]|clancy*) echo clancy ;;
-    [Ee]|abe*) echo abe ;;
-    [Hh]|homer*) echo homer ;;
-    [Ii]|netmon1*) echo netmon1 ;;
-    [Jj]|jmwaller*) echo jmwaller ;;
-    [Kk]|carl*) echo carl ;;
-    [Ll]|lisa*) echo lisa ;;
-    [Mm]|marge*) echo marge ;;
-    [Nn]|barney*) echo barney ;;
-    [Oo]|mona*) echo mona ;;
-    [Pp]|ralph*) echo ralph ;;
-    [Qq]|patty*) echo patty ;;
-    [Rr]|sarah*) echo sarah ;;
-    [Ss]|snowball*) echo snowball ;;
-    [Tt]|peter*) echo peter ;;
-    [Uu]|otto*) echo otto ;;
+    [Yy]|maeby*|homer*) echo maeby ;;
+    [Bb]|barry*) echo barry ;;
+    [Cc]|oscar*) echo oscar ;;
+    [Ll]|lindsay*) echo lindsay ;;
+    [Gg]|gob*) echo gob ;;
+    [Ii]|images*) echo images ;;
+    [Jj]|jmwaller*|jwxkl81-1061*) echo jwxkl81-1061 ;;
+    [Uu]|lucille*) echo lucille ;;
+    [Mm]|marge*|michael*) echo michael ;;
+    [Nn]|netmon1*) echo netmon1 ;;
+    [Oo]|tobias*) echo tobias ;;
+    [Pp]|lupe*) echo lupe ;;
+    [Rr]|buster*) echo buster ;;
+    [Ss]|steve*) echo steve ;;
+    [Tt]|tpope-486*) echo tpope-486 ;;
+    [Ee]|tpope-1084*) echo tpope-1084 ;;
     [Xx]|grex*) echo grex ;;
-    [Yy]|lenny*) echo lenny ;;
     ?) echo localhost ;;
     *) echo "$1" ;;
 esac
 }
 
-maggie()   { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=A; hdom=simpson;}
-bart()     { hterm="01;31"; hscrn="+b R"; hrgb="#FFA1A1"; hltr=B; hdom=simpson;}
-marge()    { hterm="01;32"; hscrn="+b G"; hrgb="#A2FFA1"; hltr=M; hdom=simpson;}
-lisa()     { hterm="00;31"; hscrn="   r"; hrgb="#D47F7F"; hltr=L; hdom=simpson;}
-homer()    { hterm="00;33"; hscrn="   y"; hrgb="#D4AA7F"; hltr=H; hdom=simpson;}
-abe()      { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=E; hdom=simpson;}
-mona()     { hterm="00;35"; hscrn="   m"; hrgb="#D47FD4"; hltr=O; hdom=simpson;}
-snowball() { hterm="01;30"; hscrn="+b K"; hrgb="#BCBBBB"; hltr=S; hdom=simpson;
+gob()      { hterm="01;31"; hscrn="+b R"; hrgb="#FFA1A1"; hltr=G;hdom=tpope.us;}
+barry()    { hterm="00;33"; hscrn="   y"; hrgb="#D4AA7F"; hltr=B;hdom=tpope.us;}
+michael()  { hterm="01;32"; hscrn="+b G"; hrgb="#A2FFA1"; hltr=M;hdom=tpope.us;}
+lucille()  { hterm="01;35"; hscrn="+b m"; hrgb="#FF7FFF"; hltr=U;hdom=tpope.us;}
+maeby()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=Y;hdom=tpope.us;}
+maggie()   { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=A;hdom=tpope.us;}
+lindsay()  { hterm="00;31"; hscrn="   r"; hrgb="#D47F7F"; hltr=L;hdom=tpope.us;}
+tobias()   { hterm="00;35"; hscrn="   m"; hrgb="#D47FD4"; hltr=O;hdom=tpope.us;}
+buster()   { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=R;hdom=tpope.us;}
+steve()    { hterm="01;30"; hscrn="+b K"; hrgb="#BCBBBB"; hltr=S;hdom=tpope.us;
 		test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
-clancy()   { hterm="00;34"; hscrn="   b"; hrgb="#7F7FFF"; hltr=C; hdom=simpson;}
-sarah()    { hterm="01;35"; hscrn="+b m"; hrgb="#FF7FFF"; hltr=R; hdom=simpson;}
-ralph()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=P; hdom=simpson;}
+oscar()    { hterm="00;34"; hscrn="   b"; hrgb="#7F7FFF"; hltr=C;hdom=tpope.us;}
+lupe()     { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=P;hdom=tpope.us;}
 
-lenny()    { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=Y; hdom=simpson;}
-carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=K; hdom=simpson;}
-patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
-barney()   { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=N; hdom=simpson;}
-otto()     { hterm="01;35"; hscrn="+b Y"; hrgb="#FF7FFF"; hltr=U; hdom=wiggum; }
-netmon1()  { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=I; hdom=;}
-jmwaller() { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=J; hdom=;}
-peter()    { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=T; hdom=simpson;}
-griffin()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=G; hdom=simpson;}
+#carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=K; hdom=simpson;}
+#patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
+images()   { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=I; hdom=jmwaller.com;}
+netmon1()  { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=N; hdom=jmwaller.com;}
+jwxkl81_1061() { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=J; hdom=jmwaller.com;}
+tpope_486() { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=T; hdom=jmwaller.com;}
+tpope_1084() { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=E; hdom=jmwaller.com;}
 grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=X; hdom=springfield;}
 unknown()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr= ; hdom=;}
 getinfo() {
-    $1 2>/dev/null || unknown
+    `echo $1|tr A-Z- a-z_` 2>/dev/null || unknown
 }
 
 suffix() {
@@ -72,18 +69,20 @@ suffix() {
 	getinfo "$1"
 	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
     elif $ifconfig -a 2>/dev/null|grep ':192\.168\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-	suffix=".iling"
+        getinfo "$1"
+        [ "$hdom" = "jmwaller.com" ] || suffix=".t"
     elif $ifconfig -a 2>/dev/null|grep ':10\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-	suffix=".iling"
+	suffix=".t"
     elif [ ! -x $ifconfig -a -x "`which connect 2>/dev/null`" ]; then
-	suffix=".proxy"
-#    elif [ -x /usr/local/bin/connect ]; then
-#	suffix=".proxy"
+	suffix=".p"
     else
 	getinfo "$1"
 	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
     fi
-    echo $suffix
+    case "$1" in
+        [1-9]*) echo ;;
+        *) echo $suffix ;;
+    esac
 }
 
 case "$hostinfo" in
@@ -92,11 +91,11 @@ ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
 hostinfo)
     : ${host:="`hostname`"}
     case "$1" in
-    -c|--host-color) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hterm; exit 0 ;;
-    -l|--letter) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hltr; exit 0 ;;
+    -c|--host-color) getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
+    -l|--letter) getinfo `gethost ${2:-$host}`; echo $hltr; exit 0 ;;
     -h|--hostname) echo `gethost ${2:-$host}`; exit 0 ;;
-    -s|--screen-code) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hscrn; exit 0 ;;
-    -r|--rgb) eval `gethost ${2:-$host}` 2>/dev/null || unknown; echo $hrgb; exit 0 ;;
+    -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
+    -r|--rgb) getinfo `gethost ${2:-$host}`; echo $hrgb; exit 0 ;;
     -S|--ssh)
 	case "$2" in
 	    *.*) host="$2";;
@@ -119,9 +118,9 @@ hostinfo)
 	exit 0
 	;;
     --fvwm-styles)
-	for host in $hosts; do $host 2>/dev/null || unknown;
+	for host in $hosts; do getinfo `gethost ${2:-$host}`;
 	    [ "$host" != - ] && echo \
-	    "Style *@$host* ForeColor $hrgb, HilightFore $hrgb, Icon $host.xpm"
+	    "Style *@$host* ForeColor $hrgb, HilightFore $hrgb" #, Icon $host.xpm"
 	done
 	exit 0
 	;;
@@ -131,19 +130,19 @@ DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
 AddToMenu MenuFvwmScreens^Green^ "Screen*norm/terminal-special.xpm*" Title
 AddToMenu MenuFvwmLogins^Red^     "Login*norm/terminal-remote.xpm*"  Title
-AddToMenu MenuFvwmScreens "& localhost%\$[HOST].xpm%"    FuncScreenXterm
-AddToMenu MenuFvwmLogins  "& localhost%\$[HOST].xpm%"    FuncXterm
+AddToMenu MenuFvwmScreens "& localhost"    FuncScreenXterm
+AddToMenu MenuFvwmLogins  "& localhost"    FuncXterm
 AddToMenu MenuFvwmScreens "" Nop
 AddToMenu MenuFvwmLogins  "" Nop
 ChangeMenuStyle Screens MenuFvwmScreens
 ChangeMenuStyle Logins  MenuFvwmLogins
 EOF
-	for host in ${menuhosts:-$hosts}; do $host 2>/dev/null || unknown;
+	for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
 	    hltr=`echo $hltr|tr 'A-Z' 'a-z'`
 	    if [ "$host" != - ]; then
 	    case $host in *$hltr*) hmenu=`echo "$host"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$host(&$hltr)" ;; esac
-		echo "AddToMenu MenuFvwmScreens $hmenu%$host.xpm% FuncScreenSshXterm $host"
-		echo "AddToMenu MenuFvwmLogins $hmenu%$host.xpm% FuncSshXterm $host"
+		echo "AddToMenu MenuFvwmScreens $hmenu FuncScreenSshXterm $host"
+		echo "AddToMenu MenuFvwmLogins $hmenu FuncSshXterm $host"
 	    else
 		echo 'AddToMenu MenuFvwmScreens "" Nop'
 		echo 'AddToMenu MenuFvwmLogins  "" Nop'
@@ -152,7 +151,7 @@ EOF
 	exit 0
 	;;
     --fvwm-keys)
-	for host in $hosts; do $host 2>/dev/null || unknown
+	for host in $hosts; do getinfo `gethost $host`;
 	    [ "$host" != - ] &&
 	    echo "Key $hltr A CM  FuncScreenSshXterm $host" &&
 	    echo "Key $hltr A CMS FuncSshXterm $host"
@@ -179,7 +178,7 @@ EOF
     [ -t 1 ] && TERMINAL=1
     if [ "$TERMINAL" ]; then
 	$RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
-	    "$host" 2>/dev/null || hterm="01;37"
+	    getinfo `gethost $host` 2>/dev/null || hterm="01;37"
 	    echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
 	done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
     else
