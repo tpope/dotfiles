@@ -65,7 +65,6 @@ XTerm*colorBDMode: true
 XTerm*colorBD: #ffffff
 XTerm*cursorColor: #c0c040
 #if WIDTH > 1150
-! nomral--13
 XTerm.VT100.font:                FIXED-normal--14-*-*-*-c-*-ENC
 XTerm.VT100.utf8Fonts.font:     FIXED-normal--14-*-*-*-c-*-UTFENC
 XTerm.VT100.boldFont:            FIXED-normal--14-*-*-*-c-*-ENC
