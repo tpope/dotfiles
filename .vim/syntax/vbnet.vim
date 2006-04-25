@@ -15,7 +15,7 @@ endif
 
 " 2. Lexical Grammar
 syn case ignore
-"syn sync linebreaks=2
+syn sync linebreaks=2
 " 2.1.4 Comments
 syn keyword vbTodo contained    TODO FIXME XXX NOTE
 syn region  vbnetComment start="\<REM\>" end="$" contains=vbnetTodo
@@ -66,7 +66,8 @@ syn match   vbnetAccessModifier "\<\(Friend\|Private\|Protected\|Protected\s\+\F
 syn match   vbnetModifier       "\<\(Shared\|Static\|ReadOnly\|WithEvents\|Shadows\)\>"
 
 " 5. Attributes
-syn match   vbnetAttribute "<[^<=>]\{-1,}>"
+"syn match   vbnetAttribute "<\(\s_\n\|[^<=>]\)\{-1,}>"
+syn match   vbnetAttribute "<\s*\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\%(([^()]*)\)\=\(\s*,\s*\%(_\n\)\=\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\%(([^()]*)\)\=\)\{-}\s*>"
 
 " 6. Source Files and Namespaces
 syn keyword vbnetImports        Imports
@@ -94,7 +95,7 @@ syn match   vbnetTypeSpecifier  "[a-zA-Z0-9]\@<=[\$%&#]"
 syn match   vbnetTypeSpecifier  "[a-zA-Z0-9]\@<=!\([^a-zA-Z0-9]\|$\)"me=s+1
 " 7.4 Enumerations
 syn keyword vbnetEnumWords      Shadows Enum contained
-syn cluster vbnetEnum           contains=vbnetTypeAccess,vbnetEnumWords,vbnetTypePrefi
+syn cluster vbnetEnum           contains=vbnetTypeAccess,vbnetEnumWords,vbnetAsClause
 syn match   vbnetEnumDeclaration "\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!Enum\s\+\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\(\s\+As\s\+\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\)\=" contains=@vbnetEnum,@vbnetStrict containedin=vbnetEnumBlock
 syn match   vbnetTypeEnd        "\<End\s\+Enum\>" containedin=vbnetEnumBlock
 " 7.5 Classes
@@ -137,12 +138,14 @@ syn keyword vbnetStorage        Delegate
 syn keyword vbnetImplementsKeyword Implements contained
 syn match   vbnetImplementsClause "\<Implements\s\+\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\(\s*,\s*\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\)*" contains=vbnetImplementsKeyword,@vbnetStrict contained
 " 9.2 Methods
-syn keyword vbnetProcedureWords Public Private Protected Friend Shadows Shared Overridable NotOverridable MustOverride Overrides Overloads contained
+syn keyword vbnetProcedureWords Public Private Protected Friend Shadows Shared Overridable NotOverridable MustOverride Overrides Overloads Delegate contained
 syn keyword vbnetSubWords       Sub New contained
+syn keyword vbnetAsError        As contained
 syn cluster vbnetSub            contains=vbnetProcedureWords,vbnetSubWords,vbnetParameter
 syn keyword vbnetFunctionWords  Function contained
 syn cluster vbnetFunction       contains=vbnetProcedureWords,vbnetFunctionWords,vbnetParameter
-syn region  vbnetSubArguments   start="(" skip="([^)]*)\|\<_$" end=")" end="$" contains=vbnetParameter,vbnetAsClause,@vbnetLiterals,@vbnetStrict keepend skipwhite nextgroup=@vbnetHandlesOrImplements contained
+" TODO: Disallow As after Sub arguments
+syn region  vbnetSubArguments   start="(" skip="([^)]*)\|\<_$" end=")" end="$" contains=vbnetParameter,vbnetAsClause,@vbnetLiterals,@vbnetStrict keepend skipwhite nextgroup=@vbnetHandlesOrImplements,vbnetSubError contained
 syn match   vbnetSubDeclaration "\<\(\w\+\s\+\)*\(\<\(End\|Exit\)\>.*\)\@<!\<Sub\>\s\+\%(\h\w*\>\|\[\h\w*\]\)" contains=@vbnetSub,@vbnetStrict containedin=vbnetSubBlock skipwhite nextgroup=vbnetSubArguments,@vbnetHandlesOrImplements
 syn match   vbnetProcedureEnd "\<End\s\+Sub\>" containedin=vbnetSubBlock
 syn region  vbnetFunctionArguments  start="(" skip="([^)]*)\|\<_$" end=")" end="$" contains=vbnetParameter,vbnetAsClause,@vbnetLiterals,@vbnetStrict keepend skipwhite nextgroup=vbnetFunctionReturn,@vbnetHandlesOrImplements contained
@@ -231,13 +234,13 @@ syn keyword vbnetOperator       And Or Not Xor Mod In Is Imp Eqv Like AndAlso Or
 
 if ! exists("vbnet_no_code_folds")
     "syn region   vbnetNamespaceBlock    start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!\<Namespace\>"rs=s end="\<\End\s\+Namespace\>"re=e contains=TOP fold
-    syn region   vbnetEnumBlock         start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!\<Enum\>"rs=s matchgroup=vbnetEnumWords end="\<\End\s\+Enum\>" contains=vbnetEnumDeclaration,vbnetAttribute,@vbnetComments,@vbnetPreProc,@vbnetLiterals fold
+    syn region   vbnetEnumBlock         start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\|\.\)\@<!\<Enum\s"rs=s matchgroup=vbnetEnumWords end="\<\End\s\+Enum\>" contains=vbnetEnumDeclaration,vbnetAttribute,@vbnetComments,@vbnetPreProc,@vbnetLiterals fold
     syn region   vbnetClassBlock        start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!\<Class\>"rs=s matchgroup=vbnetClassWords end="\<\End\s\+Class\>" contains=TOP fold
     syn region   vbnetStructureBlock    start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!\<Structure\>"rs=s matchgroup=vbnetStructureWords end="\<\End\s\+Structure\>" contains=TOP fold
     syn region   vbnetModuleBlock       start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!\<Module\>"rs=s matchgroup=vbnetModuleWords end="\<\End\s\+Module\>" contains=TOP fold
     syn region   vbnetInterfaceBlock    start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<End\>.*\)\@<!\<Interface\>"rs=s matchgroup=vbnetInterfaceWords end="\<\End\s\+Interface\>" contains=TOP fold
-    syn region  vbnetSubBlock           start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<\(End\|Exit\|Declare\|MustOverride\)\>.*\)\@<!\<Sub\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Sub\>" contains=TOP fold
-    syn region  vbnetFunctionBlock      start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<\(End\|Exit\|Declare\|MustOverride\)\>.*\)\@<!\<Function\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Function\>" contains=TOP fold
+    syn region  vbnetSubBlock           start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<\(End\|Exit\|Declare\|MustOverride\|Delegate\)\>.*\)\@<!\<Sub\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Sub\>" contains=TOP fold
+    syn region  vbnetFunctionBlock      start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<\(End\|Exit\|Declare\|MustOverride\|Delegate\)\>.*\)\@<!\<Function\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Function\>" contains=TOP fold
     syn region  vbnetReadWritePropertyBlock start="\(\w\s*\)\@<!\<\(\w\+\s\+\)*\(\<\(End\|Exit\|ReadOnly\|WriteOnly\)\>.*\)\@<!\<Property\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Property\>" contains=vbnetPropertyDeclaration,vbnetGetterBlock,vbnetSetterBlock,@vbnetComments,@vbnetPreProc fold
     syn region  vbnetReadOnlyPropertyBlock  start="\(\w\s*\)\@<!\<\(.*\<ReadOnly\>\&\(\w\+\s\+\)*\)Property\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Property\>" contains=vbnetPropertyDeclaration,vbnetGetterBlock,vbnetSetterErrorBlock,@vbnetComments,@vbnetPreProc fold
     syn region  vbnetWriteOnlyPropertyBlock start="\(\w\s*\)\@<!\<\(.*\<WriteOnly\>\&\(\w\+\s\+\)*\)Property\>"rs=s matchgroup=vbnetProcedure end="\<End\s\+Property\>" contains=vbnetPropertyDeclaration,vbnetGetterErrorBlock,vbnetSetterBlock,@vbnetComments,@vbnetPreProc fold
@@ -325,6 +328,7 @@ if version >= 508 || !exists("did_vbnet_syntax_inits")
     HiLink vbnetXmlComment              vbnetComment
     HiLink vbnetComment                 Comment
     HiLink vbnetKeywordError            vbnetError
+    HiLink vbnetAsError                 vbnetError
     HiLink vbnetError                   Error
     HiLink vbnetBoolean                 Boolean
     HiLink vbnetNumber                  Number
