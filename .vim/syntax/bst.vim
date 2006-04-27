@@ -1,9 +1,8 @@
 " Vim syntax file
 " Language:     BibTeX Bibliography Style
 " Maintainer:   Tim Pope <vim@rebelongto.us>
-" Last Change:  2005 Dec 20
+" Last Change:  2006 Apr 27
 " Filenames:    *.bst
-" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/bst.vim
 " $Id$
 
 " For version 5.x: Clear all syntax items
