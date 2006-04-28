@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     VB.NET
 " Maintainer:   Tim Pope <vim@rebelongto.us>
-" Last Change:  2006 Apr 27
+" Last Change:  2006 Apr 28
 " Filenames:    *.vb
 " $Id$
 
@@ -67,7 +67,7 @@ syn match   vbnetModifier       "\<\(Shared\|Static\|ReadOnly\|WithEvents\|Shado
 
 " 5. Attributes
 "syn match   vbnetAttribute "<\(\s_\n\|[^<=>]\)\{-1,}>"
-syn match   vbnetAttribute "<\s*\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\%(\s*([^()]*)\)\=\(\s*,\s*\%(_\n\)\=\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\%(\s*([^()]*)\)\=\)\{-}\s*>"
+syn match   vbnetAttribute "<\s*\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\%(\s*([^()]*)\)\=\(\s*,\s*\%(_\n\s*\)\=\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\%(\s*([^()]*)\)\=\)\{-}\s*>"
 
 " 6. Source Files and Namespaces
 syn keyword vbnetImports        Imports
@@ -179,9 +179,9 @@ syn keyword vbnetAsNewClause    As skipwhite nextgroup=vbnetNewClause,@vbnetAnyT
 " 9.7 Properties
 syn keyword vbnetPropertyWords  Property Default ReadOnly WriteOnly contained
 syn cluster vbnetProperty       contains=vbnetProcedureWords,vbnetPropertyWords,vbnetParameter
-syn match   vbnetPropertyDeclaration "\<\(\w\+\s\+\)*\(\<\(End\|Exit\)\>.*\)\@<!\<Property\>\s\+\%(\h\w*\>\|\[\h\w*\]\)" contains=@vbnetProperty,@vbnetStrict containedin=vbnetReadWritePropertyBlock,vbnetReadOnlyPropertyBlock,vbnetWriteOnlyPropertyBlock skipwhite nextgroup=vbnetPropertyArguments,vbnetPropertyReturn
-syn region  vbnetPropertyArguments start="(" skip="([^)]*)\|\<_$" end=")" end="$" contains=vbnetParameter,vbnetAsClause,@vbnetLiterals,@vbnetStrict keepend skipwhite nextgroup=vbnetPropertyReturn contained
-syn match   vbnetPropertyReturn     "\<As\s\+\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\>" contains=vbnetAsClause,@vbnetStrict contained
+syn match   vbnetPropertyDeclaration "\<\(\w\+\s\+\)*\(\<\(End\|Exit\)\>.*\)\@<!\<Property\>\s\+\%(\h\w*\>\|\[\h\w*\]\)" contains=@vbnetProperty,@vbnetStrict containedin=vbnetReadWritePropertyBlock,vbnetReadOnlyPropertyBlock,vbnetWriteOnlyPropertyBlock skipwhite nextgroup=vbnetPropertyArguments,vbnetPropertyReturn,vbnetImplementsClause
+syn region  vbnetPropertyArguments start="(" skip="([^)]*)\|\<_$" end=")" end="$" contains=vbnetParameter,vbnetAsClause,@vbnetLiterals,@vbnetStrict keepend skipwhite nextgroup=vbnetPropertyReturn,vbnetImplementsClause contained
+syn match   vbnetPropertyReturn     "\<As\s\+\%(\h\w*\|\[\h\w*\]\)\%(\.\h\w*\|\.\[\h\w*\]\)*\>" contains=vbnetAsClause,@vbnetStrict skipwhite nextgroup=vbnetImplementsClause contained
 syn match   vbnetProcedureEnd "\<End\s\+Property\>" containedin=vbnetReadWritePropertyBlock,vbnetReadOnlyPropertyBlock,vbnetWriteOnlyPropertyBlock
 syn keyword vbnetGetterWords    Get Public Protected Private Friend contained
 syn cluster vbnetGetter         contains=vbnetGetterWords
@@ -397,6 +397,7 @@ if version >= 508 || !exists("did_vbnet_syntax_inits")
     HiLink vbnetStatement               Statement
     HiLink vbnetLabel                   Label
     HiLink vbnetParameter               Keyword
+    HiLink vbnetEvent                   vbnetStatement
     HiLink vbnetConditional             Conditional
     HiLink vbnetRepeat                  Repeat
     HiLink vbnetException               Exception
