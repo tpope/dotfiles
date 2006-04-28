@@ -37,6 +37,8 @@ fi
 
 if [ -x "`which cygstart 2>/dev/null`" -a -z "$terminal" ]; then
     exec cygstart "$*"
+elif [ "`uname`" = Darwin -a -x "`which open 2>/dev/null`" -a -z "$terminal" ]; then
+    exec open "$*"
 elif [ "$DISPLAY" -a -z "$terminal" ]; then
     url="$*"
     case "$DISPLAY" in
