@@ -6,9 +6,9 @@
 # colourizing them.
 
 hostinfo=`basename "$0"`
-PATH="/bin:/usr/bin:/usr/local/bin"
+PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
 hosts="maggie barry oscar gob lindsay maeby jwxkl81-1061 lucille michael tobias lupe buster steve grex images netmon1 tpope-486 tpope-1084"
-menuhosts="gob michael lucille oscar buster lindsay tobias - barry maeby lupe steve"
+menuhosts="gob michael lucille lindsay tobias oscar buster - jwxkl81-1061 tpope-486 tpope-1084 netmon1 images"
 
 gethost() {
     case "$1" in
@@ -56,7 +56,7 @@ netmon1()  { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=N; hdom=jmwaller.
 jwxkl81_1061() { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=J; hdom=jmwaller.com;}
 tpope_486() { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=T; hdom=jmwaller.com;}
 tpope_1084() { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=E; hdom=jmwaller.com;}
-grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=X; hdom=springfield;}
+grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=X; hdom=tpope.us;}
 unknown()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr= ; hdom=;}
 getinfo() {
     `echo $1|tr A-Z- a-z_` 2>/dev/null || unknown
@@ -97,11 +97,13 @@ hostinfo)
     -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
     -r|--rgb) getinfo `gethost ${2:-$host}`; echo $hrgb; exit 0 ;;
     -S|--ssh)
-	case "$2" in
-	    *.*) host="$2";;
-	    *) host=`gethost ${2:-$host}` ;;
+        shift
+        exec ssh "$@"
+	case "$1" in
+	    *.*) host="$1";;
+	    *) host=`gethost ${1:-$host}` ;;
 	esac
-	shift; shift
+	shift
 	exec ssh "$host`suffix $host`" "$@" ;;
     -b|--batch-ssh)
 	case "$2" in
@@ -110,6 +112,19 @@ hostinfo)
 	esac
 	shift; shift
 	exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
+    --tunnel)
+        host="`gethost $2`" 
+        getinfo $host
+        case "`cat /etc/resolv.conf 2>/dev/null`" in
+            *$hdom*)
+                [ -x "`which nc 2>/dev/null`" ] && \
+                exec nc -q 1 "$host" "$3" ;;
+        esac
+        if [ "$hdom" = jmwaller.com ]; then
+            exec ssh -ax jmwa nc -q 1 "$host" "$3" 2>/dev/null
+        fi
+        exec ssh -ax trp nc -q 1 "$host" "$3" 2>/dev/null
+        ;;
     -H)
 	rm -f "$HOME"/bin/[A-Z]
 	for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
@@ -151,7 +166,7 @@ EOF
 	exit 0
 	;;
     --fvwm-keys)
-	for host in $hosts; do getinfo `gethost $host`;
+	for host in $menuhosts; do getinfo `gethost $host`;
 	    [ "$host" != - ] &&
 	    echo "Key $hltr A CM  FuncScreenSshXterm $host" &&
 	    echo "Key $hltr A CMS FuncSshXterm $host"
