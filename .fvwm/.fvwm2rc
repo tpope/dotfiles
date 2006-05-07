@@ -181,7 +181,9 @@ Style konsole   UseStyle Terminal
 Style *ssh@*    Icon norm/terminal-remote.xpm, MiniIcon mini/terminal-remote.xpm
 Style screen@*  Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm
 Style screen-ssh* Icon norm/terminal-special.xpm, MiniIcon mini/terminal-special.xpm
-Style screen-irc* Icon norm/chat.xpm, MiniIcon mini/chat.xpm, IconOverride
+Style screen-irc* ForeColor rgb:d0/ff/80, HilightFore rgb:d0/ff/80
+Style screen-irc* Icon norm/chat.xpm, MiniIcon mini/chat.xpm
+#, IconOverride
 
 # }}}2
 # Fvwm Module Styles {{{2
@@ -210,6 +212,7 @@ Style FvwmTaskBar  Sticky, NoHandles, NoTitle, BorderWidth 0
 Style Editor    GrabFocus, GrabFocusTransient, MiniIcon mini/editor.xpm, Icon norm/editor.xpm
 Style Editor    HilightBack rgb:40/30/60, BackColor rgb:68/60/78
 Style *vim      UseStyle Editor, MiniIcon vim-16.xpm, Icon vim.xpm
+#Style Gvim      StartsOnPage 2 1
 Style Xedit     UseStyle Editor
 Style nedit     UseStyle Editor
 Style emacs     UseStyle Editor
@@ -219,7 +222,6 @@ Style emacs     UseStyle Editor
 
 PipeRead "$HOME/bin/hostinfo --fvwm-styles"
 PipeRead "echo 'Style *localhost* UseStyle' \\*@`hostname|sed -e 's/[.].*//'`\\*"
-Style screen-irc* ForeColor rgb:d0/ff/80, HilightFore rgb:d0/ff/80, Icon norm/chat.xpm
 
 # }}}2
 # Web Browser Styles {{{2
@@ -289,7 +291,7 @@ Style *font*    Icon norm/font.xpm, MiniIcon mini/font.xpm
 Style aumix     MiniIcon aumix.mini.xpm
 Style *OpenOffice* Icon norm/word-processor.xpm, MiniIcon mini/word-processor.xpm, MaxWindowSize 100 95
 Style mutt*     Icon mutt.xpm, MiniIcon mutt.mini.xpm
-Style xpdf      MiniIcon mini.pdf.xpm, MaxWindowSize 100 95
+Style Xpdf      MiniIcon mini.pdf.xpm, MaxWindowSize 100 95
 Style gv        MiniIcon mini/ghostview.xpm, MaxWindowSize 100 95
 Style xdvi      MiniIcon mini/printing.xpm
 Style Gaim      GrabFocusOff, StartsOnPage 0 1 2, MiniIcon mini.gaim.xpm, UsePPosition
@@ -470,26 +472,42 @@ Key Space       A       4       GotoDeskAndPage 0 0 0
 PipeRead 'for i in `seq 1 26`; do echo Key \
  `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4 \
  GotoDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+PipeRead 'for i in `seq 0 8`; do echo Key \
+ `expr $i + 1` A 4 \
+ GotoDeskAndPage 0 `expr $i % 3` `expr $i / 3 % 3`; done'
 
 Key Space       A       4MS     FuncMoveToDeskAndPage 0 0 0
 PipeRead 'for i in `seq 1 26`; do echo Key \
  `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4MS \
  FuncMoveToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+PipeRead 'for i in `seq 0 8`; do echo Key \
+ `expr $i + 1` A 4MS \
+ FuncMoveToDeskAndPage 0 `expr $i % 3` `expr $i / 3 % 3`; done'
 
 Key Space       A       4M      FuncMoveAllToDeskAndPage 0 0 0
 PipeRead 'for i in `seq 1 26`; do echo Key \
  `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4M \
  FuncMoveAllToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+PipeRead 'for i in `seq 0 8`; do echo Key \
+ `expr $i + 1` A 4M \
+ FuncMoveAllToDeskAndPage 0 `expr $i % 3` `expr $i / 3 % 3`; done'
 
 Key Space       A       4CS     FuncTakeToDeskAndPage 0 0 0
 PipeRead 'for i in `seq 1 26`; do echo Key \
  `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4CS \
  FuncTakeToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+PipeRead 'for i in `seq 0 8`; do echo Key \
+ `expr $i + 1` A 4CS \
+ FuncTakeToDeskAndPage 0 `expr $i % 3` `expr $i / 3 % 3`; done'
 
 Key Space       A       4C      FuncTakeAllToDeskAndPage 0 0 0
 PipeRead 'for i in `seq 1 26`; do echo Key \
  `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4C \
  FuncTakeAllToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
+PipeRead 'for i in `seq 0 8`; do echo Key \
+ `expr $i + 1` A 4C \
+ FuncTakeAllToDeskAndPage 0 `expr $i % 3` `expr $i / 3 % 3`; done'
+
 
 Silent Key KP_Home     A       C       GotoPage 0 0
 Silent Key KP_Up       A       C       GotoPage 1 0
@@ -577,6 +595,13 @@ Key 9       A   SCM     Exec tvtime || exec xawtv
 Key Space   A   SCM     FuncXterm
 #Key Z       A   SCM     Exec tvtime || exec xawtv
 
+Key apostrophe A 4      FuncIrcScreenSshXterm
+Key slash   A   4       FuncFindOrLaunchWebBrowser
+Key bracketleft A 4     FuncFindRemoteDesktop
+Key bracketright A 4    FuncFindOffice
+Key semicolon A 4       FuncFindEditor
+Key period  A   4       FuncFindTerminal
+
 Key Home    A   4       Exec exec aumix -w +5
 Key End     A   4       Exec exec aumix -w -5
 Key Home    A   5       Exec exec aumix -v +5
@@ -589,8 +614,8 @@ Key KP_Insert   A   4   Exec exec ssh lucille br -n 4
 Key KP_Up       A   4   Exec exec ssh lucille br -f 1
 Key KP_Begin    A   4   Exec exec ssh lucille br -f 2
 Key KP_Down     A   4   Exec exec ssh lucille br -f 3
-Key KP_Prior    A   4   Exec exec ssh lucille br -n 5
-Key KP_Right    A   4   Exec exec ssh lucille br -f 5
+Key KP_Prior    A   4   Exec exec ssh lucille br -n 4
+Key KP_Right    A   4   Exec exec ssh lucille br -f 4
 Key KP_Delete   A   4   Exec exec ssh lucille br -F
 Key KP_Add      A   4   Exec exec ssh lucille br -d +1
 Key KP_Subtract A   4   Exec exec ssh lucille br -d -1
@@ -646,8 +671,8 @@ Mouse 2 I       A       PlaceAgain Icon
 #Mouse 2 TSIF    S       StrokeFunc EchoSequence DrawMotion
 Mouse 2 TS      A       FuncResizeOrRaiseOrShade
 Mouse 3 TSIF    A       Menu MenuFvwmWindowOps RaiseLower
-Mouse 4 T       A       FuncTakeToDesk -1 0 2
-Mouse 5 T       A       FuncTakeToDesk +1 0 2
+#Mouse 4 T       A       FuncTakeToDesk -1 0 2
+#Mouse 5 T       A       FuncTakeToDesk +1 0 2
 
 # Strokes {{{2
 
@@ -915,7 +940,7 @@ elif [ -x "`which xine 2>/dev/null`" ]; then \
 echo "+ \\"Xin&e%menu/video.xpm%\\" Exec exec xine"; fi'
 
 + ""                            Nop
-Test (x $[HOME]/.fvwm/fvwm-menu-music) + "Mus&ic%menu/folder.xpm%" Popup $[HOME]/media/music
+Test (x $[HOME]/.fvwm/fvwm-menu-music) + "Mus&ic%menu/folder.xpm%" Popup $[HOME]/Music
 Test (x cdcd) + "&Disc Tracks%menu/disk-cd.xpm%" Popup MenuCDTracks
 + "P&revious%mini/prev.xpm%"    Exec exec tpope media prev
 + "&Play%mini/play.xpm%"        Exec exec tpope media play
@@ -1344,11 +1369,40 @@ AddToFunc FuncXtermSsh
 + I Exec exec ssh -X $0 xterm -name xterm@$0 -T xterm@$0
 # }}}2
 # Application Functions {{{2
+DestroyFunc FuncFindResource
+AddToFunc FuncFindResource
++ I Next ($*, AcceptsFocus) Iconify off
++ I Next ($*, AcceptsFocus) Focus
++ I Next ($*, AcceptsFocus) FuncWarpToTitle
+
+DestroyFunc FuncFindDesktop
+AddToFunc FuncFindDesktop
++ I FuncFindResource "rdesktop|Vncviewer"
+
+DestroyFunc FuncFindOffice
+AddToFunc FuncFindOffice
++ I FuncFindResource "OpenOffice.org*|Gnumeric"
+
+DestroyFunc FuncFindTerminal
+AddToFunc FuncFindTerminal
++ I FuncFindResource "XTerm|ETerm"
+
+DestroyFunc FuncFindEditor
+AddToFunc FuncFindEditor
++ I FuncFindResource "Gvim|vim|Emacs|emacs"
+
 DestroyFunc FuncFindWebBrowser
 AddToFunc FuncFindWebBrowser
-+ I Next ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo", AcceptsFocus) Iconify off
-+ I Next ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo", AcceptsFocus) Focus
++ I FuncFindResource "WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo"
 
+DestroyFunc FuncFindOrLaunchWebBrowser
+AddToFunc FuncFindOrLaunchWebBrowser
++ I None ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo", AcceptsFocus) Exec exec sensible-browser $*
++ I FuncFindWebBrowser
+
+DestroyFunc FuncFindMediaProgram
+AddToFunc FuncFindMediaProgram
++ I FuncFindResource "Gimp|feh|MPlayer|xmms|Xawtv|tvtime"
 DestroyFunc FuncWebBrowser
 AddToFunc FuncWebBrowser
 + I Exec exec sensible-browser $*
@@ -1372,18 +1426,21 @@ DestroyFunc FuncIrcScreenSshXterm
 AddToFunc FuncIrcScreenSshXterm
 + I Next (screen-irc@*, AcceptsFocus) Iconify off
 + I Next (screen-irc@*, AcceptsFocus) Focus
++ I Next (screen-irc@*, AcceptsFocus) FuncWarpToTitle
 + I None (screen-irc@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name screen-irc@remote -T screen-irc@remote -e tpope chat
 
 DestroyFunc FuncIrcScreenSshXtermShared
 AddToFunc FuncIrcScreenSshXtermShared
 + I Next (screen-irc@*, AcceptsFocus) Iconify off
 + I Next (screen-irc@*, AcceptsFocus) Focus
++ I Next (screen-irc@*, AcceptsFocus) FuncWarpToTitle
 + I None (screen-irc@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name screen-irc@remote -T screen-irc@remote -e tpope chat -x"
 
 DestroyFunc FuncIrcScreenXterm
 AddToFunc FuncIrcScreenXterm
-+ I Next (screen-irc@localhost) Iconify off
++ I Next (screen-irc@localhost, AcceptsFocus) Iconify off
 + I Next (screen-irc@localhost, AcceptsFocus) Focus
++ I Next (screen-irc@localhost, AcceptsFocus) FuncWarpToTitle
 + I None (screen-irc@localhost) Exec exec x-terminal-emulator -ut -name screen-irc@localhost -T screen-irc@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
 
 DestroyFunc FuncExec
