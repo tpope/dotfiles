@@ -324,10 +324,13 @@ function! s:RailsUnderscore(str,...)
         let str = substitute(str,'^/\@!','test/fixtures/','')
     elseif line =~ '\<stylesheet_\(link_tag\|path\)\s*(\='.fpat
         let str = substitute(str,'^/\@!','/stylesheets/','')
-        let str = 'public'.substitute(str,'^[^.]*$','\1.css','')
+        let str = 'public'.substitute(str,'^[^.]*$','&.css','')
     elseif line =~ '\<javascript_\(include_tag\|path\)\s*(\='.fpat
+        if str == "defaults"
+            let str = "application"
+        endif
         let str = substitute(str,'^/\@!','/javascripts/','')
-        let str = 'public'.substitute(str,'^[^.]*$','\1.js','')
+        let str = 'public'.substitute(str,'^[^.]*$','&.js','')
     elseif line =~ '\<\(has_one\|belongs_to\)\s*(\=\s*'
         let str = 'models/'.str.'.rb'
     elseif line =~ '\<has_\(and_belongs_to_\)\=many\s*(\=\s*'
@@ -350,7 +353,9 @@ function! s:RailsSingularize(word)
     " still hit the common cases.
     let word = a:word
     let word = substitute(word,'eople$','erson','')
-    let word = substitute(word,'[aeio]\@<!ies$','y','')
+    let word = substitute(word,'[aeio]\@<!ies$','ys','')
+    let word = substitute(word,'xe[ns]$','xs','')
+    let word = substitute(word,'ves$','fs','')
     let word = substitute(word,'s$','','')
     return word
 endfunction
@@ -410,7 +415,7 @@ endfunction
 function s:FindAlternate()
     if expand("%:t") == "database.yml"
         find environment.rb
-    elseif expand("%:t") == "environment.rb"
+    elseif expand("%:t") == "environment.rb" || expand("%:t") == "schema.rb"
         find database.yml
     elseif expand("%:p") =~ '/app/views/'
         " Go to the helper, controller, or model
@@ -431,6 +436,9 @@ function s:FindAlternate()
     elseif expand("%:p") =~ '/app/helpers/.*_helper\.rb$'
         let controller = s:EscapePath(expand("%:p:s?.*/app/helpers/?app/controllers/?:s?_helper.rb$?_controller.rb?"))
         exe "find ".controller
+    elseif expand("%:e") == "csv" || expand("%:e") == "yml"
+        let file = s:RailsSingularize(expand("%:t:r")).'_test'
+        exe "find ".s:EscapePath(file)
     else
         let file = expand("%:t:r")
         if file =~ '_test$'
