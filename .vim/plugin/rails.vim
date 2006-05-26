@@ -157,9 +157,9 @@ endfunction
 function! s:Detect(filename)
   let fn = fnamemodify(a:filename,":p")
   if isdirectory(fn)
-    let fn = fnamemodify(fn,":s?/$??")
+    let fn = fnamemodify(fn,":s?[\/]$??")
   else
-    let fn = fnamemodify(fn,':s?\(.*\)/[^/]*$?\1?')
+    let fn = fnamemodify(fn,':s?\(.*\)[\/][^\/]*$?\1?')
   endif
   let ofn = ""
   while fn != ofn
@@ -167,7 +167,7 @@ function! s:Detect(filename)
       return s:InitBuffer(fn)
     endif
     let ofn = fn
-    let fn = fnamemodify(ofn,':s?\(.*\)/\(app\|components\|config\|db\|doc\|lib\|log\|public\|script\|test\|tmp\|vendor\)\($\|/.*$\)?\1?')
+    let fn = fnamemodify(ofn,':s?\(.*\)[\/]\(app\|components\|config\|db\|doc\|lib\|log\|public\|script\|test\|tmp\|vendor\)\($\|[\/].*$\)?\1?')
   endwhile
   return 0
 endfunction
@@ -216,7 +216,7 @@ function! s:InitBuffer(path)
   if &filetype == "ruby"
     setlocal suffixesadd=.rb,.rhtml,.rxml,.rjs,.yml,.csv,.rake,s.rb
     setlocal define=^\\s*def\\s\\+\\(self\\.\\)\\=
-    let views = substitute(expand("%:p"),'/app/controllers/\(.\{-\}\)_controller.rb','/app/views/\1','')
+    let views = substitute(expand("%:p"),'[\/]app[\/]controllers[\/]\(.\{-\}\)_controller.rb','/app/views/\1','')
     if views != expand("%:p")
       let &l:path = &l:path.",".s:EscapePath(views)
     endif
@@ -341,7 +341,7 @@ function! s:RailsUnderscore(str,...)
   elseif line =~ '\<has_\(and_belongs_to_\)\=many\s*(\=\s*'
     let str = 'models/'.s:RailsSingularize(str).'.rb'
   elseif line =~ '\<def\s\+' && expand("%:t") =~ '_controller\.rb'
-    let str = substitute(expand("%:p"),'.*/app/controllers/\(.\{-\}\)_controller.rb','views/\1','').'/'.str
+    let str = substitute(expand("%:p"),'.*[\/]app[\/]controllers[\/]\(.\{-\}\)_controller.rb','views/\1','').'/'.str
   else
     " If we made it this far, we'll risk making it singular.
     let str = s:RailsSingularize(str)
@@ -422,11 +422,11 @@ function s:FindAlternate()
     find environment.rb
   elseif expand("%:t") == "environment.rb" || expand("%:t") == "schema.rb"
     find database.yml
-  elseif expand("%:p") =~ '/app/views/'
+  elseif expand("%:p") =~ '[\/]app[\/]views[\/]'
     " Go to the helper, controller, or model
-    let helper = s:EscapePath(expand("%:p:h:s?.*/app/views/?app/helpers/?")."_helper.rb")
-    let controller = s:EscapePath(expand("%:p:h:s?.*/app/views/?app/controllers/?")."_controller.rb")
-    let model = s:EscapePath(expand("%:p:h:s?.*/app/views/?app/models/?").".rb")
+    let helper = s:EscapePath(expand("%:p:h:s?.*[\/]app[\/]views[\/]?app/helpers/?")."_helper.rb")
+    let controller = s:EscapePath(expand("%:p:h:s?.*[\/]app[\/]views[\/]?app/controllers/?")."_controller.rb")
+    let model = s:EscapePath(expand("%:p:h:s?.*[\/]app[\/]views[\/]?app/models/?").".rb")
     if filereadable(b:rails_app_path."/".helper)
       " Would it be better to skip the helper and go straight to the
       " controller?
@@ -439,7 +439,7 @@ function s:FindAlternate()
       exe "find ".controller
     endif
   elseif expand("%:p") =~ '/app/helpers/.*_helper\.rb$'
-    let controller = s:EscapePath(expand("%:p:s?.*/app/helpers/?app/controllers/?:s?_helper.rb$?_controller.rb?"))
+    let controller = s:EscapePath(expand("%:p:s?.*[\/]app[\/]helpers[\/]?app/controllers/?:s?_helper.rb$?_controller.rb?"))
     exe "find ".controller
   elseif expand("%:e") == "csv" || expand("%:e") == "yml"
     let file = s:RailsSingularize(expand("%:t:r")).'_test'
