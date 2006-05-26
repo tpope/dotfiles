@@ -1,6 +1,7 @@
 " Vim plugin to create parenthesizing, bracketing, and quoting operators
-" Maintainer:   Tim Pope <vim@tpope.info>
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
 " Last Change:  2006 May 10
+" GetLatestVimScripts: 1545 5777 :AutoInstall: parenquote.vim
 " $Id$
 
 " This plugin uses Vim 7's new |:map-operator| feature to create mappings for
@@ -49,6 +50,14 @@
 "  autocmd FileType perl,ruby ParenquoteMapLocal <LocalLeader>/ / /
 "  autocmd FileType perl,ruby ParenquoteMapLocal!             / / /
 "
+" KNOWN ISSUES
+"
+" If you launch gvim from the command-line, you may get blank lines, or
+" perhaps even a messed up prompt.  This is an artifact of the use of
+"  silent exe "normal! :function! ".funcname."(type)\<CR>" ...
+" which is unfortunately the only way I have found to create a function
+" factory.  Suggestions welcome, and watch for updates.
+"
 " Remember, this plugin is still in development and the interface is subject
 " to change.  Good luck and enjoy parenquote!
 
@@ -87,7 +96,7 @@ if !exists("s:parenID")
 endif
 
 function! s:ParenquoteMap(bang,map,beg,end)
-  let s:parenID += 1
+  let s:parenID = s:parenID + 1
   let funcname = "<SID>ParenFunc" . s:parenID
   if a:bang
     let amap = "<Leader>" . a:map
@@ -100,7 +109,7 @@ function! s:ParenquoteMap(bang,map,beg,end)
   if version>=700
     exe "nnoremap <silent> ".amap." :set opfunc=".funcname."<CR>g@"
   endif
-exe "vnoremap <silent> ".amap." :<C-U>call ".funcname."(visualmode())<CR>"
+  exe "vnoremap <silent> ".amap." :<C-U>call ".funcname."(visualmode())<CR>"
 endfunction
 
 function! s:ParenquoteMapLocal(bang,map,beg,end)
