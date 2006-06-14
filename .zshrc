@@ -25,10 +25,11 @@ interactive=1
 . $ENV
 #[ -f $HOME/mbox ] && export MAIL=$HOME/mbox
 
-domains=(`egrep '^(search|domain)' /etc/resolv.conf 2>/dev/null`)
-[[ -z $domains ]] || shift 1 domains
+#domains=(`egrep '^(search|domain)' /etc/resolv.conf 2>/dev/null`)
+#[[ -z $domains ]] || shift 1 domains
 
-off=(gob.tpope.us michael.tpope.us lucille.tpope.us tobias.tpope.us lindsay.tpope.us buster.tpope.us oscar.tpope.us)
+off=(gob michael lucille tobias lindsay)
+work=(arwen tpope-486 tpope-1084 jwxkl81-1061 san-netmon)
 for host in $off; do
     [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
     [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
@@ -36,24 +37,26 @@ for host in $off; do
 done
 
 if [ -n "$USERPROFILE" ] && which cygpath >/dev/null; then
-    #typeset tp="`echo -E "$USERPROFILE"|tr '\\\\' /|sed -e 's/^\([A-Za-z]\):/\/cygdrive\/\1/'`"
     typeset home="`cygpath "$USERPROFILE"`"
     typeset docs="$home/My Documents"
     typeset desktop="`cygpath -D 2>/dev/null`"
     [ -n "$APPDATA" ] || APPDATA="$USERPROFILE/Application Data"
     typeset appdata="`cygpath "$APPDATA"`"
     : ~home ~docs ~desktop ~appdata
+elif [ -d "$HOME/Documents" ]; then
+    typeset docs="$HOME/Documents"
+    : ~docs
 fi
 
 namedir() { export $1=$PWD; : ~$1 }
 
-friends=($family barry.tpope.us maeby.tpope.us steve.tpope.us lupe.tpope.us grex.tpope.us tpope-486.jmwaller.com jwxkl81-1061.jmwaller.com tpope-1084.jmwaller.com netmon1.jmwaller.com images.jmwaller.com)
+friends=($family buster oscar maeby steve grex $work)
 
-for host in $domains; do
-    off=(${off%.$host})
-    family=(${family%.$host})
-    friends=(${friends%.$host})
-done
+#for host in $domains; do
+#    off=(${off%.$host})
+#    family=(${family%.$host})
+#    friends=(${friends%.$host})
+#done
 
 unset interactive domains host
 # Section: Prompt {{{1
@@ -87,18 +90,26 @@ screen*|vt220*)
     precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
 		print -Pn "\e]1;\a\e]1;$tty%m\a"
 		print -Pn "\e]2;$screenhs [%l]\a"
-		print -Pn "\ek$tty%m\e\\"
+                if [ "$STY" ]; then
+                    print -Pn "\ek$tty\e\\"
+                else
+                    print -Pn "\ek$tty%m\e\\"
+                fi
 		}
     preexec () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
 		print -Pn "\e]1;\a\e]1;$tty%m*\a"
 		print -Pn "\e]2;$screenhs"
 		print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
 		print -Pn ") [%l]\a"
-		print -Pn "\ek$tty%m*\e\\"
+                if [ "$STY" ]; then
+                    print -Pn "\ek$tty*\e\\"
+                else
+                    print -Pn "\ek$tty%m*\e\\"
+                fi
 		}
     #[ "`hostname`" = grex.cyberspace.org ] &&TERM=vt220 &&export OLDTERM=screen
     ;;
-xterm*|rxvt*|kterm*|dtterm*|cygwin*)
+xterm*|rxvt*|kterm*|dtterm*|ansi*|cygwin*)
     precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
 		print -Pn "\e]1;$tty%m\a"
 		print -Pn "\e]2;%n@%m:%~ [%l]\a"
@@ -135,12 +146,20 @@ unset e
 # Section: Keybindings {{{1
 # -------------------------
 bindkey -e
+#bindkey -m
 bindkey "\e[3~" delete-char
 bindkey "\e[1~" beginning-of-line
 bindkey "\e[7~" beginning-of-line
+bindkey "\e[H"  beginning-of-line
+bindkey "\eOH"  beginning-of-line
 bindkey "\e[4~" end-of-line
 bindkey "\e[8~" end-of-line
+bindkey "\e[F"  end-of-line
+bindkey "\eOF"  end-of-line
 bindkey -r "^Q"
+
+bindkey "\eb"   emacs-backward-word
+bindkey "\ef"   emacs-forward-word
 
 case $ZSH_VERSION in
 3.*) ;;
