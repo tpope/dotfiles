@@ -4,6 +4,10 @@
 " Maintainer: Tim Pope <vimNOSPAM@tpope.info>
 " $Id$
 
+" Install in your plugin directory to use.  This plugin converts binary plist
+" files to XML on read, and reverses to the process on save.  Be careful, it
+" will not be converted back if the file is malformed.
+
 " Exit quickly when:
 " - this plugin was already loaded
 " - when 'compatible' is set

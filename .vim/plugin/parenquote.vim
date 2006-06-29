@@ -1,6 +1,5 @@
 " Vim plugin to create parenthesizing, bracketing, and quoting operators
 " Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
-" Last Change:  2006 May 10
 " GetLatestVimScripts: 1545 5777 :AutoInstall: parenquote.vim
 " $Id$
 
@@ -68,6 +67,8 @@ if exists("g:loaded_parenquote") || &cp
   finish
 endif
 let g:loaded_parenquote = 1
+let s:keepcpo = &cpo
+set cpo&vim
 
 function! <SID>DoSurround(type,beg,end)
   let sel_save = &selection
@@ -141,5 +142,8 @@ if !exists("g:parenquote_no_mappings")
   ParenquoteMap! " " "
   ParenquoteMap! ` ` `
 endif
+
+let &cpo = s:keepcpo
+unlet s:keepcpo
 
 " vim:set sw=2 sts=2:
