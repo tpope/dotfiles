@@ -5,7 +5,8 @@ startup_message off
 shell -$SHELL
 #sorendition =s KW
 hardstatus on
-hardstatus lastline "%H: <%n> %?%h%:%t%?"
+# hardstatus lastline "%H: <%n> %?%h%:%t%?"
+hardstatus lastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
 escape ^\\\ # Ctrl+\ as escape command.
 bindkey ^Q command
 #bindkey ^^ command
@@ -34,8 +35,8 @@ bind ^E screen -ln vim
 #bind ^ stuff "^^"
 bind ^O colon "screen -ln ssh "
 bind  o colon "screen -ln ssh "
-bind  S eval "height 51" "hardstatus alwayslastline '%-Lw%{= WK}%34>%n*%f %t%{-}%+Lw %= %0c'" "split"
-bind  Q eval "hardstatus message %?%h%:%t%?" "only" "height 24"
+bind  S eval "height 51" "hardstatus alwayslastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "split"
+bind  Q eval "hardstatus message '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "only" "height 24"
 bind ^U screen -ln -fn -t uptime sh -c 'echo -ne "\e]0;Uptime\a"; export TERMINAL=1; while clear >/tmp/ruptime.$$; do echo "HOST      STATUS       TIME        USERS   LOAD" >>/tmp/ruptime.$$; tpope ruptime >>/tmp/ruptime.$$; if [ `(cat /tmp/ruptime.$$; tpope rwho)|wc -l` -le 22 ]; then echo >>/tmp/ruptime.$$; tpope rwho >>/tmp/ruptime.$$; fi; cat /tmp/ruptime.$$; rm -f /tmp/ruptime.$$; sleep 15; done'
 bind ^B eval "hardcopy_append off" "hardcopy -h /tmp/.$LOGNAME-screen-urlview" "screen -fn -ln -t urlview urlview /tmp/.$LOGNAME-screen-urlview"
 bind ^Y eval "copy" "stuff kY" "paste ."
