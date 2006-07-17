@@ -1,5 +1,5 @@
 " $Id$
-" vim:set ft=vim et tw=70 sw=2:
+" vim:set ft=vim et tw=70 sw=2 sts=2:
 version 5.0
 
 " Section: Options {{{1
@@ -13,6 +13,9 @@ set autowrite       " Automatically save before commands like :next and :make
 set backspace=2
 set backup          " Do keep a backup file
 set backupskip+=*.tmp,crontab.*
+if has("balloon_eval")
+  set ballooneval
+endif
 set cmdheight=2
 set copyindent
 set dictionary+=/usr/share/dict/words
@@ -37,6 +40,7 @@ set showmatch       " Show matching brackets.
 set smartcase       " Case insensitive searches become sensitive with capitals
 set smarttab        " sw at the start of the line, sts everywhere else
 set splitbelow      " Split windows at bottom
+set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 set suffixes+=.dvi  " Lower priority in wildcards
 set timeoutlen=1200 " A little bit more time for macros
 set ttimeoutlen=50  " Make Esc work faster
@@ -49,14 +53,17 @@ set winaltkeys=no
 
 let g:treeExplVertical=1
 let g:c_comment_strings=1
+let g:Vimplate = "$HOME/.config/vim/vimplate"
 let g:EnhCommentifyBindInInsert='No'
 let g:EnhCommentifyRespectIndent='Yes'
 "let g:Imap_PlaceHolderStart="\xab"
 "let g:Imap_PlaceHolderEnd="\xbb"
 let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let g:lisp_rainbow=1
+let g:loaded_parenquote=1
 let g:rails_level=9
 let g:rails_default_database='sqlite3'
+let g:rails_menu=1
 let g:ruby_no_identifiers=1
 let g:rubycomplete_rails=1
 if !has("gui_running")
@@ -92,10 +99,15 @@ if version>=600
   set foldmethod=marker
   set printoptions=paper:letter ",syntax:n
   set sidescrolloff=5
+  set mouse=a
 endif
 
 if version < 602
   set clipboard+=exclude:screen.*
+elseif exists("$TERM") && $TERM =~ '^screen'
+  if exists("+ttymouse") && &ttymouse == ''
+    set ttymouse=xterm2
+  endif
 endif
 
 if has("dos16") || has("dos32") || has("win32")
@@ -108,17 +120,13 @@ elseif has("mac")
   set backupskip+=/private/tmp/*
 endif
 
-if version>503
-  set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
-endif
-
 " Section: Functions {{{1
 " -----------------------
 
-command! -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
-command! -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
-command! -nargs=0 SudoW   :silent write !sudo tee % >/dev/null
-command! -nargs=* -bang W :write<bang> <args>
+command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
+command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
+command! -bar -nargs=0 SudoW   :silent write !sudo tee % >/dev/null
+command! -bar -nargs=* -bang W :write<bang> <args>
 
 function! Eatchar(pat)
   let c = nr2char(getchar(0))
@@ -135,7 +143,7 @@ function! Invert()
     source ~/.vim/colors/tim.vim
   endif
 endfunction
-command! Invert :call Invert()
+command! -bar Invert :call Invert()
 
 function! Fancy()
   if &number
@@ -156,14 +164,17 @@ function! Fancy()
     endif
   endif
 endfunction
-command! Fancy :call Fancy()
+command! -bar Fancy :call Fancy()
 
 function! OpenURL(url)
   if has("win32")
     exe "!start cmd /cstart /b ".a:url.""
+  elseif $DISPLAY !~ '^\w'
+    exe "silent !sensible-browser \"".a:url."\""
   else
-    exe "normal :!sensible-browser \"".a:url."\" >/dev/null\<CR>"
+    exe "silent !sensible-browser -T \"".a:url."\""
   endif
+  redraw!
 endfunction
 command! -nargs=1 OpenURL :call OpenURL(<q-args>)
 
@@ -182,6 +193,8 @@ function! Run()
   elseif &ft == "python"
     wa
     !python %
+  elseif &ft == "sh"
+    !sh %
   elseif &ft == "html" || &ft == "xhtml" || &ft == "php" || &ft == "aspvbs" || &ft == "aspperl"
     wa
     if !exists("b:url")
@@ -209,14 +222,14 @@ function! Run()
     "exe "normal :!Eterm -t White -T 'make test' --pause -e make -s test &\<CR>"
   endif
 endfunction
-command! Run :call Run()
+command! -bar Run :call Run()
 
 function! SQL()
   edit SQL
   setf sql
   set bt=nofile
 endfunction
-command! SQL :call SQL()
+command! -bar SQL :call SQL()
 
 function! InsertTabWrapper()
   let col = col('.') - 1
@@ -260,8 +273,8 @@ function! InsertQuoteWrapper(char)
   endif
 endfunction
 if version >= 600
-  inoremap <silent> " <C-R>=InsertQuoteWrapper('"')<CR>
-  inoremap <silent> ' <C-R>=InsertQuoteWrapper("'")<CR>
+  "inoremap <silent> " <C-R>=InsertQuoteWrapper('"')<CR>
+  "inoremap <silent> ' <C-R>=InsertQuoteWrapper("'")<CR>
 endif
 
 function! TemplateFileFunc_sh()
@@ -277,27 +290,10 @@ function! TemplateFileFunc_rb()
 endfunction
 
 function! TemplateFileFunc_html()
-  norm k3w
+  norm 3w
 endfunction
 
-function! FTCheck_asmsyntax()
-  " see if file contains any asmsyntax=foo overrides. If so, change
-  " b:asmsyntax appropriately
-  let head = " ".getline(1)." ".getline(2)." ".getline(3)." ".getline(4).
-        \" ".getline( 5)." ".getline( 6)." ".getline( 7)." ".getline( 8).
-        \" ".getline( 9)." ".getline(10)." ".getline(11)." ".getline(12).
-        \" ".getline(13)." ".getline(14)." ".getline(15)." ".getline(16)." "
-  if head =~ '\sasmsyntax=\S\+\s'
-    let b:asmsyntax = substitute(head,'.*\sasmsyntax=\(\S\+\)\s.*','\1',"")
-  elseif head =~ '\s_ti\d\d'
-    let b:asmsyntax = "asm68a89"
-  endif
-endfunction
-
-if version < 600
-" Never actually tested this
-  command -nargs=* setlocal set <args>
-else
+if version >= 600
   runtime! macros/matchit.vim
 endif
 
@@ -321,13 +317,11 @@ else
 endif
 
 map <F3>    :cnext<CR>
-map <F4>    :cprev<CR>
-map <F5>    :cc<CR>
-map <F6>    :cnext<CR>
-"map <F7>    :wa<BAR>make<CR>
+map <F4>    :cc<CR>
+map <F5>    :cprev<CR>
 map <F8>    :wa<BAR>make<CR>
 map <F9>    :Run<CR>
-map <F10>   :wa<BAR>make
+"map <F10>   :wa<BAR>make
 map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
 imap <F12> <C-O><F12>
 map <C-F4>  :bdelete<CR>
@@ -336,8 +330,8 @@ map <C-F4>  :bdelete<CR>
 "map <C-Z> :shell<CR>
 " Attribution Fixing
 map <Leader>at gg}jWdWWPX
-map <Leader>sa :!aspell -c --dont-backup "%"<CR>:e! "%"<CR><CR>
-map <Leader>si :!ispell "%"<CR>:e! "%"<CR><CR>
+"map <Leader>sa :!aspell -c --dont-backup "%"<CR>:e! "%"<CR><CR>
+"map <Leader>si :!ispell "%"<CR>:e! "%"<CR><CR>
 "map <Leader>sh :so `sh /usr/share/doc/vim/tools/vimspell.sh %`<CR><CR>
 map <Leader>sw :!echo "<cword>"\|aspell -a --<CR>
 map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
@@ -363,12 +357,12 @@ map <silent> \\      <Plug>Traditionalj
 inoremap <C-C> <Esc>`^
 inoremap <C-X><C-A> <C-A>
 if ! has("gui_running")
-  map <Esc>[3^ <C-Del>
-  map <Esc>[5^ <C-PageUp>
-  map <Esc>[6^ <C-PageDown>
-  map <Esc>[3;5~ <C-Del>
-  map <Esc>[5;5~ <C-PageUp>
-  map <Esc>[6;5~ <C-PageDown>
+  "map <Esc>[3^ <C-Del>
+  "map <Esc>[5^ <C-PageUp>
+  "map <Esc>[6^ <C-PageDown>
+  "map <Esc>[3;5~ <C-Del>
+  "map <Esc>[5;5~ <C-PageUp>
+  "map <Esc>[6;5~ <C-PageDown>
 endif
 
 " Emacs style mappings
@@ -385,7 +379,8 @@ else
   inoremap <C-B> <Left>
   inoremap <C-F> <Right>
 endif
-noremap! <C-A>      <C-O>^
+inoremap <C-A>      <C-O>^
+cnoremap <C-A>      <Home>
 cnoremap <C-B>      <Left>
 cnoremap <C-D>      <Del>
 inoremap <C-E>      <End>
@@ -420,6 +415,7 @@ inoremap <M-A> <C-O>$
 noremap! <C-J> <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR> <C-G>u<CR>
+inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
 
 map <M-,> :Smaller<CR>
 map <M-.> :Bigger<CR>
@@ -479,11 +475,11 @@ else
 endif
 
 if has("syntax")
-  hi link User1 StatusLineNC
-  hi link User2 StatusLineNC
-  hi link User3 StatusLineNC
-  hi link User4 StatusLineNC
-  hi link User5 StatusLineNC
+  hi link User1 StatusLine
+  hi link User2 StatusLine
+  hi link User3 StatusLine
+  hi link User4 StatusLine
+  hi link User5 StatusLine
   if filereadable(expand("~/.vim/colors/tim.vim"))
     source ~/.vim/colors/tim.vim
   endif
@@ -501,8 +497,9 @@ if has("autocmd")
   endif
   augroup FTMisc " {{{2
     autocmd!
-    autocmd User Rails* Lcd
-    autocmd User Rails-model,Rails-model-ar* abbr habtm has_and_belongs_to_many
+    autocmd VimEnter * let g:rails_debug=1
+    "autocmd User Rails* silent! Rlcd
+    autocmd User Rails*model*ar* abbr <buffer> habtm has_and_belongs_to_many
     autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] 
           \ if filereadable(expand("~/.vim/templates/skel.sh")) |
           \   0r ~/.vim/templates/skel.sh |
@@ -516,9 +513,13 @@ if has("autocmd")
           \   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
           \ endif |
           \ set ft=sh | 1
-    autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_new="+x"
-    autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_new="+x"
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
+    autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_exe=1
+    autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_exe=1
+    autocmd BufWritePre * if exists("b:chmod_exe") |
+          \ unlet b:chmod_exe |
+          \ if getline(1) =~ '^#!' | let b:chmod_new="+x" | endif |
+          \ endif
     autocmd BufWritePost,FileWritePost * if exists("b:chmod_new")|
           \ silent! execute "!chmod ".b:chmod_new." <afile>"|
           \ unlet b:chmod_new|
@@ -546,10 +547,12 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *named.conf*       set ft=named
     autocmd BufNewFile,BufRead *.bst              set ft=bst
     autocmd BufNewFile,BufRead *.vb               set ft=vbnet
+    autocmd BufNewFile,BufRead *.tt,*.tt2         set ft=tt2html
+    autocmd BufNewFile,BufRead *.asm              if getline(1).getline(2).getline(3).getline(4).getline(5).getline(6).getline(7).getline(8).getline(9).getline(10) =~ '\<_ti\d\d' | set ft=asm68a89 | endif
     autocmd BufNewFile,BufRead /var/www/*
           \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
     autocmd BufNewFile,BufRead /etc/udev/*.rules set ft=udev
-    autocmd BufNewFile,BufRead *.txt,README,INSTALL set ft=text
+    autocmd BufNewFile,BufRead *.txt,README,INSTALL if &ft == ""|set ft=text|endif
     autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*  set ft=simpsons
     "autocmd BufRead * if expand("%") =~? '^https\=://.*/$'|setf html|endif
     autocmd BufNewFile,BufRead,StdinReadPost *
@@ -568,10 +571,19 @@ if has("autocmd")
     autocmd FileType tcl,perl,python        setlocal ai et sta sw=4 sts=4
     autocmd FileType php,aspperl,aspvbs,vb  setlocal ai et sta sw=4 sts=4
     autocmd FileType apache,sql,vbnet       setlocal ai et sta sw=4 sts=4
-    autocmd FileType html,xhtml,xml,tex,css setlocal ai et sta sw=2 sts=2
+    autocmd FileType tex,css                setlocal ai et sta sw=2 sts=2
+    autocmd FileType html,xhtml,xml,wml,cf  setlocal ai et sta sw=2 sts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
-    autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8
-    autocmd FileType cs,vbnet               setlocal foldmethod=syntax
+    autocmd FileType tt2html,htmltt,mason   setlocal ai et sta sw=2 sts=2
+    autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8 | if exists("+spell") | setlocal spell | endif
+    autocmd FileType cs,vbnet               setlocal foldmethod=syntax fdl=2
+    autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
+    autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
+    autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o<C-U># $Id$<Esc>o<C-U><C-X>^<Esc>o<C-U><C-G>u
+    autocmd User     allml                  imap <C-Z> <C-X>=|imap <C-J> <Down>
+    if !filereadable(expand("~/.config/vim/syntax/tt2html.vim"))
+     autocmd BufNewFile,BufRead *.tt,*.tt2        set syn=html
+    endif
     autocmd FileType aspvbs,vbnet runtime! indent/vb.vim | setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
     autocmd FileType bst setlocal smartindent ai sta sw=2 sts=2
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ %
@@ -583,7 +595,7 @@ if has("autocmd")
     autocmd FileType mail setlocal tw=70|if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
     autocmd FileType perl silent! compiler perl | setlocal iskeyword+=: keywordprg=perl\ -e'$c=shift;exec\ q{perldoc\ }.($c=~/^[A-Z]\|::/?q{}:q{-f}).qq{\ $c}'
     autocmd FileType python setlocal keywordprg=pydoc
-    autocmd FileType ruby silent! compiler ruby | setlocal makeprg=ruby\ -wc\ % keywordprg=ri
+    autocmd FileType ruby silent! compiler ruby | setlocal makeprg=ruby\ -wc\ % keywordprg=ri | imap <C-Z> <CR>end<C-O>O
     autocmd FileType sql map! <buffer> <C-Z> <Esc>`^gUaw`]a
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % wildignore+=*.dvi formatoptions+=l
@@ -599,7 +611,6 @@ if has("autocmd")
           \ endif
     autocmd FileType vim  setlocal ai et sta sw=4 sts=4 keywordprg=:help | map! <buffer> <C-Z> <C-X><C-V>
     "autocmd BufWritePost ~/.vimrc   so ~/.vimrc
-    autocmd User Rails* map <M-6> <Plug>RailsAlternate
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
