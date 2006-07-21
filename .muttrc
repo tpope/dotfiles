@@ -227,10 +227,9 @@ account-hook imap://mona.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh mona /us
 `[ -s ~/.mail_aliases ] && echo source ~/.mail_aliases || echo set`
 # Section: Aliases {{{1
 # ---------------------
-alias maggie Tim Pope <tpope@maggie.simpson>
-alias bart   Tim Pope <tpope@bart.simpson>
-alias lisa   Tim Pope <tpope@lisa.simpson>
-alias marge  Tim Pope <tpope@marge.simpson>
-alias homer  Tim Pope <tpope@homer.simpson>
-alias abe    Tim Pope <tpope@abe.simpson>
-alias mona   Tim Pope <tpope@mona.simpson>
+alias gob     Tim Pope <tpope@gob.tpope.us>
+alias lucille Tim Pope <tpope@lucille.tpope.us>
+alias michael Tim Pope <tpope@michael.tpope.us>
+alias buster  Tim Pope <tpope@buster.tpope.us>
+alias lindsay Tim Pope <tpope@lindsay.tpope.us>
+alias tobias  Tim Pope <tpope@tobias.tpope.us>
