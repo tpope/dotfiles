@@ -27,11 +27,11 @@
 " :0Pastie                  Load the newest paste
 
 " Regardless of the command used, on the first write, this script will create
-" a new paste, and on subsequent writes, it will update the the existing
-" paste.  If a bang is passed to a command that load an existing paste (:768),
-" the first write will update as well.  If the loaded paste was not created in
-" the same vim session, updates will almost certainly silently fail.
-" (Advanced users can muck around with g:pastie_session_id if desired).
+" a new paste, and on subsequent writes, it will update the existing paste.
+" If a bang is passed to a command that load an existing paste (:768), the
+" first write will update as well.  If the loaded paste was not created in the
+" same vim session, updates will almost certainly silently fail.  (Advanced
+" users can muck around with g:pastie_session_id if desired).
 
 " At the shell you can directly create a new pastie with a command like
 " $ vim +Pastie
@@ -51,7 +51,7 @@
 if exists("g:loaded_pastie") || &cp
     finish
 endif
-"let g:loaded_pastie = 1
+let g:loaded_pastie = 1
 
 augroup pastie
     autocmd!
@@ -71,8 +71,8 @@ if !exists("g:pastie_destination")
         let g:pastie_destination = 'tab'
     else
         let g:pastie_destination = 'window'
-        "let g:pastie_destination= 'buffer'
     endif
+    "let g:pastie_destination = 'buffer'
 endif
 
 command! -bar -bang -nargs=* -range=0 -complete=file Pastie :call s:Pastie(<bang>0,<line1>,<line2>,<count>,<f-args>)
