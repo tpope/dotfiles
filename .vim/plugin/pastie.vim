@@ -4,11 +4,11 @@
 " GetLatestVimScripts: 1624 1
 " $Id$
 
-" Installation: #!!
+" Installation:
 " Place in ~/.vim/plugin or vimfiles/plugin
 " A working ruby install is required (Vim interface not necessary).
 
-" Usage: #!!
+" Usage:
 " :Pastie creates a new paste (example arguments shown below).  Use :w to save
 " it by posting it to the server (the parser used is derived from the Vim
 " filetype).  This updates the filename and stores the new url in the primary
@@ -311,7 +311,7 @@ function! s:PastieRead(file)
 endfunction
 
 function! s:afterload()
-    set commentstring=%s\ #!!
+    set commentstring=%s\ #!! "
     hi def link pastieIgnore    Ignore
     hi def link pastieNonText   NonText
     if exists(":match")
