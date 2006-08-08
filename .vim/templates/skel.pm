@@ -1,24 +1,23 @@
 # -*- perl -*- vim:set ft=perl et sw=4 sts=4:
 # $Id$
 
-package @FILE@;
+package @MODULE@;
 use strict;
-use vars qw($VERSION @ISA);
+use vars qw($VERSION);
 
 $VERSION = sprintf "%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/;
-@ISA = qw();
 
 use Carp;
 
 =head1 NAME
 
-@FILE@
+@MODULE@
 
 =cut
 
 =head1 SYNOPSIS
 
-use @FILE@;
+use @MODULE@;
 
 =head1 DESCRIPTION
 
@@ -47,6 +46,6 @@ the same terms as perl itself.
 
 Tim Pope, E<lt>perl@relongto.usE<gt>.
 
-L<http://www.sexygeek.org/>
+L<http://www.tpope.net/>
 
 =cut
