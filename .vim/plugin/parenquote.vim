@@ -1,6 +1,6 @@
 " Vim plugin to create parenthesizing, bracketing, and quoting operators
 " Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
-" GetLatestVimScripts: 1545 5777 :AutoInstall: parenquote.vim
+" GetLatestVimScripts: 1545 1 :AutoInstall: parenquote.vim
 " $Id$
 
 " This plugin uses Vim 7's new |:map-operator| feature to create mappings for
@@ -49,14 +49,6 @@
 "  autocmd FileType perl,ruby ParenquoteMapLocal <LocalLeader>/ / /
 "  autocmd FileType perl,ruby ParenquoteMapLocal!             / / /
 "
-" KNOWN ISSUES
-"
-" If you launch gvim from the command-line, you may get blank lines, or
-" perhaps even a messed up prompt.  This is an artifact of the use of
-"  silent exe "normal! :function! ".funcname."(type)\<CR>" ...
-" which is unfortunately the only way I have found to create a function
-" factory.  Suggestions welcome, and watch for updates.
-"
 " Remember, this plugin is still in development and the interface is subject
 " to change.  Good luck and enjoy parenquote!
 
@@ -92,58 +84,79 @@ function! s:escstr(str)
   return substitute(a:str,"[\\\"]","\\\\\\0","g")
 endfunction
 
-if !exists("s:parenID")
-  let s:parenID = 0
+
+if version >= 700
+  function! ParenQuoteDoSurround(type) dict
+    return s:DoSurround(a:type,self.begin,self.end)
+  endfunction
+endif
+
+if version >= 700
+  if !exists("s:ID")
+    let s:ID = 0
+  endif
+  function! s:FunctionFactory(beg,end)
+    let s:ID = s:ID + 1
+    let s:ParenBegin{s:ID} = a:beg
+    let s:ParenEnd{s:ID}   = a:end
+    function! s:ParenFunc{s:ID}(type)
+      try
+        ^ " raise error
+      catch
+        let throwpoint = v:throwpoint
+      endtry
+      let id = matchstr(throwpoint,'\C_ParenFunc\zs\d\+')
+      return s:DoSurround(a:type,s:ParenBegin{id},s:ParenEnd{id})
+    endfunction
+    return "<SID>ParenFunc".s:ID
+  endfunction
 endif
 
 function! s:ParenquoteMap(bang,map,beg,end)
-  let s:parenID = s:parenID + 1
-  let funcname = "<SID>ParenFunc" . s:parenID
   if a:bang
     let amap = "<Leader>" . a:map
   else
     let amap = a:map
   endif
-  silent exe "normal! :function! ".funcname."(type)\<CR>".
-        \"call <SID>DoSurround(a:type,\"".s:escstr(a:beg)."\",\"".s:escstr(a:end)."\")\<CR>".
-        \"endfunction\<CR>"
-  if version>=700
+  if version >= 700
+    let funcname = s:FunctionFactory(a:beg,a:end)
     exe "nnoremap <silent> ".amap." :set opfunc=".funcname."<CR>g@"
   endif
-  exe "vnoremap <silent> ".amap." :<C-U>call ".funcname."(visualmode())<CR>"
+  exe "vnoremap <silent> ".amap." :<C-U>call <SID>DoSurround(visualmode(),\"".s:escstr(a:beg)."\",\"".s:escstr(a:end)."\")<CR>"
 endfunction
 
 function! s:ParenquoteMapLocal(bang,map,beg,end)
-  let s:parenID += 1
-  let funcname = "<SID>ParenFunc" . s:parenID
   if a:bang
     let amap = "<LocalLeader>" . a:map
   else
     let amap = a:map
   endif
-  silent exe "normal! :function! ".funcname."(type)\<CR>".
-        \"call <SID>DoSurround(a:type,\"".s:escstr(a:beg)."\",\"".s:escstr(a:end)."\")\<CR>".
-        \"endfunction\<CR>"
-  if version>=700
+  if version >= 700
+    let funcname = s:FunctionFactory(a:beg,a:end)
     exe "nnoremap <silent> <buffer> ".amap." :set opfunc=".funcname."<CR>g@"
   endif
-  exe "vnoremap <silent> <buffer> ".amap." :<C-U>call ".funcname."(visualmode())<CR>"
+  exe "vnoremap <silent> <buffer> ".amap." :<C-U>call <SID>DoSurround(visualmode(),\"".s:escstr(a:beg)."\",\"".s:escstr(a:end)."\")\<CR>"
 endfunction
-command! -bang -nargs=+ ParenquoteMap call s:ParenquoteMap(<bang>0,<f-args>)
+
+command! -bang -nargs=+ ParenquoteMap      call s:ParenquoteMap(<bang>0,<f-args>)
 command! -bang -nargs=+ ParenquoteMapLocal call s:ParenquoteMapLocal(<bang>0,<f-args>)
 
-if !exists("g:parenquote_no_mappings")
-  ParenquoteMap! ( ( )
-  ParenquoteMap! { { }
-" } "<-- Syntax highlighting fix
-  ParenquoteMap! [ [ ]
-  ParenquoteMap! < < >
-  ParenquoteMap! ' ' '
-  ParenquoteMap! " " "
-  ParenquoteMap! ` ` `
-endif
+function! s:Init()
+  if !exists("g:parenquote_no_mappings")
+    ParenquoteMap! ( ( )
+    ParenquoteMap! { { }
+    " } "<-- Syntax highlighting fix, for older versions of Vim
+    ParenquoteMap! [ [ ]
+    ParenquoteMap! < < >
+    ParenquoteMap! ' ' '
+    ParenquoteMap! " " "
+    ParenquoteMap! ` ` `
+  endif
+endfunction
 
 let &cpo = s:keepcpo
 unlet s:keepcpo
+
+call s:Init()
 
 " vim:set sw=2 sts=2:
