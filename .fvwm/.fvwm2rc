@@ -11,7 +11,7 @@ EdgeResistance 2000 16
 EdgeScroll 0 0
 EdgeThickness 1
 SnapAttraction 3 Screen
-MoveThreshold 2
+#MoveThreshold 2
 OpaqueMoveSize -1
 XorPixmap resize.rainbow.xpm
 ClickTime 650
@@ -19,6 +19,8 @@ ClickTime 650
 EwmhBaseStruts 0 0 0 40
 EdgeCommand Bottom All (FvwmButtons) FuncButtonsRestore
 ColormapFocus FollowsMouse
+#SetAnimation 10 -.01 0 .01 .03 .08 .18 .3 .45 .6 .75 .85 .90 .94 .97 .99 1.0
+SetAnimation 5 .01 .03 .08 .18 .3 .45 .6 .75 .85 .90 .94 .97 .99 1.0
 
 DesktopSize 1x1
 DesktopName 0 First
@@ -42,6 +44,8 @@ SetEnv SMALLXFTFONT "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true"
 DestroyFunc Fvwm24
 AddToFunc Fvwm24
 + I SetEnv fvwm_titlefont "-adobe-helvetica-bold-r-*--12-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_menufont  "-adobe-helvetica-medium-*--12-*-*-*-p-*-iso8859-1"
++ I SetEnv fvwm_labelfont "-adobe-helvetica-bold-r-*--12-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_iconfont  "-adobe-helvetica-medium-r-*--11-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_modulefont "-adobe-helvetica-medium-r-*--12-*-*-*-p-*-iso8859-1"
 + I SetEnv fvwm_alertfont "-adobe-helvetica-bold-r-*--17-*-*-*-p-*-iso8859-1"
@@ -50,23 +54,37 @@ AddToFunc Fvwm24
 
 DestroyFunc Fvwm25
 AddToFunc Fvwm25
-+ I SetEnv fvwm_titlefont "xft:Arial:style=Bold:pixelsize=12;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
-+ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=11;-adobe-helvetica-medium-r-*--11-*-*-*-p-*-*-*"
-+ I SetEnv fvwm_modulefont "xft:Arial:pixelsize=12;-adobe-helvetica-medium-r-*--12-*-*-*-p-*-*-*"
-+ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=15;-adobe-helvetica-bold-r-*--17-*-*-*-p-*-*-*"
-+ I SetEnv fvwm_smallfont "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true;-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
-+ I DefaultFont "xft:Mono:pixelsize=11;7x13"
+#+ I SetEnv fvwm_titlefont "xft:Arial:style=Bold:pixelsize=12;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
++ I SetEnv fvwm_titlefont "Shadow=1 Center:xft:Arial:style=Bold:pixelsize=12:encoding=iso10646-1;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
++ I SetEnv fvwm_menufont "xft:Bitstream Vera Sans:style=Roman:pixelsize=12:encoding=iso10646-1;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
++ I SetEnv fvwm_labelfont "Shadow=1 Center:xft:Bitstream Vera Sans:style=Bold:pixelsize=12:encoding=iso10646-1;-adobe-helvetica-bold-r-*--12-*-*-*-p-*-*-*"
++ I SetEnv fvwm_iconfont "xft:Bitstream Vera Sans:style=Roman:pixelsize=11:encoding=iso10646-1;-adobe-helvetica-medium-r-*--11-*-*-*-p-*-*-*"
++ I SetEnv fvwm_modulefont "xft:Arial:pixelsize=12:encoding=iso10646-1;-adobe-helvetica-medium-r-*--12-*-*-*-p-*-*-*"
++ I SetEnv fvwm_alertfont "xft:Bitstream Vera Sans:style=Bold:pixelsize=15:encoding=iso10646-1;-adobe-helvetica-bold-r-*--17-*-*-*-p-*-*-*"
++ I SetEnv fvwm_smallfont "Mono:style=Roman:pixelsize=8:minspace=true:antialias=true:encoding=iso10646-1;-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"
++ I DefaultFont "xft:Mono:pixelsize=11;7x13:encoding=iso10646-1"
 
 PipeRead "if fvwm --version >/dev/null 2>&1; then echo Fvwm25; else echo Fvwm24; fi"
 
 # }}}1
 # Styles {{{1
+
 # Colorsets {{{2
 
 #DestroyModuleConfig FvwmTheme: *
 CleanupColorsets
 #*FvwmTheme:
 #Colorset 6 DGradient 256 LightSteelBlue SteelBlue, fg black, bg LightSteelBlue
+SetEnv BACK       #666
+SetEnv FORE       #BBB
+SetENV FORESHAD   #555
+SetEnv HIBACK     #AAA
+SetEnv HIFORE     #000
+SetEnv HIFORESHAD #FFF
+
+Colorset 1 fg $[FORE], fgsh $[BACK], bg $[BACK], Transparent, IconAlpha 60
+Colorset 2 fg $[HIFORE], fgsh $[HIBACK], bg $[HIBACK], IconAlpha 100
+Colorset 3 fg Black, fgsh $[HIFORESHAD], bg #DDD, IconAlpha 50
 PipeRead '\
 fvwm --version >/dev/null 2>&1 || ft="*FvwmTheme:"; \
 if xdpyinfo 2>&1|grep "depth of root window: *[23]" >/dev/null; then \
@@ -89,12 +107,13 @@ MenuStyle * ActiveFore white, HilightBack navy
 MenuStyle * Animation, PopupOffset -4 100
 MenuStyle * MenuFace DGradient 256 LightSteelBlue SteelBlue
 MenuStyle * Font "$[fvwm_titlefont]"
-CopyMenuStyle * Logins
-CopyMenuStyle * Screens
-MenuStyle Logins  Background rgb:ee/80/80, ActiveFore White, HilightBack DarkRed
-MenuStyle Logins  MenuFace DGradient 256 rgb:ee/90/90 rgb:ee/70/70
-MenuStyle Screens Background rgb:80/dd/80, ActiveFore White, HilightBack DarkGreen
-MenuStyle Screens MenuFace DGradient 256 rgb:90/dd/90 rgb:70/dd/70
+MenuStyle * Font "$[fvwm_menufont]"
+#CopyMenuStyle * Logins
+#CopyMenuStyle * Screens
+#MenuStyle Logins  Background rgb:ee/80/80, ActiveFore White, HilightBack DarkRed
+#MenuStyle Logins  MenuFace DGradient 256 rgb:ee/90/90 rgb:ee/70/70
+#MenuStyle Screens Background rgb:80/dd/80, ActiveFore White, HilightBack DarkGreen
+#MenuStyle Screens MenuFace DGradient 256 rgb:90/dd/90 rgb:70/dd/70
 
 # }}}2
 # Default Styles {{{2
@@ -109,7 +128,7 @@ CursorStyle SELECT cross
 # MWM Decor {{{3
 DestroyDecor MWM
 AddToDecor MWM
-+ TitleStyle      Height 18
++ TitleStyle      Centered Height 18
 + ButtonStyle     1 - MwmDecorMenu
 + ButtonStyle     1 -- UseTitleStyle
 + ButtonStyle     1 MiniIcon -- flat
@@ -136,7 +155,7 @@ AddToDecor MWM
 DestroyDecor Flat
 AddToDecor Flat
 + BorderStyle -- NoInset HiddenHandles
-+ TitleStyle      Height 18 -- Flat
++ TitleStyle      Centered Height 18 -- Flat
 + ButtonStyle     1 - MwmDecorMenu
 + ButtonStyle     1 -- UseTitleStyle
 + ButtonStyle  1 MiniIcon -- flat
@@ -145,11 +164,15 @@ AddToDecor Flat
 + ButtonStyle 2 - !MwmDecorMax
 + ButtonStyle 2 (17 20x20@1 30x20@1 50x40@1 70x20@1 80x20@1 80x30@0 60x50@0 80x70@1 80x80@0 70x80@0 50x60@0 30x80@0 20x80@0 20x70@0 40x50@1 20x30@0 20x20@1)
 #+ ButtonStyle 2 Active (ShrunkPixmap mini.winXX-close.xpm)
++ ButtonStyle 2 Active (Pixmap active-close.xpm)
++ ButtonStyle 2 Inactive (Pixmap inactive-close.xpm)
 + ButtonStyle 4 - MwmDecorMax !MwmDecorMin
 + ButtonStyle 4 Default 2
+#+ ButtonStyle 4 ActiveUp (Pixmap active-maximize.xpm)
 #+ ButtonStyle 4 Active (ShrunkPixmap mini.winXX-maximize.xpm)
 + ButtonStyle 6 - MwmDecorMin MwmDecorShade
 + ButtonStyle 6 Default 4
+#+ ButtonStyle 6 ActiveUp (Pixmap active-iconify.xpm)
 #+ ButtonStyle 6 Active (ShrunkPixmap mini.winXX-minimize.xpm)
 + ButtonStyle 8 - MwmDecorStick
 + ButtonStyle 8 (12 85x28@4 15x28@0 15x23@1 85x23@1 85x52@4 15x52@0 15x47@1 85x47@1 85x76@4 15x76@0 15x71@1 85x71@1)
@@ -166,16 +189,22 @@ AddToDecor Flat
 + ButtonStyle All ToggledInactive -- flat
 # }}}3
 
-Style *         UseDecor Mwm, MwmBorder
+#Style *         UseDecor Mwm, MwmBorder
+Style *         UseDecor Flat, MwmBorder
+Style *         StippledTitle
 
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
 Style *         Icon norm/unknown.xpm, MiniIcon mini/unknown.xpm
 Style *         IconBox 0 -112 -0 -40, IconFill Right Bottom, IconBox -72 0 -0 -112, IconFill Bottom Right
 Style *         IconGrid 56 72, IconSize 48 48
-Style *         ForeColor white, BackColor rgb:60/78/60
-Style *         HilightFore white, HilightBack rgb:00/80/00
-Style *         BorderWidth 5, HandleWidth 5, NoStickStipples
+
+#Style *         ForeColor white, BackColor rgb:60/78/60
+#Style *         HilightFore white, HilightBack rgb:00/80/00
+Style *         HilightFore $[HIFORE], ForeColor $[FORE]
+Style *         HilightBack $[HIBACK], BackColor $[BACK]
+Style *         Colorset 1, HilightColorset 2
+Style *         BorderWidth 4, HandleWidth 4, NoStickStipples
 Style *         MwmFunctions, MwmDecor, MwmButtons, HintOverride
 Style NotStealth SloppyFocus, FPClickToFocus, GrabFocus, GrabFocusTransient
 Style NotStealth CirculateHit, WindowListHit
@@ -186,13 +215,13 @@ Style *         KeepWindowGroupsOnDesk, EWMHUseStackingOrderHints
 Style *         TileCascadePlacement
 Style *         MinOverlapPercentPlacement, MinOverlapPlacementPenalties 1 5 0.5 2 0.05 999
 Style *         MaxWindowSize 100 100, !AllowMaximizeFixedSize
+Style *         NoButton 8
 
 # }}}2
 # Terminal Emulator Styles {{{2
 
 Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm
-Style Terminal  HilightBack rgb:30/40/50, BackColor rgb:52/55/58
-#Style Terminal  HandleWidth 5
+#Style Terminal  HilightBack rgb:30/40/50, BackColor rgb:52/55/58
 Style XTerm*    UseStyle Terminal
 Style UXTerm*   UseStyle Terminal
 Style Eterm     UseStyle Terminal
@@ -205,9 +234,9 @@ Style konsole   UseStyle Terminal
 Style *ssh@*    Icon norm/terminal-remote.xpm, MiniIcon mini/terminal-remote.xpm
 #Style screen@*  Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm
 #Style screen-ssh* Icon norm/terminal-special.xpm, MiniIcon mini/terminal-special.xpm
-Style chat ForeColor rgb:d0/ff/80, HilightFore rgb:d0/ff/80
 Style chat Icon norm/chat.xpm, MiniIcon mini/chat.xpm
 Style chat@* UseStyle chat
+Style Chat@* UseStyle chat
 Style @* Icon norm/terminal-special.xpm, MiniIcon mini/terminal-special.xpm
 Style @localhost Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm
 #, IconOverride
@@ -216,7 +245,6 @@ Style @localhost Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm
 # Fvwm Module Styles {{{2
 
 Style Fvwm*     BorderWidth 2, Icon norm/system.xpm, MiniIcon mini.fvwm.xpm
-Style Fvwm*     HilightBack violetred, BackColor rgb:70/50/68
 Style Fvwm*     WindowListSkip, CirculateSkip, ClickToFocus, GrabFocusOff
 Style fvwm_menu UseStyle Fvwm*, UsePPosition, NoHandles
 Style fvwm_menu TitleAtRight, RightTitleRotatedCCW, NoButton 4, FixedSize
@@ -240,7 +268,6 @@ Style FvwmTaskBar  Sticky, NoHandles, NoTitle, BorderWidth 0
 # Editor Styles {{{2
 
 Style Editor    GrabFocus, GrabFocusTransient, MiniIcon mini/editor.xpm, Icon norm/editor.xpm
-Style Editor    HilightBack rgb:40/30/60, BackColor rgb:68/60/78
 Style *vim      UseStyle Editor, MiniIcon vim-16.xpm, Icon vim.xpm
 #Style Gvim      StartsOnDesk 3
 Style Xedit     UseStyle Editor
@@ -252,11 +279,12 @@ Style emacs     UseStyle Editor
 
 PipeRead "$HOME/bin/hostinfo --fvwm-styles"
 PipeRead "echo 'Style *localhost UseStyle' \\*@`hostname|sed -e 's/[.].*//'`\\*"
+PipeRead "echo 'Style @localhost UseStyle' @`hostname|sed -e 's/[.].*//'`\\*"
 
 # }}}2
 # Web Browser Styles {{{2
 
-Style www-browser HilightFore white, ForeColor white, HilightBack rgb:80/60/10, BackColor rgb:78/68/60, MiniIcon mini/www.xpm, GrabFocusOff, SkipMapping, Title
+Style www-browser  MiniIcon mini/www.xpm, GrabFocusOff, SkipMapping, Title
 # , StartsOnDesk 2
 Style konqueror         UseStyle www-browser, MiniIcon mini.kde.xpm
 Style kcmshell          UseStyle www-browser, MiniIcon mini.kde.xpm
@@ -275,20 +303,22 @@ Style WWW-Browser       UseStyle www-browser
 # }}}2
 # Multimedia Program Styles {{{2
 
-Style Media     HilightFore white, ForeColor white, HilightBack rgb:ff/40/00, BackColor rgb:80/62/5c, Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm
-Style Gimp      UseStyle Media, HilightBack rgb:ff/22/22, BackColor rgb:78/60/60, Icon norm/gimp.xpm, MiniIcon mini/gimp.xpm
+Style Media     Icon norm/multimedia.xpm, MiniIcon mini/multimedia.xpm
+Style Gimp      UseStyle Media, Icon norm/gimp.xpm, MiniIcon mini/gimp.xpm
 Style "The GIMP" UsePPosition
 Style "GIMP Startup" StartsOnDesk 6
-Style feh       UseStyle Media, Icon norm/image-viewer.xpm, MiniIcon mini/image-viewer.xpm
+Style feh       UseStyle Media, Icon norm/image-viewer.xpm, MiniIcon mini/image-viewer.xpm, NoButton 4
 Style MPlayer   UseStyle Media, NoPPosition, FixedPPosition, MaxWindowSize, NoIcon
 Style xmms      UseStyle Media, Icon norm/music.xpm, MiniIcon mini/music.xpm
 Style Xawtv     UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
+Style aumix     UseStyle Media, MiniIcon aumix.mini.xpm
+Style Inkscape  UseStyle Media
 
 # }}}2
 # Game Styles {{{2
 
-Style Game      Icon norm/game.xpm, MiniIcon mini/game.xpm, StartsOnDesk 8, HilightFore white, ForeColor white, HilightBack rgb:00/a0/00, BackColor rgb:60/80/60
+Style Game      Icon norm/game.xpm, MiniIcon mini/game.xpm, StartsOnDesk 8
 Style SDL_App   UseStyle Game, NoButton 4, NoHandles, BorderWidth 2
 Style mupen64   UseStyle Game
 Style *Snes9*   UseStyle Game
@@ -299,8 +329,10 @@ Style *MPlayer* StartsAnyWhere
 # }}}2
 # Common Program Styles {{{2
 
+Style trayer    GrabFocusOff
 Style *lock     NoTitle, NoHandles, Sticky, WindowListSkip, ClickToFocus, Icon norm/lock.xpm, MiniIcon mini/lock.xpm
 Style gkrellm*  Sticky, WindowListSkip, FocusFollowsMouse
+Style xosview   NoTitle, NoHandles, Sticky, WindowListSkip, CirculateSkip, NeverFocus, GrabFocusOff, StaysOnBottom, BorderWidth 2, StaysOnBottom
 Style *biff     NoTitle, Sticky, WindowListSkip, ClickToFocus
 Style xcalc     NoButton 4, Icon norm/calculator.xpm, MiniIcon mini/calculator.xpm
 Style xmh       StickyIcon, NoButton 4, Icon mail1.xpm, NoIconTitle
@@ -319,7 +351,6 @@ Style desktop_window Sticky, NoTitle, NoHandles, StaysOnBottom, StaysPut, Layer 
 Style editres   Icon editres.xpm, MiniIcon mini.x2.xpm
 Style Xscreensaver* Icon norm/display.xpm, MiniIcon mini.monitor.xpm
 Style *font*    Icon norm/font.xpm, MiniIcon mini/font.xpm
-Style aumix     MiniIcon aumix.mini.xpm
 Style *OpenOffice* Icon norm/word-processor.xpm, MiniIcon mini/word-processor.xpm, MaxWindowSize 100 95
 Style mutt*     Icon mutt.xpm, MiniIcon mutt.mini.xpm
 Style Xpdf      MiniIcon mini.pdf.xpm, MaxWindowSize 100 95
@@ -330,6 +361,10 @@ Style "Buddy Ticker" NoTitle, ClickToFocus, WindowListSkip
 Style VCLSalFrame GrabFocusOff, UsePPosition, NoFuncHint
 
 # }}}2
+UnsetEnv HIFORE
+UnsetEnv FORE
+UnsetEnv HIBACK
+UnsetEnv BACK
 # }}}1
 # Key Bindings {{{1
 # Keys are in /usr/include/X11/keysymdef.h
@@ -359,23 +394,23 @@ Key Tab         A       5       Next FuncFocusWindow
 Key Tab         A       S5      Prev FuncFocusWindow
 Key Tab         A       M       WindowList Root c c NoDeskSort SelectOnRelease Meta_L NoCurrentDeskTitle CurrentAtEnd ShowPage
 Key Tab         A       SM      WindowList Root c c NoDeskSort SelectOnRelease Meta_L NoCurrentDeskTitle ShowPage
-Key Tab         A       C       Next (CurrentPage, !Iconic) FuncFocusWindow
-Key Tab         A       4       Next (CurrentPage, !Iconic) FuncFocusWindow
-Key Tab         A       SC      Prev (CurrentPage !Iconic) FuncFocusWindow
-Key Tab         A       S4      Prev (CurrentPage !Iconic) FuncFocusWindow
-Key Tab         A       CM      Next (CurrentPage) FuncFocusWindow
-Key Tab         A       SCM     Prev (CurrentPage) FuncFocusWindow
+Key Tab         A       C       Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
+Key Tab         A       4       Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
+Key Tab         A       SC      Prev (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
+Key Tab         A       S4      Prev (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
+Key Tab         A       CM      Next (CurrentPage, AcceptsFocus) FuncFocusWindow
+Key Tab         A       SCM     Prev (CurrentPage, AcceptsFocus) FuncFocusWindow
 Key Tab         A       S4      SendToModule FvwmProxy ShowToggle
 
-Key Left        A       SM    Direction West  (CurrentDesk) FuncFlipFocusWindow
-Key Right       A       SM    Direction East  (CurrentDesk) FuncFlipFocusWindow
-Key Up          A       SM    Direction North (CurrentDesk) FuncFlipFocusWindow
-Key Down        A       SM    Direction South (CurrentDesk) FuncFlipFocusWindow
+Key Left        A       CM    Direction West  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key Right       A       CM    Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key Up          A       CM    Direction North (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key Down        A       CM    Direction South (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 
-Key Left        A       C5    Direction West  (CurrentDesk) FuncFlipFocusWindow
-Key Right       A       C5    Direction East  (CurrentDesk) FuncFlipFocusWindow
-Key Up          A       C5    Direction North (CurrentDesk) FuncFlipFocusWindow
-Key Down        A       C5    Direction South (CurrentDesk) FuncFlipFocusWindow
+Key Left        A       C5    Direction West  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key Right       A       C5    Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key Up          A       C5    Direction North (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key Down        A       C5    Direction South (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 
 # }}}2
 
@@ -441,45 +476,45 @@ Key Escape      A       SCM     EscapeFunc
 
 # Desk and Page Bindings {{{2
 
-Key Left        A       4       GotoDesk -1 0 7
+#Key Left        A       4       GotoDesk -1 0 7
 #Key Left        A       4       Scroll -100000 0
-Key Right       A       4       GotoDesk +1 0 7
+#Key Right       A       4       GotoDesk +1 0 7
 #Key Right       A       4       Scroll  100000 0
-Key Up          A       4       GotoPage 0p -1p
-Key Up          A       4       Scroll 0 -100000
-Key Down        A       4       GotoPage 0p +1p
-Key Down        A       4       Scroll  0 100000
+#Key Up          A       4       GotoPage 0p -1p
+#Key Up          A       4       Scroll 0 -100000
+#Key Down        A       4       GotoPage 0p +1p
+#Key Down        A       4       Scroll  0 100000
 Key Next        A       4       GotoDesk +1 0 7
 Key Prior       A       4       GotoDesk -1 0 7
 Key Next        A       5       GotoDesk +1 0 7
 Key Prior       A       5       GotoDesk -1 0 7
 #Key minus       A       4       Next (FvwmButtonsBottom, CirculateHit) FuncMoveButtonsToTop
 
-Key Left        A       CM      GotoDesk -1 0 7
-Key Right       A       CM      GotoDesk +1 0 7
-Key Up          A       CM      GotoPage 0p -1p
-Key Down        A       CM      GotoPage 0p +1p
+#Key Left        A       CM      GotoDesk -1 0 7
+#Key Right       A       CM      GotoDesk +1 0 7
+#Key Up          A       CM      GotoPage 0p -1p
+#Key Down        A       CM      GotoPage 0p +1p
 Key Next        A       CM      GotoDesk +1 0 7
 Key Prior       A       CM      GotoDesk -1 0 7
 
-Key Left        A       C4      FuncTakeToDesk -1 0 7
-Key Right       A       C4      FuncTakeToDesk +1 0 7
-Key Up          A       C4      FuncTakeToPage 0p -1p
-Key Down        A       C4      FuncTakeToPage 0p +1p
+#Key Left        A       C4      FuncTakeToDesk -1 0 7
+#Key Right       A       C4      FuncTakeToDesk +1 0 7
+#Key Up          A       C4      FuncTakeToPage 0p -1p
+#Key Down        A       C4      FuncTakeToPage 0p +1p
 Key Next        A       C4      FuncTakeToDesk +1 0 7
 Key Prior       A       C4      FuncTakeToDesk -1 0 7
 
-Key Left        A       SCM     FuncTakeToDesk -1 0 7
-Key Right       A       SCM     FuncTakeToDesk +1 0 7
-Key Up          A       SCM     FuncTakeToPage 0p -1p
-Key Down        A       SCM     FuncTakeToPage 0p +1p
+#Key Left        A       SCM     FuncTakeToDesk -1 0 7
+#Key Right       A       SCM     FuncTakeToDesk +1 0 7
+#Key Up          A       SCM     FuncTakeToPage 0p -1p
+#Key Down        A       SCM     FuncTakeToPage 0p +1p
 Key Next        A       SCM     FuncTakeToDesk +1 0 7
 Key Prior       A       SCM     FuncTakeToDesk -1 0 7
 
-Key Left        A       M4      MoveToDesk -1 0 7
-Key Right       A       M4      MoveToDesk +1 0 7
-Key Up          A       M4      MoveToPage 0p -1p
-Key Down        A       M4      MoveToPage 0p +1p
+#Key Left        A       M4      MoveToDesk -1 0 7
+#Key Right       A       M4      MoveToDesk +1 0 7
+#Key Up          A       M4      MoveToPage 0p -1p
+#Key Down        A       M4      MoveToPage 0p +1p
 Key Next        A       M4      MoveToDesk +1 0 7
 Key Prior       A       M4      MoveToDesk -1 0 7
 
@@ -571,6 +606,25 @@ Key BackSpace   A       5       GotoDeskAndPage prev
 
 # }}}2
 
+Key Up          WTSF12468 SM    PackWrapperUp
+Key Down        WTSF12468 SM    PackWrapperDown
+Key Left        WTSF12468 SM    PackWrapperLeft
+Key Right       WTSF12468 SM    PackWrapperRight
+
+Key Up          WTSF12468 4     SnapWrapperUp
+Key Down        WTSF12468 4     SnapWrapperDown
+Key Left        WTSF12468 4     SnapWrapperLeft
+Key Right       WTSF12468 4     SnapWrapperRight
+
+Key Down        WTSF12468 C4    EnlargeWrapperDown
+Key Up          WTSF12468 C4    ResizeWrapperUp
+Key Right       WTSF12468 C4    EnlargeWrapperRight
+Key Left        WTSF12468 C4    ResizeWrapperLeft
+Key Down        WTSF12468 M4    ResizeWrapperDown
+Key Up          WTSF12468 M4    EnlargeWrapperUp
+Key Right       WTSF12468 M4    ResizeWrapperRight
+Key Left        WTSF12468 M4    EnlargeWrapperLeft
+
 # Hyper Bindings
 Key Q       A   5       FuncCloseXmms
 Key Z       A   5       Exec exec tpope media prev
@@ -611,7 +665,6 @@ Key XF86HomePage  A A       FuncFindOrLaunchWebBrowser
 Key XF86Mail      A A       FuncIrcScreenSshXTerm
 # }}}2
 
-PipeRead "$HOME/bin/hostinfo --fvwm-keys"
 Key Grave   A   C       FuncIrcScreenSshXTerm
 Key Grave   A   SC      FuncIrcScreenSshXTermShared
 Key 0       A   CM      Exec exec favorite-app
@@ -639,11 +692,20 @@ Key Space   A   SCM     FuncXTerm
 Key Space   A   4M      FuncXTerm
 #Key Z       A   SCM     Exec tvtime || exec xawtv
 
+PipeRead 'for k in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do \
+ echo Key $$k A 4   FuncFindResource \\$$$$\\[FVWM_BOOKMARK_$$k]; \
+ echo Key $$k A CM  FuncFindResource \\$$$$\\[FVWM_BOOKMARK_$$k]; \
+ echo Key $$k A 4S  SetEnv FVWM_BOOKMARK_$$k \\$$\\[w.iconname\\]; \
+ echo Key $$k A SCM SetEnv FVWM_BOOKMARK_$$k \\$$\\[w.iconname\\]; \
+ echo Key $$k A 4M  SetEnv FVWM_BOOKMARK_$$k \\$$\\[w.resource\\]; \
+ echo Key $$k A 4C  SetEnv FVWM_BOOKMARK_$$k \\$$\\[w.class\\]; \
+ done'
+
 Key 0           A   4   Menu MenuFvwmWindowOps Interior 0 0
 Key apostrophe  A   4   FuncIrcScreenSshXTerm
-Key apostrophe  A   4S  FuncIrcScreenSshXTerm
+Key apostrophe  A   4S  FuncIrcScreenSshXTermShared
 Key grave       A   4   FuncIrcScreenSshXTerm
-Key grave       A   4S  FuncIrcScreenSshXTerm
+Key grave       A   4S  FuncIrcScreenSshXTermShared
 Key slash       A   4   FuncFindOrLaunchWebBrowser
 Key slash       A   4S  FuncWebBrowserClipboard
 Key W           A   4   FuncFindOrLaunchWebBrowser
@@ -657,6 +719,12 @@ Key semicolon   A   4   FuncFindEditor
 Key semicolon   A   4S  Exec exec sensible-editor
 Key period      A   4   FuncFindTerminal
 Key comma       A   4   FuncFindGameEtc
+Key equal       A   4S  SetEnv FVWM_BOOKMARK $[w.iconname]
+Key equal       A   4M  SetEnv FVWM_BOOKMARK $[w.resource]
+Key equal       A   4C  SetEnv FVWM_BOOKMARK $[w.class]
+Key equal       A   4   FuncFindResource $$[FVWM_BOOKMARK]
+
+PipeRead "$HOME/bin/hostinfo --fvwm-keys"
 
 Key Home    A   4       Exec exec aumix -w +5
 Key End     A   4       Exec exec aumix -w -5
@@ -715,8 +783,9 @@ Mouse 1 4       A       FuncMaximize
 Mouse 2 4       A       FuncFullScreen
 #ewmhiwa
 Mouse 3 4       A       FuncEnlarge
+Mouse (*Term) 3 4 A     FuncResize 80c 24c
 Mouse (*term) 3 4 A     FuncResize 80c 24c
-Mouse (rxvt)  3 4 A     FuncResize 80c 24c
+Mouse (*Rxvt) 3 4 A     FuncResize 80c 24c
 Mouse 1 6       A       FuncUnshadeAndIconify
 Mouse 2 6       A       Iconify
 Mouse 3 6       A       WindowShade
@@ -729,8 +798,10 @@ Mouse 1 F       A       FuncResizeOrRaiseOrShade
 Mouse 1 TS      A       FuncMoveOrRaise
 Mouse 1 TSIFW   4       FuncMoveOrRaise
 Mouse (x0rfbserver) 1 W A FuncMoveOrRaise
+Mouse (xosview)     1 W A FuncMoveOrRaise
 Mouse 2 TSIFW   4       FuncResizeOrRaiseOrShade
 Mouse (x0rfbserver) 2 W A Menu MenuFvwmWindowOps Close
+Mouse (xosview)     3 W A Menu MenuFvwmWindowOps Close
 Mouse 3 TSIFW   4       Menu MenuFvwmWindowOps Close
 Mouse 1 I       A       FuncMoveOrIconify
 Mouse 2 I       A       PlaceAgain Icon
@@ -740,6 +811,8 @@ Mouse 2 TS      A       FuncResizeOrRaiseOrShade
 Mouse 3 TSIF    A       Menu MenuFvwmWindowOps RaiseLower
 Mouse 4 TSIFW   4       FuncTakeToDesk -1 0 7
 Mouse 5 TSFIW   4       FuncTakeToDesk +1 0 7
+Mouse 4 T       N       FuncTakeToDesk -1 0 7
+Mouse 5 T       N       FuncTakeToDesk +1 0 7
 
 # Strokes {{{2
 
@@ -873,7 +946,7 @@ AddToFunc ExitFunction
 # Menus {{{1
 DestroyMenu MenuFvwmRoot
 AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^
-+ "&Terminal%menu/terminal.xpm%"         FuncScreenXTerm
++ "&Terminal%mini/terminal/left-plain.xpm%" FuncScreenXTerm
 + "&Web Browser%menu/www.xpm%"           FuncWebBrowser http://www.google.com/
 + "&Chat%menu/chat.xpm%"                 FuncIrcScreenSshXTerm
 + ""              Nop
@@ -888,8 +961,8 @@ Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames item 100-4p
 + "W&indow Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps item 100-4p c
 #+ "W&indow List%menu/windows.xpm%"     WindowList
 + ""              Nop
-+ "Remote &Logins%menu/terminal-remote.xpm%"  Popup MenuFvwmLogins item 100-4p c
-+ "Remote &Screens%menu/terminal-special.xpm%" Popup MenuFvwmScreens item 100-4p c
++ "Remote &Logins%mini/terminal/right-black.xpm%"  Popup MenuFvwmLogins item 100-4p c
++ "Remote &Screens%mini/terminal/left-black.xpm%" Popup MenuFvwmScreens item 100-4p c
 + ""              Nop
 PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian item 100-4p c'
 PipeRead 'test -e /usr/share/gnome/apps && echo + \\"GNOM\\&E%menu/gnome.xpm%\\" Popup Gnome-sys item 100-4p c'
@@ -914,9 +987,9 @@ AddToMenu MenuFvwmPrograms "Programs" Title
 Test (x rox-filer) + "&ROX-Filer%/usr/share/rox-filer/.DirIcon%" Exec exec tpope libtrash rox-filer
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
+FuncAddIfExists MenuFvwmPrograms "&Google Earth%/usr/local/google-earth/googleearth.xpm%" googleearth
+FuncAddIfExists MenuFvwmPrograms "Gps&Drive%gpsicon.png%" gpsdrive
 Test (x ethereal) + "&Ethereal%eicon3d32.xpm%" Exec exec $[sudo] ethereal
-FuncAddIfExists MenuFvwmPrograms "&GpsDrive%gpsicon.png%" gpsdrive
-FuncAddIfExists MenuFvwmPrograms "&MLDonkey%mlgui.xpm%" mlgui
 
 DestroyMenu MenuFvwmGames
 AddToMenu MenuFvwmGames "Games" Title
@@ -991,6 +1064,7 @@ AddToMenu MenuFvwmMultimedia "Multimedia" Title
 + MissingSubmenuFunction FuncMenuMusic
 + "&Aumix%aumix.mini.xpm%"      Exec exec aumix
 + "&Gimp%menu/gimp.xpm%"        FuncExec Gimp "exec gimp"
+FuncAddIfExists MenuFvwmMultimedia "In&kscape%mini.inkscape.png%" inkscape
 PipeRead 'if [ -x "`which tvtime 2>/dev/null`" ]; then \
 echo "+ \\"&TVTime%menu/graphics.xpm%\\" Exec exec tvtime"; \
 elif [ -x "`which xawtv 2>/dev/null`" ]; then \
@@ -1436,7 +1510,7 @@ AddToFunc FuncFindTerminal
 
 DestroyFunc FuncFindGameEtc
 AddToFunc FuncFindGameEtc
-+ I FuncFindResource "SDL_App|mupen64|*Snes9*|*etris*|*etrinet*|wine|Wine"
++ I FuncFindResource "SDL_App|mupen64|*Snes9*|*etris*|*etrinet*|wine|Wine|Googleearth-bin"
 
 DestroyFunc FuncFindEditor
 AddToFunc FuncFindEditor
@@ -1444,7 +1518,7 @@ AddToFunc FuncFindEditor
 
 DestroyFunc FuncFindMediaProgram
 AddToFunc FuncFindMediaProgram
-+ I FuncFindResource "Gimp|feh|MPlayer|xmms|Xawtv|tvtime"
++ I FuncFindResource "Gimp|Inkscape|feh|MPlayer|xmms|Xawtv|tvtime|aumix"
 
 DestroyFunc FuncCloseXmms
 AddToFunc FuncCloseXmms
@@ -1458,12 +1532,9 @@ AddToFunc FuncExec
 
 DestroyFunc FuncFvwmForm
 AddToFunc   FuncFvwmForm
-#+ I SetEnv LANG_ORIG $[LANG]
-+ I UnsetEnv LANG
+#+ I UnsetEnv LANG
 + I FvwmForm $0
-#+ I SetEnv LANG $[LANG_ORIG]
-+ I UnsetEnv LANG_ORIG
-PipeRead '[ -z "$[LANG]" ] || echo + I SetEnv LANG $[LANG]'
+#PipeRead '[ -z "$[LANG]" ] || echo + I SetEnv LANG $[LANG]'
 
 DestroyFunc FuncFvwmFormRun
 AddToFunc   FuncFvwmFormRun
@@ -1502,24 +1573,24 @@ AddToFunc FuncWebBrowser
 # Chat Functions {{{2
 DestroyFunc FuncIrcScreenSshXTerm
 AddToFunc FuncIrcScreenSshXTerm
-+ I Next (chat@*, AcceptsFocus) Iconify off
-+ I Next (chat@*, AcceptsFocus) Focus
-+ I Next (chat@*, AcceptsFocus) FuncWarpToTitle
-+ I None (chat@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name chat@remote -T chat@remote -e tpope chat
++ I Next (chat@*|Chat@*, AcceptsFocus) Iconify off
++ I Next (chat@*|Chat@*, AcceptsFocus) Focus
++ I Next (chat@*|Chat@*, AcceptsFocus) FuncWarpToTitle
++ I None (chat@*|Chat@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name Chat@remote -T Chat@remote -e tpope chat
 
 DestroyFunc FuncIrcScreenSshXTermShared
 AddToFunc FuncIrcScreenSshXTermShared
-+ I Next (chat@*, AcceptsFocus) Iconify off
-+ I Next (chat@*, AcceptsFocus) Focus
-+ I Next (chat@*, AcceptsFocus) FuncWarpToTitle
-+ I None (chat@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name chat@remote -T chat@remote -e tpope chat -x"
++ I Next (chat@*|Chat@*, AcceptsFocus) Iconify off
++ I Next (chat@*|Chat@*, AcceptsFocus) Focus
++ I Next (chat@*|Chat@*, AcceptsFocus) FuncWarpToTitle
++ I None (chat@*|Chat@*, AcceptsFocus) Exec exec x-terminal-emulator -ut -name Chat@remote -T Chat@remote -e tpope chat -x
 
 DestroyFunc FuncIrcScreenXTerm
 AddToFunc FuncIrcScreenXTerm
-+ I Next (chat@localhost, AcceptsFocus) Iconify off
-+ I Next (chat@localhost, AcceptsFocus) Focus
-+ I Next (chat@localhost, AcceptsFocus) FuncWarpToTitle
-+ I None (chat@localhost) Exec exec x-terminal-emulator -ut -name chat@localhost -T chat@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
++ I Next (chat@localhost|Chat@localhost, AcceptsFocus) Iconify off
++ I Next (chat@localhost|Chat@localhost, AcceptsFocus) Focus
++ I Next (chat@localhost|Chat@localhost, AcceptsFocus) FuncWarpToTitle
++ I None (chat@localhost|Chat@localhost) Exec exec x-terminal-emulator -ut -name Chat@localhost -T Chat@localhost -e tpope screen -c "$HOME/.irssi/screenrc" -dRR irc
 # }}}2
 # XTerm Functions {{{2
 DestroyFunc FuncXTerm
@@ -1529,7 +1600,7 @@ AddToFunc FuncXTerm
 DestroyFunc FuncScreenXTerm
 AddToFunc FuncScreenXTerm
 + I FuncFindResource @localhost
-+ I None (@localhost, AcceptsFocus) Exec exec x-terminal-emulator -name @localhost -T @localhost -e screen -dRR $[HOST]
++ I None (@localhost, AcceptsFocus) Exec exec x-terminal-emulator -name @localhost -T @localhost -e tpope screen -dRR $[HOST]
 
 DestroyFunc FuncSshXTerm
 AddToFunc FuncSshXTerm
@@ -1603,6 +1674,326 @@ AddToFunc   FuncResetHeadlines
 + I DestroyMenu linuxtoday
 + I DestroyMenu kde-news
 + I DestroyMenu cnn
+# }}}2
+# Next Edge Functions {{{2
+
+DestroyFunc FuncNextEdgeDown
+AddToFunc FuncNextEdgeDown
++ I SetEnv edge_w $1
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test $[w.y] -lt $edge_w \
+        -a $[w.y] -gt $0  \
+        && echo SetEnv edge_w $[w.y] \
+        || echo Nop"
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test `expr $[w.y] + $[w.height]` -lt $edge_w \
+        -a `expr $[w.y] + $[w.height]` -gt $0  \
+        && echo SetEnv edge_w `expr $[w.y] + $[w.height]` \
+        || echo Nop"
+#+ I PipeRead "test $edge_w -gt $1 && echo SetEnv edge_w $1"
+
+DestroyFunc FuncNextEdgeUp
+AddToFunc FuncNextEdgeUp
++ I SetEnv edge_w $1
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test $[w.y] -gt $edge_w \
+        -a $[w.y] -lt $0  \
+        && echo SetEnv edge_w $[w.y] \
+        || echo Nop"
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test `expr $[w.y] + $[w.height]` -gt $edge_w \
+        -a `expr $[w.y] + $[w.height]` -lt $0  \
+        && echo SetEnv edge_w `expr $[w.y] + $[w.height]` \
+        || echo Nop"
+#+ I PipeRead "test $edge_w -lt $1 && echo SetEnv edge_w $1"
+
+DestroyFunc FuncNextEdgeRight
+AddToFunc FuncNextEdgeRight
++ I SetEnv edge_w $1
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test $[w.x] -lt $edge_w \
+        -a $[w.x] -gt $0  \
+        && echo SetEnv edge_w $[w.x] \
+        || echo Nop"
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test `expr $[w.x] + $[w.width]` -lt $edge_w \
+        -a `expr $[w.x] + $[w.width]` -gt $0  \
+        && echo SetEnv edge_w `expr $[w.x] + $[w.width]` \
+        || echo Nop"
+#+ I PipeRead "test $edge_w -gt $1 && echo SetEnv edge_w $1"
+
+DestroyFunc FuncNextEdgeLeft
+AddToFunc FuncNextEdgeLeft
++ I SetEnv edge_w $1
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test $[w.x] -gt $edge_w \
+        -a $[w.x] -lt $0 \
+        && echo SetEnv edge_w $[w.x]  \
+        || echo Nop"
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test `expr $[w.x] + $[w.width]` -gt $edge_w \
+        -a `expr $[w.x] + $[w.width]` -lt $0 \
+        && echo SetEnv edge_w `expr $[w.x] + $[w.width]`  \
+        || echo Nop"
+#+ I PipeRead "test $edge_w -lt $1 && echo SetEnv edge_w $1"
+
+# }}}2
+# Window Movement Functions {{{2
+
+# Hacked up from Taviso's famous fvwm2rc
+
+DestroyFunc PackWindowUp
+AddToFunc PackWindowUp
++ I SetEnv low_w 0
++ I WindowId $3 Raise
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test `expr $[w.y] + $[w.height]` -gt $low_w \
+        -a `expr $[w.y] + $[w.height]` -lt $0 \
+        -a \\( \\( $[w.x] -ge $1 -a $[w.x] -lt `expr $1 + $2` \\) \
+            -o \\( $1 -gt $[w.x] -a $1 -lt `expr $[w.x] + $[w.width]` \\) \
+            -o \\( $1 -le $[w.x] -a `expr $1 + $2` -ge `expr $[w.x] + $[w.width]` \\) \
+            -o \\( $[w.x] -lt $1 -a `expr $[w.x] + $[w.width]` -gt `expr $1 + $2` \\) \
+        \\) \
+        && echo SetEnv low_w `expr $[w.y] + $[w.height]` \
+        || echo Nop"
++ I WindowId $3 AnimatedMove keep $[low_w]p Warp
++ I UnsetEnv low_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc PackWrapperUp
+AddToFunc PackWrapperUp
++ I NoWindow PackWindowUp $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+DestroyFunc SnapWindowUp
+AddToFunc SnapWindowUp
++ I WindowId $3 Raise
++ I PipeRead "echo FuncNextEdgeUp `expr $0 + $4` $4"
++ I PipeRead "echo SetEnv edge_w `expr $edge_w - $4`"
++ I FuncNextEdgeUp $0 $[edge_w]
++ I WindowId $3 Move keep $[edge_w]p Warp
++ I UnsetEnv edge_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc SnapWrapperUp
+AddToFunc SnapWrapperUp
++ I NoWindow SnapWindowUp $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+DestroyFunc PackWindowDown
+AddToFunc PackWindowDown
++ I SetEnv high_w $[vp.height]
++ I WindowId $3 Raise
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test $[w.y] -lt $high_w \
+        -a $[w.y] -gt `expr $0 + $4`  \
+        -a \\( \\( $[w.x] -ge $1 -a $[w.x] -lt `expr $1 + $2` \\) \
+            -o \\( $1 -gt $[w.x] -a $1 -lt `expr $[w.x] + $[w.width]` \\) \
+            -o \\( $1 -le $[w.x] -a `expr $1 + $2` -ge `expr $[w.x] + $[w.width]` \\) \
+            -o \\( $[w.x] -lt $1 -a `expr $[w.x] + $[w.width]` -gt `expr $1 + $2` \\) \
+        \\) \
+        && echo SetEnv high_w $[w.y] \
+        || echo Nop"
++ I PipeRead "echo WindowId $3 AnimatedMove keep `expr $[high_w] - $4`p Warp"
++ I UnsetEnv high_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc PackWrapperDown
+AddToFunc PackWrapperDown
++ I NoWindow PackWindowDown $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+DestroyFunc SnapWindowDown
+AddToFunc SnapWindowDown
++ I WindowId $3 Raise
++ I PipeRead "echo FuncNextEdgeDown `expr $0 + $4` `expr $[vp.height]`"
++ I PipeRead "echo SetEnv edge_w `expr $edge_w - $4`"
++ I FuncNextEdgeDown $0 $[edge_w]
++ I WindowId $3 Move keep $[edge_w]p Warp
++ I UnsetEnv edge_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc SnapWrapperDown
+AddToFunc SnapWrapperDown
++ I NoWindow SnapWindowDown $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+#####
+# Name:     PackWindowLeft
+# Bound:    Alt+Shift+Left When a window is active
+# Purpose:  See PackWindowUp.
+#
+# The Logic works likes this:
+#   1. Set Destination to the Left Edge
+#   2. For every window, Run these tests:
+#               + Is the Window's Right edge further _Right_ than furthest edge seen yet?
+#       And:    + Is it's Right edge Further _Left_ than Target Windows Left edge? (ie, in the way)
+#           Yes:
+#                   + Does the window start inside Target Window, and end below?
+#               Or  + Does it start above, and end inside?
+#               Or  + Is it the same vertical position/height/size, or start inside and end inside?
+#               Or  + Does it start above, and end below?
+#                   Yes:
+#                       This is the new Destination.
+#                   No:
+#                       Nop
+#           No:
+#               Nop
+#   3. Move to Destination.
+#
+#################
+DestroyFunc PackWindowLeft
+AddToFunc PackWindowLeft
++ I SetEnv left_w 0
++ I WindowId $3 Raise
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test `expr $[w.x] + $[w.width]` -gt $left_w \
+        -a `expr $[w.x] + $[w.width]` -lt $1 \
+        -a \\( \\( $[w.y] -ge $0 -a $[w.y] -lt `expr $0 + $4` \\) \
+            -o \\( $[w.y] -lt $0 -a `expr $[w.y] + $[w.height]` -gt $0 \\) \
+            -o \\( $[w.y] -ge $0 -a `expr $[w.y] + $[w.height]` -le `expr $0 + $4` \\) \
+            -o \\( $[w.y] -lt $0 -a `expr $[w.y] + $[w.height]` -gt `expr $0 + $4` \\) \
+        \\) \
+        && echo SetEnv left_w `expr $[w.x] + $[w.width]`  \
+        || echo Nop"
++ I WindowId $3 AnimatedMove $[left_w]p keep Warp
++ I UnsetEnv left_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc PackWrapperLeft
+AddToFunc PackWrapperLeft
++ I NoWindow PackWindowLeft $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+DestroyFunc SnapWindowLeft
+AddToFunc SnapWindowLeft
++ I WindowId $3 Raise
++ I PipeRead "echo FuncNextEdgeLeft `expr $1 + $2` $2"
++ I PipeRead "echo SetEnv edge_w `expr $edge_w - $2`"
++ I FuncNextEdgeLeft $1 $[edge_w]
++ I WindowId $3 Move $[edge_w]p keep Warp
++ I UnsetEnv edge_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc SnapWrapperLeft
+AddToFunc SnapWrapperLeft
++ I NoWindow SnapWindowLeft $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+DestroyFunc PackWindowRight
+AddToFunc PackWindowRight
++ I SetEnv right_w $[vp.width]
++ I WindowId $3 Raise
++ I All (CurrentPage !Iconic \
+        !Shaded) PipeRead "test $[w.x] -lt $\right_w \
+        -a $[w.x] -gt `expr $1 + $2` \
+        -a \\( \\( $[w.y] -ge $0 -a $[w.y] -lt `expr $0 + $4` \\) \
+            -o \\( $[w.y] -lt $0 -a `expr $[w.y] + $[w.height]` -gt $0 \\) \
+            -o \\( $[w.y] -ge $0 -a `expr $[w.y] + $[w.height]` -le `expr $0 + $4` \\) \
+            -o \\( $[w.y] -lt $0 -a `expr $[w.y] + $[w.height]` -gt `expr $0 + $4` \\) \
+        \\) \
+        && echo SetEnv right_w $[w.x] \
+        || echo Nop"
++ I PipeRead "echo WindowId $3 AnimatedMove `expr $[right_w] - $2`p keep Warp"
++ I UnsetEnv right_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc PackWrapperRight
+AddToFunc PackWrapperRight
++ I NoWindow PackWindowRight $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+DestroyFunc SnapWindowRight
+AddToFunc SnapWindowRight
++ I WindowId $3 Raise
++ I PipeRead "echo FuncNextEdgeRight `expr $1 + $2` $[vp.width]"
++ I PipeRead "echo SetEnv edge_w `expr $edge_w - $2`"
++ I FuncNextEdgeRight $1 $[edge_w]
++ I WindowId $3 Move $[edge_w]p keep Warp
++ I UnsetEnv edge_w
++ I WindowId $3 FuncFocusWindow
+DestroyFunc SnapWrapperRight
+AddToFunc SnapWrapperRight
++ I NoWindow SnapWindowRight $[w.y] $[w.x] $[w.width] $[w.id] $[w.height]
+
+# }}}2
+# Resize Functions {{{2
+
+DestroyFunc EnlargeWindowDown
+AddToFunc EnlargeWindowDown
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeDown `expr $1 + $2` $[vp.height]"
++ I PipeRead "echo WindowId $0 Resize frame keep `expr $[edge_w] - $1`p"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc EnlargeWrapperDown
+AddToFunc EnlargeWrapperDown
++ I NoWindow EnlargeWindowDown $[w.id] $[w.y] $[w.height]
+
+DestroyFunc ResizeWindowUp
+AddToFunc ResizeWindowUp
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeUp `expr $1 + $2` `expr $1 + $2 / 2`"
++ I PipeRead "echo WindowId $0 Resize frame keep `expr $[edge_w] - $1`p"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc ResizeWrapperUp
+AddToFunc ResizeWrapperUp
++ I NoWindow ResizeWindowUp $[w.id] $[w.y] $[w.height]
+
+DestroyFunc EnlargeWindowUp
+AddToFunc EnlargeWindowUp
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeUp $1 0"
++ I PipeRead "echo WindowId $0 ResizeMove frame keep `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc EnlargeWrapperUp
+AddToFunc EnlargeWrapperUp
++ I NoWindow EnlargeWindowUp $[w.id] $[w.y] $[w.height]
+
+DestroyFunc ResizeWindowDown
+AddToFunc ResizeWindowDown
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeDown $1 `expr $1 + $2 / 2`"
++ I PipeRead "echo WindowId $0 ResizeMove frame keep `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc ResizeWrapperDown
+AddToFunc ResizeWrapperDown
++ I NoWindow ResizeWindowDown $[w.id] $[w.y] $[w.height]
+
+DestroyFunc EnlargeWindowRight
+AddToFunc EnlargeWindowRight
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeRight `expr $1 + $2` $[vp.width]"
++ I PipeRead "echo WindowId $0 Resize frame `expr $[edge_w] - $1`p keep"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc EnlargeWrapperRight
+AddToFunc EnlargeWrapperRight
++ I NoWindow EnlargeWindowRight $[w.id] $[w.x] $[w.width]
+
+DestroyFunc ResizeWindowLeft
+AddToFunc ResizeWindowLeft
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeLeft `expr $1 + $2` `expr $1 + $2 / 2`"
++ I PipeRead "echo WindowId $0 Resize frame `expr $[edge_w] - $1`p keep"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc ResizeWrapperLeft
+AddToFunc ResizeWrapperLeft
++ I NoWindow ResizeWindowLeft $[w.id] $[w.x] $[w.width]
+
+DestroyFunc EnlargeWindowLeft
+AddToFunc EnlargeWindowLeft
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeLeft $1 0"
++ I PipeRead "echo WindowId $0 ResizeMove frame `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p keep"
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc EnlargeWrapperLeft
+AddToFunc EnlargeWrapperLeft
++ I NoWindow EnlargeWindowLeft $[w.id] $[w.x] $[w.width]
+
+DestroyFunc ResizeWindowRight
+AddToFunc ResizeWindowRight
++ I WindowId $0 Raise
++ I PipeRead "echo FuncNextEdgeRight $1 `expr $1 + $2 / 2`"
++ I PipeRead "echo WindowId $0 ResizeMove frame `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p keep"
++ I Echo $[edge_w]
++ I UnsetEnv edge_w
+#+ I WindowId $0 FuncFocusWindow
+DestroyFunc ResizeWrapperRight
+AddToFunc ResizeWrapperRight
++ I NoWindow ResizeWindowRight $[w.id] $[w.x] $[w.width]
+
 # }}}2
 # }}}1
 # Modules Config {{{1
@@ -1750,6 +2141,7 @@ DestroyModuleConfig FvwmEvent: *
 DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *numManagers 1
 *FvwmIconMan: *Resolution  page
+*FvwmIconMan: *ReliefThickness 1
 *FvwmIconMan: *Background  $[fvwm_mybg]
 *FvwmIconMan: *Foreground  black
 *FvwmIconMan: *Format      "%t"
@@ -1762,6 +2154,7 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *SortWeight   1 resource=screen@*
 *FvwmIconMan: *SortWeight   2 resource=*localhost
 *FvwmIconMan: *SortWeight   4 resource=chat@*
+*FvwmIconMan: *SortWeight   4 resource=Chat@*
 *FvwmIconMan: *SortWeight   5 resource=screen-ssh@*
 *FvwmIconMan: *SortWeight   5 resource=@*
 *FvwmIconMan: *SortWeight   7 resource=ssh@*
@@ -1794,8 +2187,10 @@ DestroyModuleConfig FvwmPagerSubPanel: *
 *FvwmPagerSubPanel: SloppyFocus
 *FvwmPagerSubPanel: Balloons
 *FvwmPagerSubPanel: BalloonFont "xft:Bitstream Vera Sans:style=Roman:size=7:antialias=True"
+*FvwmPagerSubPanel: BalloonFore White
 *FvwmPagerSubPanel: Hilight White
 *FvwmPagerSubPanel: NoDeskHilight
+*FvwmPagerSubPanel: WindowColorsets 1 2
 PipeRead 'for i in `seq 0 7`; do echo "*FvwmPagerSubPanel: DeskColor $i \\#0`expr $i + 1``expr 8 - $i`"; done'
 PipeRead 'for i in `seq 0 8`; do echo "*FvwmPagerSubPanel: Colorset $i 4$i"; done'
 *FvwmPagerSubPanel: Label 0 "First"
@@ -1843,11 +2238,12 @@ DestroyModuleConfig FvwmPagerInline: *
 *FvwmPagerInline: MiniIcons
 #*FvwmPagerInline: SloppyFocus
 *FvwmPagerInline: Balloons
-*FvwmPagerInline: BalloonFore white
 *FvwmPagerInline: BalloonFont "xft:Bitstream Vera Sans:style=Roman:size=7:antialias=True"
+*FvwmPagerInline: BalloonFore White
 #*FvwmPagerInline: SmallFont micro
 *FvwmPagerInline: Hilight White
 *FvwmPagerInline: NoDeskHilight
+*FvwmPagerInline: WindowColorsets 1 2
 PipeRead 'for i in `seq 0 7`; do echo "*FvwmPagerInline: DeskColor $i \\#0`expr $i + 1``expr 8 - $i`"; done'
 PipeRead 'for i in `seq 0 8`; do echo "*FvwmPagerInline: Colorset $i 4$i"; done'
 *FvwmPagerInline: Label 0 "First"
@@ -1896,20 +2292,28 @@ DestroyModuleConfig FvwmScroll: *
 *FvwmScroll: Back grey40
 *FvwmScroll: Fore green
 
+DestroyModuleConfig FvwmFormDefault: *
+*FvwmFormDefault: Back #bbb
+*FvwmFormDefault: Colorset 3
+*FvwmFormDefault: ItemColorset 3
+*FvwmFormDefault: ButtonFont $[fvwm_labelfont]
+*FvwmFormDefault: Font       $[fvwm_labelfont]
+*FvwmFormDefault: InputFont  "xft:Mono:pixelsize=11"
+
 # }}}2
 # FvwmForm-Run Config {{{2
 DestroyModuleConfig  FvwmForm-Run: *
 *FvwmForm-Run: Geometry     +180-50
 *FvwmForm-Run: Title        "Run Program
-*FvwmForm-Run: Line         right
+*FvwmForm-Run: Line         expand
 *FvwmForm-Run: Text         "Command:"
 *FvwmForm-Run: Input        Program        30      ""
-*FvwmForm-Run: Line         right
+*FvwmForm-Run: Line         expand
 *FvwmForm-Run: Text         "Host (optional):"
-*FvwmForm-Run: Input        Host           20      ""
+*FvwmForm-Run: Input        Host           22      ""
 *FvwmForm-Run: Line         expand
 *FvwmForm-Run: Button       quit    "Run"           ^M
-*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name screen@localhost -T screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ;; *://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
+*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ;; *://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
 # Before saving the data, remove any previously saved data:
 *FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
 *FvwmForm-Run: Command !(                                      /bin/echo \
@@ -1918,7 +2322,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 ) > ${FVWM_USERDIR}/.FvwmForm-Run
 *FvwmForm-Run: Command !(                                      /bin/echo \
   "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
- Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name screen@localhost -T screen@localhost) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ';; *://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
+ Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?hostinfo -S $(Host) -t) screen -dRR $[HOST] ';; *://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
 ) > ${FVWM_USERDIR}/.FvwmForm-RunLast
 
 *FvwmForm-Run: Button       quit    "In Terminal"           ^J
@@ -1948,5 +2352,7 @@ Read ConfigFvwmTaskBar
 
 Read /etc/X11/fvwm/menudefs.hook Quiet
 Read menudefs.hook Quiet
+
+Read fvwm2rc.local Quiet
 
 # }}}1
