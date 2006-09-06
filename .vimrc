@@ -1,5 +1,5 @@
 " $Id$
-" vim:set ft=vim et tw=70 sw=2 sts=2:
+" vim:set ft=vim et tw=78 sw=2 sts=2:
 version 5.0
 
 " Section: Options {{{1
@@ -13,7 +13,7 @@ set autowrite       " Automatically save before commands like :next and :make
 set backspace=2
 set backup          " Do keep a backup file
 set backupskip+=*.tmp,crontab.*
-if has("balloon_eval")
+if has("balloon_eval") && has("unix")
   set ballooneval
 endif
 set cmdheight=2
@@ -30,15 +30,20 @@ endif
 "let &listchars="tab:\<M-;>\<M-7>,trail:\<M-7>"
 set listchars=tab:>\ ,trail:-
 set listchars+=extends:>,precedes:<
+if version >= 700
+  set listchars+=nbsp:+
+endif
 set modelines=5     " Debian likes to disable this
 set mousemodel=popup
 "set nohidden       " Disallow hidden buffers
-"set nostartofline
 set pastetoggle=<F2>
 set showcmd         " Show (partial) command in status line.
 set showmatch       " Show matching brackets.
 set smartcase       " Case insensitive searches become sensitive with capitals
 set smarttab        " sw at the start of the line, sts everywhere else
+if exists("+spelllang")
+  set spelllang=en_gb
+endif
 set splitbelow      " Split windows at bottom
 set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 set suffixes+=.dvi  " Lower priority in wildcards
@@ -53,17 +58,17 @@ set winaltkeys=no
 
 let g:treeExplVertical=1
 let g:c_comment_strings=1
-let g:Vimplate = "$HOME/.config/vim/vimplate"
 let g:EnhCommentifyBindInInsert='No'
 let g:EnhCommentifyRespectIndent='Yes'
 "let g:Imap_PlaceHolderStart="\xab"
 "let g:Imap_PlaceHolderEnd="\xbb"
 let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let g:lisp_rainbow=1
-let g:loaded_parenquote=1
+"let g:loaded_parenquote=1
 let g:rails_level=9
 let g:rails_default_database='sqlite3'
 let g:rails_menu=1
+let g:rubyindent_match_parentheses=0
 let g:ruby_no_identifiers=1
 let g:rubycomplete_rails=1
 if !has("gui_running")
@@ -78,14 +83,13 @@ if has("gui_running")
       set guifont=bitstream\ vera\ sans\ mono\ 11 ",fixed,-bitstream-bitstream\ vera\ sans\ mono-medium-r-normal-*-*-110-*-*-m-*-iso8859-1
     endif
     "set guioptions-=T guioptions-=m
+    set guioptions-=e
   elseif has("win32")
     set guifont=Courier\ New:h10
   endif
   set background=light
-"  set cmdheight=2 lines=25 " columns=80
+  "set cmdheight=2 lines=25 columns=80
   set title
-  map <S-Insert> <MiddleMouse>
-  map! <S-Insert> <MiddleMouse>
   if has("diff") && &diff
     set columns=165
   endif
@@ -99,19 +103,26 @@ if version>=600
   set foldmethod=marker
   set printoptions=paper:letter ",syntax:n
   set sidescrolloff=5
-  set mouse=a
+  set mouse=nvi
 endif
 
 if version < 602
   set clipboard+=exclude:screen.*
-elseif exists("$TERM") && $TERM =~ '^screen'
+elseif $TERM =~ '^screen'
   if exists("+ttymouse") && &ttymouse == ''
-    set ttymouse=xterm2
+    set ttymouse=xterm
+  endif
+  if $TERM != 'screen.linux' && &t_Co == 8
+    set t_Co=16
   endif
 endif
 
-if has("dos16") || has("dos32") || has("win32")
-  if $PATH =~? 'cygwin' && ! exists("no_cygwin_shell")
+if $TERM == 'xterm-color' && &t_Co == 8
+  set t_Co=16
+endif
+
+if has("dos16") || has("dos32") || has("win32") || has("win64")
+  if $PATH =~? 'cygwin' && ! exists("g:no_cygwin_shell")
     set shell=bash
     set shellpipe=2>&1\|tee
     set shellslash
@@ -179,7 +190,11 @@ endfunction
 command! -nargs=1 OpenURL :call OpenURL(<q-args>)
 
 function! Run()
-  if &ft == "mail" || &ft == "text"
+  let cmd = matchstr(getline(1),'^#!\zs[^ ]*')
+  if cmd != '' && executable(cmd)
+    w
+    exe "!".matchstr(getline(1),'^#!\zs.*').' %'
+  elseif &ft == "mail" || &ft == "text" || &ft == "help"
     setlocal spell!
   elseif exists("b:rails_root") && exists(":Rake")
     wa
@@ -207,8 +222,6 @@ function! Run()
     source %
   elseif &ft == "sql"
     1,$DBExecRangeSQL
-  elseif &ft == "txt" || &ft == "text" || &ft == "mail"
-    normal "\ss"
   elseif expand("%:e") == "tex"
     wa
     exe "normal :!rubber -f %:r && xdvi %:r 2>/dev/null &\<CR>"
@@ -277,20 +290,15 @@ if version >= 600
   "inoremap <silent> ' <C-R>=InsertQuoteWrapper("'")<CR>
 endif
 
-function! TemplateFileFunc_sh()
-  $
-endfunction
-
-function! TemplateFileFunc_pl()
-  $
-endfunction
-
-function! TemplateFileFunc_rb()
-  $
-endfunction
-
-function! TemplateFileFunc_html()
-  norm 3w
+function! TemplateFileFunc_pm()
+  let module = expand("%:p:r")
+  let module = substitute(module,'.*\<\(perl\d*\%([\/][0-9.]*\)\=\|lib\|auto\)[\/]','','')
+  if module =~ '^/' || module =~ '^[A-Za-z]:'
+    let module = fnamemodify(module,':t')
+  endif
+  let module = substitute(module,'[\/]','::','g')
+  silent! exe "%s/@MODULE@/".module."/g"
+  norm gg4}
 endfunction
 
 if version >= 600
@@ -300,6 +308,8 @@ endif
 " Section: Mappings {{{1
 " ----------------------
 
+map  <S-Insert> <MiddleMouse>
+map! <S-Insert> <MiddleMouse>
 " Don't use Ex mode; use Q for formatting
 map Q       gqj
 " open URL under cursor in browser
@@ -319,6 +329,8 @@ endif
 map <F3>    :cnext<CR>
 map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
+map <F6>    :bnext<CR>
+map <F7>    :bprevious<CR>
 map <F8>    :wa<BAR>make<CR>
 map <F9>    :Run<CR>
 "map <F10>   :wa<BAR>make
@@ -367,7 +379,6 @@ endif
 
 " Emacs style mappings
 if version >= 600
-  "col('.')>strlen(getline('.'))
   " If at end of a line of spaces, delete back to the previous line.
   " Otherwise, <Left>
   inoremap <silent> <C-B> <C-R>=getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<Lt>C-T>\<Lt>Esc>kJs":"\<Lt>Left>"<CR>
@@ -457,6 +468,8 @@ iab teh the
 iab seperate separate
 iab relevent relevant
 iab relavent relevant
+iab consistant consistent
+iab anomoly anomaly
 
 " Section: Syntax Highlighting and Colors {{{1
 " --------------------------------------------
@@ -499,13 +512,12 @@ if has("autocmd")
     autocmd!
     autocmd VimEnter * let g:rails_debug=1
     "autocmd User Rails* silent! Rlcd
-    autocmd User Rails*model*ar* abbr <buffer> habtm has_and_belongs_to_many
-    autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.] 
-          \ if filereadable(expand("~/.vim/templates/skel.sh")) |
-          \   0r ~/.vim/templates/skel.sh |
-          \   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
-          \ endif |
-          \ set ft=sh | $
+    "autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.]
+          "\ if filereadable(expand("~/.vim/templates/skel.sh")) |
+          "\   0r ~/.vim/templates/skel.sh |
+          "\   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
+          "\ endif |
+          "\ set ft=sh | $
     autocmd BufNewFile */init.d/*
           \ if filereadable("/etc/init.d/skeleton") |
           \   0r /etc/init.d/skeleton |
@@ -527,8 +539,8 @@ if has("autocmd")
     autocmd BufWritePost,FileWritePost ~/.Xdefaults,~/.Xresources silent! !xrdb -load % >/dev/null 2>&1
     autocmd BufWritePre,FileWritePre /etc/* if &ft == "dns" |
           \ exe "normal msHmt" |
-          \ exe ":g/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
-          \ exe "normal `tzt`s" |
+          \ exe "gl/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
+          \ exe "normal g`tztg`s" |
           \ endif
 "    autocmd BufWritePre,FileWritePre */.vim/*.vim,*/.vim.*/*.vim,~/.vimrc* exe "normal msHmt" |
 "          \ %s/^\(" Last [Cc]hange:\s\+\).*/\=submatch(1).strftime("%Y %b %d")/e |
@@ -537,6 +549,13 @@ if has("autocmd")
     autocmd BufReadPre *.doc | setlocal readonly
     autocmd BufReadCmd *.doc execute "0read! antiword \"<afile>\""|$delete|1|set nomodifiable
     autocmd FileReadCmd *.doc execute "read! antiword \"<afile>\""
+    autocmd CursorHold,BufWritePost,BufReadPost,BufLeave *
+      \ if isdirectory(expand("<amatch>:h")) | let &swapfile = &modified | endif
+    "if version >= 700
+      "autocmd SwapExists * let v:swapchoice = "e" | echohl MoreMsg | echomsg 'Swap file "'.fnamemodify(v:swapname,':~:.').'" already exists!' | echohl None
+    "else
+      "set shortmess+=A
+    "endif
   augroup END " }}}2
   augroup FTCheck " {{{2
     autocmd!
@@ -569,30 +588,32 @@ if has("autocmd")
     autocmd FileType c,cpp,cs,java          setlocal ai et sta sw=4 sts=4 cin
     autocmd FileType sh,csh,tcsh,zsh        setlocal ai et sta sw=4 sts=4
     autocmd FileType tcl,perl,python        setlocal ai et sta sw=4 sts=4
+    autocmd FileType javascript             setlocal ai et sta sw=4 sts=4 cin
     autocmd FileType php,aspperl,aspvbs,vb  setlocal ai et sta sw=4 sts=4
     autocmd FileType apache,sql,vbnet       setlocal ai et sta sw=4 sts=4
     autocmd FileType tex,css                setlocal ai et sta sw=2 sts=2
     autocmd FileType html,xhtml,xml,wml,cf  setlocal ai et sta sw=2 sts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
     autocmd FileType tt2html,htmltt,mason   setlocal ai et sta sw=2 sts=2
-    autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8 | if exists("+spell") | setlocal spell | endif
+    autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8
     autocmd FileType cs,vbnet               setlocal foldmethod=syntax fdl=2
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
-    autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o<C-U># $Id$<Esc>o<C-U><C-X>^<Esc>o<C-U><C-G>u
+    autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o<C-U># $I<C-V>d$<Esc>o<C-U><C-X>^<Esc>o<C-U><C-G>u
     autocmd User     allml                  imap <C-Z> <C-X>=|imap <C-J> <Down>
     if !filereadable(expand("~/.config/vim/syntax/tt2html.vim"))
      autocmd BufNewFile,BufRead *.tt,*.tt2        set syn=html
     endif
-    autocmd FileType aspvbs,vbnet runtime! indent/vb.vim | setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
-    autocmd FileType bst setlocal smartindent ai sta sw=2 sts=2
+    autocmd FileType aspvbs,vbnet setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
+    autocmd FileType asp*         runtime! indent/html.vim
+    autocmd FileType bst  setlocal smartindent ai sta sw=2 sts=2
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ %
     autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
     "autocmd FileType eruby setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType help setlocal ai fo+=2n
+    autocmd FileType help setlocal ai fo+=2n | silent! setlocal nospell
     autocmd FileType html setlocal iskeyword+=:,~
     autocmd FileType java silent! compiler javac | setlocal makeprg=javac\ %
-    autocmd FileType mail setlocal tw=70|if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif
+    autocmd FileType mail setlocal tw=70|if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif|silent! setlocal spell
     autocmd FileType perl silent! compiler perl | setlocal iskeyword+=: keywordprg=perl\ -e'$c=shift;exec\ q{perldoc\ }.($c=~/^[A-Z]\|::/?q{}:q{-f}).qq{\ $c}'
     autocmd FileType python setlocal keywordprg=pydoc
     autocmd FileType ruby silent! compiler ruby | setlocal makeprg=ruby\ -wc\ % keywordprg=ri | imap <C-Z> <CR>end<C-O>O
@@ -609,6 +630,7 @@ if has("autocmd")
           \ call IMAP('^^','^^',"tex")|
           \ call IMAP('::','::',"tex")|
           \ endif
+    autocmd FileType vbnet        runtime! indent/vb.vim
     autocmd FileType vim  setlocal ai et sta sw=4 sts=4 keywordprg=:help | map! <buffer> <C-Z> <C-X><C-V>
     "autocmd BufWritePost ~/.vimrc   so ~/.vimrc
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
