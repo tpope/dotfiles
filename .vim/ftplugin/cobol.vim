@@ -17,8 +17,9 @@ set cpo&vim
 
 setlocal commentstring=\ \ \ \ \ \ *%s
 setlocal comments=:*
-setlocal textwidth=72
+setlocal fo+=croqlt
 setlocal expandtab
+setlocal textwidth=72
 
 " matchit support
 if exists("loaded_matchit")
@@ -35,8 +36,13 @@ if exists("loaded_matchit")
     \ '-\@<!\<\%(delete\|rewrite\|start\|write\|read\)\>\%(.*\(\%$\|\%(\n\%(\%(\s*\|.\{6\}\)[*/].*\n\)*\)\=\s*\%(invalid\s\+key\|at\s\+end\|no\s\+data\|at\s\+end-of-page\)\>\)\)\@=:\%(\<not\s\+\)\@<!\<\%(not\s\+\)\=\%(invalid\s\+key\|at\s\+end\|no\s\+data\|at\s\+end-of-page\)\>:\<end-\%(delete\|rewrite\|start\|write\|read\)\>' .s:ordot
 endif
 
-let b:undo_ftplugin = "setlocal com< cms< tw< et<" .
-            \ " | unlet! b:browsefilter"
+if has("gui_win32") && !exists("b:browsefilter")
+  let b:browsefilter = "COBOL Source Files (*.cbl, *.cob)\t*.cbl;*.cob;*.lib\n".
+		     \ "All Files (*.*)\t*.*\n"
+endif
+
+let b:undo_ftplugin = "setlocal com< cms< fo< et< tw<" .
+            \ " | unlet! b:browsefilter b:match_words b:match_ignorecase b:match_skip"
 if !exists("g:no_plugin_maps") && !exists("g:no_cobol_maps")
     let b:undo_ftplugin = b:undo_ftplugin .
             \ " | sil! exe 'nunmap <buffer> <'" .
