@@ -10,7 +10,7 @@ endif
 foreach dir ( /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/bin" )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
-foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin /usr/etc )
+foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/lib/surfraw /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
@@ -22,15 +22,9 @@ setenv ENV "$HOME/.shrc"
 setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java"
 if ( -d "$HOME/java" )  setenv CLASSPATH "${CLASSPATH}:$HOME/java"
-if ( -d "$HOME/.ruby" ) setenv RUBYLIB   "$HOME/.ruby"
+if ( -f "$HOME/.ruby/lib/tpope.rb" ) setenv RUBYOPT "rtpope"
+setenv RUBYLIB  "$HOME/.ruby/lib:$HOME/ruby/lib:$HOME/.ruby"
 setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
-if ( -f "$HOME/.perl/Echo.pm" ) then
-    if ( $?PERL5OPT ) then
-        if ( "x$PERL5OPT" !~ *Echo* ) setenv PERL5OPT "$PERL5OPT -MEcho"
-    else
-        setenv PERL5OPT "-MEcho"
-    endif
-endif
 setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
 if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
 setenv CVS_RSH 'ssh'
@@ -54,7 +48,7 @@ setenv PAGER "$HOME/bin/sensible-pager"
 setenv BROWSER "$HOME/bin/sensible-browser"
 setenv LESSOPEN '|lesspipe %s'
 set hostname = `hostname|sed -e 's/[.].*//'`
-setenv CVSROOT ':ext:iling.us:/home/tpope/.cvs'
+setenv CVSROOT ':ext:gob:/home/tpope/.cvs'
 if ( $hostname == gob ) setenv CVSROOT "$HOME/.cvs"
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
@@ -99,8 +93,11 @@ if ( $?tcsh ) then
 
     case screen*:
     case vt220*:
-	alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
-	#alias precmd ']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
+        if ( $?STY ) then
+        alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
+        else
+        alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}"'\"'
+        endif
 	#echo -n "k${ttydash}${hostname}\" # "
 	set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
 	breaksw
@@ -108,7 +105,9 @@ if ( $?tcsh ) then
     case xterm*:
     case rxvt*:
     case kterm*:
+    case putty*:
     case dtterm*:
+    case ansi*:
     case cygwin*:
 	alias precmd 'echo -n "]1;'"i${ttydash}${hostname}"']2;'"${USER}@${hostname}"':`echo $cwd|sed -e s,^$HOME,~,`'"${ttyslash}"'"'
 	#alias jobcmd 'echo -n "]2\;\!#"'
@@ -155,10 +154,11 @@ else if ( -x /usr/local/bin/dircolors && $?tcsh ) then
     eval `/usr/local/bin/dircolors -c $HOME/.dir_colors`
     alias ls 'ls -F --color=auto'
 else if ( -x /usr/bin/dircolors || -x /usr/local/bin/dircolors ) then
-    #eval `dircolors -c`
     alias ls 'ls -F --color=auto'
 else
     alias ls 'ls -F'
+    setenv CLICOLOR ''
+    setenv LSCOLORS ExGxFxdxCxfxexCaCdEaEd
 endif
 
 grep --color |& grep unknown >/dev/null || alias grep 'grep --color=auto'

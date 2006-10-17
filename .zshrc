@@ -14,7 +14,7 @@ fi
 
 fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc)
 watch=(notme)
-[ -f $HOME/.friends ] && watch=(`cat $HOME/.friends`)
+[ -f "$HOME/.friends" ] && watch=(`cat "$HOME/.friends"`)
 HISTSIZE=100
 WORDCHARS='*?_-.[]~&;!#$%^(){}<>'
 PERIOD=3600
@@ -29,12 +29,14 @@ interactive=1
 #[[ -z $domains ]] || shift 1 domains
 
 off=(gob michael lucille tobias lindsay)
-work=(arwen tpope-486 tpope-1084 jwxkl81-1061 san-netmon)
-for host in $off; do
-    [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
-    [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
-    : ~${host%.tpope.us}
-done
+work=(arwen tpope-1084 jwxkl81-1061 san-netmon jmwa-netmon atl-netmon)
+if [ -d "$HOME/friends" ]; then
+    for host in $off; do
+        [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
+        [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
+        : ~${host%.tpope.us}
+    done
+fi
 
 if [ -n "$USERPROFILE" ] && which cygpath >/dev/null; then
     typeset home="`cygpath "$USERPROFILE"`"
@@ -50,7 +52,7 @@ fi
 
 namedir() { export $1=$PWD; : ~$1 }
 
-friends=($family buster oscar maeby steve grex $work)
+friends=($off buster oscar maeby steve grex $work)
 
 #for host in $domains; do
 #    off=(${off%.$host})
@@ -63,77 +65,75 @@ unset interactive domains host
 # --------------------
 local e _find_promptinit hostcolor hostletter hostcode usercolor usercode
 e=`echo -ne "\e"`
-    if [ -x "$HOME/bin/hostinfo" ]; then
-	hostcolor=`$HOME/bin/hostinfo -c`
-	hostletter=`$HOME/bin/hostinfo -l`
-	hostcode=`$HOME/bin/hostinfo -s`
-    else
-	hostcolor="01;37"
-	hostletter=
-	hostcode="+b W"
-    fi
-    usercolor="01;33" && usercode="+b Y"
-    [ $UID = '0' ] && usercolor="01;37" && usercode="+b W"
 
 _find_promptinit=( $^fpath/promptinit(N) )
 if (( $#_find_promptinit >= 1 )) && [[ -r $_find_promptinit[1] ]]; then
     autoload -U promptinit && promptinit && prompt simpson
     RPS1=$'%(?..(%{\e[01;35m%}%?%{\e[00m%}%)%<<)'
 else
+    if [ -x "$HOME/bin/hostinfo" ]; then
+        hostcolor=`$HOME/bin/hostinfo -c`
+        hostletter=`$HOME/bin/hostinfo -l`
+    else
+        hostcolor="01;37"
+        hostletter=
+    fi
+    usercolor="01;33"
+    [ $UID = '0' ] && usercolor="01;37"
     PS1="%{${e}[${usercolor}m%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{${e}[01;34m%}%~%{${e}[00m%}%# "
     RPS1="%(?..(%{${e}[01;35m%}%?%{${e}[00m%}%)%<<)"
 fi
 
 case ${OLDTERM:-$TERM} in
 screen*|vt220*)
+    if [ -x "$HOME/bin/hostinfo" ]; then
+        hostcode=`$HOME/bin/hostinfo -s`
+    else
+        hostcode="+b W"
+    fi
+    usercode="+b Y"
+    [ $UID = '0' ] && usercode="+b W"
+
     screenhs="\005{$usercode}%n\005{-}@\005{$hostcode}%m\005{-}:\005{+b B}%~\005{-}"
     precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
-		print -Pn "\e]1;\a\e]1;$tty%m\a"
-		print -Pn "\e]2;$screenhs [%l]\a"
+                # print -Pn "\e]1;\a\e]1;$tty%m\a"
+                print -Pn "\e]2;$screenhs [%l]\a"
                 if [ "$STY" ]; then
-                    print -Pn "\ek$tty\e\\"
+                    print -Pn "\e]1;\a\e]1;@%m\a"
+                    # $tty
+                    print -Pn "\ek@\e\\"
                 else
-                    print -Pn "\ek$tty%m\e\\"
+                    print -Pn "\ek@%m\e\\"
                 fi
-		}
+            }
     preexec () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
-		print -Pn "\e]1;\a\e]1;$tty%m*\a"
-		print -Pn "\e]2;$screenhs"
-		print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
-		print -Pn ") [%l]\a"
+                local cmd="$1"
+                case "$cmd" in
+                    ???????????*) cmd="`echo "$cmd"|sed -e 's/ .*//g'`" ;;
+                esac
+                # print -Pn "\e]1;\a\e]1;$tty%m*\a"
+                print -Pn "\e]2;$screenhs"
+                print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
+                print -Pn ") [%l]\a"
                 if [ "$STY" ]; then
-                    print -Pn "\ek$tty*\e\\"
+                    print -Pn "\ek$cmd@\e\\"
                 else
-                    print -Pn "\ek$tty%m*\e\\"
+                    print -Pn "\ek$cmd@%m\e\\"
                 fi
-		}
+                }
     #[ "`hostname`" = grex.cyberspace.org ] &&TERM=vt220 &&export OLDTERM=screen
     ;;
-xterm*|rxvt*|kterm*|dtterm*|ansi*|cygwin*)
+xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
     precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
-		print -Pn "\e]1;$tty%m\a"
-		print -Pn "\e]2;%n@%m:%~ [%l]\a"
-		}
+                print -Pn "\e]1;$tty%m\a"
+                print -Pn "\e]2;%n@%m:%~ [%l]\a"
+                }
     preexec () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
-		print -Pn "\e]1;$tty%m*\a"
-		print -Pn "\e]2;%n@%m:%~"
-		print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
-		print -Pn ") [%l]\a"
-		} ;;
-Eterm*)
-    precmd  () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
-		print -Pn "\e]1;$tty%m\a"
-		print -Pn "\e]2;%n@%m:%~ [%l]\a"
-		print -Pn "\e]I%m.xpm\e\\"
-		}
-    preexec () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
-		print -Pn "\e]1;$tty%m*\a"
-		print -Pn "\e]2;%n@%m:%~"
-		print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
-		print -Pn ") [%l]\a"
-		} 
-    #[ "`hostname`" = grex.cyberspace.org ] &&TERM=xterm &&export OLDTERM=Eterm
-    ;;
+                print -Pn "\e]1;$tty%m*\a"
+                print -Pn "\e]2;%n@%m:%~"
+                print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
+                print -Pn ") [%l]\a"
+                } ;;
 linux) ;;
 *)
     PS1="$hostletter%# "
@@ -165,18 +165,18 @@ case $ZSH_VERSION in
 3.*) ;;
 *)
 beginning-of-sentence() {
-    local WORDCHARS="'"'*?_-.[]~=/!#$%^(){}<>" 	' #'
+    local WORDCHARS="'"'*?_-.[]~=/!#$%^(){}<>"  ' #'
     zle backward-word
 }
 zle -N beginning-of-sentence
-bindkey "\ea" beginning-of-sentence
+#bindkey "\ea" beginning-of-sentence
 
 end-of-sentence() {
-    local WORDCHARS="'"'*?_-.[]~=/!#$%^(){}<>" 	' #'
+    local WORDCHARS="'"'*?_-.[]~=/!#$%^(){}<>"  ' #'
     zle forward-word
 }
 zle -N end-of-sentence
-bindkey "\ee" end-of-sentence
+#bindkey "\ee" end-of-sentence
 
 change-first-word() {
     zle beginning-of-line -N
@@ -184,6 +184,7 @@ change-first-word() {
 }
 zle -N change-first-word
 bindkey "\eE" change-first-word
+bindkey "\ea" change-first-word
 
 new-screen() {
     [ -z "$STY" ] || screen < "$TTY"
@@ -191,6 +192,9 @@ new-screen() {
 zle -N new-screen
 [[ -z "$terminfo[kf12]" ]] || bindkey "$terminfo[kf12]" new-screen
 [[ -z "$terminfo[kf11]" ]] || bindkey -s "$terminfo[kf11]" "^Ascreen ^E\n"
+
+zle -N edit-command-line
+bindkey '^[e' edit-command-line
 
 ;;
 esac
@@ -213,10 +217,10 @@ which sudo >/dev/null && alias sudo='sudo ' # this makes $1 expand as an alias
 
 # Global aliases -- These do not have to be
 # at the beginning of the command line.
-alias -g MM='|more'
-alias -g HH='|head'
-alias -g TT='|tail'
-alias -g LL='|less'
+# alias -g MM='|more'
+# alias -g HH='|head'
+# alias -g TT='|tail'
+# alias -g LL='|less'
 
 # Section: Modules {{{1
 # ---------------------
@@ -234,6 +238,7 @@ zmodload -i zsh/mathfunc
 autoload -U zrecompile
 autoload -U zmv
 autoload -U zsh-mime-setup
+autoload -U edit-command-line
 
 # Section: Styles {{{1
 # ------------------------
@@ -244,12 +249,12 @@ zstyle ':mime:*' mailcap ~/.mailcap
 
 zstyle ':completion:*' add-space true
 zstyle -e ':completion:*' completer '
-	if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]]; then
-	    _last_try="$HISTNO$BUFFER$CURSOR"
-	    reply=(_complete _ignored:complete _prefix _complete:full)
-	else
-	    reply=(_complete _ignored:complete _prefix _complete:full _correct _approximate)
-	fi' #'
+        if [[ $_last_try != "$HISTNO$BUFFER$CURSOR" ]]; then
+            _last_try="$HISTNO$BUFFER$CURSOR"
+            reply=(_complete _ignored:complete _prefix _complete:full)
+        else
+            reply=(_complete _ignored:complete _prefix _complete:full _correct _approximate)
+        fi' #'
 zstyle ':completion::prefix:*' completer _complete _ignored:complete
 #zstyle ':completion:*' completer _complete _ignored _prefix
 #zstyle ':completion:*' completions 1
@@ -285,7 +290,7 @@ zstyle ':completion:*' users tpope root $USER ${watch/notme/}
 zstyle ':completion:*' verbose true
 zstyle ':completion:*:rm:*' ignore-line yes
 #zstyle ':completion:*:rsync:*:files' command ssh -a -x '${words[CURRENT]%:*}' ls -d1F '${${:-${${${:-${words[CURRENT]#*:}-}:h}/${slash}(#e)/}/\*}/#.$slash/}' 2>/dev/null
-zstyle :compinstall filename '/home/tpope/.zshrc'
+zstyle :compinstall filename "$HOME/.zshrc"
 
 autoload -U compinit
 compinit -u

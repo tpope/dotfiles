@@ -5,7 +5,7 @@
 # bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
 # .zshrc, .bashrc, and .profile, respectively.
 
-for dir in /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
+for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
     if [ -d "$dir" ]; then
 	case "$PATH" in
 	    *"$dir"*) ;;
@@ -14,7 +14,7 @@ for dir in /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
     fi
 done
 
-for dir in /usr/bin /bin /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /usr/local/sbin /usr/sbin /sbin /usr/etc; do
+for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc; do
     if [ -d "$dir" ]; then
 	case "$PATH" in
 	    *:"$dir":*|*:"$dir"|"$dir":*|"$dir") ;;
@@ -28,36 +28,49 @@ case "$PATH" in
     *) PATH="$HOME/bin:$PATH" ;;
 esac
 
-if [ -f "$HOME/.locale" -a -z "$LANG" -a -z "$LC_ALL" ]; then
+if [ -z "$LANG" -a -z "$LC_ALL" -a -f "$HOME/.locale" ]; then
     LANG="`cat "$HOME/.locale"`"
     export LANG
 fi
 
-CLASSPATH=.
-[ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
-[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
+if [ -z "$CLASSPATH" ]; then
+    CLASSPATH=.
+    [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
+    [ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
+    export CLASSPATH
+fi
 
-[ -d "$HOME/.ruby" ] && RUBYLIB="$HOME/.ruby"
+if [ -z "$RUBYLIB" ]; then
+    for dir in "$HOME/.ruby/lib" "$HOME/ruby/lib" "$HOME/.ruby"; do
+        case ":$RUBYLIB:" in
+            *:"$dir":*) ;;
+            *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB$dir"
+        esac
+    done
+    RUBYLIB="`echo "$RUBYLIB"|sed -e s/^://`"
+    export RUBYLIB
+fi
 
-for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
-    case ":$PERL5LIB:" in
-        *:"$dir":*) ;;
-        *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB$dir"
-    esac
-done
-PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
-[ ! -f "$HOME/.perl/Echo.pm" ] || case "$PERL5OPT" in
-   *Echo*) ;;
-   '') PERL5OPT="-MEcho" ;;
-   *)  PERL5OPT="$PERL5OPT -MEcho" ;;
-esac
 
-export PATH CLASSPATH PERL5LIB PERL5OPT RUBYLIB RUBYOPT
+if [ -z "$PERL5LIB" ]; then
+    for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
+        case ":$PERL5LIB:" in
+            *:"$dir":*) ;;
+            *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB$dir"
+        esac
+    done
+    PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
+    export PERL5LIB
+fi
+[ ! -f "$HOME/.ruby/lib/tpope.rb" ] || RUBYOPT="rtpope"
 
+export PATH RUBYLIB RUBYOPT
+
+hostname=`hostname|sed -e 's/[.].*//'`
 RSYNC_RSH='ssh -axqoBatchmode=yes'
 CVS_RSH='ssh'
-CVSROOT=':ext:iling.us:/home/tpope/.cvs'
-[ "`hostname`" != gob ] || CVSROOT="$HOME/.cvs"
+CVSROOT=':ext:gob:/home/tpope/.cvs'
+[ "$hostname" != gob ] || CVSROOT="$HOME/.cvs"
 LYNX_CFG="$HOME/.lynx.cfg"
 export RSYNC_RSH CVS_RSH CVSROOT LYNX_CFG
 
@@ -74,9 +87,6 @@ if [ -t 1 ]; then
 
 RSYNC_RSH='ssh -ax'
 
-hostname=`hostname|sed -e 's/[.].*//'`
-[ "$TERM" = Eterm -o "$TERM" = Eterm-xterm ] && \
-    echo -n "]I$hostname.xpm\\"
 [ "$TERM" = linux ] && TMOUT=43200
 
 if [ "$interactive" -o "$_" = "interactive" ] || \
@@ -92,30 +102,21 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     #oldterm="$TERM"
     #[ "$OLDTERM" ] && oldterm="$OLDTERM"
+    if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
+        tty=`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`
+    fi
     case "$TERM" in
 	screen*|vt220*)
-	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-	    echo -n "k`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname\\"
-	    echo -n "]1;`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname"
-	else
-	    echo -n "k$hostname\\"
-	    echo -n "]1;$hostname"
-	fi
+        [ "$STY" ] || h="$hostname"
+        echo -n "k$tty@$h\\"
+        echo -n "]1;$tty@$hostname"
+        unset h
 	;;
-	xterm*|rxvt*|kterm*|dtterm*|cygwin*)
-	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-	echo -n "]1;`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname"
-	else
-	    echo -n "]1;$hostname"
-	fi ;;
-	Eterm*)
-	if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-	    echo -n "]1;`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`@$hostname"
-	else
-	    echo -n "]1;$hostname"
-	fi
+	xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
+        echo -n "]1;$tty@$hostname"
 	;;
     esac
+    unset tty
 
     execbin=`echo $0|sed -e 's/^-//' -e 's/\.shrc/_/'`
 
@@ -137,6 +138,8 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     if [ "`basename "$execbin"`" != sh ]; then
 
+        [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
+
 	alias ls='ls -F'
 
 	alias mv='mv -i'
@@ -145,10 +148,10 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
 	alias j='jobs'
 
-	[ -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
+	[ -n "$cygwin" -o -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
 	    alias vi='vim'
-	[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
-	    alias vi='vim' # -X
+        #[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
+            #alias vi='vim' # -X
 
 	if [ -x "`which dircolors 2>/dev/null`" ]; then
 	    eval `dircolors -b "$HOME/.dir_colors"`
@@ -156,7 +159,15 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	elif [ -x "`which gdircolors 2>/dev/null`" ]; then
 	    eval `gdircolors -b "$HOME/.dir_colors"`
 	    alias ls="gls -F --color=auto"
+        else
+            CLICOLOR=1
+            LSCOLORS=ExGxFxdxCxfxexCaCdEaEd
+            export CLICOLOR LSCOLORS
 	fi
+
+        [ -z "$LS_COLORS" ] || case "$TERM" in xterm*|screen*)
+            LS_COLORS="`echo "$LS_COLORS"|sed -e 's/01;3/00;9/g'`" ;;
+        esac
 
 	if ! grep --color 2>&1 | grep unknown >/dev/null; then
 	    alias grep='grep --color=auto'
@@ -168,22 +179,23 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	    #PAGER='less -R'
 	fi
 
-	unalias stop >/dev/null 2>&1
+        #unalias stop >/dev/null 2>&1
 	for cmd in `tpope aliases`; do
-	    if [ -x "`which $cmd 2>/dev/null`" ]; then
-		eval "${cmd}() { tpope $cmd \"\$@\"; }"
-	    else
+	    if [ -n "$cygwin" ] || ! [ -x "`which $cmd 2>/dev/null`" ]; then
 		alias $cmd="$HOME/bin/tpope $cmd"
+	    else
+		eval "${cmd}() { tpope $cmd \"\$@\"; }"
 	    fi
 	done
 
-	if [ -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
+        [ -n "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+        [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+        [ -z "$MAIL" ] || export MAIL
+	if [ -z "$cygwin" -a -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
 	    if finger $LOGNAME 2>/dev/null|grep "^New mail" >/dev/null 2>/dev/null; then
 		echo "You have new mail."
 	    fi
 	elif [ "$LS_COLORS" -a -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
-	    [ "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
-	    [ "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
 	    mtime=-1 atime=-1
 	    mtime=`ls -l --time-style=+%s "$MAIL"|awk '{print $6}'`
 	    atime=`ls -ul --time-style=+%s "$MAIL"|awk '{print $6}'`
@@ -195,9 +207,9 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 	set -o emacs -o noclobber >/dev/null 2>&1
 
     fi
-    export VISUAL PAGER LESSOPEN LESSCHARSET PS1
+    export VISUAL BROWSER PAGER LESSOPEN LESSCHARSET PS1
 fi
-unset promptchar interactive execbin hostname oldterm dir mtime atime
+unset promptchar interactive execbin hostname oldterm dir mtime atime cygwin
 fi
 
 test -f "$HOME/.shrc.local" && . "$HOME/.shrc.local"
