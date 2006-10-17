@@ -15,7 +15,6 @@ SnapAttraction 3 Screen
 OpaqueMoveSize -1
 XorPixmap resize.rainbow.xpm
 ClickTime 650
-# 750
 EwmhBaseStruts 0 0 0 40
 EdgeCommand Bottom All (FvwmButtons) FuncButtonsRestore
 ColormapFocus FollowsMouse
@@ -31,9 +30,6 @@ DesktopName 4 Fifth
 DesktopName 5 Sixth
 DesktopName 6 Seventh
 DesktopName 7 Eighth
-#DesktopName 0 Cyan
-#DesktopName 1 Yellow
-#DesktopName 2 Magenta
 
 PipeRead "echo SetEnv HOST `hostname|sed -e 's/[.].*//'`"
 PipeRead "echo SetEnv sudo `if [ -x /usr/bin/gksudo ]; then echo gksudo; else echo sudo; fi`"
@@ -372,6 +368,7 @@ UnsetEnv BACK
 IgnoreModifiers 2
 
 # Focus Bindings {{{2
+
 #Key Comma       A       4       Prev (CurrentPage, !Iconic)  FuncFocusWindow
 #Key Period      A       4       Next (CurrentPage, !Iconic)  FuncFocusWindow
 #Key Comma       A       S4      Prev (CurrentPage)           FuncFocusWindow
@@ -394,13 +391,13 @@ Key Tab         A       5       Next FuncFocusWindow
 Key Tab         A       S5      Prev FuncFocusWindow
 Key Tab         A       M       WindowList Root c c NoDeskSort SelectOnRelease Meta_L NoCurrentDeskTitle CurrentAtEnd ShowPage
 Key Tab         A       SM      WindowList Root c c NoDeskSort SelectOnRelease Meta_L NoCurrentDeskTitle ShowPage
-Key Tab         A       C       Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
+#Key Tab         A       C       Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
 Key Tab         A       4       Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
-Key Tab         A       SC      Prev (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
+#Key Tab         A       SC      Prev (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
 Key Tab         A       S4      Prev (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
 Key Tab         A       CM      Next (CurrentPage, AcceptsFocus) FuncFocusWindow
 Key Tab         A       SCM     Prev (CurrentPage, AcceptsFocus) FuncFocusWindow
-Key Tab         A       S4      SendToModule FvwmProxy ShowToggle
+#Key Tab         A       S4      SendToModule FvwmProxy ShowToggle
 
 Key Left        A       CM    Direction West  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 Key Right       A       CM    Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
@@ -462,27 +459,11 @@ Silent Key Print A      SC      Exec exec import -window root $[HOME]/root-`date
 Silent Key Print A      M       Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 Key Escape      A       SCM     EscapeFunc
 
-#Key 1           A       4       FuncWindowWarp 25 20
-#Key 2           A       4       FuncWindowWarp 75 20
-#Key 3           A       4       FuncWindowWarp 25 65
-#Key 4           A       4       FuncWindowWarp 75 65
-#Key 5           A       4       FuncMenuFvwmRoot
-#Key 6           A       4       FuncFvwmFormRun
-#Key 6           A       S4      Read .FvwmForm-RunLast Quiet
-#Key 7           A       4       Menu MenuFvwmUtilities
-#Key 7           A       S4      Menu /Debian
-#Key 8           A       4       Menu MenuFvwmScreens
-#Key 8           A       S4      Menu MenuFvwmLogins
-
 # Desk and Page Bindings {{{2
 
-#Key Left        A       4       GotoDesk -1 0 7
 #Key Left        A       4       Scroll -100000 0
-#Key Right       A       4       GotoDesk +1 0 7
 #Key Right       A       4       Scroll  100000 0
-#Key Up          A       4       GotoPage 0p -1p
 #Key Up          A       4       Scroll 0 -100000
-#Key Down        A       4       GotoPage 0p +1p
 #Key Down        A       4       Scroll  0 100000
 Key Next        A       4       GotoDesk +1 0 7
 Key Prior       A       4       GotoDesk -1 0 7
@@ -490,31 +471,15 @@ Key Next        A       5       GotoDesk +1 0 7
 Key Prior       A       5       GotoDesk -1 0 7
 #Key minus       A       4       Next (FvwmButtonsBottom, CirculateHit) FuncMoveButtonsToTop
 
-#Key Left        A       CM      GotoDesk -1 0 7
-#Key Right       A       CM      GotoDesk +1 0 7
-#Key Up          A       CM      GotoPage 0p -1p
-#Key Down        A       CM      GotoPage 0p +1p
 Key Next        A       CM      GotoDesk +1 0 7
 Key Prior       A       CM      GotoDesk -1 0 7
 
-#Key Left        A       C4      FuncTakeToDesk -1 0 7
-#Key Right       A       C4      FuncTakeToDesk +1 0 7
-#Key Up          A       C4      FuncTakeToPage 0p -1p
-#Key Down        A       C4      FuncTakeToPage 0p +1p
 Key Next        A       C4      FuncTakeToDesk +1 0 7
 Key Prior       A       C4      FuncTakeToDesk -1 0 7
 
-#Key Left        A       SCM     FuncTakeToDesk -1 0 7
-#Key Right       A       SCM     FuncTakeToDesk +1 0 7
-#Key Up          A       SCM     FuncTakeToPage 0p -1p
-#Key Down        A       SCM     FuncTakeToPage 0p +1p
 Key Next        A       SCM     FuncTakeToDesk +1 0 7
 Key Prior       A       SCM     FuncTakeToDesk -1 0 7
 
-#Key Left        A       M4      MoveToDesk -1 0 7
-#Key Right       A       M4      MoveToDesk +1 0 7
-#Key Up          A       M4      MoveToPage 0p -1p
-#Key Down        A       M4      MoveToPage 0p +1p
 Key Next        A       M4      MoveToDesk +1 0 7
 Key Prior       A       M4      MoveToDesk -1 0 7
 
@@ -533,42 +498,22 @@ Key Right       A       S5      CursorMove +1p 0
 Key Up          A       S5      CursorMove 0 -1p
 Key Down        A       S5      CursorMove 0 +1p
 
-#Key Space       A       4       GotoDeskAndPage 0 0 0
-#PipeRead 'for i in `seq 1 26`; do echo Key \
-# `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4 \
-# GotoDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
 PipeRead 'for i in `seq 0 8`; do echo Key \
  `expr $i + 1` A 4 \
  GotoDeskAndPage $i 0 0; done'
 
-#Key Space       A       4MS     FuncMoveToDeskAndPage 0 0 0
-#PipeRead 'for i in `seq 1 26`; do echo Key \
-# `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4MS \
-# FuncMoveToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
 PipeRead 'for i in `seq 0 8`; do echo Key \
  `expr $i + 1` A 4MS \
  FuncMoveToDeskAndPage $i 0 0; done'
 
-#Key Space       A       4M      FuncMoveAllToDeskAndPage 0 0 0
-#PipeRead 'for i in `seq 1 26`; do echo Key \
-# `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4M \
-# FuncMoveAllToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
 PipeRead 'for i in `seq 0 8`; do echo Key \
  `expr $i + 1` A 4M \
  FuncMoveAllToDeskAndPage $i 0 0; done'
 
-#Key Space       A       4CS     FuncTakeToDeskAndPage 0 0 0
-#PipeRead 'for i in `seq 1 26`; do echo Key \
-# `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4CS \
-# FuncTakeToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
 PipeRead 'for i in `seq 0 8`; do echo Key \
  `expr $i + 1` A 4CS \
  FuncTakeToDeskAndPage $i 0 0; done'
 
-#Key Space       A       4C      FuncTakeAllToDeskAndPage 0 0 0
-#PipeRead 'for i in `seq 1 26`; do echo Key \
-# `expr substr "ABCDEFGHIJKLMNOPQRSTUVWXYZ" $i 1` A 4C \
-# FuncTakeAllToDeskAndPage `expr $i / 9 % 3` `expr $i % 3` `expr $i / 3 % 3`; done'
 PipeRead 'for i in `seq 0 8`; do echo Key \
  `expr $i + 1` A 4C \
  FuncTakeAllToDeskAndPage $i 0 0; done'
@@ -665,32 +610,31 @@ Key XF86HomePage  A A       FuncFindOrLaunchWebBrowser
 Key XF86Mail      A A       FuncIrcScreenSshXTerm
 # }}}2
 
-Key Grave   A   C       FuncIrcScreenSshXTerm
-Key Grave   A   SC      FuncIrcScreenSshXTermShared
-Key 0       A   CM      Exec exec favorite-app
-Key 1       A   CM      FuncWebBrowser http://www.google.com/
-Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
-Key 3       A   CM      Exec sleep 1; xscreensaver-command -lock || exec xlock
+#Key Grave   A   C       FuncIrcScreenSshXTerm
+#Key Grave   A   SC      FuncIrcScreenSshXTermShared
+#Key 0       A   CM      Exec exec favorite-app
+#Key 1       A   CM      FuncWebBrowser http://www.google.com/
+#Key 2       A   CM      Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && sudo /sbin/cardctl eject
+#Key 3       A   CM      Exec sleep 1; xscreensaver-command -lock || exec xlock
 #Key 4       A   CM      FuncIrcScreenSshXTerm
-Key 6       A   CM      Exec exec xpenguins --nice .8 3
-Key 7       A   CM      Module FvwmConsole
-Key 8       A   CM      Exec if [ -x "`which beep-media-player 2>/dev/null`" ]; then exec beep-media-player; else exec xmms; fi
-Key 9       A   CM      Exec exec aumix
+#Key 6       A   CM      Exec exec xpenguins --nice .8 3
+#Key 7       A   CM      Module FvwmConsole
+#Key 8       A   CM      Exec if [ -x "`which beep-media-player 2>/dev/null`" ]; then exec beep-media-player; else exec xmms; fi
+#Key 9       A   CM      Exec exec aumix
 Key Space   A   CM      FuncScreenXTerm
 Key Space   A   4C      FuncScreenXTerm
 Key Space   A   4S      FuncScreenXTerm
 Key Space   A   4       FuncFindResource "*@localhost|localhost"
 
-Key 1       A   SCM     FuncWebBrowser
-Key 2       A   SCM     Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && (sudo ifdown eth0; sudo /sbin/cardctl eject)
-Key 3       A   SCM     Exec sleep 1; xscreensaver-command -activate || exec xlock -lockdelay 3600
-Key 4       A   SCM     FuncIrcScreenXTerm
-Key 6       A   SCM     Exec exec xpenguins -t "Big Penguins" --nice .8 3
-Key 7       A   SCM     Exec exec pkill -U $[LOGNAME] xpenguins
-Key 9       A   SCM     Exec tvtime || exec xawtv
+#Key 1       A   SCM     FuncWebBrowser
+#Key 2       A   SCM     Exec [ -x /usr/sbin/automount ] && sudo /usr/bin/killall -USR1 automount; [ -x /sbin/cardctl ] && (sudo ifdown eth0; sudo /sbin/cardctl eject)
+#Key 3       A   SCM     Exec sleep 1; xscreensaver-command -activate || exec xlock -lockdelay 3600
+#Key 4       A   SCM     FuncIrcScreenXTerm
+#Key 6       A   SCM     Exec exec xpenguins -t "Big Penguins" --nice .8 3
+#Key 7       A   SCM     Exec exec pkill -U $[LOGNAME] xpenguins
+#Key 9       A   SCM     Exec tvtime || exec xawtv
 Key Space   A   SCM     FuncXTerm
 Key Space   A   4M      FuncXTerm
-#Key Z       A   SCM     Exec tvtime || exec xawtv
 
 PipeRead 'for k in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do \
  echo Key $$k A 4   FuncFindResource \\$$$$\\[FVWM_BOOKMARK_$$k]; \
@@ -732,26 +676,26 @@ Key Home    A   5       Exec exec aumix -v +5
 Key End     A   5       Exec exec aumix -v -5
 
 # Automation Key Bindings {{{2
-Key 7           A   5   Exec exec ssh lucille br -n 1
-Key 8           A   5   Exec exec ssh lucille br -f 1
-Key U           A   5   Exec exec ssh lucille br -n 2
-Key I           A   5   Exec exec ssh lucille br -f 2
-Key J           A   5   Exec exec ssh lucille br -n 3
-Key K           A   5   Exec exec ssh lucille br -f 3
-Key M           A   5   Exec exec ssh lucille br -n 5
-Key Comma       A   5   Exec exec ssh lucille br -f 5
-Key KP_Home     A   4   Exec exec ssh lucille br -n 1
-Key KP_Left     A   4   Exec exec ssh lucille br -n 2
-Key KP_End      A   4   Exec exec ssh lucille br -n 3
-Key KP_Insert   A   4   Exec exec ssh lucille br -n 4
-Key KP_Up       A   4   Exec exec ssh lucille br -f 1
-Key KP_Begin    A   4   Exec exec ssh lucille br -f 2
-Key KP_Down     A   4   Exec exec ssh lucille br -f 3
-Key KP_Prior    A   4   Exec exec ssh lucille br -n 4
-Key KP_Right    A   4   Exec exec ssh lucille br -f 4
-Key KP_Delete   A   4   Exec exec ssh lucille br -F
-Key KP_Add      A   4   Exec exec ssh lucille br -d +1
-Key KP_Subtract A   4   Exec exec ssh lucille br -d -1
+Key 7           A   5   Exec exec tpope br -n 1
+Key 8           A   5   Exec exec tpope br -f 1
+Key U           A   5   Exec exec tpope br -n 2
+Key I           A   5   Exec exec tpope br -f 2
+Key J           A   5   Exec exec tpope br -n 3
+Key K           A   5   Exec exec tpope br -f 3
+Key M           A   5   Exec exec tpope br -n 5
+Key Comma       A   5   Exec exec tpope br -f 5
+Key KP_Home     A   4   Exec exec tpope br -n 1
+Key KP_Left     A   4   Exec exec tpope br -n 2
+Key KP_End      A   4   Exec exec tpope br -n 3
+Key KP_Insert   A   4   Exec exec tpope br -n 4
+Key KP_Up       A   4   Exec exec tpope br -f 1
+Key KP_Begin    A   4   Exec exec tpope br -f 2
+Key KP_Down     A   4   Exec exec tpope br -f 3
+Key KP_Prior    A   4   Exec exec tpope br -n 4
+Key KP_Right    A   4   Exec exec tpope br -f 4
+Key KP_Delete   A   4   Exec exec tpope br -F
+Key KP_Add      A   4   Exec exec tpope br -d +1
+Key KP_Subtract A   4   Exec exec tpope br -d -1
 # }}}2
 # }}}1
 # Mouse Bindings {{{1
@@ -1502,7 +1446,7 @@ AddToFunc FuncFindDesktop
 
 DestroyFunc FuncFindOffice
 AddToFunc FuncFindOffice
-+ I FuncFindResource "OpenOffice.org*|Gnumeric|Xpdf|gv"
++ I FuncFindResource "OpenOffice.org*|Gnumeric|Xpdf|gv|Acroread"
 
 DestroyFunc FuncFindTerminal
 AddToFunc FuncFindTerminal
@@ -2299,6 +2243,9 @@ DestroyModuleConfig FvwmFormDefault: *
 *FvwmFormDefault: ButtonFont $[fvwm_labelfont]
 *FvwmFormDefault: Font       $[fvwm_labelfont]
 *FvwmFormDefault: InputFont  "xft:Mono:pixelsize=11"
+
+DestroyModuleConfig FvwmBanner: *
+*FvwmBanner: Timeout 2
 
 # }}}2
 # FvwmForm-Run Config {{{2
