@@ -2,6 +2,10 @@
 ! $Id$
 ! vim600: foldmethod=marker
 
+#ifndef HOME
+#define HOME /home/tpope
+#endif
+
 *customization: -color
 !## NETSCAPE {{{1
 Gecko*drawingArea.translations:  #replace    \
@@ -52,97 +56,115 @@ Netscape*documentFonts.xResolution*iso-8859-1: 100
 Netscape*documentFonts.yResolution*iso-8859-1: 100
 
 !## XTERM {{{1
-#define FIXED -misc-fixed-medium-r
-#define ENC iso8859-1
-#define UTFENC iso10646-1
-!#define FIXED -jmk-neep-medium-r
-XTerm*VT100*background: #000000
-XTerm*VT100*foreground: #aaaaaa
-XTerm*boldMode: false
-XTerm*scrollBar: false
+XTerm.background:        #000000
+XTerm.VT100.background:  #000000
+XTerm.foreground:        #aaaaaa
+XTerm.VT100.foreground:  #aaaaaa
+XTerm.termName:    xterm-256color
+XTerm*ttyModes:    start ^- stop ^-
+XTerm*boldMode:    false
+XTerm*scrollBar:   false
 !XTerm*backarrowKey: false
 XTerm*colorBDMode: true
-XTerm*colorBD: #ffffff
-XTerm*cursorColor: #c0c040
-#if WIDTH > 1150
-XTerm.VT100.font:                FIXED-normal--14-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font:     FIXED-normal--14-*-*-*-c-*-UTFENC
-XTerm.VT100.boldFont:            FIXED-normal--14-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.boldFont: FIXED-normal--14-*-*-*-c-*-UTFENC
-XTerm.VT100.font3:               FIXED-semicondensed--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font3:    FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font3*Label:      Normal
-#elif WIDTH < 800
-XTerm.VT100.font:                FIXED-normal--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font:     FIXED-normal--13-*-*-*-c-*-UTFENC
-XTerm.VT100.boldFont:            FIXED-normal--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.boldFont: FIXED-normal--13-*-*-*-c-*-UTFENC
-XTerm.VT100.font3:               FIXED-semicondensed--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font3:    FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font3*Label:      Normal
-#elif WIDTH < 1000
-XTerm.VT100.font:                FIXED-normal--10-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font:     FIXED-normal--10-*-*-*-c-*-UTFENC
-XTerm.VT100.boldFont:            FIXED-normal--10-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.boldFont: FIXED-normal--10-*-*-*-c-*-UTFENC
-XTerm.VT100.font3:               FIXED-semicondensed--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font3:    FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font3*Label:      Normal
-#else
-XTerm.VT100.font:                FIXED-semicondensed--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font:     FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm.VT100.boldFont:            FIXED-semicondensed--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.boldFont: FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm.VT100.font3:               FIXED-normal--13-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font3:    FIXED-normal--13-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font3*Label:      Large
-#endif
-XTerm*fontMenu*fontdefault*Label: Default
-XTerm.VT100.font1:           -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
-XTerm.VT100.utf8Fonts.font1:   FIXED-normal--6-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font1*Label:   Tiny
-XTerm.VT100.font2:              FIXED-normal--7-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font2:   FIXED-normal--7-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font2*Label:   Small
-XTerm.VT100.font4:              FIXED-normal--20-*-*-*-c-*-ENC
-XTerm.VT100.utf8Fonts.font4:   FIXED-normal--18-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font4*Label: Huge
-XTerm.VT100.font5:              -sony-fixed-medium-r-normal--24-*-*-*-c-*-*-1
-XTerm*VT100.utf8Fonts.font5:   FIXED-normal--20-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font5*Label: Gigantic
-XTerm.VT100.font6:              -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
-XTerm.VT100.utf8Fonts.font6:   -*-clean-medium-r-normal--12-*-*-*-c-*-UTFENC
-XTerm*fontMenu*font6*Label: VGA
-XTerm*faceSize: 10
+XTerm*colorBD:     #ffffff
+XTerm*cursorColor: #c0c090
 XTerm*visualBell: true
 XTerm*eightBitInput: false
 XTerm*modifyCursorKeys: 1
 XTerm*trimSelection: true
 XTerm*CharClass: 33:48,37-38:48,45-47:48,58:48,61:48,63-64:48,126:48,161-255:48
-XTerm*VT100.activeIcon: true
-XTerm*VT100*translations: #override \
+XTerm*activeIcon: true
+XTerm.VT100.translations: #override \
 	Ctrl<Key>comma: smaller-vt-font() \n\
 	Ctrl<Key>period: larger-vt-font() \n\
+	Ctrl<Key>9: scroll-forw(1,page-1) \n\
+	Ctrl<Key>0: scroll-back(1,page-1) \n\
 	<Key>XF86Back: string(0x1b) string("[1;2D") \n\
 	<Key>XF86Forward: string(0x1b) string("[1;2C") \n\
 	<Key>leftanglebracket: string(0x1b) string("[1;2D") \n\
 	<Key>rightanglebracket: string(0x1b) string("[1;2C")
-XTerm*VT100*color0: #000000
-XTerm*VT100*color1: #aa0000
-XTerm*VT100*color2: #00aa00
-XTerm*VT100*color3: #aa5522
-XTerm*VT100*color4: #0000aa
-XTerm*VT100*color5: #aa00aa
-XTerm*VT100*color6: #00aaaa
-XTerm*VT100*color7: #aaaaaa
-XTerm*VT100*color8: #444444
-XTerm*VT100*color9: #ff4444
-XTerm*VT100*color10: #44ff44
-XTerm*VT100*color11: #ffff00
-XTerm*VT100*color12: #4444ff
-XTerm*VT100*color13: #ff00ff
-XTerm*VT100*color14: #00ffff
-XTerm*VT100*color15: #ffffff
+XTerm*color0:  #000000
+XTerm*color1:  #aa0000
+XTerm*color2:  #00aa00
+XTerm*color3:  #aa5522
+XTerm*color4:  #0000aa
+XTerm*color5:  #aa00aa
+XTerm*color6:  #00aaaa
+XTerm*color7:  #aaaaaa
+XTerm*color8:  #555555
+XTerm*color9:  #ff4444
+XTerm*color10: #44ff44
+XTerm*color11: #ffff00
+XTerm*color12: #4444ff
+XTerm*color13: #ff00ff
+XTerm*color14: #00ffff
+XTerm*color15: #ffffff
+
+#define FIXED -misc-fixed-medium-r
+#define ISOENC iso8859-1
+#define UTFENC iso10646-1
+#if WIDTH > 1450
+#define ISOFONT   FIXED-normal--18-*-*-*-c-*-ISOENC
+#define UTFFONT   FIXED-normal--18-*-*-*-c-*-UTFENC
+#define ISOFONT2  FIXED-normal--14-*-*-*-c-*-ISOENC
+#define UTFFONT2  FIXED-normal--14-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font3.Label:     Medium
+#else
+#if WIDTH > 1150
+#define ISOFONT   FIXED-normal--14-*-*-*-c-*-ISOENC
+#define UTFFONT   FIXED-normal--14-*-*-*-c-*-UTFENC
+#define ISOFONT2  FIXED-semicondensed--13-*-*-*-c-*-ISOENC
+#define UTFFONT2  FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font3.Label:     Normal
+#else
+#if WIDTH < 800
+#define ISOFONT   FIXED-normal--13-*-*-*-c-*-ISOENC
+#define UTFFONT   FIXED-normal--13-*-*-*-c-*-UTFENC
+#define ISOFONT2  FIXED-semicondensed--13-*-*-*-c-*-ISOENC
+#define UTFFONT2  FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font3.Label:     Normal
+#else
+#if WIDTH < 1000
+#define ISOFONT   FIXED-normal--10-*-*-*-c-*-ISOENC
+#define UTFFONT   FIXED-normal--10-*-*-*-c-*-UTFENC
+#define ISOFONT2  FIXED-semicondensed--13-*-*-*-c-*-ISOENC
+#define UTFFONT2  FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font3.Label:     Normal
+#else
+#define ISOFONT   FIXED-semicondensed--13-*-*-*-c-*-ISOENC
+#define UTFFONT   FIXED-semicondensed--13-*-*-*-c-*-UTFENC
+#define ISOFONT2  FIXED-normal--13-*-*-*-c-*-ISOENC
+#define UTFFONT2  FIXED-normal--13-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font3.Label:     Large
+#endif
+#endif
+#endif
+#endif
+XTerm.VT100.font:         ISOFONT
+XTerm.font:               ISOFONT
+XTerm*boldFont:           ISOFONT
+XTerm*font3:              ISOFONT2
+XTerm*utf8Fonts.font:     UTFFONT
+XTerm*utf8Fonts.boldFont: UTFFONT
+XTerm*utf8Fonts.font3:    UTFFONT2
+
+XTerm.fontMenu.fontdefault.Label: Default
+XTerm*font1:            -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
+XTerm*utf8Fonts.font1:  FIXED-normal--6-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font1.Label:   Tiny
+XTerm*font2:            FIXED-normal--7-*-*-*-c-*-ISOENC
+XTerm*utf8Fonts.font2:  FIXED-normal--7-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font2.Label:   Small
+XTerm*font4:            FIXED-normal--20-*-*-*-c-*-ISOENC
+XTerm*utf8Fonts.font4:  FIXED-normal--18-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font4.Label:   Huge
+XTerm*font5:            -sony-fixed-medium-r-normal--24-*-*-*-c-*-*-1
+XTerm*utf8Fonts.font5:  FIXED-normal--20-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font5.Label:   Gigantic
+XTerm*font6:            -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
+XTerm*utf8Fonts.font6:  -*-clean-medium-r-normal--12-*-*-*-c-*-UTFENC
+XTerm.fontMenu.font6.Label:   VGA
+XTerm*faceSize: 10
 
 !## XTERM-WHITE {{{1
 XTerm-white*VT100*color0: #ffffff
@@ -163,20 +185,76 @@ XTerm-white*VT100*color14: #00aaaa
 XTerm-white*VT100*color15: #000000
 
 !## RXVT {{{1
-Rxvt*background: #000000
-Rxvt*foreground: #aaaaaa
-Rxvt*colorBD: #ffffff
-Rxvt*boldFont: 
+Rxvt*scrollBar:    false
+Rxvt*background:   #000000
+Rxvt*foreground:   #aaaaaa
+!Rxvt*font:	   ISOFONT
+!Rxvt*boldFont:     ISOFONT
+Rxvt*visualBell:   true
+Rxvt*colorBD:      #ffffff
+Rxvt*color0:       #000000
+Rxvt*color1:       #aa0000
+Rxvt*color2:       #00aa00
+Rxvt*color3:       #aa5522
+Rxvt*color4:       #0000aa
+Rxvt*color5:       #aa00aa
+Rxvt*color6:       #00aaaa
+Rxvt*color7:       #aaaaaa
+Rxvt*color8:       #444444
+Rxvt*color9:       #ff4444
+Rxvt*color10:      #44ff44
+Rxvt*color11:      #ffff00
+Rxvt*color12:      #4444ff
+Rxvt*color13:      #ff00ff
+Rxvt*color14:      #00ffff
+Rxvt*color15:      #ffffff
+Rxvt*cursorColor:  #90c090
+URxvt.cursorColor: #90c0c0
+URxvt.underlineColor: #777777
+!URxvt.termName:    rxvt
+URxvt*keysym.C-F1: command:\033]710;UTFFONT\007
+URxvt*keysym.C-F2: command:\033]710;FIXED-normal--6-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F3: command:\033]710;FIXED-normal--7-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F4: command:\033]710;FIXED-normal--8-*-*-*-c-*-UTFENC\007
+!URxvt*keysym.C-F5: command:\033]710;FIXED-normal--9-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F5: command:\033]710;FIXED-normal--10-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F6: command:\033]710;FIXED-semicondensed--13-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F7: command:\033]710;FIXED-normal--13-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F8: command:\033]710;FIXED-normal--14-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F9: command:\033]710;FIXED-normal--15-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F10:command:\033]710;FIXED-normal--18-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
+URxvt*keysym.C-9:  command:\033]720;12\007
+URxvt*keysym.C-0:  command:\033]721;12\007
+URxvt.keysym.C-comma:  perl:dabbrev-expand:\\\\w
+URxvt.keysym.C-period: perl:dabbrev-expand:\\\\w./-
+URxvt.font:        UTFFONT
+URxvt.boldFont:
+URxvt.perl-lib:    HOME/perl/urxvt:HOME/.perl/urxvt
+URxvt.perl-ext:    default,searchable-scrollback<C-equal>,mark-urls,matcher<1>,dabbrev-expand,selection-pastebin,remote-clipboard,selection-autotransform
+URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
+	sub { /\\n/ ? ("join lines with spaces" => sub {  s{^\\s+}{}mg; s/ \*\\n/ /g; s{ $}{}; }) : () }, \n\
+	sub { /\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/ ? ("quote for irc" => sub { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; }) : () };
+URxvt.urlLauncher: sensible-browser
+URxvt.matcher.pattern.1:  \\B(/\\S+?):(\\d+)(?=:|$)
+URxvt.matcher.launcher.1: gvim +$2 $1
+URxvt.matcher.button: 1
+URxvt.selection-pastebin.cmd: scp -p % tpope.us:/var/www/pastebin/
+URxvt.selection-pastebin.url: http:\/\/tpope.us/pastebin/%
+URxvt.remote-selection.store: ssh tpope.us 'cat >/tmp/distributed-selection'
+URxvt.remote-selection.fetch: ssh tpope.us 'cat /tmp/distributed-selection'
+URxvt.selection-autotransform.0: if(/\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/) { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; };
+URxvt.selection-autotransform.1: if(/^irb.*?> /) { s{^irb.*?[>*]\\s*}{}g; s/^=>/#=>/mg;}
 
-!## ATERM {{{1
-Aterm*background: #000000
-Aterm*foreground: #aaaaaa
+!## OTHER TERMINALS {{{1
+Aterm*cursorColor:#c09090
+Aterm.termName:    rxvt
 
-!## KTERM {{{1
-Kterm*background: #000000
-Kterm*foreground: #aaaaaa
+kterm*background: #000000
+kterm*foreground: #aaaaaa
+kterm*cursorColor:#9090c0
 
-!## DTTERM {{{1
 Dtterm*background: #000000
 Dtterm*foreground: #aaaaaa
 
@@ -193,6 +271,9 @@ XConsole*font: 5x7
 !## XFM {{{1
 Xfm*defaultEditor: sensible-editor
 Xfm*defaultViewer: sensible-pager
+!## XOSVIEW {{{1
+xosview*background: #666
+xosview*interrupts: false
 !## CLOCK {{{1
 Clock*hour: red
 Clock*minute: blue
@@ -200,7 +281,7 @@ Clock*jewel: black
 Clock*BorderColor: darkgreen
 Clock*Background: white
 
-XClock*font: FIXED-normal--8-80-75-75-c-50-ENC
+XClock*font: FIXED-normal--8-80-75-75-c-50-ISOENC
 ! }}}1
 !## XBIFF {{{1
 XBiff*volume: 80
