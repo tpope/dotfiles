@@ -25,12 +25,26 @@ if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
     shift
 fi
 
+if [ aliases = "$basename" ]; then
+    # Optimization: put this early since it is called for every shell
+    aliases="launch lt lv dm pg sb b e p sursync ruptime rwho status \
+    rclink rc start stop restart reload force-reload mount shutdown tomorrow \
+    vnc xssc mpl mpa ri whois char rds feh rsync aumix \
+    word ord wor or Word Ord Wor Or"
+    PATH=/usr/bin:/usr/sbin:/usr/local/bin
+    for app in apt-get aptitude emerge port cardctl rubber xdvi xpdf gv; do
+        [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
+    done
+    echo $aliases
+    exit 0
+fi
+
 rcd=/etc/init.d
 [ -d "$rcd" ] || rcd=/etc/rc.d
 
 words="cat /usr/share/dict/words"
 Words="cat /usr/share/dict/words"
-[ -f "$HOME/text/scrabble" ] && words="cat $HOME/text/scrabble"
+[ -f "$HOME/misc/scrabble" ] && words="cat $HOME/misc/scrabble"
 
 hostname="`hostname|sed -e 's/[.].*//'`"
 [ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
@@ -93,46 +107,47 @@ try_libtrash() {
 }
 
 do_clean() {
-	if [ "$1" = -v ]; then
-	    FIND()    { find "$@" ! -type d -print 2>/dev/null; }
-	    FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
-	    shift
-	else
-	    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
-		    xargs -0 rmdir >/dev/null 2>&1; }
-	    if inpath wipe; then
-		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-			xargs -0 wipe -fcsq >/dev/null 2>&1; }
-            elif inpath shred; then
-		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-			xargs -0 shred -fun 4 >/dev/null 2>&1; }
-	    else
-		FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-			xargs -0 rm >/dev/null 2>&1; }
-	    fi
-	fi
-	case "$1" in
-	    1|2|3|4) unit=$1 ;;
-	    5) unit=4 ;;
-	    '') unit=2 ;;
-	    *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
-	esac
-	unset LD_PRELOAD
-	PROTECT_TRASH=NO
-	export PROTECT_TRASH
-	FIND "$HOME" \( -path /media -o -path /priv \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" -o -name screen-exchange -o -name "*.stackdump" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
-	FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
-	FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30`
-	[ $unit = 4 ] && unit=6
-	FIND "$HOME/.trash" -atime +`expr $unit \* 15`
-	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
-	FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
-	FINDDIR "$HOME/.trash" -atime +`expr $unit \* 1` -empty
-	if [ ! -d "$HOME/.trash" ]; then
-	    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
-	fi
-	rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/.zsh/functions/_bibtex"
-	return 0
+    if [ "$1" = -v ]; then
+        FIND()    { find "$@" ! -type d -print 2>/dev/null; }
+        FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
+        shift
+    else
+        FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
+                xargs -0 rmdir >/dev/null 2>&1; }
+        if inpath wipe; then
+            FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+                    xargs -0 wipe -fcsq >/dev/null 2>&1; }
+        elif inpath shred; then
+            FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+                    xargs -0 shred -fun 4 >/dev/null 2>&1; }
+        else
+            FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+                    xargs -0 rm >/dev/null 2>&1; }
+        fi
+    fi
+    case "$1" in
+        1|2|3|4) unit=$1 ;;
+        5) unit=4 ;;
+        '') unit=2 ;;
+        *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
+    esac
+    unset LD_PRELOAD
+    PROTECT_TRASH=NO
+    export PROTECT_TRASH
+    FIND "$HOME" \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" -o -name screen-exchange -o -name "*.stackdump" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
+    FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
+    FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30`
+    [ $unit = 4 ] && unit=6
+    FIND "$HOME/.trash" "$HOME/.mutt_cache" -atime +`expr $unit \* 15`
+    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
+    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
+    FINDDIR "$HOME/.trash" -atime +`expr $unit \* 1` -empty
+    if [ ! -d "$HOME/.trash" ]; then
+        mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
+    fi
+    rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/.zsh/functions/_bibtex" "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/justify.vim" "$HOME/.vim/plugin/matrix.vim" "$HOME/.vim/templates/.skel.cbl.JGZaB2" "$HOME/.vim/templates/skel.rb" "$HOME/.vim/plugin/templatefile.vim" "$HOME/.terminfo/E/Eterm" "$HOME/.terminfo/E/Eterm-xterm"
+    rmdir "$HOME/.terminfo/E" 2>/dev/null
+    return 0
 }
 
 display_manage() {
@@ -160,7 +175,7 @@ status() {
     if [ "$#" = 0 -a -f "$HOME/.status" ]; then
 	exec cat "$HOME/.status"
     fi
-    if [ "$hostname" = michael -o "$hostname" = marge ]; then
+    if [ "$hostname" = michael -o "$hostname" = gob ]; then
 	if [ "$1" = away -o "$1" = activity ] && [ "$#" = 1 ]; then
 	    exec cat "$HOME/.$1" 2>/dev/null
 	fi
@@ -170,11 +185,11 @@ status() {
 	    rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
 	    *) echo "Unknown status command $1" >&2 ;;
 	esac
-    elif ping -c 1 michael >/dev/null 2>&1; then
+    elif ping -c 1 gob >/dev/null 2>&1; then
 	if [ "$#" = 2 -a -z "$2" ]; then
-	    exec hostinfo -b michael tpope status "$1" -c
+	    exec hostinfo -b gob tpope status "$1" -c
 	else
-	    exec hostinfo -b michael tpope status "$@"
+	    exec hostinfo -b gob tpope status "$@"
 	fi
     else
 	exit 2
@@ -183,19 +198,16 @@ status() {
 
 case "$basename" in
 
-    aliases)
-	aliases="launch lt lv dm pg sb sursync ruptime rwho status \
-	rclink rc start stop restart reload force-reload \
-	tomorrow vnc xssc mpl mpa mount shutdown whois char \
-	word ord wor or Word Ord Wor Or"
-	for app in apt-get aptitude emerge port cardctl aumix feh rsync rubber xdvi xpdf gv; do
-	    inpath $app && [ ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
-	done
-	echo $aliases
-	exit 0 ;;
-    
     status) status "$@" ;;
     rehash|activity|away|out|check) status $basename "$@" ;;
+
+    br)
+        if [ "`hostname`" = tobias ]; then
+            no_links
+            exec br "$@"
+        else
+            hostinfo --batch-ssh tobias br "$@"
+        fi ;;
 
     char) case "$1" in
 	\') echo 39 ;;
@@ -206,9 +218,9 @@ case "$basename" in
     esac ;;
 
     chat) if [ -z "$*" ]; then
-	    exec hostinfo -S michael -t '$HOME/.irssi/Chat-script' $hostname
+	    exec hostinfo -S gob -t '$HOME/.irssi/Chat-script' $hostname
 	else
-	    exec hostinfo -S michael -t '$HOME/.irssi/Chat-script' "$@"
+	    exec hostinfo -S gob -t '$HOME/.irssi/Chat-script' "$@"
 	fi ;;
 
     clean) do_clean "$@" ;;
@@ -225,12 +237,12 @@ case "$basename" in
 	installer --cron
 	find "$HOME" -maxdepth 1 -name .install-root -mtime +15 -exec installer --cron --root-only \;
 	cl=4
-	for i in `df|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
+	for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
 	    [ "$i" -gt 90 ] && cl=3
 	done
 	do_clean $cl
-	find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'sync-tpope -W && touch "$HOME/.autodl"' \; 2>/dev/null
 	touch "$HOME/. tpope"
+	exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'sync-tpope -W && touch "$HOME/.autodl"' \; 2>/dev/null
     ;;
 
     display-manage|dm) display_manage "$@" ;;
@@ -324,8 +336,8 @@ case "$basename" in
 	exit 0
     ;;
 
-    sensible-browser|sb) exec "$HOME/bin/sensible-browser" "$@" ;;
-    sensible-pager|sp)
+    sensible-browser|sb|b) exec "$HOME/bin/sensible-browser" "$@" ;;
+    sensible-pager|sp|p)
 	term=exec
 	if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" ]; then
 	    term="x-terminal-emulator -title Pager -e"
@@ -373,6 +385,40 @@ case "$basename" in
 	    exit 1
 	fi ;;
 
+    e)
+        gvime_ok() { inpath gvim &&
+            gvim --serverlist 2>/dev/null | grep '^E$' >/dev/null; }
+        gvim_ok() { inpath gvim &&
+            gvim --serverlist 2>/dev/null | grep '.' >/dev/null; }
+        case "$DISPLAY" in
+            :*)
+            if gvime_ok; then
+                [ -n "$*" ] || exit 0
+                case "`vim --version 2>/dev/null|head -1`" in
+                    "VIM - Vi IMproved "[7891]*)
+                    exec gvim --servername E --remote-tab "$@" ;;
+                    *)
+                    exec gvim --servername E --remote "$@" ;;
+                esac
+            elif gvim_ok; then
+                [ -n "$*" ] || exit 0
+                case "`vim --version 2>/dev/null|head -1`" in
+                    "VIM - Vi IMproved "[7891]*)
+                    exec gvim --remote-tab "$@" ;;
+                    *)
+                    exec gvim --remote "$@" ;;
+                esac
+            elif inpath gvim && [ -z "$*" ]; then
+                exec gvim --servername e
+            fi ;;
+        esac
+        if [ -n "$STY" ]; then
+            exec tpope screen -ln -fn -t Editor sensible-editor "$@"
+        else
+            exec sensible-editor "$@"
+        fi
+    ;;
+
     x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
     start|stop|restart|reload|force-reload) root_init
@@ -406,13 +452,22 @@ case "$basename" in
     
     [Qq]uit|Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Tt]oggle|[Nn]ext|[Pp]rev|[Ff]fwd|[Rr]ew) do_media "$basename" "$@"; exit ;;
 
+    screen|s)
+    if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
+        TERM=rxvt-unicode
+    elif [ "$TERM" = "rxvt-unicode" -a ! -f /usr/share/terminfo/r/rxvt-unicode ]; then
+        TERM=rxvt
+    fi
+    exec screen "$@"
+    ;;
+
     sursync|suscp)
     for arg in "$@"; do
 	case "$arg" in
 	    [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
 	esac
     done
-    args=-CP
+    args=-P
     [ "$basename" = suscp ] && args=-P
     sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
     ret="$?"
@@ -543,6 +598,11 @@ case "$basename" in
 	if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
     feh) no_links
 	try_libtrash feh -Z "$@" ;;
+    rds)
+        width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
+        height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
+        exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
+        ;;
     rsync) no_links
 	exec rsync -CP "$@" ;;
     rubber) no_links
@@ -554,10 +614,19 @@ case "$basename" in
 	    exec rubber
 	fi ;;
     see) no_links;
+        if inpath see; then
+            see=see
+        elif inpath cygstart; then
+            see=cygstart
+        elif [ "`uname`" = Darwin ] && inpath open; then
+            see=open
+        else
+            see=less
+        fi
 	if [ -f "$*" ]; then
-	    exec see "$*"
+	    exec $see "$*"
 	else
-	    exec see "$@"
+	    exec $see "$@"
 	fi ;;
     xdvi) no_links
 	[ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
@@ -568,9 +637,13 @@ case "$basename" in
     rm) no_links
 	if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
 	    try_libtrash rm "$@"
+        elif [ "`uname`" = Darwin ] && inpath rmm; then
+            exec rmm "$@"
 	else
 	    exec rm -i "$@"
 	fi ;;
+
+    ri) no_links; exec ri -f bs "$@" ;;
 
     whois)
 	#no_links
