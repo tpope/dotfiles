@@ -221,7 +221,7 @@ endfunction
 function! s:Tab()
     if (strpart(getline('.'),0,col('.')-1) =~ '^\s*$' && &sta)
         return s:IncreaseIndent()
-    elseif &sts == &sw && &sts != 8 && !et
+    elseif &sts == &sw && &sts != 8 && !&et
         return s:repeat(" ",s:increase(col('.')-1))
     else
         return "\<Tab>"
