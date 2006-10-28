@@ -1,5 +1,5 @@
 " allml.vim - useful XML/HTML mappings
-" Author:       Tim Pope <vim@rebelongto.us>
+" Author:       Tim Pope <vimNOSPAM@tpope.info>
 " $Id$
 
 " These are my personal mappings for XML/XHTML editing, particularly with
@@ -22,7 +22,7 @@ if has("autocmd")
     augroup <SID>allml
         autocmd!
         autocmd FileType html,xhtml,xml,wml,cf          call s:Init()
-        autocmd FileType php,aspvbs,aspperl,mason,eruby call s:Init()
+        autocmd FileType php,asp*,mason,eruby           call s:Init()
         autocmd FileType htmltt,tt2html,htmldjango,jsp  call s:Init()
     augroup END
 endif
@@ -87,28 +87,37 @@ function! s:Init()
     if &ft == "php"
         inoremap <buffer> <C-X><Lt> <?php
         inoremap <buffer> <C-X>>    ?>
+        let b:surround_45 = "<?php \n ?>"
     elseif &ft == "htmltt" || &ft == "tt2html"
         inoremap <buffer> <C-X><Lt> [%
         inoremap <buffer> <C-X>>    %]
+        let b:surround_45 = "[% \n %]"
     elseif &ft == "htmldjango"
         "inoremap <buffer> <SID>allmlOopen    {{
         "inoremap <buffer> <SID>allmlOclose   }}<Left>
         inoremap <buffer> <C-X><Lt> {{
         inoremap <buffer> <C-X>>    }}
+        let b:surround_45 = "{{ \n }}"
     elseif &ft == "mason"
         inoremap <buffer> <SID>allmlOopen    <&<Space>
         inoremap <buffer> <SID>allmlOclose   <Space>&><Left><Left>
         inoremap <buffer> <C-X><Lt> <%
         inoremap <buffer> <C-X>>    %>
+        let b:surround_45 = "<% \n %>"
+        let b:surround_61 = "<& \n &>"
     elseif &ft == "cf"
         inoremap <buffer> <SID>allmlOopen    <cfoutput>
         inoremap <buffer> <SID>allmlOclose   </cfoutput><Left><C-Left><Left>
         inoremap <buffer> <C-X><Lt> <cf
         inoremap <buffer> <C-X>>    >
+        let b:surround_45 = "<cf \n>"
+        let b:surround_61 = "<cfoutput>\n</cfoutput>"
     else
         inoremap <buffer> <SID>allmlOopen    <%=<Space>
         inoremap <buffer> <C-X><Lt> <%
         inoremap <buffer> <C-X>>    %>
+        let b:surround_45 = "<% \n %>"
+        let b:surround_61 = "<%= \n %>"
     endif
     " <%= %>
     "if &ft == "cf"
@@ -132,6 +141,7 @@ function! s:Init()
     if &ft == "eruby"
         inoremap  <buffer> <C-X>- <%<Space><Space>-%><Esc>3hi
         inoremap  <buffer> <C-X>_ <C-V><NL><Esc>I<%<Space><Esc>A<Space>-%><Esc>F<NL>s
+        let b:surround_61 = "<% \n -%>"
     elseif &ft == "cf"
         inoremap  <buffer> <C-X>- <cf><Left>
         inoremap  <buffer> <C-X>_ <cfset ><Left>
