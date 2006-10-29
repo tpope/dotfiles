@@ -30,6 +30,9 @@ function! s:LoadFilename(filename)
   if ext == ''
     let ext = (fnamemodify(a:filename,':t'))
   endif
+  if ext =~ '['
+    return
+  endif
   call s:ReadTemplate(ext,a:filename)
 endfunction
 
