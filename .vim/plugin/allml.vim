@@ -3,7 +3,10 @@
 " $Id$
 
 " These are my personal mappings for XML/XHTML editing, particularly with
-" dynamic content like PHP/ASP/ERb.  Examples shown are for ERb.
+" dynamic content like PHP/ASP/ERb.  Because they are personal, less effort
+" has been put into customizability (if you like these mappings but the lack
+" of customizability poses an issue for you, let me know).  Examples shown are
+" for ERb.
 "
 " If the binding is pressed on the end of a line consisting of "foo"
 "
@@ -45,12 +48,23 @@ if has("autocmd")
     augroup END
 endif
 
+inoremap <silent> <Plug>allmlHtmlComplete <C-R>=<SID>htmlEn()<CR><C-X><C-O><C-P><C-R>=<SID>htmlDis()<CR><C-N>
+"imap <C-X>H <Plug>allmlHtmlComplete
+
 "if maparg('<M-o>','i') == ''
     "inoremap <M-o> <Esc>o
 "endif
+"if maparg('<C-j>','i') == ''
+    "inoremap <C-j> <Down>
+"endif
+
+function! AllmlInit()
+    " Public interface, for if you have your own filetypes to activate on
+    call s:Init()
+endfunction
 
 function! s:Init()
-    let b:surround_indent = 1
+    let b:loaded_allml = 1
     "inoremap <silent> <buffer> <SID>dtmenu  <C-R>=<SID>htmlEn()<CR><Lt>!DOCTYPE<C-X><C-O><C-R>=<SID>htmlDis()<CR><C-P>
     imap <silent> <buffer> <SID>xmlversion  <?xml version="1.0" encoding="<C-R>=toupper(<SID>charset())<CR>"?>
     inoremap      <buffer> <SID>htmltrans   <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -101,14 +115,17 @@ function! s:Init()
     elseif &ft == "htmltt" || &ft == "tt2html"
         inoremap <buffer> <C-X><Lt> [%
         inoremap <buffer> <C-X>>    %]
-        let b:surround_45 = "[% \r %]"
-        let b:surround_61 = "[% \r %]"
+        let b:surround_45  = "[% \r %]"
+        let b:surround_61  = "[% \r %]"
+        if !exists("b:surround_101")
+            let b:surround_101 = "[% \r %]\n[% END %]"
+        endif
     elseif &ft == "htmldjango"
         "inoremap <buffer> <SID>allmlOopen    {{
         "inoremap <buffer> <SID>allmlOclose   }}<Left>
         inoremap <buffer> <C-X><Lt> {{
         inoremap <buffer> <C-X>>    }}
-        let b:surround_45 = "{{ \r }}"
+        let b:surround_45 = "{% \r %}"
         let b:surround_61 = "{{ \r }}"
     elseif &ft == "mason"
         inoremap <buffer> <SID>allmlOopen    <&<Space>
@@ -147,7 +164,7 @@ function! s:Init()
     if &ft == "eruby"
         inoremap  <buffer> <C-X>- <%<Space><Space>-%><Esc>3hi
         inoremap  <buffer> <C-X>_ <C-V><NL><Esc>I<%<Space><Esc>A<Space>-%><Esc>F<NL>s
-        let b:surround_45 = "<% \r -%>"
+        "let b:surround_45 = "<% \r -%>"
     elseif &ft == "cf"
         inoremap  <buffer> <C-X>- <cf><Left>
         inoremap  <buffer> <C-X>_ <cfset ><Left>
@@ -173,11 +190,19 @@ function! s:Init()
         inoremap <buffer> <C-X>'     <Lt>!--<Space><Space>--><Esc>3hi
         inoremap <buffer> <C-X>"     <C-V><NL><Esc>I<!--<Space><Esc>A<Space>--><Esc>F<NL>s
         let b:surround_35 = "<!-- \r -->"
+    elseif &ft == "django"
+        inoremap <buffer> <C-X>'     {#<Space><Space>#}<Esc>2hi
+        inoremap <buffer> <C-X>"     <C-V><NL><Esc>I<C-X>{#<Space><Esc>A<Space>#}<Esc>F<NL>s
+        let b:surround_35 = "{# \r #}"
     else
         imap     <buffer> <C-X>'     <C-X><Lt>#<Space><Space><C-X>><Esc>2hi
         imap     <buffer> <C-X>"     <C-V><NL><Esc>I<C-X><Lt>#<Space><Esc>A<Space><C-X>><Esc>F<NL>s
         let b:surround_35 = maparg("<C-X><Lt>","i")."# \r ".maparg("<C-X>>","i")
     endif
+    map <buffer> <LocalLeader>ue <Plug>allmlUrlEncode
+    map <buffer> <LocalLeader>ud <Plug>allmlUrlDecode
+    map <buffer> <LocalLeader>he <Plug>allmlHtmlEncode
+    map <buffer> <LocalLeader>hd <Plug>allmlHtmlDecode
     "if has("spell")
         "setlocal spell
     "endif
@@ -188,10 +213,12 @@ function! s:Init()
             runtime! indent/html.vim
         endif
     endif
-    if exists("g:html_indent_tags")
+    " Pet peeve
+    if exists("g:html_indent_tags") && g:html_indent_tags !~ '\\|p\>'
         let g:html_indent_tags = g:html_indent_tags.'\|p'
     endif
     set indentkeys+=!^F
+    let b:surround_indent = 1
     silent doautocmd User allml
 endfunction
 
@@ -237,7 +264,7 @@ function! s:javascriptIncludeTag()
     if !exists("b:allml_javascript_include_tag")
         if &ft == "eruby" && expand('%:p') =~ '\<app[\\/]views\>'
             " This will ultimately be factored into rails.vim
-             let b:allml_javascript_include_tag = "<%= javascript_include_tag :\rdefaults\r %>"
+             let b:allml_javascript_include_tag = "<%= jaaaavascript_include_tag :\rdefaults\r %>"
          else
              let b:allml_javascript_include_tag = "<script type=\"text/javascript\" src=\"/javascripts/\r.js\"></script>"
         endif
@@ -328,3 +355,87 @@ function! s:tagextras()
         return ""
     endif
 endfunction
+
+
+function! s:UrlEncode(str)
+    return substitute(a:str,'[^A-Za-z0-9_.-]','\="%".printf("%02X",char2nr(submatch(0)))','g')
+endfunction
+
+function! s:UrlDecode(str)
+    let str = substitute(substitute(a:str,'%0[Aa]\n$','%0A',''),'%0[Aa]','\n','g')
+    return substitute(str,'%\(\x\x\)','\=nr2char("0x".submatch(1))','g')
+endfunction
+
+let s:entities = "\"quot\n<lt\n>gt\n\u00a0nbsp\n\u00a9copy\n\u00ablaquo\n\u00aereg\n\u00b5micro\n\u00b6para\n\u00bbraquo\n\u00dfszlig\n"
+
+function! s:HtmlEncode(str)
+    let str = substitute(a:str,'&','\&amp;','g')
+    let changes = s:entities
+    while changes != ""
+        let orig = matchstr(changes,'.')
+        let repl = matchstr(changes,'^.\zs.\{-\}\ze\%(\n\|$\)')
+        let changes = substitute(changes,'^.\{-\}\%(\n\|$\)','','')
+        let str = substitute(str,'\M'.orig,'\&'.repl.';','g')
+    endwhile
+    return str
+endfunction
+
+function! s:HtmlDecode(str)
+    let str = a:str
+    let changes = s:entities
+    while changes != ""
+        let orig = matchstr(changes,'.')
+        let repl = matchstr(changes,'^.\zs.\{-\}\ze\%(\n\|$\)')
+        let changes = substitute(changes,'^.\{-\}\%(\n\|$\)','','')
+        let str = substitute(str,'&'.repl.';',orig == '&' ? '\&' : orig,'g')
+    endwhile
+    let str = substitute(str,'&#\(\d\+\);','\=nr2char(submatch(1))','g')
+    let str = substitute(str,'&#\(x\x\+\);','\=nr2char("0".submatch(1))','g')
+    return substitute(str,'&amp;','\&','g')
+endfunction
+
+function! s:opfuncUrlEncode(type)
+    return s:opfunc("UrlEncode",a:type)
+endfunction
+
+function! s:opfuncUrlDecode(type)
+    return s:opfunc("UrlDecode",a:type)
+endfunction
+
+function! s:opfuncHtmlEncode(type)
+    return s:opfunc("HtmlEncode",a:type)
+endfunction
+
+function! s:opfuncHtmlDecode(type)
+    return s:opfunc("HtmlDecode",a:type)
+endfunction
+
+function! s:opfunc(algorithm,type)
+    let sel_save = &selection
+    let &selection = "inclusive"
+    let reg_save = @@
+    if a:type =~ '^.$'
+        silent exe "normal! `<" . a:type . "`>y"
+    elseif a:type == 'line'
+        silent exe "normal! '[V']y"
+    elseif a:type == 'block'
+        silent exe "normal! `[\<C-V>`]y"
+    else
+        silent exe "normal! `[v`]y"
+    endif
+    let @@ = s:{a:algorithm}(@@)
+    norm! gvp
+    let &selection = sel_save
+    let @@ = reg_save
+endfunction
+
+nmap <silent> <Plug>allmlUrlEncode :set opfunc=<SID>opfuncUrlEncode<CR>g@
+vmap <silent> <Plug>allmlUrlEncode :<C-U>call <SID>opfuncUrlEncode(visualmode())<CR>
+nmap <silent> <Plug>allmlUrlDecode :set opfunc=<SID>opfuncUrlDecode<CR>g@
+vmap <silent> <Plug>allmlUrlDecode :<C-U>call <SID>opfuncUrlDecode(visualmode())<CR>
+nmap <silent> <Plug>allmlHtmlEncode :set opfunc=<SID>opfuncHtmlEncode<CR>g@
+vmap <silent> <Plug>allmlHtmlEncode :<C-U>call <SID>opfuncHtmlEncode(visualmode())<CR>
+nmap <silent> <Plug>allmlHtmlDecode :set opfunc=<SID>opfuncHtmlDecode<CR>g@
+vmap <silent> <Plug>allmlHtmlDecode :<C-U>call <SID>opfuncHtmlDecode(visualmode())<CR>
+"nmap <silent> <Plug>allmlUrlEncode :call setreg('"',(substitute(@@,'\n$','','') =~ '[^A-Za-z0-9_.%-]' ? UrlEncode(@@) : UrlDecode(substitute(@@,'\n$','','')))<CR>
+"vmap <silent> <Plug>allmlUrlEncode y:call setreg(v:register,UrlEncode(getreg(v:register)))<CR>gvp
