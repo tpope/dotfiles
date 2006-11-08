@@ -1,7 +1,10 @@
 " Vim indent file
-" Language:	ERuby
-" Author:	Tim Pope <vimNOSPAM@tpope.info>
-" $Id$
+" Language:		eRuby
+" Maintainer:		Tim Pope <vimNOSPAM@tpope.info>
+" Info:			$Id$
+" URL:			http://vim-ruby.rubyforge.org
+" Anon CVS:		See above site
+" Release Coordinator:	Doug Kearns <dougkearns@gmail.com>
 
 if exists("b:did_indent")
   finish
@@ -53,4 +56,4 @@ function! GetErubyIndent(lnum)
   return ind
 endfunction
 
-" vim:set sw=2 sts=2 et:
+" vim:set sw=2 sts=2 ts=8 noet ff=unix:
