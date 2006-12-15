@@ -344,7 +344,7 @@ function! s:PastieWrite(file)
     endif
     silent exe "write ".tmp
     let result = ""
-    let rubycmd = 'print Net::HTTP.start(%{'.s:domain.'}){|h|h.post(%{'.url.'}, %q{paste[parser]='.parser.'&paste[authorization]=burger&paste[key]=&paste[body]=} + File.read(%q{'.tmp.'}).gsub(/^(.*?) *#!! *$/,%{!!}+92.chr+%{1}).gsub(/[^a-zA-Z0-9_.-]/n) {|s| %{%%%02x} % s[0]},{%{Cookie} => %{'.s:cookies().'}})}[%{Location}]'
+    let rubycmd = 'print Net::HTTP.start(%{'.s:domain.'}){|h|h.post(%{'.url.'}, %q{paste[parser]='.parser.'&paste[authorization]=burger&paste[key]=&paste[body]=} + File.read(%q{'.tmp.'}).gsub(/^(.*?) *#\!\! *#{36.chr}/,%{!\!}+92.chr+%{1}).gsub(/[^a-zA-Z0-9_.-]/n) {|s| %{%%%02x} % s[0]},{%{Cookie} => %{'.s:cookies().'}})}[%{Location}]'
     let result = system('ruby -rnet/http -e "'.rubycmd.'"')
     call delete(tmp)
     if result =~ '^\w\+://'
@@ -423,7 +423,8 @@ function! s:cookies()
     endif
     if !exists("g:pastie_account")
         let rubycmd = '%w(~/.mozilla/firefox ~/.firefox/default ~/.phoenix/default ~/Application\ Data/Mozilla/Firefox/Profiles ~/Library/Application\ Support/Firefox/Profiles)'
-        let rubycmd = rubycmd . '.each {|dir| Dir[File.join(File.expand_path(dir),%{*})].select {|p| File.exists?(File.join(p,%{cookies.txt}))}.each {|p| File.open(File.join(p,%{cookies.txt})).each_line { |l| a=l.split(9.chr); puts a[6] if a[0] =~ /pastie\.caboo\.se$/ && Time.now.to_i < a[4].to_i && a[5] == %{account} }}}'
+        let rubycmd = rubycmd . '.each {|dir| Dir[File.join(File.expand_path(dir),%{*})].select {|p| File.exists?(File.join(p,%{cookies.txt}))}.each {|p| File.open(File.join(p,%{cookies.txt})).each_line { |l| a=l.split(9.chr); puts a[6] if a[0] =~ /pastie\.caboo\.se#{37.chr}/ && Time.now.to_i < a[4].to_i && a[5] == %{account} }}}'
+        let output = ''
         let output = system('ruby -e "'.rubycmd.'"')
         if output =~ '\n' && output !~ '-e:'
             let g:pastie_account = substitute(output,'\n.*','','')
