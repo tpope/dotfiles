@@ -96,10 +96,10 @@ endif
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-if exists("b:did_cobol_ftplugin_functions")
+if exists("g:did_cobol_ftplugin_functions")
     finish
 endif
-let b:did_cobol_ftplugin_functions = 1
+let g:did_cobol_ftplugin_functions = 1
 
 function! s:repeat(str,count)
     let i = 0
