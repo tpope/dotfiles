@@ -58,6 +58,10 @@
 " execution.  In Vim 7 highlighting is done with :2match (use ":2match none"
 " to disable it) and in previous versions, :match (use ":match none" to
 " disable).
+"
+" Known Issues:
+" URL sometimes disappears with the bang (:Pastie!) variant.  You can still
+" retrieve it from the clipboard.
 
 if exists("g:loaded_pastie") || &cp
     finish
@@ -92,6 +96,9 @@ endif
 command! -bar -bang -nargs=* -range=0 -complete=file Pastie :call s:Pastie(<bang>0,<line1>,<line2>,<count>,<f-args>)
 
 function! s:Pastie(bang,line1,line2,count,...)
+    if exists(":tab")
+        let tabnr = tabpagenr()
+    endif
     let newfile = "http://".s:domain."/paste/"
     let loggedin = 0
     let ft = &ft
@@ -269,7 +276,12 @@ function! s:Pastie(bang,line1,line2,count,...)
     call s:afterload()
     if a:bang
         write
+        let name = bufname('%')
+        " TODO: re-echo the URL in a way that doesn't disappear. Stupid Vim.
         silent! bdel
+        if exists("tabnr")
+            silent exe "norm! ".tabnr."gt"
+        endif
     endif
 endfunction
 
@@ -468,7 +480,7 @@ function! s:latestid()
 endfunction
 
 function! s:newwindow()
-    if !(&modified) && (expand("%") == '' || (version >= 700 && winnr("$") == 1))
+    if !(&modified) && (expand("%") == '' || (version >= 700 && winnr("$") == 1 && tabpagenr("$") == 1))
         enew
     else
         if g:pastie_destination == 'tab'
