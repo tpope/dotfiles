@@ -66,7 +66,7 @@ endfunction
 function! s:Init()
     let b:loaded_allml = 1
     "inoremap <silent> <buffer> <SID>dtmenu  <C-R>=<SID>htmlEn()<CR><Lt>!DOCTYPE<C-X><C-O><C-R>=<SID>htmlDis()<CR><C-P>
-    imap <silent> <buffer> <SID>xmlversion  <?xml version="1.0" encoding="<C-R>=toupper(<SID>charset())<CR>"?>
+    inoremap <silent> <buffer> <SID>xmlversion  <?xml version="1.0" encoding="<C-R>=toupper(<SID>charset())<CR>"?>
     inoremap      <buffer> <SID>htmltrans   <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
     "inoremap      <buffer> <SID>htmlstrict  <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
     inoremap      <buffer> <SID>xhtmltrans  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -103,6 +103,8 @@ function! s:Init()
     else
         inoremap <silent> <buffer> <C-X>/ <Lt>/><Left>
     endif
+    let g:surround_{char2nr("p")} = "<p>\n\t\r\n</p>"
+    let g:surround_{char2nr("d")} = "<div\1div: \r^[^ ]\r &\1>\n\t\r\n</div>"
     imap <buffer> <C-X><C-_> <C-X>/
     imap <buffer> <SID>allmlOopen    <C-X><Lt><Space>
     imap <buffer> <SID>allmlOclose   <Space><C-X>><Left><Left>
@@ -215,7 +217,7 @@ function! s:Init()
     endif
     " Pet peeve
     if exists("g:html_indent_tags") && g:html_indent_tags !~ '\\|p\>'
-        let g:html_indent_tags = g:html_indent_tags.'\|p'
+        let g:html_indent_tags = g:html_indent_tags.'\|p\|li'
     endif
     set indentkeys+=!^F
     let b:surround_indent = 1
@@ -241,7 +243,7 @@ function! s:doctypeSeek()
         if &ft == 'xhtml' || &ft == 'eruby'
             let b:allml_doctype_index = 10
         elseif &ft != 'xml'
-            let b:allml_doctype_index = 6
+            let b:allml_doctype_index = 7
         endif
     endif
     let index = b:allml_doctype_index - 1
@@ -345,12 +347,14 @@ function! s:charset()
 endfunction
 
 function! s:tagextras()
-    if @" == "html" && s:subtype() == "xhtml"
+    if @" == 'html' && s:subtype() == 'xhtml'
         return ' xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"'
     elseif @" == 'style'
         return ' type="text/css"'
     elseif @" == 'script'
         return ' type="text/javascript"'
+    elseif @" == 'table'
+        return ' cellspacing="0"'
     else
         return ""
     endif
