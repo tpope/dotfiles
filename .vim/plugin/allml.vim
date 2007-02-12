@@ -24,6 +24,8 @@
 " <C-X>@        <link rel="stylesheet" type="text/css" href="/stylesheets/^.css" />
 " <C-X>#        <meta http-equiv="Content-Type" ... />
 " <C-X>$        <script type="text/javascript" src="/javascripts/^.css"></script>
+" Note the doctype inserter uses Vim completion, which in 7.0 includes
+" erroneous doctypes.  Lowercase the first occurance of "HTML" to fix them.
 "
 " Combined with surround.vim, you also get three "replacements".  Below, the ^
 " indicates the location of the wrapped text.  See the documentation of
