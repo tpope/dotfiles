@@ -22,19 +22,26 @@ TERM con80x30
 TERM con80x43
 TERM con80x50
 TERM con80x60
+TERM cygwin
 TERM dtterm
+TERM mlterm
+TERM putty
 TERM xterm
 TERM xterm-color
+TERM xterm-16color
+TERM xterm-256color
 TERM xterm-debian
 TERM rxvt
+TERM rxvt-unicode
 TERM screen
+TERM screen-bce
 TERM screen-w
 TERM screen.linux
 #TERM vt100
 TERM Eterm
 TERM Eterm-xterm
-TERM cygwin
 
+ENDCODE \e[0m\e[0K
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
 # Attribute codes:
@@ -47,7 +54,7 @@ NORMAL 00	# global default, although everything should be something.
 FILE 00		# normal file
 DIR 01;34	# directory
 #LINK target
-#LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
+LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
 		# numerical value, the color is as for the file pointed to.)
 FIFO 33		# pipe
 SOCK 01;35	# socket
