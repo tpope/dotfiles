@@ -18,11 +18,14 @@ hi Type        gui=none
 hi Statement   gui=none
 hi Search NONE gui=underline term=underline cterm=underline
 
-hi link rubyBlockParameter NONE
-hi link rubyConstant       NONE
-hi link rubySymbol         Identifier
-hi link railsMethod        Type
-hi TabLineFill  term=underline cterm=underline gui=underline
+hi link rubyBlockParameter  NONE
+hi link rubyConstant        Type
+"hi link rubyType            Type
+hi link rubySymbol          Constant
+"hi link railsMethod         Type
+"hi TabLineFill  term=underline cterm=underline gui=underline
+hi TabLineFill NONE
+hi link TabLineFill TabLine
 
 if &background=="light"
   " Section: Light Background {{{1
@@ -39,8 +42,8 @@ if &background=="light"
     " hi Visual     ctermbg=LightMagenta cterm=none
     hi VisualNOS  ctermbg=LightRed     cterm=none guibg=LightRed gui=none
   endif
-  hi TabLine    term=underline cterm=underline,bold gui=underline guibg=NONE
-  hi TabLineSel term=bold cterm=none gui=bold
+  "hi TabLine    term=underline cterm=underline,bold gui=underline guibg=NONE
+  "hi TabLineSel term=bold cterm=none gui=bold
   hi StatusLine term=bold,inverse cterm=none ctermfg=White ctermbg=0
   hi StatusLineNC term=bold,inverse cterm=none ctermfg=grey ctermbg=Black
   hi User1 ctermfg=LightBlue ctermbg=Black gui=bold guifg=DodgerBlue guibg=Black
@@ -60,6 +63,7 @@ else
   hi Folded     ctermfg=LightCyan ctermbg=DarkBlue guifg=Cyan guibg=DarkBlue
   hi FoldColumn ctermfg=LightCyan ctermbg=DarkBlue guifg=Cyan guibg=DarkBlue
   hi PmenuSel   ctermfg=White ctermbg=DarkBlue
+  hi Pmenu      ctermfg=Grey  ctermbg=DarkMagenta
   hi Todo       ctermfg=White ctermbg=Black
   hi Comment    term=bold ctermfg=DarkCyan guifg=DarkCyan
 " hi Label      term=bold ctermfg=DarkMagenta guifg=DarkMagenta
@@ -68,8 +72,8 @@ else
     hi Visual     ctermbg=DarkMagenta cterm=none
     hi VisualNOS  ctermbg=DarkRed     cterm=none guibg=DarkRed gui=none
   endif
-  hi TabLine    term=underline cterm=underline gui=underline guibg=NONE
-  hi TabLineSel term=bold cterm=bold gui=bold
+  "hi TabLine    term=underline cterm=underline gui=underline guibg=NONE
+  "hi TabLineSel term=bold cterm=bold gui=bold
   if &t_Co > 8
     hi StatusLine term=bold,reverse ctermbg=White ctermfg=Black cterm=none guifg=White
     hi StatusLineNC term=reverse ctermbg=Grey cterm=none guifg=White
