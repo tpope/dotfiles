@@ -35,6 +35,13 @@ else
     }
 fi
 
+fvwm_find_browser() {
+    if [ -x "`which FvwmCommand 2>/dev/null`" -a -n "$FVWM_USERDIR" ]; then
+        FvwmCommand FuncFindWebBrowser
+    fi
+    return 0
+}
+
 if [ -x "`which cygstart 2>/dev/null`" -a -z "$terminal" ]; then
     exec cygstart "$*"
 elif [ "`uname`" = Darwin -a -x "`which open 2>/dev/null`" -a -z "$terminal" ]; then
@@ -49,6 +56,8 @@ elif [ "$DISPLAY" -a -z "$terminal" ]; then
 	    /*) url="file://$url" ;;
 	    *) url="file://`pwd`/$url" ;;
 	esac
+    else
+        case "$url" in www*) url="http://$url"; esac
     fi
     case "$gui$url" in
 	file:*|/*) ;;
@@ -56,21 +65,21 @@ elif [ "$DISPLAY" -a -z "$terminal" ]; then
 	for browser in firefox mozilla-firebird mozilla netscape; do
 	    if [ -x "`which $browser 2>/dev/null`" ] && \
 		    xlsclients | grep $browser >/dev/null; then
-		nice -n 1 $browser -remote "openURL($url,new-tab)" >/dev/null 2>/dev/null && exit 0
+		nice -n 1 $browser -remote "openURL($url,new-tab)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
 	    fi
 	done
 	if [ -x "`which opera 2>/dev/null`" ] && \
 		pidof opera >/dev/null; then
-	    nice -n 1 opera -remote "openURL($url,new-page)" >/dev/null 2>/dev/null && exit 0
+	    nice -n 1 opera -remote "openURL($url,new-page)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
 	fi
 	if [ -x "`which galeon 2>/dev/null`" ] && \
 		xlsclients | grep galeon >/dev/null; then
-	    nice -n 1 galeon -n "$url" >/dev/null 2>/dev/null && exit 0
+	    nice -n 1 galeon -n "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
 	fi
 	if [ -x "`which dcop 2>/dev/null`" ]; then
 	    konq="`dcop 2>/dev/null|grep konqueror|head -1`"
 	    if [ "$konq" ]; then
-		dcop "$konq" 'konqueror-mainwindow#1' newTab "$1" && exit 0
+		dcop "$konq" 'konqueror-mainwindow#1' newTab "$1" && fvwm_find_browser && exit 0
 	    fi
 	fi
 	[ "$gui" ] && \
