@@ -5,6 +5,7 @@
 export ENV="$HOME/.shrc"
 . $ENV
 unset interactive
+echo hi
 
 if [ "$PS1" ]; then
 # If running interactively, then:
@@ -13,8 +14,10 @@ if [ "$PS1" ]; then
 
 hostname=`hostname|sed -e 's/[.].*//'`
 
-# don't put duplicate lines in the history. See bash(1) for more options
+# don't put duplicate lines in the history
 export HISTCONTROL=ignoredups
+# In fact, let's not use a history file at all
+export HISTFILE=
 
 if [ -x "$HOME/bin/hostinfo" ]; then
     hostcolor=`$HOME/bin/hostinfo -c`
@@ -26,6 +29,17 @@ fi
 
 [ "$UID" ] || UID=`id -u`
 usercolor="01;33" && usercode="+b Y"
+dircolor='01;34'
+case "$TERM" in
+    screen*)
+    usercolor='38;5;184'
+    dircolor='38;5;27'
+    ;;
+    xterm*|rxvt-unicode)
+    usercolor='93'
+    dircolor='94'
+    ;;
+esac
 [ $UID = '0' ] && usercolor="01;37" && usercode="+b W"
 
 
@@ -34,7 +48,7 @@ if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
     ttydash="`tty|sed -e s,^/dev/,, -e s/^tty// -e s,/,-,g`@"
 fi
 
-PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e[01;34m\]\w\[\e[00m\]\$ '
+PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$dircolor'm\]\w\[\e[00m\]\$ '
 
 #if [ "`basename $0`" = bash ]; then
     bind '"\e[1~": beginning-of-line'
@@ -71,4 +85,6 @@ esac
 fi
 which sudo >/dev/null 2>&1 && alias sudo='sudo '
 
-unset hostname hostcolor hostcode usercolor usercode ttyslash ttydash
+[ ! -f /etc/bash_completion ] || . /etc/bash_completion
+
+unset hostname hostcolor hostcode usercolor usercode dircolor ttyslash ttydash
