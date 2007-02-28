@@ -29,7 +29,7 @@ if [ aliases = "$basename" ]; then
     # Optimization: put this early since it is called for every shell
     aliases="launch lt lv dm pg sb b e p sursync ruptime rwho status \
     rclink rc start stop restart reload force-reload mount shutdown tomorrow \
-    vnc xssc mpl mpa ri whois char rds feh rsync aumix \
+    vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix \
     word ord wor or Word Ord Wor Or"
     PATH=/usr/bin:/usr/sbin:/usr/local/bin
     for app in apt-get aptitude emerge port cardctl rubber xdvi xpdf gv; do
@@ -145,7 +145,7 @@ do_clean() {
     if [ ! -d "$HOME/.trash" ]; then
         mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
     fi
-    rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/.zsh/functions/_bibtex" "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/justify.vim" "$HOME/.vim/plugin/matrix.vim" "$HOME/.vim/templates/.skel.cbl.JGZaB2" "$HOME/.vim/templates/skel.rb" "$HOME/.vim/plugin/templatefile.vim" "$HOME/.terminfo/E/Eterm" "$HOME/.terminfo/E/Eterm-xterm"
+    rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/.zsh/functions/_bibtex" "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/justify.vim" "$HOME/.vim/plugin/matrix.vim" "$HOME/.vim/templates/.skel.cbl.JGZaB2" "$HOME/.pixmaps/mini/terminal/.right-teal.xpm.XM3cFo" "$HOME/.vim/templates/skel.rb" "$HOME/.vim/plugin/templatefile.vim" "$HOME/.terminfo/E/Eterm" "$HOME/.terminfo/E/Eterm-xterm"
     rmdir "$HOME/.terminfo/E" 2>/dev/null
     return 0
 }
@@ -559,11 +559,13 @@ case "$basename" in
 	if xscreensaver-command -time 2>/dev/null|egrep 'locked' >/dev/null; then
 	    dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
 	    [ "$dpms" = on ] && $xset dpms force standby
-	    skill xscreensaver
-	    xscreensaver -no-splash >/dev/null 2>&1 &
-	    xscreensaver-command -activate >/dev/null 2>&1 &
-	    xscreensaver-command -throttle >/dev/null 2>&1 &
-	    [ "$dpms" = on ] && sleep 2 && $xset dpms force $dpms
+            echo 'BAD NEWS!'
+            echo 'WOULD HAVE KILLED XSCREENSAVER' >&2
+            #skill xscreensaver
+            #xscreensaver -no-splash >/dev/null 2>&1 &
+            #xscreensaver-command -activate >/dev/null 2>&1 &
+            #xscreensaver-command -throttle >/dev/null 2>&1 &
+            #[ "$dpms" = on ] && sleep 2 && $xset dpms force $dpms
 	fi
 	exit 0
 	;;
@@ -604,7 +606,7 @@ case "$basename" in
         exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
         ;;
     rsync) no_links
-	exec rsync -CP "$@" ;;
+	exec rsync -CP --include='*.so' --include='*.exe' "$@" ;;
     rubber) no_links
 	if [ "$*" ]; then
 	    exec rubber "$@"
@@ -652,6 +654,19 @@ case "$basename" in
 	else
 	    exec /usr/bin/whois "$@"
 	fi ;;
+
+    xrandr)
+        case "$DISPLAY" in
+            ""|localhost:*) DISPLAY=:0; export DISPLAY ;;
+        esac
+        /usr/bin/xrandr "$@"
+        ret="$?"
+        if [ "$ret" = 0 -a "$#" != 0 -a "x$*" != "x-q" ]; then
+            xrdb -load "$HOME/.Xresources"
+            FvwmCommand Restart >/dev/null 2>&1
+        fi
+        exit "$ret"
+        ;;
 
     '') echo "Usage: `basename "$0"` <command> [options]" ;;
     *) echo "$basename: unknown command." >&2 ;;
