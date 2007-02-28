@@ -31,9 +31,10 @@ set realname="Tim Pope"
 set reverse_name
 set reverse_realname
 set query_command="lbdbq %s 2>/dev/null"
-`if mutt -v|head -1|egrep '1\.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(usisp\.com|hotpop\.com|sexygeek\.us)|tpope%`hostname`(\.simpson)?@(sexygeek\.org|bart(\.simpson)?)|timpope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|tim@sanlan\.org|(kstrp00|timothy\.pope)@tamuk\.edu|timothy\.pope@jmwaller\.com|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@(rebelongto\.us|tpope\.info|tpope\.net))$"
-`[ -d "$HOME/.smime/certificates" ] && echo set smime_default_key=$(hostname).pem || echo set`
-`[ -x /usr/bin/muttprint ] && echo set print_command=muttprint || echo set`
+`if mutt -v|head -1|egrep '1\.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(tpope\.us|sexygeek\.us)|tim[p]ope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|(kstrp00|timothy\.pope)@tamuk\.edu|tim[a-z]*\.pope@jmwaller\.com|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@(rebelongto\.us|tpope\.info|tpope\.net))$"
+set`[ -d "$HOME/.smime/certificates" ] && " smime_default_key=$(hostname).pem"`
+set`[ -x /usr/bin/muttprint ] && echo " print_command=muttprint"`
+set`[ -d "$HOME/.mutt_cache" ] && echo " header_cache=~/.mutt_cache message_cachedir=~/.mutt_cache"`
 
 mailboxes "!" # "imap://bart/" "imap://lisa/" "imap://marge/" "imap://homer/" "imap://abe/" "imap://mona/"
 auto_view text/richtext text/html
@@ -44,7 +45,7 @@ alternative_order text/enriched text/richtext text/plain text
 # Section: Headers {{{1
 # ---------------------
 unhdr_order *
-hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: X-MimeOLE User-Agent: X-Mailer: X-Editor: X-Operating-System: Subject: X-Spam-Status:
+hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: X-MimeOLE User-Agent: X-HTTP-UserAgent: X-Mailer: X-Newsreader: X-Editor: X-Operating-System: Subject: X-Spam-Status:
 
 my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
 my_hdr X-All-Your-Base-Are-Belong-To: Us
@@ -62,7 +63,10 @@ ignore X-All-Your-Base-Are-Belong-To X-BFI X-HotPOP-Delivered-To X-Return-Path
 ignore X-eGroups- X-Yahoo-Profile X-Juno-Line-Breaks X-Mailman- X-BeenThere
 ignore X-YahooFilteredBulk X-Header-Overseas X-Header-NoReverseIP
 ignore X-MS- Thread- X-Priority X-ASG- X-ORBL X-Barracuda-Spam-
-ignore Return-Path Message-ID Received Mime-Version Content-Disposition
+ignore X-DMCA X-Abuse X-AntiAbuse X-RFC2646 X-Postfilter
+ignore X-ML- X-MLServer X-Mail-Count Posted X-Complaints-To Complaints-To
+ignore Newsgroups NNTP- X-From-Usenet X-Trace Injection-Info X-rubymirror
+ignore Return-Path Message-ID Received Mime-Version Content-Disposition Path
 ignore Content-Type Content-Length Status Lines "From "
 
 # Section: Bindings {{{1
@@ -75,6 +79,7 @@ bind pager + next-line
 bind pager 0 next-page
 bind generic 0 next-page
 bind index <Esc>N search-opposite
+bind attach i exit
 
 # Section: Macros {{{1
 # --------------------
@@ -93,13 +98,18 @@ macro pager \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forg
 charset-hook ^iso-8859-1$ cp1252
 #send-hook . 'set pgp_create_traditional=yes; unmy_hdr From:' #; set from='
 send-hook . 'unmy_hdr From:'
-send-hook ~C@jmwaller\.com 'my_hdr From: Tim Pope <timothy.pope@jmwaller.com>'
-send-hook ~C@tamuk\.edu 'my_hdr From: Tim Pope <kstrp00@tamuk.edu>'
+send-hook ~C@jmwaller\\.com 'my_hdr From: Tim Pope <timothy.pope@jmwaller.com>'
+send-hook ~C@tamuk\\.edu 'my_hdr From: Tim Pope <kstrp00@tamuk.edu>'
+#send-hook '~p ~P ~s"(test|fuck|^[jf][^A-Z]*$)"' 'set record='
 
 message-hook '~A' 'unignore X-Face; ignore X-Spam-Status'
 message-hook '~P|~h ^X-All-Your-Base-Are-Belong-To:' 'ignore X-Face X-Spam-Status'
 message-hook '~h X-Spam-Level:\ \\*' 'unignore X-Face X-Spam-Status'
 save-hook '~h X-Spam-Level:\ \\*\\*\\*' =definitely-spam
+save-hook '~f"@(ebay|amazon|paypal|buy|newegg)\\.com$"'        =purchase
+save-hook '~s"\\<(order|invoice|purchase|payment|shipped)\\>"' =purchase
+save-hook '~s"\\<(vim|ruby|rails)\\>"' =geek
+fcc-hook  '~p ~P ~s"(test|fu[c]k|^[jf][^A-Z]*$)"' /dev/null
 #save-hook '~H .' =definitely-spam
 #reply-hook . 'set pgp_autosign=yes; set pgp_create_traditional=ask-no'
 #reply-hook '~h ^X-Mailer: (Internet Mail Service|AOL|Microsoft Outlook)' 'set pgp_create_traditional=ask-yes'
@@ -145,6 +155,8 @@ color header    brightgreen     black   ^X-Disposition-Notification-To:
 color header    brightgreen     black   ^X-URL:
 color header    magenta         black   ^Date:
 color header    magenta         black   ^Delivery-date:
+color header    magenta         black   ^Posted:
+color header    magenta         black   ^NNTP-Posting-Date:
 color header    brightcyan      black   ^Subject:
 color header    brightwhite     black   ^X-All-Your-Base-Are-Belong-To:
 color header    green           black   ^Received:
@@ -152,6 +164,8 @@ color header    green           black   ^Message-ID:
 color header    green           black   ^References:
 color header    green           black   ^In-Reply-To:
 color header    green           black   ^Organi[sz]ation:
+color header    green           black   ^X-Trace:
+color header    green           black   ^Injection-Info:
 color header    yellow          black   ^X-Spam-
 color header    red             black   ^Status:
 color header    red             black   ^Content-Length:
@@ -162,9 +176,12 @@ color header    brightyellow    black   ^User-Agent:
 color header    brightyellow    black   ^X-Mailer[A-Za-z-]*:
 color header    brightyellow    black   ^X-Editor:
 color header    brightyellow    black   ^X-Operating-System:
+color header    brightyellow    black   ^X-Newsreader:
 color header    brightyellow    black   ^X-Accept-Language:
 color header    brightyellow    black   ^X-MSMail-
 color header    brightyellow    black   ^(X-)?Priority:
+color header    brightyellow    black   ^(X-)?Priority:
+color header    brightyellow    black   ^X-HTTP-UserAgent:
 color header    brightblack     black   ^X-HotPOP-Delivered-To:
 color header    brightblack     black   ^X-Face:
 mono  header    bold                    ^From:
