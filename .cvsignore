@@ -13,4 +13,5 @@
 *.toc
 *.dvi
 *.class
+*.org
 a.out
