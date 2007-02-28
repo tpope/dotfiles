@@ -20,4 +20,4 @@ if [ ! -f "$HOME/. tpope" ]; then
 elif [ -x /usr/games/fortune ] && [ "$SHLVL" -le 1 -a \( -z "$SSH_TTY" -o "$TERMCAP" \) ]; then
     /usr/games/fortune
 fi
-tpope cron --login
+[ ! -x "`which tpope 2>/dev/null`" ] || tpope cron --login
