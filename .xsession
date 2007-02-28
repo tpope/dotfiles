@@ -8,9 +8,9 @@ PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
 [ ! -x /bin/zsh ] || SHELL=/bin/zsh
 unset STY
 
-xsetroot -solid '#001010'
+xsetroot -solid '#000420'
 
-hosts="marge bart maggie lisa homer mona"
+hosts="gob barry michael lucille maeby lindsay tobias buster"
 dpy=`echo ${DISPLAY:-':0.0'} | sed -e 's/localhost//'`
 if echo $dpy|grep '^:' >/dev/null; then
     hname=`hostname`
@@ -47,12 +47,12 @@ if [ ! -f "$HOME/.xmodmap" -a ! -f "$HOME/.Xmodmap" ] && \
     xmodmap -e "clear Mod5"
     xmodmap -e "add lock = Caps_Lock"
     xmodmap -e "add Mod4 = Super_L Super_R"
-    xmodmap -e "add Mod4 = Hyper_L Hyper_R"
+    xmodmap -e "add Mod5 = Hyper_L Hyper_R"
 fi
 
 ESPEAKER="$hname"
 RPLAY_HOST="$hname"
-WINDOW_MANAGER="fvwm2"
+#WINDOW_MANAGER="fvwm2"
 export ESPEAKER RPLAY_HOST WINDOW_MANAGER
 
 hostname="`hostname|sed -e 's/[.].*//'`"
@@ -76,7 +76,7 @@ wait
 
 if [ -x "`which xscreensaver 2>/dev/null`" ]; then
     nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
-    case "$hname$dpy" in mona:0|lisa:0|homer:0|sarah:0)
+    case "$hname$dpy" in tobias:0|lucille:0|lindsay:0|maeby:0|buster:0)
 	(xscreensaver-command -watch|while read trash; do
 	    case "$trash" in
 		BLANK*|LOCK*|UNBLANK*) tpope status check "$hname" ;;
@@ -93,7 +93,7 @@ fi
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
 [ "$GPG_AGENT_INFO" -o -z "$AGENT_SOCKET" ] || export GPG_AGENT_INFO="$AGENT_SOCKET"
 
-xsetroot -solid '#002020'
+xsetroot -solid '#000840'
 
 tpope status rehash
 
