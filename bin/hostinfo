@@ -7,77 +7,90 @@
 
 hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="maggie barry oscar gob lindsay maeby jwxkl81-1061 lucille michael tobias lupe buster steve grex images netmon1 tpope-486 tpope-1084"
-menuhosts="gob michael lucille lindsay tobias oscar buster - jwxkl81-1061 tpope-486 tpope-1084 netmon1 images"
+hosts="oscar gob lindsay maeby jwxkl81-1061 lucille michael tobias buster steve grex jmwa-netmon atl-netmon san-netmon tpope-1084 george arwen"
+menuhosts="gob michael lucille lindsay tobias oscar buster - george arwen jwxkl81-1061 tpope-1084 san-netmon jmwa-netmon atl-netmon"
 
 gethost() {
     case "$1" in
-    [Aa]|maggie*) echo maggie ;;
-    [Yy]|maeby*|homer*) echo maeby ;;
-    [Bb]|barry*) echo barry ;;
-    [Cc]|oscar*) echo oscar ;;
-    [Ll]|lindsay*) echo lindsay ;;
-    [Gg]|gob*) echo gob ;;
-    [Ii]|images*) echo images ;;
+    [Aa]|arwen*)        echo arwen ;;
+    [Bb]|atl-netmon*)   echo atl-netmon ;;
+    [Cc]|oscar*)        echo oscar ;;
+    [Ee]|george*)       echo george ;;
+    [Gg]|gob*)          echo gob ;;
     [Jj]|jmwaller*|jwxkl81-1061*) echo jwxkl81-1061 ;;
-    [Uu]|lucille*) echo lucille ;;
-    [Mm]|marge*|michael*) echo michael ;;
-    [Nn]|netmon1*) echo netmon1 ;;
-    [Oo]|tobias*) echo tobias ;;
-    [Pp]|lupe*) echo lupe ;;
-    [Rr]|buster*) echo buster ;;
-    [Ss]|steve*) echo steve ;;
-    [Tt]|tpope-486*) echo tpope-486 ;;
-    [Ee]|tpope-1084*) echo tpope-1084 ;;
-    [Xx]|grex*) echo grex ;;
-    ?) echo localhost ;;
+    [Ll]|lindsay*)      echo lindsay ;;
+    [Mm]|michael*)      echo michael ;;
+    [Nn]|san-netmon*)   echo san-netmon ;;
+    [Oo]|tobias*)       echo tobias ;;
+    [Rr]|buster*)       echo buster ;;
+    [Ss]|steve*)        echo steve ;;
+    [Tt]|tpope-1084*)   echo tpope-1084 ;;
+    [Uu]|lucille*)      echo lucille ;;
+    [Vv]|jmwa-netmon*)  echo jmwa-netmon ;;
+    [Xx]|grex*)         echo grex ;;
+    [Yy]|maeby*)        echo maeby ;;
+    ?)                  echo localhost ;;
     *) echo "$1" ;;
 esac
 }
 
-gob()      { hterm="01;31"; hscrn="+b R"; hrgb="#FFA1A1"; hltr=G;hdom=tpope.us;}
-barry()    { hterm="00;33"; hscrn="   y"; hrgb="#D4AA7F"; hltr=B;hdom=tpope.us;}
-michael()  { hterm="01;32"; hscrn="+b G"; hrgb="#A2FFA1"; hltr=M;hdom=tpope.us;}
-lucille()  { hterm="01;35"; hscrn="+b m"; hrgb="#FF7FFF"; hltr=U;hdom=tpope.us;}
-maeby()    { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=Y;hdom=tpope.us;}
-maggie()   { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=A;hdom=tpope.us;}
-lindsay()  { hterm="00;31"; hscrn="   r"; hrgb="#D47F7F"; hltr=L;hdom=tpope.us;}
-tobias()   { hterm="00;35"; hscrn="   m"; hrgb="#D47FD4"; hltr=O;hdom=tpope.us;}
-buster()   { hterm="00;36"; hscrn="   c"; hrgb="#7FD4D4"; hltr=R;hdom=tpope.us;}
-steve()    { hterm="01;30"; hscrn="+b K"; hrgb="#BCBBBB"; hltr=S;hdom=tpope.us;
-		test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
-oscar()    { hterm="00;34"; hscrn="   b"; hrgb="#7F7FFF"; hltr=C;hdom=tpope.us;}
-lupe()     { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=P;hdom=tpope.us;}
-
-#carl()     { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=K; hdom=simpson;}
-#patty()    { hterm="01;35"; hscrn="+b M"; hrgb="#FF7FFF"; hltr=Q; hdom=simpson;}
-images()   { hterm="01;33"; hscrn="+b Y"; hrgb="#FFFF7F"; hltr=I; hdom=jmwaller.com;}
-netmon1()  { hterm="01;34"; hscrn="+b B"; hrgb="#A2A2FF"; hltr=N; hdom=jmwaller.com;}
-jwxkl81_1061() { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=J; hdom=jmwaller.com;}
-tpope_486() { hterm="01;36"; hscrn="+b C"; hrgb="#7FFFFF"; hltr=T; hdom=jmwaller.com;}
-tpope_1084() { hterm="00;32"; hscrn="   g"; hrgb="#7FD47F"; hltr=E; hdom=jmwaller.com;}
-grex()     { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr=X; hdom=tpope.us;}
-unknown()  { hterm="01;37"; hscrn="+b W"; hrgb="#FFFFFF"; hltr= ; hdom=;}
 getinfo() {
-    `echo $1|tr A-Z- a-z_` 2>/dev/null || unknown
+    `echo $1|tr A-Z.- a-z__` 2>/dev/null || unknown
+    case "$TERM" in screen*|xterm-*) hterm="`echo $hterm|sed -e 's/01;3/00;9/'`" ;;
+    esac
 }
+
+gob()         { hcolor=orange; $hcolor;hltr=G;hdom=tpope.us;}
+michael()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
+lindsay()     { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
+tobias()      { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
+lucille()     { hcolor=magenta;$hcolor;hltr=U;hdom=tpope.us;}
+maeby()       { hcolor=yellow; $hcolor;hltr=Y;hdom=tpope.us;}
+buster()      { hcolor=teal;   $hcolor;hltr=R;hdom=tpope.us;}
+oscar()       { hcolor=navy;   $hcolor;hltr=C;hdom=tpope.us;}
+steve()       { hcolor=grey;   $hcolor;hltr=S;hdom=tpope.us;}
+arwen()       { hcolor=brown;  $hcolor;hltr=A;hdom=jmwaller.com;}
+george()      { hcolor=cyan;   $hcolor;hltr=E;hdom=jmwaller.com;}
+jmwa_netmon() { hcolor=blue;   $hcolor;hltr=V;hdom=jmwaller.com;}
+san_netmon()  { hcolor=blue;   $hcolor;hltr=N;hdom=jmwaller.com;}
+atl_netmon()  { hcolor=blue;   $hcolor;hltr=B;hdom=jmwaller.com;}
+jwxkl81_1061(){ hcolor=yellow; $hcolor;hltr=J;hdom=jmwaller.com;}
+tpope_1084()  { hcolor=green;  $hcolor;hltr=T;hdom=jmwaller.com;}
+grex()        { hcolor=white;  $hcolor;hltr=X;hdom=tpope.us;}
+unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
+
+red()         { hterm="00;31";hscrn="   r";hlrgb="#D47F7F";hdrgb="#550000";}
+green()       { hterm="00;32";hscrn="   g";hlrgb="#7FD47F";hdrgb="#005500";}
+brown()       { hterm="00;33";hscrn="   y";hlrgb="#D4AA7F";hdrgb="#552b00";}
+navy()        { hterm="00;34";hscrn="   b";hlrgb="#7F7FFF";hdrgb="#000080";}
+purple()      { hterm="00;35";hscrn="   m";hlrgb="#D47FD4";hdrgb="#550055";}
+teal()        { hterm="00;36";hscrn="   c";hlrgb="#7FD4D4";hdrgb="#005555";}
+grey()        { hterm="01;30";hscrn="+b K";hlrgb="#BCBBBB";hdrgb="#3d3c3c";
+                test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
+orange()      { hterm="01;31";hscrn="+b R";hlrgb="#FFA1A1";hdrgb="#802222";}
+lime()        { hterm="01;32";hscrn="+b G";hlrgb="#A2FFA1";hdrgb="#238022";}
+yellow()      { hterm="01;33";hscrn="+b Y";hlrgb="#FFFF7F";hdrgb="#808000";}
+blue()        { hterm="01;34";hscrn="+b B";hlrgb="#A2A2FF";hdrgb="#232380";}
+magenta()     { hterm="01;35";hscrn="+b M";hlrgb="#FF7FFF";hdrgb="#800080";}
+cyan()        { hterm="01;36";hscrn="+b C";hlrgb="#7FFFFF";hdrgb="#008080";}
+white()       { hterm="01;37";hscrn="+b W";hlrgb="#FFFFFF";hdrgb="#808080";}
 
 suffix() {
     domains="`egrep '^search|^domain' /etc/resolv.conf 2>/dev/null`"
     ifconfig="/sbin/ifconfig"
     if $ifconfig -a 2>/dev/null|grep ':172\.' >/dev/null 2>&1; then
-	getinfo "$1"
-	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
+        getinfo "$1"
+        case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
     elif $ifconfig -a 2>/dev/null|grep ':192\.168\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
         getinfo "$1"
         [ "$hdom" = "jmwaller.com" ] || suffix=".t"
     elif $ifconfig -a 2>/dev/null|grep ':10\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-	suffix=".t"
+        suffix=".t"
     elif [ ! -x $ifconfig -a -x "`which connect 2>/dev/null`" ]; then
-	suffix=".p"
+        suffix=".p"
     else
-	getinfo "$1"
-	case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
+        getinfo "$1"
+        case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
     fi
     case "$1" in
         [1-9]*) echo ;;
@@ -95,30 +108,37 @@ hostinfo)
     -l|--letter) getinfo `gethost ${2:-$host}`; echo $hltr; exit 0 ;;
     -h|--hostname) echo `gethost ${2:-$host}`; exit 0 ;;
     -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
-    -r|--rgb) getinfo `gethost ${2:-$host}`; echo $hrgb; exit 0 ;;
+    -r|--rgb) getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
     -S|--ssh)
         shift
         exec ssh "$@"
-	case "$1" in
-	    *.*) host="$1";;
-	    *) host=`gethost ${1:-$host}` ;;
-	esac
-	shift
-	exec ssh "$host`suffix $host`" "$@" ;;
+        case "$1" in
+            *.*) host="$1";;
+            *) host=`gethost ${1:-$host}` ;;
+        esac
+        shift
+        exec ssh "$host`suffix $host`" "$@" ;;
     -b|--batch-ssh)
-	case "$2" in
-	    *.*|-*) host="$2";;
-	    *) host=`gethost ${2:-$host}` ;;
-	esac
-	shift; shift
-	exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
+        case "$2" in
+            *.*|-*) host="$2";;
+            *) host=`gethost ${2:-$host}` ;;
+        esac
+        shift; shift
+        exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@" ;;
     --tunnel)
-        host="`gethost $2`" 
+        host="`gethost $2`"
         getinfo $host
         case "`cat /etc/resolv.conf 2>/dev/null`" in
             *$hdom*)
-                [ -x "`which nc 2>/dev/null`" ] && \
-                exec nc -q 1 "$host" "$3" ;;
+            if [ -x "`which nc 2>/dev/null`" ]; then
+                # Some versions benefit from -q, some choke on it
+                if [ -f /etc/debian_version ]; then
+                    exec nc -q 1 "$host" "$3"
+                else
+                    exec nc "$host" "$3"
+                fi
+            fi
+            ;;
         esac
         if [ "$hdom" = jmwaller.com ]; then
             exec ssh -ax jmwa nc -q 1 "$host" "$3" 2>/dev/null
@@ -126,53 +146,60 @@ hostinfo)
         exec ssh -ax trp nc -q 1 "$host" "$3" 2>/dev/null
         ;;
     -H)
-	rm -f "$HOME"/bin/[A-Z]
-	for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
-	    ln -s hostinfo "$HOME/bin/$ltr"
-	done
-	exit 0
-	;;
+        rm -f "$HOME"/bin/[A-Z]
+        for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
+            ln -s hostinfo "$HOME/bin/$ltr"
+        done
+        exit 0
+        ;;
     --fvwm-styles)
-	for host in $hosts; do getinfo `gethost ${2:-$host}`;
-	    [ "$host" != - ] && echo \
-	    "Style *@$host* ForeColor $hrgb, HilightFore $hrgb" #, Icon $host.xpm"
-	done
-	exit 0
-	;;
+        for host in $hosts; do getinfo `gethost ${2:-$host}`;
+            if [ "$host" != - ]; then
+                #echo "Style *@$host* ForeColor $hlrgb, HilightFore $hdrgb"
+                echo "Style *@$host* MiniIcon mini/terminal/right-$hcolor.xpm" #, Icon $host.xpm"
+                echo "Style @$host* MiniIcon mini/terminal/left-$hcolor.xpm"
+            fi
+        done
+        exit 0
+        ;;
     --fvwm-menus)
-cat<<EOF
+    cat<<EOF
 DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
-AddToMenu MenuFvwmScreens^Green^ "Screen*norm/terminal-special.xpm*" Title
-AddToMenu MenuFvwmLogins^Red^     "Login*norm/terminal-remote.xpm*"  Title
-AddToMenu MenuFvwmScreens "& localhost"    FuncScreenXterm
-AddToMenu MenuFvwmLogins  "& localhost"    FuncXterm
+AddToMenu MenuFvwmScreens "Screen" Title
+AddToMenu MenuFvwmLogins     "Login"  Title
+AddToMenu MenuFvwmScreens "& localhost%mini/terminal/left-plain.xpm%"    FuncScreenXTerm
+AddToMenu MenuFvwmLogins "& localhost%mini/terminal/right-plain.xpm%"    FuncXTerm
 AddToMenu MenuFvwmScreens "" Nop
 AddToMenu MenuFvwmLogins  "" Nop
 ChangeMenuStyle Screens MenuFvwmScreens
 ChangeMenuStyle Logins  MenuFvwmLogins
 EOF
-	for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
-	    hltr=`echo $hltr|tr 'A-Z' 'a-z'`
-	    if [ "$host" != - ]; then
-	    case $host in *$hltr*) hmenu=`echo "$host"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$host(&$hltr)" ;; esac
-		echo "AddToMenu MenuFvwmScreens $hmenu FuncScreenSshXterm $host"
-		echo "AddToMenu MenuFvwmLogins $hmenu FuncSshXterm $host"
-	    else
-		echo 'AddToMenu MenuFvwmScreens "" Nop'
-		echo 'AddToMenu MenuFvwmLogins  "" Nop'
-	    fi
-	done
-	exit 0
-	;;
+        for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
+            hltr=`echo $hltr|tr 'A-Z' 'a-z'`
+            if [ "$host" != - ]; then
+            case $host in *$hltr*) hmenu=`echo "$host"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$host(&$hltr)" ;; esac
+                echo "AddToMenu MenuFvwmScreens $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
+                echo "AddToMenu MenuFvwmLogins $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm $host"
+            else
+                echo 'AddToMenu MenuFvwmScreens "" Nop'
+                echo 'AddToMenu MenuFvwmLogins  "" Nop'
+            fi
+        done
+        exit 0
+        ;;
     --fvwm-keys)
-	for host in $menuhosts; do getinfo `gethost $host`;
-	    [ "$host" != - ] &&
-	    echo "Key $hltr A CM  FuncScreenSshXterm $host" &&
-	    echo "Key $hltr A CMS FuncSshXterm $host"
-	done
-	exit 0
-	;;
+        for host in $hosts; do getinfo `gethost $host`;
+            [ "$host" != - ] &&
+            echo "Key $hltr A 4   FuncFindXTerm $host" &&
+            echo "Key $hltr A CM  FuncScreenSshXTerm $host" &&
+            echo "Key $hltr A 4S  FuncScreenSshXTerm $host" &&
+            echo "Key $hltr A 4C  FuncScreenSshXTerm $host" &&
+            echo "Key $hltr A CMS FuncSshXTerm $host" &&
+            echo "Key $hltr A 4M  FuncSshXTerm $host"
+        done
+        exit 0
+        ;;
     -u|-w|--ruptime|--rwho)
     PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
     command="$1"; shift
@@ -180,41 +207,41 @@ EOF
     [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
     [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
     if [ "$1" = "-p" ]; then
-	RUPTIME=cat
-	shift
+        RUPTIME=cat
+        shift
     elif [ -x "`which $command 2>/dev/null`" -a "`hostname`" != grex.cyberspace.org ]; then
-	RUPTIME="$command"
+        RUPTIME="$command"
     else
-	RUPTIME="finger $command$1@tpope.net"
-	[ -n "$1" ] && shift
+        RUPTIME="finger $command$1@tpope.net"
+        [ -n "$1" ] && shift
     fi
     AWK='{print $1" "$0}'
     [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
     [ -t 1 ] && TERMINAL=1
     if [ "$TERMINAL" ]; then
-	$RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
-	    getinfo `gethost $host` 2>/dev/null || hterm="01;37"
-	    echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
-	done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
+        $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
+            getinfo `gethost $host` 2>/dev/null || hterm="01;37"
+            echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
+        done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
     else
-	$RUPTIME "$@"|grep -v '^\[tpope\.net\]'
+        $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
     fi
     exit 0
-	    ;;
-	    -*) echo "Usage: [-chls] [hostname]" >&2; exit 1 ;;
-	    *) echo `gethost ${1:-$host}`; exit 0 ;;
-	esac
-	exit 2
-	;;
-    ?)	[ -n "$STY" ] && SCREEN="screen -ln"
-	exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
+            ;;
+            -*) echo "Usage: [-chls] [hostname]" >&2; exit 1 ;;
+            *) echo `gethost ${1:-$host}`; exit 0 ;;
+        esac
+        exit 2
+        ;;
+    ?)  [ -n "$STY" ] && SCREEN="screen -ln"
+        exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
     batch-ssh)
-	case "$2" in
-	    *.*|-*) host="$2";;
-	    *) host=`gethost ${2:-$host}` ;;
-	esac
-	shift; shift
-	exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
+        case "$2" in
+            *.*|-*) host="$2";;
+            *) host=`gethost ${2:-$host}` ;;
+        esac
+        shift; shift
+        exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
 
-	*) echo WARNING ;;
+    *) echo Warning: invalid command ;;
 esac
