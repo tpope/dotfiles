@@ -1,54 +1,59 @@
-# vim: ft=zsh
+# vim:set ft=zsh:
 prompt_simpson_help () {
-	cat <<'EOF'
-Prompt reminiscent of the Simpsons.
+        cat <<'EOF'
+Prompt (that used to be) reminiscent of the Simpsons.
 You can configure this prompt to derive from a particular family member:
 
-  prompt simpson [<simpson-name>]
+  prompt simpson [<name>]
 
-The default family member is derived from the host name.
+The default name is derived from the host name.
 EOF
 }
 
 prompt_simpson_setup () {
-	local hostname=${1:-`/bin/hostname`}
-	local hostcolor
-	case "$hostname" in
-		*) hostletter=`hostinfo -l`
-			hostcolor="`echo '\e'`[`hostinfo -c`m"  ;;
-	esac
-	local usercolor="$fg_bold[yellow]"
-	[ $UID = '0' ] && usercolor="$fg_bold[white]"
-	#if [ "$TERM" = "linux" -o "$TERM" = "xterm" -o "$TERM" = "screen" -o "$TERM" = "screen-w" -o "$TERM" = "Eterm" ]
-	case "$TERM" in
-	linux*|screen*|xterm*|rxvt*|kterm*|Eterm*|dtterm*|vt220*|cygwin*)
-		PROMPT="%{$usercolor%}%n%{$reset_color%}@%{$hostcolor%}%m%{$reset_color%}:%{$fg_bold[blue]%}%20<...<%~%<<%{$reset_color%}%{$reset_color%}%# "
-		;;
-	*)
-		PS1="$hostletter%# "
-		;;
-	esac
-	#PS2="> "
-	precmd () {
-		setopt promptsubst
-	}
-	preexec () {
-		
-	}
+    local hostname=${1:-`/bin/hostname`}
+    if [ -x "`which hostinfo 2>/dev/null`" ]; then
+        local hostcolor="`echo '\e'`[`hostinfo -c`m"
+    fi
+    local usercolor="$fg_bold[yellow]"
+    local dircolor="$fg_bold[blue]"
+    case "$TERM" in
+        screen*)
+        usercolor=$'\e[38;5;184m'
+        dircolor=$'\e[38;5;27m'
+        ;;
+        xterm*|rxvt-unicode)
+        usercolor=$'\e[93m'
+        dircolor=$'\e[94m'
+        ;;
+    esac
+    [ $UID = '0' ] && usercolor="$fg_bold[white]"
+        case "$TERM" in
+            linux*|screen*|xterm*|rxvt*|putty*|kterm*|Eterm*|dtterm*|vt220*|ansi*|cygwin*)
+            PROMPT="%{$usercolor%}%n%{$reset_color%}@%{$hostcolor%}%m%{$reset_color%}:%{$dircolor%}%20<...<%~%<<%{$reset_color%}%{$reset_color%}%# "
+            ;;
+            *)
+            if [ -x "`which hostinfo 2>/dev/null`" ]; then
+                local hostletter=`hostinfo -l`
+            fi
+            PS1="$hostletter%# "
+            ;;
+        esac
+        #PS2="> "
 }
 
 prompt_simpson_preview () {
-	local host
-	if (( ! $#* ))
-	then
-		for host in homer marge bart lisa maggie abe
-		do
-			prompt_preview_theme simpson $host
-			print
-		done
-	else
-		prompt_preview_theme simpson "$@"
-	fi
+        local host
+        if (( ! $#* ))
+        then
+                for host in michael gob tobias lindsay lucille oscar
+                do
+                        prompt_preview_theme simpson $host
+                        print
+                done
+        else
+                prompt_preview_theme simpson "$@"
+        fi
 }
 
 prompt_simpson_setup "$@"
