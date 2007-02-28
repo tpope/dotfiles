@@ -13,7 +13,15 @@ elif [ "$1" = "-E" ]; then
     exec "$term" "$@"
 fi
 
-[ -x "$XTERM" ] && exec "$XTERM" "$@"
+[ -n "$XTERM" ] && [ -x "`which $XTERM 2>/dev/null`" ] && exec "$XTERM" "$@"
+
+# NOT exported
+[ -z "$RXVT_SOCKET" ] && RXVT_SOCKET="$HOME/.rxvt-unicode-`hostname`"
+if [ -S "$RXVT_SOCKET" -a -x "`which urxvtc 2>/dev/null`" ]; then
+    urxvtc --help 2>/dev/null
+    [ "$?" = 1 ] && exec urxvtc "$@"
+fi
+[ -x "`which urxvt 2>/dev/null`" ] && exec urxvt "$@"
 
 case "${LANG:-$LC_ALL}" in
     *.UTF-8) ;;
@@ -23,6 +31,7 @@ case "${LANG:-$LC_ALL}" in
             shift
             ut="--utmp-logging=false"
         fi
+        [ "x$1" != "x+vb" -a "x$1" != "x-vb" ] || shift
         if [ "x$1" = x-name ]; then
             shift
             $name="-n"
