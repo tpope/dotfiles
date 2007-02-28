@@ -1,4 +1,4 @@
-#compdef sb sensible-browser
+#compdef b sb sensible-browser
 
 _arguments \
     '-dump[dump to stdout]' \
