@@ -58,6 +58,11 @@ definitely-spam
 * ^X-Spam-Status: Yes
 probably-spam
 
+:0 h
+* ^From.*(Mail Delivery System|MAILER-DAEMON)
+* ^To: ...(|.|..|...)@rebelongto\.us
+probably-spam
+
 :0
 * ^From: .*networkworld
 /dev/null
@@ -80,6 +85,22 @@ debian-knoppix
 :0
 * ^Return-path: .*mutt-users.*@mutt\.org>$
 mutt-users
+
+:0
+* ^Delivered-To: mailing list vim-dev@vim\.org$
+vim-dev
+
+:0
+* ^X-BeenThere: rxvt-unicode@lists\.schmorp\.de$
+rxvt-unicode
+
+:0
+* ^List-Id: ruby-talk\.ruby-lang\.org$
+ruby-talk
+
+:0
+* ^List-Id:.*vim-ruby-devel\.rubyforge\.org\b
+vim-ruby-devel
 
 :0
 * ^From: SPNET
