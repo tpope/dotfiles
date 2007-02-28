@@ -29,7 +29,7 @@ interactive=1
 #[[ -z $domains ]] || shift 1 domains
 
 off=(gob michael lucille tobias lindsay)
-work=(arwen tpope-1084 jwxkl81-1061 san-netmon jmwa-netmon atl-netmon)
+work=(george arwen tpope-1084 jwxkl81-1061 san-netmon jmwa-netmon atl-netmon)
 if [ -d "$HOME/friends" ]; then
     for host in $off; do
         [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
@@ -48,6 +48,11 @@ if [ -n "$USERPROFILE" ] && which cygpath >/dev/null; then
 elif [ -d "$HOME/Documents" ]; then
     typeset docs="$HOME/Documents"
     : ~docs
+fi
+
+if [ -x "`which ruby 2>/dev/null`" ]; then
+    gems="`ruby -rubygems -e 'puts Gem.dir + %{/gems}' 2>/dev/null`"
+    [ -z gems ] || : ~gems
 fi
 
 namedir() { export $1=$PWD; : ~$1 }
@@ -110,6 +115,9 @@ screen*|vt220*)
                 local cmd="$1"
                 case "$cmd" in
                     ???????????*) cmd="`echo "$cmd"|sed -e 's/ .*//g'`" ;;
+                esac
+                case "$cmd" in
+                    ???????????*) cmd="`echo "$cmd"|sed -e 's,.*/,,g'`" ;;
                 esac
                 # print -Pn "\e]1;\a\e]1;$tty%m*\a"
                 print -Pn "\e]2;$screenhs"
