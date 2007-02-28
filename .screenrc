@@ -9,11 +9,15 @@ hardstatus on
 hardstatus lastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
 escape ^\\\ # Ctrl+\ as escape command.
 bindkey ^Q command
+defnonblock on
+#nonblock on
 #bindkey ^^ command
-termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* WS=\E[8;%d;%dt
-termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* ti@:te@:G0
-termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;8)\007
-termcapinfo xterm*|rxvt*|kterm*|Eterm*|dtterm* XT:C8
+termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* WS=\E[8;%d;%dt
+termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* ti@:te@:G0
+termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;8)\007
+termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* XT
+termcapinfo Eterm*|linux* C8
+# termcapinfo * "" Co#256
 termcapinfo rxvt*|Eterm* "" *7=\E[8$:%i=\E[c:#4=\E[d:#2=\E[7$
 termcapinfo xterm*      "" *7=\E[2F:%i=\E[2C:#4=\E[2D:#2=\E[2H
 defflow off
@@ -32,10 +36,12 @@ bind  K kill
 bind  ` select 0
 bind  e screen -ln vim
 bind ^E screen -ln vim
+bind  R screen -fn -ln irb
 #bind ^ stuff "^^"
 bind ^O colon "screen -ln ssh "
 bind  o colon "screen -ln ssh "
-bind  S eval "height 51" "hardstatus alwayslastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "split"
+# bind  S eval "height 51" "hardstatus alwayslastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "split"
+bind  S eval "height 50" "split"
 bind  Q eval "hardstatus message '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "only" "height 24"
 bind ^U screen -ln -fn -t uptime sh -c 'echo -ne "\e]0;Uptime\a"; export TERMINAL=1; while clear >/tmp/ruptime.$$; do echo "HOST      STATUS       TIME        USERS   LOAD" >>/tmp/ruptime.$$; tpope ruptime >>/tmp/ruptime.$$; if [ `(cat /tmp/ruptime.$$; tpope rwho)|wc -l` -le 22 ]; then echo >>/tmp/ruptime.$$; tpope rwho >>/tmp/ruptime.$$; fi; cat /tmp/ruptime.$$; rm -f /tmp/ruptime.$$; sleep 15; done'
 bind ^B eval "hardcopy_append off" "hardcopy -h /tmp/.$LOGNAME-screen-urlview" "screen -fn -ln -t urlview urlview /tmp/.$LOGNAME-screen-urlview"
@@ -92,8 +98,8 @@ bind -c shiftalt 4 stuff ^[[24
 
 bindkey -d -k kD
 bindkey -d -k kb
-bindkey ^[^[[	command -c shiftalt # PuTTY Alt
-bindkey ^[^[O	command -c shiftalt # PuTTY Alt
+bindkey ^[^[[	command -c shiftalt # Rxvt/PuTTY Alt
+bindkey ^[^[O	command -c shiftalt # Rxvt/PuTTY Alt
 bindkey ^[O2	command -c shiftalt # XTerm F-Key Shift
 bindkey ^[O3	command -c shiftalt # XTerm F-Key Alt
 #bindkey ^[O5	command -c shiftalt # XTerm F-Key Ctrl
@@ -109,7 +115,7 @@ bindkey ^[^H      other
 bindkey "^[ "     other
 bindkey "^[^I"    focus # Alt+Tab
 bindkey ^[[Z      focus # Shift+Tab
-bindkey ^[[a      copy  # RXVT/Eterm Shift
+bindkey ^[[a      copy  # Rxvt/Eterm Shift
 bindkey ^[[b      colon
 bindkey ^[[c      next
 bindkey ^[[d      prev
