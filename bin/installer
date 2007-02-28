@@ -285,17 +285,17 @@ if [ -d "$HOME/.kde/share" -a ! -h "$HOME/.kde/share/icons" ]; then
     links=1
 fi
 if [ ! -h "$HOME/.bash_logout" ]; then
-    ln -s .zlogout "$HOME/.bash_logout"
+    ln -sf .zlogout "$HOME/.bash_logout"
 fi
 if [ ! -f "$HOME/bin/sdplay" ]; then
     if inpath rplay && pidof rplayd >/dev/null 2>&1; then
-	ln -s "`which rplay`" "$HOME/bin/sdplay"
+	ln -sf "`which rplay`" "$HOME/bin/sdplay"
     elif inpath esdplay && pidof esd >/dev/null 2>&1; then
-	ln -s "`which esdplay`" "$HOME/bin/sdplay"
+	ln -sf "`which esdplay`" "$HOME/bin/sdplay"
     elif inpath artsplay && pidof artsd >/dev/null 2>&1; then
-	ln -s "`which artsplay`" "$HOME/bin/sdplay"
+	ln -sf "`which artsplay`" "$HOME/bin/sdplay"
     elif inpath play; then
-	ln -s "`which play`" "$HOME/bin/sdplay"
+	ln -sf "`which play`" "$HOME/bin/sdplay"
     fi
     [ ! -h "$HOME/bin/sdplay" ] || links=1
 fi
@@ -351,8 +351,10 @@ if [ "$cron" = 0 -o "$cron" = n ]; then
 	env=ENV
     fi
     [ -n "$PERL5LIB" ]  || PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
-    [ -n "$RUBYLIB" ]   || RUBYLIB="$HOME/.ruby"
+    [ -n "$RUBYLIB" ]   || RUBYLIB="$HOME/.ruby/lib:$HOME/ruby/lib:$HOME/.ruby"
     [ -n "$CLASSPATH" ] || CLASSPATH=".:$HOME/.java:$HOME/java"
+    [ ! -f "$HOME/.ruby/lib/tpope.rb" ] || rubyopt="
+RUBYOPT=rtpope"
     cat >/tmp/crontab.template.$$ <<EOF
 # -*- crontab -*- vim:set ft=crontab:
 # crontab for $LOGNAME@$hostname
@@ -362,7 +364,7 @@ $env=$HOME/.shrc
 CLASSPATH=$CLASSPATH
 PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
 PERL5LIB=$PERL5LIB
-RUBYLIB=$RUBYLIB
+RUBYLIB=$RUBYLIB$rubyopt
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
 20 */4 * * *	tpope cron
