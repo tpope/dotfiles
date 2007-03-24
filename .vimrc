@@ -1,6 +1,5 @@
 " $Id$
 " vim:set ft=vim et tw=78 sw=2 sts=2:
-version 5.0
 
 " Section: Options {{{1
 " ---------------------
@@ -27,7 +26,9 @@ let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 set incsearch       " Incremental search
 set joinspaces
 set laststatus=2    " Always show status line
-if ! has("mac")
+if has("mac")
+  set nomacatsui
+else
   set lazyredraw
 endif
 "let &listchars="tab:\<M-;>\<M-7>,trail:\<M-7>"
@@ -49,10 +50,11 @@ if exists("+spelllang")
   set spelllang=en_gb
 endif
 set splitbelow      " Split windows at bottom
-set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
+set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 set suffixes+=.dvi  " Lower priority in wildcards
 set timeoutlen=1200 " A little bit more time for macros
 set ttimeoutlen=50  " Make Esc work faster
+set viminfo=!,'20,<50,s10,h
 set visualbell
 set virtualedit=block
 set wildmenu
@@ -65,15 +67,15 @@ if has("gui_running")
     set guifont=Monaco:h12
   elseif has("unix")
     if &guifont == ""
-      set guifont=bitstream\ vera\ sans\ mono\ 11 ",fixed,-bitstream-bitstream\ vera\ sans\ mono-medium-r-normal-*-*-110-*-*-m-*-iso8859-1
+      set guifont=bitstream\ vera\ sans\ mono\ 11 ",fixed
     endif
     "set guioptions-=T guioptions-=m
     set guioptions-=e
   elseif has("win32")
-    set guifont=Courier\ New:h10
+    set guifont=Consolas:h11,Courier\ New:h10
   endif
   set background=light
-  "set cmdheight=2 lines=25 columns=80
+  set cmdheight=2 lines=25 columns=80
   set title
   if has("diff") && &diff
     set columns=165
@@ -117,23 +119,25 @@ elseif has("mac")
 endif
 
 " Plugin Settings {{{2
-let g:treeExplVertical=1
 let g:c_comment_strings=1
+"let g:capslock_command_mode=1
 let g:EnhCommentifyBindInInsert='No'
 let g:EnhCommentifyRespectIndent='Yes'
 "let g:Imap_PlaceHolderStart="\xab"
 "let g:Imap_PlaceHolderEnd="\xbb"
+let g:miniBufExplForceSyntaxEnable = 1
 let g:NERD_mapleader = "<Leader>n"
 let g:NERD_com_in_insert_map = "<M-x>"
 let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let g:Tex_SmartKeyQuote = 0
-"let g:cobol_legacy_code=1
+let g:treeExplVertical=1
 let g:lisp_rainbow=1
 let g:rails_level=9
 let g:rails_default_database='sqlite3'
 let g:rails_menu=1
 let g:rubyindent_match_parentheses=0
-let g:ruby_no_identifiers=1
+"let g:ruby_no_identifiers=1
+let g:ruby_minlines=500
 let g:rubycomplete_rails=1
 if !has("gui_running")
   let g:showmarks_enable=0
@@ -145,6 +149,21 @@ let g:surround_61 = "<%= \r %>"
 " }}}2
 " Section: Functions {{{1
 " -----------------------
+
+function! StatusLineColors()
+  let save = @l
+  redir @l>
+  silent highlight StatusLine
+  redir END
+  let reg = @l
+  let @l = save
+  let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
+  exe "hi User1 ".reg
+  exe "hi User2 ".reg
+  exe "hi User3 ".reg
+  exe "hi User4 ".reg
+  exe "hi User5 ".reg
+endfunction
 
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
@@ -267,6 +286,19 @@ function! SQL()
 endfunction
 command! -bar SQL :call SQL()
 
+function! ToTeX()
+  silent! s/\%u201c/``/g
+  silent! s/\%u201d/''/g
+  silent! s/\%u2018/`/g
+  silent! s/\%u2019/'/g
+  silent! s/\%u2014/---/g
+  silent! s/\%u2026/\\ldots{}/g
+  silent! s/ - /---/g
+  silent! s/ -$/---%/g
+  silent! s/^\t\+//g
+endfunction
+command! -bar -range=% ToTeX :<line1>,<line2>call ToTeX()
+
 function! InsertTabWrapper()
   let col = col('.') - 1
   if !col || getline('.')[col - 1] !~ '\k'
@@ -327,6 +359,7 @@ endif
 " Section: Mappings {{{1
 " ----------------------
 
+imap <C-X>/ <Lt>/<Plug>allmlHtmlComplete
 map  <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
 map Y       y$
@@ -338,6 +371,8 @@ map gb      :call OpenURL(expand("<cfile>"))<CR>
 " Run p in Visual mode replace the selected text with the "" register.
 "vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
 "vnoremap <C-C> "+y
+nnoremap <silent> <C-L> :nohls<CR><C-L>
+
 imap <F1>   <C-O><F1>
 map <F1>    K<CR>
 if has("gui_running")
@@ -350,10 +385,9 @@ map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
 map <F6>    :bnext<CR>
 map <F7>    :bprevious<CR>
-map <F8>    :wa<BAR>make<CR>
+map <F8>    :wa<Bar>make<CR>
 map <F9>    :Run<CR>
-"map <F10>   :wa<BAR>make
-map <F11>   :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
+map <silent> <F11> :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
 map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
 imap <F12> <C-O><F12>
 map <C-F4>  :bdelete<CR>
@@ -382,8 +416,13 @@ vmap <Leader>< v`>a><Esc>`<i<<Esc>
 vmap <Leader>" v`>a"<Esc>`<i"<Esc>
 vmap <Leader>' v`>a'<Esc>`<i'<Esc>
 ") <-- Fix syntax highlighting
+
 " EnhancedCommentify
-map <silent> \\      <Plug>Traditionalj
+map <silent> \\     <Plug>Traditionalj
+" capslock
+map <Leader>l       <Plug>CapsLockToggle
+imap <C-L>          <Plug>CapsLockToggle
+imap <C-G>c         <Plug>CapsLockToggle
 
 "inoremap <C-]> <Esc>`^
 inoremap <C-C> <Esc>`^
@@ -399,10 +438,10 @@ endif
 
 if version >= 600
   "inoremap <silent> <Tab> <C-R>=InsertTabWrapper()<CR>
-  inoremap <silent> <C-L> <C-R>=InsertCtrlLWrapper()<CR>
+  "inoremap <silent> <C-L> <C-R>=InsertCtrlLWrapper()<CR>
 else
   "inoremap <Tab> <C-R>=InsertTabWrapper()<CR>
-  inoremap <C-L> <C-R>=InsertCtrlLWrapper()<CR>
+  "inoremap <C-L> <C-R>=InsertCtrlLWrapper()<CR>
 endif
 
 " Emacs style mappings
@@ -445,6 +484,10 @@ if !has("gui_running")
   map! <F31> <M-d>
 endif
 
+if has("gui_mac")
+  noremap <C-6> <C-^>
+endif
+
 cnoremap <C-O>      <Up>
 inoremap <M-o>      <C-O>o
 inoremap <M-O>      <C-O>O
@@ -454,11 +497,12 @@ inoremap <M-A>      <C-O>$
 noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR>       <C-G>u<CR>
-nnoremap ]<Space>   o<Space><C-U><Esc>-
-nnoremap [<Space>   O<Space><C-U><Esc>+
+"nnoremap ]<Space>   o<Space><C-U><Esc>-
+"nnoremap [<Space>   O<Space><C-U><Esc>+
+nnoremap <silent> ]<Space>   :put=''<Bar>-<CR>
+nnoremap <silent> [<Space>   :put!=''<Bar>+<CR>
 
 inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
-
 
 noremap <M-,> :Smaller<CR>
 noremap <M-.> :Bigger<CR>
@@ -469,8 +513,8 @@ noremap <M-Up> :bprevious<CR>
 noremap <M-Down> :bnext<CR>
 noremap <M-Left> :tabprevious<CR>
 noremap <M-Right> :tabnext<CR>
-noremap <S-Left> :tabprevious<CR>
-noremap <S-Right> :tabnext<CR>
+noremap <S-Left> :bprevious<CR>
+noremap <S-Right> :bnext<CR>
 "noremap <C-PageUp> :tabprevious<CR>
 "noremap <C-PageDown> :tabnext<CR>
 noremap <C-Up>  <C-W><Up>
@@ -556,8 +600,9 @@ if has("autocmd")
   endif
   augroup FTMisc " {{{2
     autocmd!
+    silent! autocmd ColorScheme * call StatusLineColors()
     autocmd VimEnter * let g:rails_debug=1
-    "autocmd VimEnter * if argc() == 0 | Scratch | endif
+    autocmd VimEnter * if argc() == 0 && expand("<amatch>") == "" | Scratch | endif
     "autocmd User Rails* silent! Rlcd
     "autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.]
           "\ if filereadable(expand("~/.vim/templates/skel.sh")) |
@@ -636,10 +681,11 @@ if has("autocmd")
   augroup END " }}}2
   augroup FTOptions " {{{2
     autocmd!
+    autocmd BufNewFile,BufRead *.kml        setlocal ts=2 noet
     autocmd FileType c,cpp,cs,java          setlocal ai et sta sw=4 sts=4 cin
     autocmd FileType sh,csh,tcsh,zsh        setlocal ai et sta sw=4 sts=4
     autocmd FileType tcl,perl,python        setlocal ai et sta sw=4 sts=4
-    autocmd FileType javascript             setlocal ai et sta sw=4 sts=4 cin
+    autocmd FileType javascript             setlocal ai et sta sw=4 sts=4 cin isk+=$
     autocmd FileType php,aspperl,aspvbs,vb  setlocal ai et sta sw=4 sts=4
     autocmd FileType apache,sql,vbnet       setlocal ai et sta sw=4 sts=4
     autocmd FileType tex,css                setlocal ai et sta sw=2 sts=2
@@ -662,15 +708,16 @@ if has("autocmd")
     autocmd FileType bst  setlocal smartindent cinkeys-=0# ai sta sw=2 sts=2 comments=:% commentstring=%%s
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ -x\ -Wall\ %
     autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
+    autocmd FileType css  silent! set omnifunc=csscomplete#CompleteCSS
     "autocmd FileType eruby setlocal omnifunc=htmlcomplete#CompleteTags
     autocmd FileType help setlocal ai fo+=2n | silent! setlocal nospell
-    autocmd FileType html setlocal iskeyword+=:,~
+    autocmd FileType html setlocal iskeyword+=~
     autocmd FileType java silent! compiler javac | setlocal makeprg=javac\ %
     autocmd FileType mail setlocal tw=70|if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif|silent! setlocal spell
     autocmd FileType perl silent! compiler perl | setlocal iskeyword+=: keywordprg=perl\ -e'$c=shift;exec\ q{perldoc\ }.($c=~/^[A-Z]\|::/?q{}:q{-f}).qq{\ $c}'
     autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1 | if !exists("b:current_syntax") | setlocal syntax=postscr | endif
     autocmd FileType python setlocal keywordprg=pydoc
-    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=ruby\ -wc\ % keywordprg=ri | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | let b:surround_101 = "\r\nend" | imap <C-Z> <CR>end<C-O>O
+    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=ruby\ -wc\ % keywordprg=ri | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | imap <buffer> <C-Z> <CR>end<C-O>O
     autocmd FileType sql map! <buffer> <C-Z> <Esc>`^gUaw`]a
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % wildignore+=*.dvi formatoptions+=l
