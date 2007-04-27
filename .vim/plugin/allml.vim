@@ -205,8 +205,17 @@ function! s:Init()
     endif
     map <buffer> <LocalLeader>ue <Plug>allmlUrlEncode
     map <buffer> <LocalLeader>ud <Plug>allmlUrlDecode
-    map <buffer> <LocalLeader>he <Plug>allmlHtmlEncode
-    map <buffer> <LocalLeader>hd <Plug>allmlHtmlDecode
+    map <buffer> <LocalLeader>he <Plug>allmlXmlEncode
+    map <buffer> <LocalLeader>hd <Plug>allmlXmlDecode
+    " New, and preferred
+    map <buffer> <LocalLeader>eu <Plug>allmlUrlEncode
+    map <buffer> <LocalLeader>du <Plug>allmlUrlDecode
+    map <buffer> <LocalLeader>ex <Plug>allmlXmlEncode
+    map <buffer> <LocalLeader>dx <Plug>allmlXmlDecode
+    nmap <buffer> <LocalLeader>euu <Plug>allmlLineUrlEncode
+    nmap <buffer> <LocalLeader>duu <Plug>allmlLineUrlDecode
+    nmap <buffer> <LocalLeader>exx <Plug>allmlLineXmlEncode
+    nmap <buffer> <LocalLeader>dxx <Plug>allmlLineXmlDecode
     "if has("spell")
         "setlocal spell
     "endif
@@ -291,7 +300,9 @@ endfunction
 
 function! s:htmlEn()
     let b:allml_omni = &l:omnifunc
-    setlocal omnifunc=htmlcomplete#CompleteTags
+    let b:allml_isk = &l:isk
+    " : is for namespaced xml attributes
+    setlocal omnifunc=htmlcomplete#CompleteTags isk+=:
     return ""
 endfunction
 
@@ -299,6 +310,10 @@ function! s:htmlDis()
     if exists("b:allml_omni")
         let &l:omnifunc = b:allml_omni
         unlet b:allml_omni
+    endif
+    if exists("b:allml_isk")
+        let &l:isk = b:allml_isk
+        unlet b:allml_isk
     endif
     return ""
 endfunction
@@ -372,21 +387,29 @@ function! s:UrlDecode(str)
     return substitute(str,'%\(\x\x\)','\=nr2char("0x".submatch(1))','g')
 endfunction
 
-let s:entities = "\"quot\n<lt\n>gt\n\u00a0nbsp\n\u00a9copy\n\u00ablaquo\n\u00aereg\n\u00b5micro\n\u00b6para\n\u00bbraquo\n\u00dfszlig\n"
+let s:entities = "'apos\n\u00a0nbsp\n\u00a9copy\n\u00ablaquo\n\u00aereg\n\u00b5micro\n\u00b6para\n\u00bbraquo\n\u00dfszlig\n"
 
-function! s:HtmlEncode(str)
-    let str = substitute(a:str,'&','\&amp;','g')
-    let changes = s:entities
-    while changes != ""
-        let orig = matchstr(changes,'.')
-        let repl = matchstr(changes,'^.\zs.\{-\}\ze\%(\n\|$\)')
-        let changes = substitute(changes,'^.\{-\}\%(\n\|$\)','','')
-        let str = substitute(str,'\M'.orig,'\&'.repl.';','g')
-    endwhile
+function! s:XmlEncode(str)
+    let str = a:str
+    let str = substitute(str,'&','\&amp;','g')
+    let str = substitute(str,'<','\&lt;','g')
+    let str = substitute(str,'>','\&gt;','g')
+    let str = substitute(str,'"','\&quot;','g')
+    if s:subtype() == 'xml'
+        let str = substitute(str,"'",'\&apos;','g')
+    else
+        let changes = s:entities
+        while changes != ""
+            let orig = matchstr(changes,'.')
+            let repl = matchstr(changes,'^.\zs.\{-\}\ze\%(\n\|$\)')
+            let changes = substitute(changes,'^.\{-\}\%(\n\|$\)','','')
+            let str = substitute(str,'\M'.orig,'\&'.repl.';','g')
+        endwhile
+    endif
     return str
 endfunction
 
-function! s:HtmlDecode(str)
+function! s:XmlDecode(str)
     let str = a:str
     let changes = s:entities
     while changes != ""
@@ -397,6 +420,10 @@ function! s:HtmlDecode(str)
     endwhile
     let str = substitute(str,'&#\(\d\+\);','\=nr2char(submatch(1))','g')
     let str = substitute(str,'&#\(x\x\+\);','\=nr2char("0".submatch(1))','g')
+    let str = substitute(str,'&apos;',"'",'g')
+    let str = substitute(str,'&quot;','"','g')
+    let str = substitute(str,'&gt;','>','g')
+    let str = substitute(str,'&lt;','<','g')
     return substitute(str,'&amp;','\&','g')
 endfunction
 
@@ -408,19 +435,21 @@ function! s:opfuncUrlDecode(type)
     return s:opfunc("UrlDecode",a:type)
 endfunction
 
-function! s:opfuncHtmlEncode(type)
-    return s:opfunc("HtmlEncode",a:type)
+function! s:opfuncXmlEncode(type)
+    return s:opfunc("XmlEncode",a:type)
 endfunction
 
-function! s:opfuncHtmlDecode(type)
-    return s:opfunc("HtmlDecode",a:type)
+function! s:opfuncXmlDecode(type)
+    return s:opfunc("XmlDecode",a:type)
 endfunction
 
 function! s:opfunc(algorithm,type)
     let sel_save = &selection
     let &selection = "inclusive"
     let reg_save = @@
-    if a:type =~ '^.$'
+    if a:type =~ '^\d\+$'
+        silent exe 'norm! ^v'.a:type.'$hy'
+    elseif a:type =~ '^.$'
         silent exe "normal! `<" . a:type . "`>y"
     elseif a:type == 'line'
         silent exe "normal! '[V']y"
@@ -437,11 +466,15 @@ endfunction
 
 nmap <silent> <Plug>allmlUrlEncode :set opfunc=<SID>opfuncUrlEncode<CR>g@
 vmap <silent> <Plug>allmlUrlEncode :<C-U>call <SID>opfuncUrlEncode(visualmode())<CR>
+nmap <silent> <Plug>allmlLineUrlEncode :<C-U>call <SID>opfuncUrlEncode(v:count1)<CR>
 nmap <silent> <Plug>allmlUrlDecode :set opfunc=<SID>opfuncUrlDecode<CR>g@
 vmap <silent> <Plug>allmlUrlDecode :<C-U>call <SID>opfuncUrlDecode(visualmode())<CR>
-nmap <silent> <Plug>allmlHtmlEncode :set opfunc=<SID>opfuncHtmlEncode<CR>g@
-vmap <silent> <Plug>allmlHtmlEncode :<C-U>call <SID>opfuncHtmlEncode(visualmode())<CR>
-nmap <silent> <Plug>allmlHtmlDecode :set opfunc=<SID>opfuncHtmlDecode<CR>g@
-vmap <silent> <Plug>allmlHtmlDecode :<C-U>call <SID>opfuncHtmlDecode(visualmode())<CR>
+nmap <silent> <Plug>allmlLineUrlDecode :<C-U>call <SID>opfuncUrlDecode(v:count1)<CR>
+nmap <silent> <Plug>allmlXmlEncode :set opfunc=<SID>opfuncXmlEncode<CR>g@
+vmap <silent> <Plug>allmlXmlEncode :<C-U>call <SID>opfuncXmlEncode(visualmode())<CR>
+nmap <silent> <Plug>allmlLineXmlEncode :<C-U>call <SID>opfuncXmlEncode(v:count1)<CR>
+nmap <silent> <Plug>allmlXmlDecode :set opfunc=<SID>opfuncXmlDecode<CR>g@
+vmap <silent> <Plug>allmlXmlDecode :<C-U>call <SID>opfuncXmlDecode(visualmode())<CR>
+nmap <silent> <Plug>allmlLineXmlDecode :<C-U>call <SID>opfuncXmlDecode(v:count1)<CR>
 "nmap <silent> <Plug>allmlUrlEncode :call setreg('"',(substitute(@@,'\n$','','') =~ '[^A-Za-z0-9_.%-]' ? UrlEncode(@@) : UrlDecode(substitute(@@,'\n$','','')))<CR>
 "vmap <silent> <Plug>allmlUrlEncode y:call setreg(v:register,UrlEncode(getreg(v:register)))<CR>gvp
