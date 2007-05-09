@@ -50,7 +50,7 @@ function! s:LoadFiletype(type,filename)
 endfunction
 
 function! s:ReadTemplate(type,filename)
-  if !(line("$") == 1 && getline("$") == "")
+  if !(line("$") == 1 && getline("$") == "") || filereadable(a:filename)
     return
   endif
   let template = a:type
