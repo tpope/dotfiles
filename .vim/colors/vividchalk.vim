@@ -1,7 +1,9 @@
 " Vim color scheme
 " Name:         vividchalk.vim
 " Maintainer:   Tim Pope <vim@tpope.info>
-" Last Change:  19 Feb 2007
+" Last Change:  08 May 2007
+
+" Based on the Vibrank Ink theme for TextMate
 
 if has("gui_running")
     set background=dark
