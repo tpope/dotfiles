@@ -3,29 +3,65 @@
 " $Id$
 
 " These are my personal mappings for XML/XHTML editing, particularly with
-" dynamic content like PHP/ASP/ERb.  Because they are personal, less effort
+" dynamic content like PHP/ASP/eRuby.  Because they are personal, less effort
 " has been put into customizability (if you like these mappings but the lack
 " of customizability poses an issue for you, let me know).  Examples shown are
-" for ERb.
+" for eRuby.
 "
-" If the binding is pressed on the end of a line consisting of "foo"
+" The table below shows what happens if the binding is pressed on the end of a
+" line consisting of "foo".
 "
 " Mapping       Changed to   (cursor = ^)
 " <C-X>=        foo<%= ^ %>
 " <C-X>+        <%= foo^ %>
 " <C-X>-        foo<% ^ %>
 " <C-X>_        <% foo^ %>
-" <C-X>'        foo<%# ^ %>
+" <C-X>'        foo<%# ^ %>         (mnemonic: ' is a comment in ASP with VBS)
 " <C-X>"        <%# foo^ %>
 " <C-X><Space>  <foo>^</foo>
 " <C-X><CR>     <foo>\n^\n</foo>
 " <C-X>/        Last HTML tag closed (requires Vim 7)
 " <C-X>!        <!DOCTYPE...>/<?xml ...?> (Vim 7 allows selection from menu)
 " <C-X>@        <link rel="stylesheet" type="text/css" href="/stylesheets/^.css" />
+"               (mnemonic: @ is used for importing in a CSS file)
 " <C-X>#        <meta http-equiv="Content-Type" ... />
 " <C-X>$        <script type="text/javascript" src="/javascripts/^.css"></script>
-" Note the doctype inserter uses Vim completion, which in 7.0 includes
+"               (mnemonic: $ is valid in javascript identifiers)
+"
+" For the bindings that generate HTML tag pairs, in a few cases, attributes
+" will be automatically added.  For example, script becomes
+" <script type="text/javascript">
+"
+" Note the doctype insertion uses Vim completion, which in 7.0 includes
 " erroneous doctypes.  Lowercase the first occurance of "HTML" to fix them.
+"
+" Encoding:
+"
+" Mappings are provided to encode URLs and escape HTML/XML.  By default, they
+" are only only available in the buffers where allml.vim is activated.  If you
+" want them globally, simply add mappingss for each "global map" in the table
+" below that you want.  If you want all of them with a <Leader> prefix, you
+" can let g:allml_global_maps = 1.  (This also gets you a global <C-X>/ map.)
+"
+" The first four maps below take a {motion} to specify the text when used in
+" normal mode, and also work in visual mode.  The second four are for normal
+" mode only and always encode/decode the current line.
+"
+" Default map      Global map
+" <LocalLeader>eu  <Plug>allmlUrlEncode
+" <LocalLeader>du  <Plug>allmlUrlDecode
+" <LocalLeader>ex  <Plug>allmlXmlEncode
+" <LocalLeader>dx  <Plug>allmlXmlDecode
+" <LocalLeader>euu <Plug>allmlLineUrlEncode
+" <LocalLeader>duu <Plug>allmlLineUrlDecode
+" <LocalLeader>exx <Plug>allmlLineXmlEncode
+" <LocalLeader>dxx <Plug>allmlLineXmlDecode
+"
+" Don't let the names fool you, the XmlEncode mappings work on HTML as well,
+" and add a few additional escaped characters if the buffer is confirmed to
+" contain HTML.
+"
+" Surroundings:
 "
 " Combined with surround.vim, you also get three "replacements".  Below, the ^
 " indicates the location of the wrapped text.  See the documentation of
@@ -36,29 +72,26 @@
 " =             <%= ^ %>
 " #             <%# ^ %>
 
+" You might find these helpful in your vimrc
+"
+" inoremap <M-o>       <Esc>o
+" inoremap <C-j>       <Down>
+" let g:allml_global_maps = 1
+
 if exists("g:loaded_allml") || &cp
     finish
 endif
 let g:loaded_allml = 1
 
 if has("autocmd")
-    augroup <SID>allml
+    augroup allml
         autocmd!
-        autocmd FileType html,xhtml,xml,wml,cf          call s:Init()
-        autocmd FileType php,asp*,mason,eruby           call s:Init()
-        autocmd FileType htmltt,tt2html,htmldjango,jsp  call s:Init()
+        autocmd FileType *html*,wml,xml,xslt,xsd,jsp    call s:Init()
+        autocmd FileType php,asp*,cf,mason,eruby        call s:Init()
     augroup END
 endif
 
 inoremap <silent> <Plug>allmlHtmlComplete <C-R>=<SID>htmlEn()<CR><C-X><C-O><C-P><C-R>=<SID>htmlDis()<CR><C-N>
-"imap <C-X>H <Plug>allmlHtmlComplete
-
-"if maparg('<M-o>','i') == ''
-    "inoremap <M-o> <Esc>o
-"endif
-"if maparg('<C-j>','i') == ''
-    "inoremap <C-j> <Down>
-"endif
 
 function! AllmlInit()
     " Public interface, for if you have your own filetypes to activate on
@@ -73,11 +106,11 @@ function! s:Init()
     "inoremap      <buffer> <SID>htmlstrict  <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
     inoremap      <buffer> <SID>xhtmltrans  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     "inoremap      <buffer> <SID>xhtmlstrict <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-    if &ft == 'xml'
+    if s:subtype() == "xml"
         imap <script> <buffer> <SID>doctype <SID>xmlversion
     elseif exists("+omnifunc")
         inoremap <silent> <buffer> <SID>doctype  <C-R>=<SID>htmlEn()<CR><!DOCTYPE<C-X><C-O><C-P><C-R>=<SID>htmlDis()<CR><C-N><C-R>=<SID>doctypeSeek()<CR>
-    elseif &ft == 'xhtml' || &ft == 'eruby'
+    elseif s:subtype() == "xhtml"
         imap <script> <buffer> <SID>doctype <SID>xhtmltrans
     else
         imap <script> <buffer> <SID>doctype <SID>htmltrans
@@ -124,7 +157,7 @@ function! s:Init()
         if !exists("b:surround_101")
             let b:surround_101 = "[% \r %]\n[% END %]"
         endif
-    elseif &ft == "htmldjango"
+    elseif &ft =~ "django"
         "inoremap <buffer> <SID>allmlOopen    {{
         "inoremap <buffer> <SID>allmlOclose   }}<Left>
         inoremap <buffer> <C-X><Lt> {{
@@ -203,15 +236,10 @@ function! s:Init()
         imap     <buffer> <C-X>"     <C-V><NL><Esc>I<C-X><Lt>#<Space><Esc>A<Space><C-X>><Esc>F<NL>s
         let b:surround_35 = maparg("<C-X><Lt>","i")."# \r ".maparg("<C-X>>","i")
     endif
-    map <buffer> <LocalLeader>ue <Plug>allmlUrlEncode
-    map <buffer> <LocalLeader>ud <Plug>allmlUrlDecode
-    map <buffer> <LocalLeader>he <Plug>allmlXmlEncode
-    map <buffer> <LocalLeader>hd <Plug>allmlXmlDecode
-    " New, and preferred
-    map <buffer> <LocalLeader>eu <Plug>allmlUrlEncode
-    map <buffer> <LocalLeader>du <Plug>allmlUrlDecode
-    map <buffer> <LocalLeader>ex <Plug>allmlXmlEncode
-    map <buffer> <LocalLeader>dx <Plug>allmlXmlDecode
+    map  <buffer> <LocalLeader>eu  <Plug>allmlUrlEncode
+    map  <buffer> <LocalLeader>du  <Plug>allmlUrlDecode
+    map  <buffer> <LocalLeader>ex  <Plug>allmlXmlEncode
+    map  <buffer> <LocalLeader>dx  <Plug>allmlXmlDecode
     nmap <buffer> <LocalLeader>euu <Plug>allmlLineUrlEncode
     nmap <buffer> <LocalLeader>duu <Plug>allmlLineUrlDecode
     nmap <buffer> <LocalLeader>exx <Plug>allmlLineXmlEncode
@@ -320,7 +348,7 @@ endfunction
 
 function! s:subtype()
     let top = getline(1)."\n".getline(2)
-    if top =~ '<?xml\>' || &ft == "xml"
+    if (top =~ '<?xml\>' && &ft !~? 'html') || &ft =~? '^\%(xml\|xsd\|xslt\)$'
         return "xml"
     elseif top =~? '\<xhtml\>'
         return 'xhtml'
@@ -328,8 +356,10 @@ function! s:subtype()
         return "html"
     elseif &ft == "xhtml" || &ft == "eruby"
         return "xhtml"
-    else
+    elseif exists("b:loaded_allml")
         return "html"
+    else
+        return ""
     endif
 endfunction
 
@@ -364,8 +394,14 @@ function! s:charset()
 endfunction
 
 function! s:tagextras()
-    if @" == 'html' && s:subtype() == 'xhtml'
-        return ' xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"'
+    if s:subtype() == "xml"
+        return ""
+    elseif @" == 'html' && s:subtype() == 'xhtml'
+        let lang = "en"
+        if exists("$LANG") && $LANG =~ '^..'
+            let lang = strpart($LANG,0,2)
+        endif
+        return ' xmlns="http://www.w3.org/1999/xhtml" lang="'.lang.'" xml:lang="'.lang.'"'
     elseif @" == 'style'
         return ' type="text/css"'
     elseif @" == 'script'
@@ -377,17 +413,16 @@ function! s:tagextras()
     endif
 endfunction
 
-
 function! s:UrlEncode(str)
     return substitute(a:str,'[^A-Za-z0-9_.-]','\="%".printf("%02X",char2nr(submatch(0)))','g')
 endfunction
 
 function! s:UrlDecode(str)
-    let str = substitute(substitute(a:str,'%0[Aa]\n$','%0A',''),'%0[Aa]','\n','g')
+    let str = substitute(substitute(substitute(a:str,'%0[Aa]\n$','%0A',''),'%0[Aa]','\n','g'),'+',' ','g')
     return substitute(str,'%\(\x\x\)','\=nr2char("0x".submatch(1))','g')
 endfunction
 
-let s:entities = "'apos\n\u00a0nbsp\n\u00a9copy\n\u00ablaquo\n\u00aereg\n\u00b5micro\n\u00b6para\n\u00bbraquo\n\u00dfszlig\n"
+let s:entities = "\u00a0nbsp\n\u00a9copy\n\u00ablaquo\n\u00aereg\n\u00b5micro\n\u00b6para\n\u00bbraquo\n\u00dfszlig\n"
 
 function! s:XmlEncode(str)
     let str = a:str
@@ -397,7 +432,7 @@ function! s:XmlEncode(str)
     let str = substitute(str,'"','\&quot;','g')
     if s:subtype() == 'xml'
         let str = substitute(str,"'",'\&apos;','g')
-    else
+    elseif s:subtype() =~ 'html'
         let changes = s:entities
         while changes != ""
             let orig = matchstr(changes,'.')
@@ -464,17 +499,28 @@ function! s:opfunc(algorithm,type)
     let @@ = reg_save
 endfunction
 
-nmap <silent> <Plug>allmlUrlEncode :set opfunc=<SID>opfuncUrlEncode<CR>g@
-vmap <silent> <Plug>allmlUrlEncode :<C-U>call <SID>opfuncUrlEncode(visualmode())<CR>
-nmap <silent> <Plug>allmlLineUrlEncode :<C-U>call <SID>opfuncUrlEncode(v:count1)<CR>
-nmap <silent> <Plug>allmlUrlDecode :set opfunc=<SID>opfuncUrlDecode<CR>g@
-vmap <silent> <Plug>allmlUrlDecode :<C-U>call <SID>opfuncUrlDecode(visualmode())<CR>
-nmap <silent> <Plug>allmlLineUrlDecode :<C-U>call <SID>opfuncUrlDecode(v:count1)<CR>
-nmap <silent> <Plug>allmlXmlEncode :set opfunc=<SID>opfuncXmlEncode<CR>g@
-vmap <silent> <Plug>allmlXmlEncode :<C-U>call <SID>opfuncXmlEncode(visualmode())<CR>
-nmap <silent> <Plug>allmlLineXmlEncode :<C-U>call <SID>opfuncXmlEncode(v:count1)<CR>
-nmap <silent> <Plug>allmlXmlDecode :set opfunc=<SID>opfuncXmlDecode<CR>g@
-vmap <silent> <Plug>allmlXmlDecode :<C-U>call <SID>opfuncXmlDecode(visualmode())<CR>
-nmap <silent> <Plug>allmlLineXmlDecode :<C-U>call <SID>opfuncXmlDecode(v:count1)<CR>
-"nmap <silent> <Plug>allmlUrlEncode :call setreg('"',(substitute(@@,'\n$','','') =~ '[^A-Za-z0-9_.%-]' ? UrlEncode(@@) : UrlDecode(substitute(@@,'\n$','','')))<CR>
-"vmap <silent> <Plug>allmlUrlEncode y:call setreg(v:register,UrlEncode(getreg(v:register)))<CR>gvp
+nnoremap <silent> <Plug>allmlUrlEncode :<C-U>set opfunc=<SID>opfuncUrlEncode<CR>g@
+vnoremap <silent> <Plug>allmlUrlEncode :<C-U>call <SID>opfuncUrlEncode(visualmode())<CR>
+nnoremap <silent> <Plug>allmlLineUrlEncode :<C-U>call <SID>opfuncUrlEncode(v:count1)<CR>
+nnoremap <silent> <Plug>allmlUrlDecode :<C-U>set opfunc=<SID>opfuncUrlDecode<CR>g@
+vnoremap <silent> <Plug>allmlUrlDecode :<C-U>call <SID>opfuncUrlDecode(visualmode())<CR>
+nnoremap <silent> <Plug>allmlLineUrlDecode :<C-U>call <SID>opfuncUrlDecode(v:count1)<CR>
+nnoremap <silent> <Plug>allmlXmlEncode :<C-U>set opfunc=<SID>opfuncXmlEncode<CR>g@
+vnoremap <silent> <Plug>allmlXmlEncode :<C-U>call <SID>opfuncXmlEncode(visualmode())<CR>
+nnoremap <silent> <Plug>allmlLineXmlEncode :<C-U>call <SID>opfuncXmlEncode(v:count1)<CR>
+nnoremap <silent> <Plug>allmlXmlDecode :<C-U>set opfunc=<SID>opfuncXmlDecode<CR>g@
+vnoremap <silent> <Plug>allmlXmlDecode :<C-U>call <SID>opfuncXmlDecode(visualmode())<CR>
+nnoremap <silent> <Plug>allmlLineXmlDecode :<C-U>call <SID>opfuncXmlDecode(v:count1)<CR>
+
+if exists("g:allml_global_maps")
+    imap     <C-X>H      <Plug>allmlHtmlComplete
+    imap     <C-X>/    </<Plug>allmlHtmlComplete
+    map      <Leader>eu  <Plug>allmlUrlEncode
+    map      <Leader>du  <Plug>allmlUrlDecode
+    map      <Leader>ex  <Plug>allmlXmlEncode
+    map      <Leader>dx  <Plug>allmlXmlDecode
+    nmap     <Leader>euu <Plug>allmlLineUrlEncode
+    nmap     <Leader>duu <Plug>allmlLineUrlDecode
+    nmap     <Leader>exx <Plug>allmlLineXmlEncode
+    nmap     <Leader>dxx <Plug>allmlLineXmlDecode
+endif
