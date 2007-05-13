@@ -1,7 +1,8 @@
 " Vim color scheme
 " Name:         vividchalk.vim
-" Maintainer:   Tim Pope <vim@tpope.info>
-" Last Change:  08 May 2007
+" Author:       Tim Pope <vimNOSPAM@tpope.info>
+" GetLatestVimScripts: 1891 1 :AutoInstall: vividchalk.vim
+" $Id$
 
 " Based on the Vibrank Ink theme for TextMate
 
