@@ -19,6 +19,10 @@ case "$PATH" in
     *) PATH="$HOME/bin:$PATH" ;;
 esac
 
+if [ -f "$ENV" ]; then
+    . "$ENV"
+fi
+
 basename=`basename "$0"`
 if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
     tpope="$basename " basename="$1"
@@ -604,6 +608,16 @@ case "$basename" in
         width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
         height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
         exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
+        ;;
+    rubydemo)
+        exec ruby - "$*" <<-EOF
+        print ARGV.join(' ') + ' #=> '
+        begin
+            p(eval(ARGV.join(' '),binding,'(demo)'))
+        rescue Exception => e
+            puts "#<#{e.class}: #{e.message[/.*/]}>"
+        end
+EOF
         ;;
     rsync) no_links
 	exec rsync -CP --include='*.so' --include='*.exe' "$@" ;;
