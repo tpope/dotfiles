@@ -11,13 +11,13 @@
 
 FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
- .profile .bashrc .bash_profile .screenrc .terminfo .dir_colors \
+ .profile .bashrc .bash_profile .screenrc .terminfo/? .dir_colors .irbrc \
  .vimrc .vim/[^l]* .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
  .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js .pixmaps/mi* \
- .fvwm/.fvwm2rc .fvwm/icons/* .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
+ .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
- bin/sync-tpope bin/media bin/installer \
+ bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb \
  "
 # bin/ps-grep bin/rwho bin/ruptime bin/launch bin/runcontrol \
 # bin/start bin/stop bin/restart bin/reload bin/force-reload \
@@ -73,9 +73,9 @@ fi
 
 [ -n "$ALL_HOSTS" ] || simpson=1
 if [ -n "$simpson" ]; then
-	MY_HOSTS="$MY_HOSTS gob oscar buster lindsay lucille tobias michael"
+	MY_HOSTS="$MY_HOSTS gob lindsay tobias"
 	ALL_HOSTS="$ALL_HOSTS gob oscar buster lindsay lucille tobias michael maeby maggie barry lupe"
-	LOCAL_HOSTS="$LOCAL_HOSTS gob oscar buster lindsay lucille tobias michael"
+	LOCAL_HOSTS="$LOCAL_HOSTS gob lindsay lucille tobias michael"
 fi
 
 if [ -n "$cvs" ]; then
