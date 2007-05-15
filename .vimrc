@@ -21,13 +21,13 @@ set copyindent
 set dictionary+=/usr/share/dict/words
 let &fileencodings = substitute(&fileencodings,"latin1","cp1252,latin1","")
 "set foldlevelstart=1
-set grepprg=grep\ -nH\ $*
+set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude=tags\ $*
 let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 set incsearch       " Incremental search
 set joinspaces
 set laststatus=2    " Always show status line
 if has("mac")
-  set nomacatsui
+  silent! set nomacatsui
 else
   set lazyredraw
 endif
@@ -119,10 +119,11 @@ elseif has("mac")
 endif
 
 " Plugin Settings {{{2
-let g:c_comment_strings=1
+let g:allml_global_maps=1
+"let g:c_comment_strings=1
 "let g:capslock_command_mode=1
-let g:EnhCommentifyBindInInsert='No'
-let g:EnhCommentifyRespectIndent='Yes'
+let g:EnhCommentifyBindInInsert = 'No'
+let g:EnhCommentifyRespectIndent = 'Yes'
 "let g:Imap_PlaceHolderStart="\xab"
 "let g:Imap_PlaceHolderEnd="\xbb"
 let g:miniBufExplForceSyntaxEnable = 1
@@ -136,7 +137,6 @@ let g:rails_level=9
 let g:rails_default_database='sqlite3'
 let g:rails_menu=1
 let g:rubyindent_match_parentheses=0
-"let g:ruby_no_identifiers=1
 let g:ruby_minlines=500
 let g:rubycomplete_rails=1
 if !has("gui_running")
@@ -145,10 +145,13 @@ endif
 let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 let g:surround_45 = "<% \r %>"
 let g:surround_61 = "<%= \r %>"
+let g:surround_indent = 1
 
 " }}}2
 " Section: Functions {{{1
 " -----------------------
+
+silent! ruby require 'tpope'; require 'vim'
 
 function! StatusLineColors()
   let save = @l
@@ -167,14 +170,16 @@ endfunction
 
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
-command! -bar -nargs=0 SudoW   :silent write !sudo tee % >/dev/null
+command! -bar -nargs=0 SudoW   :silent write !sudo tee % >/dev/null|edit
 command! -bar -nargs=* -bang W :write<bang> <args>
-command! -bar -nargs=0 -bang Scratch silent edit<bang> [Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
-
-function! Eatchar(pat)
-  let c = nr2char(getchar(0))
-  return (c =~ a:pat) ? '' : c
-endfunction
+command! -bar -nargs=0 -bang Scratch :silent edit<bang> [Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
+command! -bar -count=0 RFC     :e http://www.ietf.org/rfc/rfc<count>.txt|setl ro noma
+command! -bar -nargs=* -bang Rename :
+      \ let v:errmsg = ""|
+      \ saveas<bang> <args>|
+      \ if v:errmsg == ""|
+      \   call delete(expand("#"))|
+      \ endif
 
 function! Invert()
   if &background=="light"
@@ -254,7 +259,6 @@ function! Run()
   elseif &ft == "html" || &ft == "xhtml" || &ft == "php" || &ft == "aspvbs" || &ft == "aspperl"
     wa
     if !exists("b:url")
-      "let b:url=expand("%:p")
       call OpenURL(expand("%:p"))
     else
       call OpenURL(b:url)
@@ -279,12 +283,7 @@ function! Run()
 endfunction
 command! -bar Run :call Run()
 
-function! SQL()
-  edit SQL
-  setf sql
-  set bt=nofile
-endfunction
-command! -bar SQL :call SQL()
+command! -bar SQL :edit SQL|set ft=sql bt=nofile
 
 function! ToTeX()
   silent! s/\%u201c/``/g
@@ -299,30 +298,8 @@ function! ToTeX()
 endfunction
 command! -bar -range=% ToTeX :<line1>,<line2>call ToTeX()
 
-function! InsertTabWrapper()
-  let col = col('.') - 1
-  if !col || getline('.')[col - 1] !~ '\k'
-    return "\<tab>"
-  else
-    return "\<c-p>"
-  endif
-endfunction
-
 function! InsertCtrlDWrapper()
   return col('.')>strlen(getline('.'))?"\<C-D>":"\<Del>"
-endfunction
-
-function! InsertCtrlLWrapper()
-  if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
-    return "0\<C-T>\<BS>"
-    "return "\<Esc>d^xkJs"
-  elseif exists("b:rails_root")
-    return "\<C-X>\<C-U>\<C-P>"
-  elseif &filetype =~ 'sh$'
-    return "\<C-X>\<C-F>\<C-P>"
-  else
-    return "\<C-X>\<C-L>"
-  endif
 endfunction
 
 function! InsertQuoteWrapper(char)
@@ -359,7 +336,11 @@ endif
 " Section: Mappings {{{1
 " ----------------------
 
-imap <C-X>/ <Lt>/<Plug>allmlHtmlComplete
+"function! s:Eatchar(pat)
+  "let c = nr2char(getchar(0))
+  "return (c =~ a:pat) ? '' : c
+"endfunction
+
 map  <S-Insert> <MiddleMouse>
 map! <S-Insert> <MiddleMouse>
 map Y       y$
@@ -367,9 +348,6 @@ map Y       y$
 map Q       gqj
 " open URL under cursor in browser
 map gb      :call OpenURL(expand("<cfile>"))<CR>
-"inoremap <C-L> <Esc>d^xkJs
-" Run p in Visual mode replace the selected text with the "" register.
-"vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
 "vnoremap <C-C> "+y
 nnoremap <silent> <C-L> :nohls<CR><C-L>
 
@@ -396,10 +374,8 @@ map <C-F4>  :bdelete<CR>
 "map <C-Z> :shell<CR>
 " Attribution Fixing
 map <Leader>at gg}jWdWWPX
-"map <Leader>sa :!aspell -c --dont-backup "%"<CR>:e! "%"<CR><CR>
-"map <Leader>si :!ispell "%"<CR>:e! "%"<CR><CR>
-"map <Leader>sh :so `sh /usr/share/doc/vim/tools/vimspell.sh %`<CR><CR>
-map <Leader>sw :!echo "<cword>"\|aspell -a --<CR>
+"map <Leader>sw :!echo "<cword>"\|aspell -a --<CR>
+map <Leader>S  r<CR>ddkP=j
 map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
 map <Leader>fJ :% call Justify('',3,)<CR>
 map <Leader>fp gqap
@@ -408,14 +384,6 @@ map <Leader>ft :!thesaurus "<cword>"<CR>
 " Merge consecutive empty lines
 map <Leader>fm :g/^\s*$/,/\S/-j<CR>
 map <Leader>v :so ~/.vimrc<CR>
-" Wrap visual in parentheses
-vmap <Leader>( v`>a)<Esc>`<i(<Esc>
-vmap <Leader>{ v`>a}<Esc>`<i{<Esc>
-vmap <Leader>[ v`>a]<Esc>`<i[<Esc>
-vmap <Leader>< v`>a><Esc>`<i<<Esc>
-vmap <Leader>" v`>a"<Esc>`<i"<Esc>
-vmap <Leader>' v`>a'<Esc>`<i'<Esc>
-") <-- Fix syntax highlighting
 
 " EnhancedCommentify
 map <silent> \\     <Plug>Traditionalj
@@ -423,25 +391,34 @@ map <silent> \\     <Plug>Traditionalj
 map <Leader>l       <Plug>CapsLockToggle
 imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
+"imap <C-X>/         <Lt>/<Plug>allmlHtmlComplete
+"map  <Leader>eu     <Plug>allmlUrlEncode
+"map  <Leader>du     <Plug>allmlUrlDecode
+"map  <Leader>ex     <Plug>allmlXmlEncode
+"map  <Leader>dx     <Plug>allmlXmlDecode
+"nmap <Leader>euu    <Plug>allmlLineUrlEncode
+"nmap <Leader>duu    <Plug>allmlLineUrlDecode
+"nmap <Leader>exx    <Plug>allmlLineXmlEncode
+"nmap <Leader>dxx    <Plug>allmlLineXmlDecode
 
-"inoremap <C-]> <Esc>`^
+vnoremap <M-<> <gv
+vnoremap <M->> >gv
+
 inoremap <C-C> <Esc>`^
 inoremap <C-X><C-A> <C-A>
-if ! has("gui_running")
-  "map <Esc>[3^ <C-Del>
-  "map <Esc>[5^ <C-PageUp>
-  "map <Esc>[6^ <C-PageDown>
-  "map <Esc>[3;5~ <C-Del>
-  "map <Esc>[5;5~ <C-PageUp>
-  "map <Esc>[6;5~ <C-PageDown>
-endif
 
+function! InsertTabWrapper()
+  let col = col('.') - 1
+  if !col || getline('.')[col - 1] !~ '\k'
+    return "\<tab>"
+  else
+    return "\<c-p>"
+  endif
+endfunction
 if version >= 600
   "inoremap <silent> <Tab> <C-R>=InsertTabWrapper()<CR>
-  "inoremap <silent> <C-L> <C-R>=InsertCtrlLWrapper()<CR>
 else
   "inoremap <Tab> <C-R>=InsertTabWrapper()<CR>
-  "inoremap <C-L> <C-R>=InsertCtrlLWrapper()<CR>
 endif
 
 " Emacs style mappings
@@ -497,42 +474,43 @@ inoremap <M-A>      <C-O>$
 noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR>       <C-G>u<CR>
-"nnoremap ]<Space>   o<Space><C-U><Esc>-
-"nnoremap [<Space>   O<Space><C-U><Esc>+
-nnoremap <silent> ]<Space>   :put=''<Bar>-<CR>
-nnoremap <silent> [<Space>   :put!=''<Bar>+<CR>
+if exists("*repeat")
+  nnoremap <silent> ]<Space>   :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
+  nnoremap <silent> [<Space>   :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
+else
+  nnoremap          ]<Space>   o<Space><C-U><Esc>-
+  nnoremap          [<Space>   O<Space><C-U><Esc>+
+endif
 
 inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
 
-noremap <M-,> :Smaller<CR>
-noremap <M-.> :Bigger<CR>
-noremap <M-PageUp> :bprevious<CR>
+noremap <M-,>        :Smaller<CR>
+noremap <M-.>        :Bigger<CR>
+noremap <M-PageUp>   :bprevious<CR>
 noremap <M-PageDown> :bnext<CR>
-noremap <C-Del> :bdelete<CR>
-noremap <M-Up> :bprevious<CR>
-noremap <M-Down> :bnext<CR>
-noremap <M-Left> :tabprevious<CR>
-noremap <M-Right> :tabnext<CR>
-noremap <S-Left> :bprevious<CR>
-noremap <S-Right> :bnext<CR>
-"noremap <C-PageUp> :tabprevious<CR>
-"noremap <C-PageDown> :tabnext<CR>
-noremap <C-Up>  <C-W><Up>
-noremap <C-Down> <C-W><Down>
-noremap <C-Left> <C-W><Left>
-noremap <C-Right> <C-W><Right>
-noremap <S-Home> <C-W><Up>
-noremap <S-End> <C-W><Down>
-noremap <S-Up> <C-W><Up>
-noremap <S-Down> <C-W><Down>
-noremap! <C-Up> <Esc><C-W><Up>
-noremap! <C-Down> <Esc><C-W><Down>
-noremap! <C-Left> <Esc><C-W><Left>
-noremap! <C-Right> <Esc><C-W><Right>
-noremap! <S-Home> <Esc><C-W><Up>
-noremap! <S-End> <Esc><C-W><Down>
-noremap! <S-Up> <Esc><C-W><Up>
-noremap! <S-Down> <Esc><C-W><Down>
+noremap <C-Del>      :bdelete<CR>
+noremap <M-Up>       :bprevious<CR>
+noremap <M-Down>     :bnext<CR>
+noremap <M-Left>     :tabprevious<CR>
+noremap <M-Right>    :tabnext<CR>
+noremap <S-Left>     :bprevious<CR>
+noremap <S-Right>    :bnext<CR>
+noremap <C-Up>       <C-W><Up>
+noremap <C-Down>     <C-W><Down>
+noremap <C-Left>     <C-W><Left>
+noremap <C-Right>    <C-W><Right>
+noremap <S-Home>     <C-W><Up>
+noremap <S-End>      <C-W><Down>
+noremap <S-Up>       <C-W><Up>
+noremap <S-Down>     <C-W><Down>
+noremap! <C-Up>      <Esc><C-W><Up>
+noremap! <C-Down>    <Esc><C-W><Down>
+noremap! <C-Left>    <Esc><C-W><Left>
+noremap! <C-Right>   <Esc><C-W><Right>
+noremap! <S-Home>    <Esc><C-W><Up>
+noremap! <S-End>     <Esc><C-W><Down>
+noremap! <S-Up>      <Esc><C-W><Up>
+noremap! <S-Down>    <Esc><C-W><Down>
 
 " Section: Abbreviations {{{1
 " ---------------------------
@@ -591,7 +569,6 @@ endif
 " Section: Autocommands {{{1
 " --------------------------
 
-" Only do this part when compiled with support for autocommands.
 if has("autocmd")
   if version>600
     filetype plugin indent on
@@ -618,8 +595,9 @@ if has("autocmd")
           \ endif |
           \ set ft=sh | 1
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
-    autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_exe=1
-    autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_exe=1
+    "autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_exe=1
+    "autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_exe=1
+    autocmd BufNewFile  * let b:chmod_exe=1
     autocmd BufWritePre * if exists("b:chmod_exe") |
           \ unlet b:chmod_exe |
           \ if getline(1) =~ '^#!' | let b:chmod_new="+x" | endif |
@@ -654,7 +632,6 @@ if has("autocmd")
     autocmd!
     autocmd BufNewFile,BufRead *Fvwm*             set ft=fvwm
     autocmd BufNewFile,BufRead *.cl[so],*.bbl     set ft=tex
-    " autocmd BufNewFile,BufRead *.cfg            set ft=tex isk+=@
     autocmd BufNewFile,BufRead /var/www/*.module  set ft=php
     autocmd BufNewFile,BufRead *named.conf*       set ft=named
     autocmd BufNewFile,BufRead *.bst              set ft=bst
@@ -678,6 +655,8 @@ if has("autocmd")
           \ " ".getline(3) =~? '<\%(!DOCTYPE \)\=html\>' | setf html | endif
     autocmd BufRead,StdinReadPost * if ! did_filetype() && getline(1) =~ '^%PDF-' | setf pdf | endif
     autocmd BufNewFile,BufRead *.txt,README,INSTALL if &ft == ""|set ft=text|endif
+    autocmd BufNewFile,BufRead *.erb set ft=eruby
+    autocmd BufNewFile,BufRead *.pl.erb let b:eruby_subtype = 'perl'|set ft=eruby
   augroup END " }}}2
   augroup FTOptions " {{{2
     autocmd!
@@ -689,7 +668,8 @@ if has("autocmd")
     autocmd FileType php,aspperl,aspvbs,vb  setlocal ai et sta sw=4 sts=4
     autocmd FileType apache,sql,vbnet       setlocal ai et sta sw=4 sts=4
     autocmd FileType tex,css                setlocal ai et sta sw=2 sts=2
-    autocmd FileType html,xhtml,xml,wml,cf  setlocal ai et sta sw=2 sts=2
+    autocmd FileType html,xhtml,wml,cf      setlocal ai et sta sw=2 sts=2
+    autocmd FileType xml,xsd,xslt           setlocal ai et sta sw=2 sts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
     autocmd FileType tt2html,htmltt,mason   setlocal ai et sta sw=2 sts=2
     autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8
@@ -699,9 +679,6 @@ if has("autocmd")
     autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o<C-U># $I<C-V>d$<Esc>o<C-U><C-X>^<Esc>o<C-U><C-G>u
     autocmd FileType c,cpp,cs,java,perl,javscript,php,aspperl,tex,css let b:surround_101 = "\r\n}"
     autocmd User     allml                  inoremap <buffer> <C-J> <Down>
-    "if !filereadable(expand("~/.config/vim/syntax/tt2html.vim"))
-     "autocmd BufNewFile,BufRead *.tt,*.tt2        setlocal syntax=html
-    "endif
     autocmd FileType tt2html,htmltt if !exists("b:current_syntax") | setlocal syntax=html | endif
     autocmd FileType aspvbs,vbnet setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
     autocmd FileType asp*         runtime! indent/html.vim
