@@ -36,7 +36,7 @@ set`[ -d "$HOME/.smime/certificates" ] && " smime_default_key=$(hostname).pem"`
 set`[ -x /usr/bin/muttprint ] && echo " print_command=muttprint"`
 set`[ -d "$HOME/.mutt_cache" ] && echo " header_cache=~/.mutt_cache message_cachedir=~/.mutt_cache"`
 
-mailboxes "!" # "imap://bart/" "imap://lisa/" "imap://marge/" "imap://homer/" "imap://abe/" "imap://mona/"
+mailboxes "!" # "imap://lucille/" "imap://michael/" "imap://lindsay/" "imap://tobias/"
 auto_view text/richtext text/html
 #set implicit_autoview
 alternative_order text/enriched text/richtext text/plain text
@@ -106,9 +106,9 @@ message-hook '~A' 'unignore X-Face; ignore X-Spam-Status'
 message-hook '~P|~h ^X-All-Your-Base-Are-Belong-To:' 'ignore X-Face X-Spam-Status'
 message-hook '~h X-Spam-Level:\ \\*' 'unignore X-Face X-Spam-Status'
 save-hook '~h X-Spam-Level:\ \\*\\*\\*' =definitely-spam
-save-hook '~f"@(ebay|amazon|paypal|buy|newegg)\\.com$"'        =purchase
-save-hook '~s"\\<(order|invoice|purchase|payment|shipped)\\>"' =purchase
-save-hook '~s"\\<(vim|ruby|rails)\\>"' =geek
+save-hook '~f"@(ebay|amazon|paypal|buy|newegg)\\.com$" !~l'        =purchase
+save-hook '~s"\\<(order|invoice|purchase|payment|shipped)\\>" !~l' =purchase
+save-hook '~s"\\<(vim|ruby|rails)\\>" !~l' =geek
 fcc-hook  '~p ~P ~s"(test|fu[c]k|^[jf][^A-Z]*$)"' /dev/null
 #save-hook '~H .' =definitely-spam
 #reply-hook . 'set pgp_autosign=yes; set pgp_create_traditional=ask-no'
@@ -222,19 +222,17 @@ lists mutt-users speedseductionlist zaurus-general debian-knoppix
 account-hook . 'unset imap_user imap_pass tunnel'; folder-hook . 'set folder="$HOME/Mail" record="=sent"'
 
 account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
-account-hook imap://bart/   'set tunnel="hostinfo -S bart -qx /usr/sbin/imapd"'; folder-hook imap://bart/ 'set folder=imap://bart/'
-account-hook imap://lisa/   'set tunnel="hostinfo -S lisa -qx /usr/sbin/imapd"'; folder-hook imap://lisa/ 'set folder=imap://lisa/'
-account-hook imap://marge/  'set tunnel="hostinfo -S marge -qx /usr/sbin/imapd"'; folder-hook imap://marge/ 'set folder=imap://marge/'
-account-hook imap://homer/  'set tunnel="hostinfo -S homer -qx /usr/sbin/imapd"'; folder-hook imap://homer/ 'set folder=imap://homer/'
-account-hook imap://abe/    'set tunnel="hostinfo -S abe -qx /usr/sbin/imapd"'; folder-hook imap://abe/ 'set folder=imap://abe/'
-account-hook imap://mona/   'set tunnel="hostinfo -S mona -qx /usr/sbin/imapd"'; folder-hook imap://mona/ 'set folder=imap://mona/'
+account-hook imap://gob/       'set tunnel="hostinfo -S gob -qx /usr/sbin/imapd"'; folder-hook imap://gob/ 'set folder=imap://gob/'
+account-hook imap://lucille/   'set tunnel="hostinfo -S lucille -qx /usr/sbin/imapd"'; folder-hook imap://lucille/ 'set folder=imap://lucille/'
+account-hook imap://michael/   'set tunnel="hostinfo -S michael -qx /usr/sbin/imapd"'; folder-hook imap://michael/ 'set folder=imap://michael/'
+account-hook imap://lindsay/   'set tunnel="hostinfo -S lindsay -qx /usr/sbin/imapd"'; folder-hook imap://lindsay/ 'set folder=imap://lindsay/'
+account-hook imap://tobias/    'set tunnel="hostinfo -S tobias -qx /usr/sbin/imapd"'; folder-hook imap://tobias/ 'set folder=imap://tobias/'
 
-account-hook imap://bart.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh bart /usr/sbin/imapd"'
-account-hook imap://lisa.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh lisa /usr/sbin/imapd"'
-account-hook imap://marge.sexygeek.us/ 'set tunnel="ssh sexygeek.us ssh marge /usr/sbin/imapd"'
-account-hook imap://homer.sexygeek.us/ 'set tunnel="ssh sexygeek.us ssh homer /usr/sbin/imapd"'
-account-hook imap://abe.sexygeek.us/   'set tunnel="ssh sexygeek.us ssh abe /usr/sbin/imapd"'
-account-hook imap://mona.sexygeek.us/  'set tunnel="ssh sexygeek.us ssh mona /usr/sbin/imapd"'
+account-hook imap://gob.tpope.us/      'set tunnel="ssh sexygeek.us ssh gob /usr/sbin/imapd"'
+account-hook imap://lucille.tpope.us/  'set tunnel="ssh sexygeek.us ssh lucille /usr/sbin/imapd"'
+account-hook imap://michael.tpope.us/  'set tunnel="ssh sexygeek.us ssh michael /usr/sbin/imapd"'
+account-hook imap://lindsay.tpope.us/  'set tunnel="ssh sexygeek.us ssh lindsay /usr/sbin/imapd"'
+account-hook imap://tobias.tpope.us/   'set tunnel="ssh sexygeek.us ssh tobias /usr/sbin/imapd"'
 
 # }}}1
 # Section: Misc {{{1
