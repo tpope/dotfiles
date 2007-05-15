@@ -5,7 +5,6 @@
 export ENV="$HOME/.shrc"
 . $ENV
 unset interactive
-echo hi
 
 if [ "$PS1" ]; then
 # If running interactively, then:
