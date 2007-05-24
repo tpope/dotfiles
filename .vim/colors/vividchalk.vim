@@ -97,11 +97,11 @@ else
 endif
 highlight StatusLine    guifg=Black   guibg=#aabbee gui=bold ctermfg=Black ctermbg=White  cterm=bold
 highlight StatusLineNC  guifg=#444444 guibg=#aaaaaa gui=none ctermfg=Black ctermbg=Grey   cterm=none
-if &t_Co == 256
-    highlight StatusLine ctermbg=117
-else
-    highlight StatusLine ctermbg=43
-endif
+"if &t_Co == 256
+    "highlight StatusLine ctermbg=117
+"else
+    "highlight StatusLine ctermbg=43
+"endif
 highlight WildMenu      guifg=Black   guibg=#ffff00 gui=bold ctermfg=Black ctermbg=Yellow cterm=bold
 highlight Cursor        guifg=Black guibg=White ctermfg=Black ctermbg=White
 highlight CursorLine    guibg=#333333 guifg=NONE
