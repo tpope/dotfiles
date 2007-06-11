@@ -599,7 +599,7 @@ function! s:urlencode(char)
 endfunction
 
 function! s:urlmap(char)
-    let rpl = s:urlencode(a:char)
+    let repl = s:urlencode(a:char)
     exe "inoremap <buffer> ".a:char." ".repl
 endfunction
 
