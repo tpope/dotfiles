@@ -123,7 +123,7 @@ function! s:Pastie(bang,line1,line2,count,...)
         let numcheck = substitute(numcheck,'\n\+$','','')
         let numcheck = substitute(numcheck,'^\n\+','','g')
         if numcheck =~ '\n'
-            let numcheck == ''
+            let numcheck = ''
         endif
         if numcheck =~ '^\d\d+$'
             let num = numcheck
@@ -387,18 +387,20 @@ endfunction
 function! s:parser(type)
     " Accepts a filename, extension, or vim filetype
     let type = tolower(substitute(a:type,'.*\.','',''))
-    if type =~ '^\%(eruby\|x\=html\|php\|asp\w*\)$'
-        return "html"
-    elseif type =~ '^\%(ruby\|rb\|rake\|rxml\|rjs\|mab\|irbrc\)'
-        return "ruby"
+    if type =~ '^\%(x\=html\|php\|asp\w*\)$'
+        return 'html'
+    elseif type =~ '^\%(eruby\|erb\|rhtml\)$'
+        return 'rhtml'
+    elseif type =~ '^\%(ruby\|rb\|rake\|rxml\|builder\|rjs\|mab\|irbrc\)'
+        return 'ruby'
     elseif type == 'js' || type == 'javascript'
-        return "javascript"
+        return 'javascript'
     elseif type == 'c' || type == 'cpp'
-        return "c"
+        return 'c'
     elseif type == 'diff' || type == 'sql'
         return type
     else
-        return "plaintext"
+        return 'plaintext'
     endif
 endfunction
 
@@ -435,11 +437,13 @@ function! s:cookies()
     endif
     if !exists("g:pastie_account")
         let rubycmd = '%w(~/.mozilla/firefox ~/.firefox/default ~/.phoenix/default ~/Application\ Data/Mozilla/Firefox/Profiles ~/Library/Application\ Support/Firefox/Profiles)'
-        let rubycmd = rubycmd . '.each {|dir| Dir[File.join(File.expand_path(dir),%{*})].select {|p| File.exists?(File.join(p,%{cookies.txt}))}.each {|p| File.open(File.join(p,%{cookies.txt})).each_line { |l| a=l.split(9.chr); puts a[6] if a[0] =~ /pastie\.caboo\.se#{36.chr}/ && Time.now.to_i < a[4].to_i && a[5] == %{account} }}}'
+        let rubycmd = rubycmd . '.each {|dir| Dir[File.join(File.expand_path(dir),%{*})].select {|p| File.exists?(File.join(p,%{cookies.txt}))}.each {|p| File.open(File.join(p,%{cookies.txt})).each_line { |l| a=l.split(9.chr); puts [a[4],a[6]].join(%{ }) if a[0] =~ /pastie\.caboo\.se#{36.chr}/ && Time.now.to_i < a[4].to_i && a[5] == %{account} }}}'
         let output = ''
         let output = system('ruby -e "'.rubycmd.'"')
         if output =~ '\n' && output !~ '-e:'
-            let g:pastie_account = substitute(output,'\n.*','','')
+            let output = substitute(output,'\n.*','','')
+            let g:pastie_account = matchstr(output,' \zs.*')
+            let g:pastie_account_expires = matchstr(output,'.\{-\}\ze ')
         else
             let g:pastie_account = ''
         endif
@@ -464,13 +468,17 @@ function! s:extractcookies(path)
         let g:pastie_cookies = cookie
     endif
     if cookie !~ '-e:'
-        let session_id = matchstr(cookie,'\<_session_id=\zs.\{-\}\ze\%(;\|$\)')
-        let account    = matchstr(cookie,'\<account=\zs.\{-\}\ze\%(;\|$\)')
+        let session_id = matchstr(cookie,'\<_session_id=\zs.\{-\}\ze\%([;,]\|$\)')
+        let account    = matchstr(cookie,'\<account=\zs.\{-\}\ze\%([;,]\|$\)')
         if session_id != ""
             let g:pastie_session_id = session_id
         endif
         if account != ""
             let g:pastie_account = account
+            let time = matchstr(cookie,'\<[Ee]xpires=\zs\w\w\w,.\{-\}\ze\%([;,]\|$\)')
+            if time != ""
+                let g:pastie_account_expires = system('ruby -e "print Time.parse(%{'.time.'}).to_i"')
+            endif
         endif
     endif
 endfunction
