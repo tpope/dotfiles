@@ -3,6 +3,8 @@
 " GetLatestVimScripts: 1896 1 :AutoInstall: allml.vim
 " $Id$
 
+" Distributable under the same terms as Vim itself (see :help license)
+
 " These are my personal mappings for XML/XHTML editing, particularly with
 " dynamic content like PHP/ASP/eRuby.  Because they are personal, less effort
 " has been put into customizability (if you like these mappings but the lack
@@ -33,7 +35,7 @@
 " will be automatically added.  For example, script becomes
 " <script type="text/javascript">
 "
-" Note the doctype insertion uses Vim completion, which in 7.0 includes
+" Note that the doctype insertion uses Vim completion, which in 7.0 includes
 " erroneous doctypes.  Lowercase the first occurance of "HTML" to fix them.
 "
 " Encoding:
@@ -61,6 +63,16 @@
 " Don't let the names fool you, the XmlEncode mappings work on HTML as well,
 " and add a few additional escaped characters if the buffer is confirmed to
 " contain HTML.
+"
+" There are also a few insert mode mappings.  The first two take the next
+" character to be typed and encode it.  The second two put Vim into a special
+" mode where characters are encoded automatically when required.  This is
+" quite cool for demos but is of limited practical value otherwise.
+"
+" <C-V>%           <Plug>allmlUrlV
+" <C-V>&           <Plug>allmlXmlV
+" <C-X>%           <Plug>allmlUrlEncode
+" <C-X>&           <Plug>allmlXmlEncode
 "
 " Surroundings:
 "
@@ -125,8 +137,6 @@ function! s:Init()
     "imap <buffer> <C-X>& <SID>doctype<C-O>ohtml<C-X><CR>head<C-X><CR><C-X>#<Esc>otitle<C-X><Space><C-R>=expand('%:t:r')<CR><Esc>jobody<C-X><CR><Esc>cc
     imap <silent> <buffer> <C-X># <meta http-equiv="Content-Type" content="text/html; charset=<C-R>=<SID>charset()<CR>"<C-R>=<SID>closetag()<CR>
     "map! <buffer> <SID>Thl html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"
-    "abbr <buffer> Thl <SID>Thl
-    "abbr <buffer> Xhl <Lt><SID>Thl>
     "map! <buffer> <C-X>h <Thl><CR></html><Esc>O
     inoremap <silent> <buffer> <SID>HtmlComplete <C-R>=<SID>htmlEn()<CR><C-X><C-O><C-P><C-R>=<SID>htmlDis()<CR><C-N>
     imap     <buffer> <C-X>H <SID>HtmlComplete
@@ -253,22 +263,23 @@ function! s:Init()
     imap <buffer> <C-X>&           <Plug>allmlXmlEncode
     imap <buffer> <C-V>%           <Plug>allmlUrlV
     imap <buffer> <C-V>&           <Plug>allmlXmlV
-    nmap <script><buffer> <LocalLeader>iu  i<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>ix  i<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>Iu  I<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>Ix  I<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>au  a<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>ax  a<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>Au  A<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>Ax  A<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>ou  o<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>ox  o<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>Ou  O<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>Ox  O<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>su  s<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>sx  s<SID>allmlXmlEncode
-    nmap <script><buffer> <LocalLeader>Su  S<SID>allmlUrlEncode
-    nmap <script><buffer> <LocalLeader>Sx  S<SID>allmlXmlEncode
+    " Are these really worth it?
+    "nmap <script><buffer> <LocalLeader>iu  i<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>ix  i<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>Iu  I<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>Ix  I<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>au  a<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>ax  a<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>Au  A<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>Ax  A<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>ou  o<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>ox  o<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>Ou  O<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>Ox  O<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>su  s<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>sx  s<SID>allmlXmlEncode
+    "nmap <script><buffer> <LocalLeader>Su  S<SID>allmlUrlEncode
+    "nmap <script><buffer> <LocalLeader>Sx  S<SID>allmlXmlEncode
     "if has("spell")
         "setlocal spell
     "endif
@@ -279,7 +290,7 @@ function! s:Init()
             runtime! indent/html.vim
         endif
     endif
-    " Pet peeve
+    " Pet peeve.  Do people still not close their <p> and <li> tags?
     if exists("g:html_indent_tags") && g:html_indent_tags !~ '\\|p\>'
         let g:html_indent_tags = g:html_indent_tags.'\|p\|li'
     endif
