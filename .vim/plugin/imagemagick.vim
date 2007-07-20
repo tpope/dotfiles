@@ -20,31 +20,40 @@ augroup imagemagick
   " Enable clear text (XPM) editing of png/gif files
   " set binary mode before reading the file
   autocmd BufReadPre,FileReadPre	*.png,*.gif  setlocal bin
-  autocmd BufReadPost,FileReadPost	*.png,*.gif  call s:read("convert")
-  autocmd BufWritePost,FileWritePost	*.png,*.gif  call s:write("convert")
+  autocmd BufReadPost,FileReadPost	*.png,*.gif  if s:read("convert %s xpm:%s")|setf xpm|endif
+  autocmd BufWritePost,FileWritePost	*.png  call s:write("convert %s png:%s")
+  autocmd BufWritePost,FileWritePost	*.gif  call s:write("convert %s gif:%s")
 
 augroup END
 
-" Function to check that executing "cmd [-f]" works.
+function! s:esc(arg)
+  if exists("*shellescape")
+    return (shellescape(a:arg))
+  else
+    return '"'.a:arg.'"'
+  endif
+endfunction
+
+" Function to check that executing "cmd" works.
 " The result is cached in s:have_"cmd" for speed.
-fun s:check(cmd)
+function! s:check(cmd)
   let name = substitute(a:cmd, '\(\S*\).*', '\1', '')
   if !exists("s:have_" . name)
     let e = executable(name)
     if e < 0
-      let r = system(name);
+      let r = system(name)
       let e = (r !~ "not found" && r != "")
     endif
     exe "let s:have_" . name . "=" . e
   endif
   exe "return s:have_" . name
-endfun
+endfunction
 
 " After reading binary file: Convert text in buffer with "cmd"
-fun s:read(cmd)
+function! s:read(cmd)
   " don't do anything if the cmd is not supported
   if !s:check(a:cmd)
-    return
+    return 0
   endif
   " make 'patchmode' empty, we don't want a copy of the written file
   let pm_save = &pm
@@ -57,13 +66,12 @@ fun s:read(cmd)
   setlocal ma
   " when filtering the whole buffer, it will become empty
   let empty = line("'[") == 1 && line("']") == line("$")
-  let tmp = tempname()
-  let tmpe = tmp . "." . expand("<afile>:e")
-  let tmpo = tmp . ".xpm"
-  " write the just read lines to a temp file "'[,']w tmp.xpm"
+  let tmpe = tempname()
+  let tmpo = tempname()
+  " write the just read lines to a temp file
   execute "silent '[,']w " . tmpe
   " convert the temp file, modified for imagemagick
-  call system(a:cmd . " \"" . tmpe . "\" \"" . tmpo . "\"")
+  call system(printf(a:cmd,s:esc(tmpe),s:esc(tmpo)))
   " delete the binary lines; remember the line number
   let l = line("'[") - 1
   if exists(":lockmarks")
@@ -71,7 +79,7 @@ fun s:read(cmd)
   else
     '[,']d _
   endif
-  " read in the converted lines "'[-1r tmpo"
+  " read in the converted lines
   setlocal bin
   if exists(":lockmarks")
     execute "silent lockmarks " . l . "r " . tmpo
@@ -92,35 +100,39 @@ fun s:read(cmd)
   let &pm = pm_save
   let &cpo = cpo_save
   let &l:ma = ma_save
+
   " When converted the whole buffer, do autocommands
   if empty
     if &verbose >= 8
-      execute "doau BufReadPost " . expand("%:r") . ".xpm"
+      execute         "doau BufReadPost " . expand("%:r") . ".xpm"
     else
       execute "silent! doau BufReadPost " . expand("%:r") . ".xpm"
     endif
   endif
-  setf xpm
-endfun
+  return 1
+endfunction
 
 " After writing binary file: Convert written file with "cmd"
-fun s:write(cmd)
+function! s:write(cmd)
   " don't do anything if the cmd is not supported
   if s:check(a:cmd)
     let nm = expand("<afile>")
-    let tmp = tempname() . "." . expand("<afile>:e")
-    let cmdout = system(a:cmd . " " . " \"" . nm . "\" \"" . tmp . "\" 2>&1")
-    if cmdout !~? "error:"
+    let tmp = tempname()
+    call system(printf(a:cmd,s:esc(nm),s:esc(tmp)))
+    if !v:shell_error
       call rename(tmp, nm)
-      execute "silent edit"
     else
-      echo "An error occured while trying to convert the image using imagemagick."
+      echohl ErrorMsg
+      echo "An error occured while trying to convert the file."
+      echohl NONE
+      return
     endif
     " refresh buffer from the disk; this prevents the user from
     " receiving errant "file has changed on disk" messages; plus, it does
-    " update the buffer to reflect changes made by imagemagick at save-time
-    call s:read("convert")
+    " update the buffer to reflect changes made at save-time
+    execute "silent edit"
+    execute "silent doau BufReadPost ".nm
   endif
-endfun
+endfunction
 
 " vim: set sw=2 :

@@ -23,40 +23,61 @@ augroup plutil
 
   " Enable clear text (XML) editing of plist files
   " set binary mode before reading the file
-  autocmd BufReadPre,FileReadPre	*.plist  setlocal bin
-  autocmd BufReadPost,FileReadPost	*.plist  call s:read("plutil")
-  autocmd BufWritePost,FileWritePost	*.plist  call s:write("plutil")
+  autocmd BufReadPre,FileReadPre	*.plist  setlocal bin ts=2
+  autocmd BufReadPost,FileReadPost	*.plist  call s:readplist()
+  autocmd BufWritePost,FileWritePost	*.plist  call s:writeplist()
 
 augroup END
 
+function! s:esc(arg)
+  if exists("*shellescape")
+    return (shellescape(a:arg))
+  else
+    return '"'.a:arg.'"'
+  endif
+endfunction
+
 " Function to check that executing "cmd [-f]" works.
 " The result is cached in s:have_"cmd" for speed.
-fun s:check(cmd)
+function! s:check(cmd)
   let name = substitute(a:cmd, '\(\S*\).*', '\1', '')
   if !exists("s:have_" . name)
     let e = executable(name)
     if e < 0
-      let r = system(name);
+      let r = system(name)
       let e = (r !~ "not found" && r != "")
     endif
     exe "let s:have_" . name . "=" . e
   endif
   exe "return s:have_" . name
-endfun
+endfunction
 
 " After reading binary file: Convert text in buffer with "cmd"
-fun s:read(cmd)
+function! s:readplist()
   " don't do anything if the cmd is not supported
-  if !s:check(a:cmd)
-    return
-  endif
   if getline(1) =~ '<?xml\>'
     " If already XML, make a note and exit
     let b:plist_format = "xml1"
     setlocal nobin
     return
+  endif
+  let b:plist_format = "binary1"
+  let cmd = "plutil -convert xml1 %s -o %s"
+
+  call s:read(cmd)
+
+  " When converted the whole buffer, do autocommands
+  if &verbose >= 8
+    execute         "doau BufReadPost " . expand("%:r") . ".xml"
   else
-    let b:plist_format = "binary1"
+    execute "silent! doau BufReadPost " . expand("%:r") . ".xml"
+  endif
+endfunction
+
+function! s:read(cmd)
+  " don't do anything if the cmd is not supported
+  if !s:check(a:cmd)
+    return 0
   endif
   " make 'patchmode' empty, we don't want a copy of the written file
   let pm_save = &pm
@@ -69,12 +90,12 @@ fun s:read(cmd)
   setlocal ma
   " when filtering the whole buffer, it will become empty
   let empty = line("'[") == 1 && line("']") == line("$")
-  let tmp = tempname()
-  let tmpe = tmp . "." . expand("<afile>:e")
-  " write the just read lines to a temp file "'[,']w tmp.plist"
+  let tmpe = tempname()
+  let tmpo = tempname()
+  " write the just read lines to a temp file
   execute "silent '[,']w " . tmpe
   " convert the temp file, modified for plutil
-  call system(a:cmd . " -convert xml1 -o \"" . tmp . "\" \"" . tmpe . "\"")
+  call system(printf(a:cmd,s:esc(tmpe),s:esc(tmpo)))
   " delete the binary lines; remember the line number
   let l = line("'[") - 1
   if exists(":lockmarks")
@@ -82,12 +103,12 @@ fun s:read(cmd)
   else
     '[,']d _
   endif
-  " read in the converted lines "'[-1r tmp"
+  " read in the converted lines
   setlocal bin
   if exists(":lockmarks")
-    execute "silent lockmarks " . l . "r " . tmp
+    execute "silent lockmarks " . l . "r " . tmpo
   else
-    execute "silent " . l . "r " . tmp
+    execute "silent " . l . "r " . tmpo
   endif
 
   " if buffer became empty, delete trailing blank line
@@ -96,45 +117,48 @@ fun s:read(cmd)
     1
   endif
   " delete the temp file and the used buffers
-  call delete(tmp)
+  call delete(tmpo)
   call delete(tmpe)
-  silent! exe "bwipe " . tmp
+  silent! exe "bwipe " . tmpo
   silent! exe "bwipe " . tmpe
   let &pm = pm_save
   let &cpo = cpo_save
   let &l:ma = ma_save
-  " When converted the whole buffer, do autocommands
-  if empty
-    if &verbose >= 8
-      execute "doau BufReadPost " . expand("%:r")
-    else
-      execute "silent! doau BufReadPost " . expand("%:r")
-    endif
-  endif
-endfun
 
-" After writing binary file: Convert written file with "cmd"
-fun s:write(cmd)
-  " don't do anything if the cmd is not supported or the old format is unknown
-  if s:check(a:cmd) && exists("b:plist_format")
-    let nm = expand("<afile>")
-    let tmp = tempname()
-    let cmdout = system(a:cmd . " -convert " . b:plist_format . " -o \"" . tmp . "\" \"" . nm . "\" 2>&1")
-    if cmdout !~? "error:"
-      call rename(tmp, nm)
-      execute "silent edit"
-    else
-      echo "An error occured while trying to convert the plist using plutil."
-    endif
-    " refresh buffer from the disk; this prevents the user from
-    " receiving errant "file has changed on disk" messages; plus, it does
-    " update the buffer to reflect changes made by plutil at save-time
-    call s:read("plutil")
+  return 1
+endfunction
+
+function! s:writeplist()
+  if exists("b:plist_format")
+    call s:write("plutil -convert ".b:plist_format." %s -o %s")
     " I don't know why this is sometimes necessary
     if &ft == "xml"
       let &syn = &ft
     endif
   endif
-endfun
+endfunction
+
+" After writing binary file: Convert written file with "cmd"
+function s:write(cmd)
+  " don't do anything if the cmd is not supported
+  if s:check(a:cmd)
+    let nm = expand("<afile>")
+    let tmp = tempname()
+    call system(printf(a:cmd,s:esc(nm),s:esc(tmp)))
+    if !v:shell_error
+      call rename(tmp, nm)
+    else
+      echohl ErrorMsg
+      echo "An error occured while trying to convert the file."
+      echohl NONE
+      return
+    endif
+    " refresh buffer from the disk; this prevents the user from
+    " receiving errant "file has changed on disk" messages; plus, it does
+    " update the buffer to reflect changes made at save-time
+    execute "silent edit"
+    execute "silent doau BufReadPost ".nm
+  endif
+endfunction
 
 " vim: set sw=2 :
