@@ -354,9 +354,16 @@ function! s:PastieWrite(file)
     else
         let url = "/".num."/create"
     endif
+    if exists("b:pastie_display_name")
+        let pdn = "&paste[display_name]=".s:urlencode(b:pastie_display_name)
+    elseif exists("g:pastie_display_name")
+        let pdn = "&paste[display_name]=".s:urlencode(g:pastie_display_name)
+    else
+        let pdn = ""
+    endif
     silent exe "write ".tmp
     let result = ""
-    let rubycmd = 'print Net::HTTP.start(%{'.s:domain.'}){|h|h.post(%{'.url.'}, %q{paste[parser]='.parser.'&paste[authorization]=burger&paste[key]=&paste[body]=} + File.read(%q{'.tmp.'}).gsub(/^(.*?) *#\!\! *#{36.chr}/,%{!\!}+92.chr+%{1}).gsub(/[^a-zA-Z0-9_.-]/n) {|s| %{%%%02x} % s[0]},{%{Cookie} => %{'.s:cookies().'}})}[%{Location}]'
+    let rubycmd = 'print Net::HTTP.start(%{'.s:domain.'}){|h|h.post(%{'.url.'}, %q{paste[parser]='.parser.pdn.'&paste[authorization]=burger&paste[key]=&paste[body]=} + File.read(%q{'.tmp.'}).gsub(/^(.*?) *#\!\! *#{36.chr}/,%{!\!}+92.chr+%{1}).gsub(/[^a-zA-Z0-9_.-]/n) {|s| %{%%%02x} % s[0]},{%{Cookie} => %{'.s:cookies().'}})}[%{Location}]'
     let result = system('ruby -rnet/http -e "'.rubycmd.'"')
     call delete(tmp)
     if result =~ '^\w\+://'
@@ -485,6 +492,10 @@ endfunction
 
 function! s:latestid()
     return system('ruby -rnet/http -e "print Net::HTTP.get_response(URI.parse(%{http://'.s:domain.'/all})).body.match(%r{<a href=.http://'.s:domain.'/(\d+).>View})[1]"')
+endfunction
+
+function! s:urlencode(str)
+    return substitute(a:str,'[^A-Za-z0-9_.~-]','\="%".printf("%02X",char2nr(submatch(0)))','g')
 endfunction
 
 function! s:newwindow()
