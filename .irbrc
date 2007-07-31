@@ -1,26 +1,64 @@
-# -*- ruby -*- vim:set ft=ruby sw=2 sts=2 sta et:
+# -*- mode: ruby; ruby-indent-level: 2 -*- vim:set ft=ruby sw=2 sts=2 sta et:
 # $Id$
 
+ENV['HOME'] ||= ENV['USERPROFILE']
+unless IRB.conf[:LOAD_MODULES].respond_to?(:to_ary)
+  IRB.conf[:LOAD_MODULES] = []
+end
 IRB.conf[:AUTO_INDENT]   = true
 IRB.conf[:USE_READLINE]  = true
-IRB.conf[:LOAD_MODULES] |= %w(irb/completion stringio ostruct enumerator pp)
+IRB.conf[:LOAD_MODULES] |= %w(irb/completion stringio ostruct enumerator)
 IRB.conf[:HISTORY_FILE]  = File.expand_path('~/.irb_history.rb') rescue nil
 IRB.conf[:SAVE_HISTORY]  = 50
-IRB.conf[:EVAL_HISTORY]  = 2
+IRB.conf[:EVAL_HISTORY]  = 3
 
 $LOAD_PATH.unshift(File.expand_path('~/.ruby/lib'),File.expand_path('~/.ruby'))
 $LOAD_PATH.uniq!
 
-def optional_require(lib)
-  begin; require lib; rescue LoadError; end
+def desire(lib)
+  require lib
+  true
+rescue LoadError
+  false
 end
 
-optional_require 'tpope'
-optional_require 'rubygems'
-optional_require 'active_support' unless IRB.conf[:PROMPT_MODE] == :SIMPLE && ENV["RAILS_ENV"]
-optional_require File.expand_path('~/.irb_local.rb')
+desire 'tpope'
+desire 'rubygems'
+
+Kernel.autoload(:JMWaller, 'jm_waller')
+
+def IRB.rails_root
+  conf[:LOAD_MODULES].to_ary.include?('console_app') &&
+    conf[:LOAD_MODULES].
+    detect {|x| break $1 if x =~ %r{(.*)/config/environment$}}
+end
+
+if IRB.rails_root
+  # Rails
+  IRB.conf[:HISTORY_FILE] = File.join(IRB.rails_root,'tmp','irb_history.rb')
+  module ActiveRecord
+    class Base
+      def self.[](*args)
+        find(*args)
+      end
+      def self.each(*args,&block)
+        find(*args).each(&block)
+      end
+      extend Enumerable
+    end
+  end
+  desire 'rails_ext'
+else
+  desire 'active_support'
+end
+desire File.expand_path('~/.irb_local.rb')
 
 $KCODE = 'UTF8' if RUBY_PLATFORM =~ /mswin32/ || ENV['LANG'].to_s =~ /UTF/i
+
+# def pp(*args)
+  # require 'pp'
+  # PrettyPrint.send(:pp, *args)
+# end
 
 class Object
 
@@ -46,7 +84,7 @@ class Object
   end
 
   def exec_ri(*args)
-    system("ri","-f","bs",*args)
+    system('ri','-f','bs',*args)
   end
 
 end
@@ -91,11 +129,17 @@ class Module
 
 end
 
+module Enumerable
+  def count_by(&block)
+    group_by(&block).inject({}) {|h,(k,v)| h[k] = v.size; h}
+  end
+end
+
 class IRB::Irb
   def output_value
     if @context.inspect_mode.kind_of?(Symbol)
       value = @context.last_value.send(@context.inspect_mode).to_s.dup
-      if value.chomp! 
+      if value.chomp!
         value[0,0] = "\n"
       end
       printf @context.return_format, value
@@ -108,21 +152,26 @@ class IRB::Irb
 end
 
 class Class
-  def inspect_filter
-    alias_method 'unfiltered_inspect', :inspect unless instance_methods.include?('unfiltered_inspect')
-    define_method(:inspect) do
-      if caller.first(5).any? {|t| t =~ /\birb\.?r[bc]:\d+:in `output_value'$/}
+  def inspect_filter(method = :inspect)
+    alias_method "unfiltered_#{method}", method unless method_defined?("unfiltered_#{method}")
+    define_method(method) do
+      filtered_caller = caller.reject {|t| t =~ /`\w*inspect\w*'/}
+      if filtered_caller.first(5).any? {|t| t =~ /\birb\.?r[bc]:\d+:in `output_value'$/}
+        $caller = filtered_caller
         if ENV['TERM'] && ENV['TERM'] != 'dumb'
-          return yield(unfiltered_inspect)
+          return yield(send("unfiltered_#{method}"))
         end
       end
-      unfiltered_inspect
+      send "unfiltered_#{method}"
     end
   end
 end
 
 [String, Numeric, TrueClass, FalseClass].each do |klass|
   klass.inspect_filter {|text| "\e[1;35m#{text}\e[0m"}
+end
+Array.inspect_filter do |text|
+  text[0] == ?% ?  "\e[1;35m#{text}\e[0m" : text
 end
 NilClass.inspect_filter {|text| "\e[1;30m#{text}\e[0m"}
 Symbol.inspect_filter {|text| "\e[1;36m#{text}\e[0m"}
