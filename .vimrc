@@ -3,6 +3,7 @@
 
 " Section: Options {{{1
 " ---------------------
+let &runtimepath = substitute(&runtimepath,'\(\~\|tpope\)/vimfiles\>','\1/.vim','g')
 set runtimepath^=~/.config/vim,~/.vim.local
 set runtimepath+=~/.vim.local/after,~/.config/vim/after
 
@@ -14,6 +15,9 @@ set backup          " Do keep a backup file
 set backupskip+=*.tmp,crontab.*
 if has("balloon_eval") && has("unix")
   set ballooneval
+endif
+if exists("&breakindent")
+  set breakindent showbreak=+++
 endif
 set cmdheight=2
 set complete-=i
@@ -47,14 +51,16 @@ set showmatch       " Show matching brackets.
 set smartcase       " Case insensitive searches become sensitive with capitals
 set smarttab        " sw at the start of the line, sts everywhere else
 if exists("+spelllang")
-  set spelllang=en_gb
+  set spelllang=en_us
 endif
 set splitbelow      " Split windows at bottom
 set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 set suffixes+=.dvi  " Lower priority in wildcards
 set timeoutlen=1200 " A little bit more time for macros
 set ttimeoutlen=50  " Make Esc work faster
-set viminfo=!,'20,<50,s10,h
+if v:version >= 700
+  set viminfo=!,'20,<50,s10,h
+endif
 set visualbell
 set virtualedit=block
 set wildmenu
@@ -62,7 +68,7 @@ set wildmode=longest:full,full
 set wildignore+=*~
 set winaltkeys=no
 
-if has("gui_running")
+if exists("&guifont")
   if has("mac")
     set guifont=Monaco:h12
   elseif has("unix")
@@ -74,18 +80,16 @@ if has("gui_running")
   elseif has("win32")
     set guifont=Consolas:h11,Courier\ New:h10
   endif
-  set background=light
-  set cmdheight=2 lines=25 columns=80
-  set title
-  if has("diff") && &diff
-    set columns=165
-  endif
-else
-  set background=dark
-  set notitle noicon
 endif
 
-if version>=600
+if !has("gui_running")
+  set background=dark
+  set notitle noicon
+else
+  set background=light
+endif
+
+if v:version >= 600
   set autoread
   set foldmethod=marker
   set printoptions=paper:letter ",syntax:n
@@ -93,7 +97,7 @@ if version>=600
   set mouse=nvi
 endif
 
-if version < 602
+if v:version < 602
   set clipboard+=exclude:screen.*
 elseif $TERM =~ '^screen'
   if exists("+ttymouse") && &ttymouse == ''
@@ -133,7 +137,8 @@ let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let g:Tex_SmartKeyQuote = 0
 let g:treeExplVertical=1
 let g:lisp_rainbow=1
-let g:rails_level=9
+let g:rails_search_url = "http://www.railsapi.org/methods/search_form?api_method[name]=%s"
+"let g:rails_level=9
 let g:rails_default_database='sqlite3'
 let g:rails_menu=1
 let g:rubyindent_match_parentheses=0
@@ -145,28 +150,15 @@ endif
 let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 let g:surround_45 = "<% \r %>"
 let g:surround_61 = "<%= \r %>"
+let g:surround_{char2nr('8')} = "/* \r */"
 let g:surround_indent = 1
+let g:dbext_default_history_file = "/tmp/dbext_sql_history.txt"
 
 " }}}2
-" Section: Functions {{{1
+" Section: Commands {{{1
 " -----------------------
 
 silent! ruby require 'tpope'; require 'vim'
-
-function! StatusLineColors()
-  let save = @l
-  redir @l>
-  silent highlight StatusLine
-  redir END
-  let reg = @l
-  let @l = save
-  let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
-  exe "hi User1 ".reg
-  exe "hi User2 ".reg
-  exe "hi User3 ".reg
-  exe "hi User4 ".reg
-  exe "hi User5 ".reg
-endfunction
 
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
@@ -174,12 +166,17 @@ command! -bar -nargs=0 SudoW   :silent write !sudo tee % >/dev/null|edit
 command! -bar -nargs=* -bang W :write<bang> <args>
 command! -bar -nargs=0 -bang Scratch :silent edit<bang> [Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
 command! -bar -count=0 RFC     :e http://www.ietf.org/rfc/rfc<count>.txt|setl ro noma
-command! -bar -nargs=* -bang Rename :
+command! -bar -nargs=* -bang -complete=file Rename :
       \ let v:errmsg = ""|
       \ saveas<bang> <args>|
       \ if v:errmsg == ""|
       \   call delete(expand("#"))|
       \ endif
+
+function! Synname()
+    let s = synIDattr(synID(line('.'),col('.'),1),'name')
+    return s
+endfunction
 
 function! Invert()
   if &background=="light"
@@ -249,8 +246,17 @@ function! Run()
     !perl -w %
   elseif &ft == "ruby"
     wa
-    let &makeprg = "ruby"
-    make %
+    if executable(expand("%:p")) || getline(1) =~ '^#!'
+      compiler ruby
+      let &makeprg = "ruby"
+      make %
+    elseif expand("%:t") =~ '_test\.rb$'
+      compiler rubyunit
+      let &makeprg = "ruby"
+      make %
+    else
+      !irb -r"%:p"
+    endif
   elseif &ft == "python"
     wa
     !python %
@@ -350,6 +356,8 @@ map Q       gqj
 map gb      :call OpenURL(expand("<cfile>"))<CR>
 "vnoremap <C-C> "+y
 nnoremap <silent> <C-L> :nohls<CR><C-L>
+nnoremap =p m`=ap``
+nnoremap == ==
 
 imap <F1>   <C-O><F1>
 map <F1>    K<CR>
@@ -401,25 +409,13 @@ imap <C-G>c         <Plug>CapsLockToggle
 "nmap <Leader>exx    <Plug>allmlLineXmlEncode
 "nmap <Leader>dxx    <Plug>allmlLineXmlDecode
 
-vnoremap <M-<> <gv
-vnoremap <M->> >gv
+vnoremap     <M-<> <gv
+vnoremap     <M->> >gv
+vnoremap     <Space> I<Space><Esc>gv
+"vnoremap     <BS>    I<Del><Esc>gv
 
 inoremap <C-C> <Esc>`^
 inoremap <C-X><C-A> <C-A>
-
-function! InsertTabWrapper()
-  let col = col('.') - 1
-  if !col || getline('.')[col - 1] !~ '\k'
-    return "\<tab>"
-  else
-    return "\<c-p>"
-  endif
-endfunction
-if version >= 600
-  "inoremap <silent> <Tab> <C-R>=InsertTabWrapper()<CR>
-else
-  "inoremap <Tab> <C-R>=InsertTabWrapper()<CR>
-endif
 
 " Emacs style mappings
 if version >= 600
@@ -475,12 +471,39 @@ noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR>       <C-G>u<CR>
 if exists("*repeat")
-  nnoremap <silent> ]<Space>   :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
-  nnoremap <silent> [<Space>   :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
+  nnoremap <silent> ]<Space> :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
+  nnoremap <silent> [<Space> :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
 else
-  nnoremap          ]<Space>   o<Space><C-U><Esc>-
-  nnoremap          [<Space>   O<Space><C-U><Esc>+
+  nnoremap          ]<Space> o<Space><C-U><Esc>-
+  nnoremap          [<Space> O<Space><C-U><Esc>+
 endif
+
+function! MoveByOffset(num)
+  if a:num == 0
+    exe "norm! \<Esc>"
+    return
+  endif
+  let dir   = expand("%:h")
+  if dir != ''
+    let dir = dir . '/'
+  endif
+  let files = split(glob(dir."*[^~]"),"\n")
+  let original = expand("%")
+  if a:num < 0
+    call reverse(sort(filter(files,'v:val < original')))
+  else
+    call sort(filter(files,'v:val > original'))
+  end
+  let num = a:num < 0 ? -a:num : a:num
+  let file = get(files,num-1,"")
+  if file != ""
+    edit `=file`
+  else
+    exe "norm! \<Esc>"
+  endif
+endfunction
+nnoremap <silent> ]o :<C-U>call MoveByOffset(v:count<Bar><Bar>1)<CR>
+nnoremap <silent> [o :<C-U>call MoveByOffset(-(v:count<Bar><Bar>1))<CR>
 
 inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
 
@@ -540,6 +563,21 @@ iabbrev <silent> Deuro   <C-R>=strftime("%d-%b-%y")<CR>
 " Section: Syntax Highlighting and Colors {{{1
 " --------------------------------------------
 
+function! StatusLineColors()
+  let save = @l
+  redir @l>
+  silent highlight StatusLine
+  redir END
+  let reg = @l
+  let @l = save
+  let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
+  exe "hi User1 ".reg
+  exe "hi User2 ".reg
+  exe "hi User3 ".reg
+  exe "hi User4 ".reg
+  exe "hi User5 ".reg
+endfunction
+
 " Switch syntax highlighting on, when the terminal has colors
 if (&t_Co > 2 || has("gui_running")) && has("syntax")
   if exists("syntax_on") || exists("syntax_manual")
@@ -559,10 +597,12 @@ if has("syntax")
   hi link User3 StatusLine
   hi link User4 StatusLine
   hi link User5 StatusLine
-  if filereadable(expand("~/.vim/colors/tim.vim"))
-    source ~/.vim/colors/tim.vim
-  elseif filereadable(expand("~/.vim/colors/tpope.vim"))
-    source ~/.vim/colors/tpope.vim
+  if !exists('g:colors_name')
+    if filereadable(expand("~/.vim/colors/tim.vim"))
+      source ~/.vim/colors/tim.vim
+    elseif filereadable(expand("~/.vim/colors/tpope.vim"))
+      source ~/.vim/colors/tpope.vim
+    endif
   endif
 endif
 
@@ -580,7 +620,9 @@ if has("autocmd")
     silent! autocmd ColorScheme * call StatusLineColors()
     autocmd VimEnter * let g:rails_debug=1
     autocmd VimEnter * if argc() == 0 && expand("<amatch>") == "" | Scratch | endif
+    autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif
     "autocmd User Rails* silent! Rlcd
+    autocmd User Rails set ts=2
     "autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.]
           "\ if filereadable(expand("~/.vim/templates/skel.sh")) |
           "\   0r ~/.vim/templates/skel.sh |
@@ -617,8 +659,9 @@ if has("autocmd")
 "          \ exe "normal `tzt`s"
 "    autocmd BufRead /usr/* setlocal patchmode=.org
     autocmd BufReadPre *.pdf setlocal binary
-    autocmd BufReadPre *.doc setlocal readonly
-    autocmd BufReadCmd *.doc execute "0read! antiword \"<afile>\""|$delete|1|set nomodifiable
+    "autocmd BufReadPre *.doc setlocal readonly
+    "autocmd BufReadCmd *.doc execute "0read! antiword \"<afile>\""|$delete|1|set nomodifiable
+    autocmd BufReadCmd *.jar call zip#Browse(expand("<amatch>"))
     autocmd FileReadCmd *.doc execute "read! antiword \"<afile>\""
     autocmd CursorHold,BufWritePost,BufReadPost,BufLeave *
       \ if isdirectory(expand("<amatch>:h")) | let &swapfile = &modified | endif
@@ -638,6 +681,7 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.vb               set ft=vbnet
     autocmd BufNewFile,BufRead *.tt,*.tt2         set ft=tt2html
     autocmd BufNewFile,BufRead *.pdf              set ft=pdf
+    "autocmd BufNewFile,BufRead *.jar              set ft=zipfile
     autocmd BufNewFile,BufRead *.asm              if getline(1).getline(2).getline(3).getline(4).getline(5).getline(6).getline(7).getline(8).getline(9).getline(10) =~ '\<_ti\d\d' | set ft=asm68a89 | endif
     autocmd BufNewFile,BufRead *.CBL,*.COB,*.LIB  set ft=cobol
     autocmd BufNewFile,BufRead /var/www/*
@@ -676,7 +720,7 @@ if has("autocmd")
     autocmd FileType cs,vbnet               setlocal foldmethod=syntax fdl=2
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
-    autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o<C-U># $I<C-V>d$<Esc>o<C-U><C-X>^<Esc>o<C-U><C-G>u
+    autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o <C-U># $I<C-V>d$<Esc>o <C-U><C-X>^<Esc>o <C-U><C-G>u
     autocmd FileType c,cpp,cs,java,perl,javscript,php,aspperl,tex,css let b:surround_101 = "\r\n}"
     autocmd User     allml                  inoremap <buffer> <C-J> <Down>
     autocmd FileType tt2html,htmltt if !exists("b:current_syntax") | setlocal syntax=html | endif
@@ -694,7 +738,7 @@ if has("autocmd")
     autocmd FileType perl silent! compiler perl | setlocal iskeyword+=: keywordprg=perl\ -e'$c=shift;exec\ q{perldoc\ }.($c=~/^[A-Z]\|::/?q{}:q{-f}).qq{\ $c}'
     autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1 | if !exists("b:current_syntax") | setlocal syntax=postscr | endif
     autocmd FileType python setlocal keywordprg=pydoc
-    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=ruby\ -wc\ % keywordprg=ri | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | imap <buffer> <C-Z> <CR>end<C-O>O
+    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=rake keywordprg=ri | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | imap <buffer> <C-Z> <CR>end<C-O>O
     autocmd FileType sql map! <buffer> <C-Z> <Esc>`^gUaw`]a
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % wildignore+=*.dvi formatoptions+=l
