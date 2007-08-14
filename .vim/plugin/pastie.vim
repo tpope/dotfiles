@@ -495,7 +495,7 @@ function! s:latestid()
 endfunction
 
 function! s:urlencode(str)
-    return substitute(a:str,'[^A-Za-z0-9_.~-]','\="%".printf("%02X",char2nr(submatch(0)))','g')
+    return substitute(substitute(a:str,' ','%20','g'),"[\001- &?=\\\\]",'\="%".printf("%02X",char2nr(submatch(0)))','g')
 endfunction
 
 function! s:newwindow()
