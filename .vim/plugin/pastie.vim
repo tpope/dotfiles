@@ -495,7 +495,8 @@ function! s:latestid()
 endfunction
 
 function! s:urlencode(str)
-    return substitute(substitute(a:str,' ','%20','g'),"[\001- &?=\\\\]",'\="%".printf("%02X",char2nr(submatch(0)))','g')
+    " Vim 6.2, how did we ever live with you?
+    return substitute(substitute(a:str,"[\001-\037%&?=\\\\]",'\="%".printf("%02X",char2nr(submatch(0)))','g'),' ','%20','g')
 endfunction
 
 function! s:newwindow()
