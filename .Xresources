@@ -1,6 +1,4 @@
 ! ~/.Xresources
-! $Id$
-! vim600: foldmethod=marker
 
 #ifndef HOME
 #define HOME /home/tpope
@@ -174,7 +172,7 @@ XTerm-white*VT100*color3: #ffff00
 XTerm-white*VT100*color4: #4444ff
 XTerm-white*VT100*color5: #ff00ff
 XTerm-white*VT100*color6: #00ffff
-XTerm-white*VT100*color7: #444444
+XTerm-white*VT100*color7: #555555
 XTerm-white*VT100*color8: #aaaaaa
 XTerm-white*VT100*color9: #aa0000
 XTerm-white*VT100*color10: #00aa00
@@ -188,7 +186,7 @@ XTerm-white*VT100*color15: #000000
 Rxvt*scrollBar:    false
 Rxvt*background:   #000000
 Rxvt*foreground:   #aaaaaa
-!Rxvt*font:	   ISOFONT
+!Rxvt*font:         ISOFONT
 !Rxvt*boldFont:     ISOFONT
 Rxvt*visualBell:   true
 Rxvt*colorBD:      #ffffff
@@ -200,7 +198,7 @@ Rxvt*color4:       #0000aa
 Rxvt*color5:       #aa00aa
 Rxvt*color6:       #00aaaa
 Rxvt*color7:       #aaaaaa
-Rxvt*color8:       #444444
+Rxvt*color8:       #555555
 Rxvt*color9:       #ff4444
 Rxvt*color10:      #44ff44
 Rxvt*color11:      #ffff00
@@ -238,10 +236,10 @@ URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
 	sub { /\\n/ ? ("join lines with spaces" => sub {  s{^\\s+}{}mg; s/ \*\\n/ /g; s{ $}{}; }) : () }, \n\
 	sub { /\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/ ? ("quote for irc" => sub { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; }) : () };
 URxvt.urlLauncher: sensible-browser
-URxvt.matcher.pattern.1:  \\B(/\\S+?):(\\d+)(?=:|$)
-URxvt.matcher.launcher.1: gvim +$2 $1
-URxvt.matcher.pattern.2: (?:https?:\/\/|ftp:\/\/|news:\/\/|mailto:|file:\/\/|\\bwww\\.)[a-zA-Z0-9\\-\\@;\\/:&=%\\$_.+*~]*\\.(?:gif|jpg|png)\\b
-URxvt.matcher.launcher.2: feh
+!URxvt.matcher.pattern.1:  ^\\B(/\\S+?):(\\d+)(?=:|$)
+!URxvt.matcher.launcher.1: gvim +$2 $1
+!URxvt.matcher.pattern.2: (?:https?:\/\/|ftp:\/\/|news:\/\/|mailto:|file:\/\/|\\bwww\\.)[a-zA-Z0-9\\-\\@;\\/:&=%\\$_.+*~]*\\.(?:gif|jpg|png)\\b
+!URxvt.matcher.launcher.2: feh -Z $0
 URxvt.matcher.button: 1
 URxvt.selection-pastebin.cmd: scp -p % tpope.us:/var/www/pastebin/
 URxvt.selection-pastebin.url: http:\/\/tpope.us/pastebin/%
