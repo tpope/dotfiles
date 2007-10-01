@@ -1,7 +1,4 @@
-// -*- Mode: java; c-basic-offset: 2 -*- vi:set sw=2 sts=2:
-// Author: Tim Pope
-// $Id$
-
+// ~/.netscape/user.js
 // This file configures everything from Netscape 4 to Firefox
 
 with (PrefConfig) {
@@ -32,7 +29,7 @@ user_pref("browser.tabs.extensions.window_hook_mode", 2);
 user_pref("browser.tabs.loadInBackground", true);
 user_pref("browser.tabs.opentabfor.middleclick", true);
 user_pref("browser.tabs.opentabfor.windowopen", true);
-user_pref("browser.throbber.url","http://www.sexyeek.org/");
+user_pref("browser.throbber.url","http://www.tpope.net/");
 user_pref("content.notify.backoffcount", 200);
 user_pref("content.notify.interval", 120000);
 user_pref("content.notify.ontimer", true);
@@ -49,14 +46,27 @@ user_pref("downloadmgr.loadTabInBackground", true);
 user_pref("downloadmgr.windowType", 2);
 user_pref("extensions.downloadmgr.loadTabInBackground", true);
 user_pref("extensions.downloadmgr.windowType", 2);
+user_pref("extensions.tabmix.openTabNext", true);
+user_pref("extensions.tabmix.sessions.crashRecovery", false);
+user_pref("extensions.tabmix.sessions.manager", false);
+user_pref("extensions.tabmix.singleWindow", true);
+//user_pref("extensions.tabmix.hideTabBarButton", false);
+//user_pref("extensions.tabmix.tabXMode.enable", false);
+//user_pref("extensions.tabmix.tabBarMode", 2);
 user_pref("editor.html_editor", "gvim %f");
 user_pref("editor.image_editor", "gimp %f");
 user_pref("editor.use_html_editor", 1);
 user_pref("extensions.disabledObsolete", true);
-user_pref("googlebar.country2Search", 71);
 user_pref("imageblocker.enable", true);
+user_pref("keyconfig.main.trp_key_ScrollLeft", "][H][][goDoCommand('cmd_scrollLeft');");
 user_pref("keyconfig.main.trp_key_ScrollLineDown", "][J][][goDoCommand('cmd_scrollLineDown');");
 user_pref("keyconfig.main.trp_key_ScrollLineUp", "][K][][goDoCommand('cmd_scrollLineUp');");
+user_pref("keyconfig.main.trp_key_ScrollRight", "][L][][goDoCommand('cmd_scrollRight');");
+//user_pref("keyconfig.main.trp2_key_ScrollPageUp", "][][VK_BACK][goDoCommand('cmd_scrollPageUp');");
+user_pref("keyconfig.main.trp_key_ScrollPageUp", "][-][][goDoCommand('cmd_scrollPageUp');");
+//user_pref("keyconfig.main.xxx_key19_cmd_handleBackspace", "!][][");
+//user_pref("keyconfig.main.key_findAgain", "][N][");
+user_pref("keyconfig.main.key_findPrevious", "shift][N][");
 user_pref("mailnews.headers.showUserAgent", true);
 user_pref("mailnews.reply_on_top", 0);
 user_pref("middlemouse.openNewWindow", true);
