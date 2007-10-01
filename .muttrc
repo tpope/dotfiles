@@ -1,5 +1,4 @@
 # ~/.muttrc
-# $Id$
 
 # Section: Options {{{1
 # ---------------------
@@ -222,17 +221,12 @@ lists mutt-users speedseductionlist zaurus-general debian-knoppix
 account-hook . 'unset imap_user imap_pass tunnel'; folder-hook . 'set folder="$HOME/Mail" record="=sent"'
 
 account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
-account-hook imap://gob/       'set tunnel="hostinfo -S gob -qx /usr/sbin/imapd"'; folder-hook imap://gob/ 'set folder=imap://gob/'
-account-hook imap://lucille/   'set tunnel="hostinfo -S lucille -qx /usr/sbin/imapd"'; folder-hook imap://lucille/ 'set folder=imap://lucille/'
-account-hook imap://michael/   'set tunnel="hostinfo -S michael -qx /usr/sbin/imapd"'; folder-hook imap://michael/ 'set folder=imap://michael/'
-account-hook imap://lindsay/   'set tunnel="hostinfo -S lindsay -qx /usr/sbin/imapd"'; folder-hook imap://lindsay/ 'set folder=imap://lindsay/'
-account-hook imap://tobias/    'set tunnel="hostinfo -S tobias -qx /usr/sbin/imapd"'; folder-hook imap://tobias/ 'set folder=imap://tobias/'
-
-account-hook imap://gob.tpope.us/      'set tunnel="ssh sexygeek.us ssh gob /usr/sbin/imapd"'
-account-hook imap://lucille.tpope.us/  'set tunnel="ssh sexygeek.us ssh lucille /usr/sbin/imapd"'
-account-hook imap://michael.tpope.us/  'set tunnel="ssh sexygeek.us ssh michael /usr/sbin/imapd"'
-account-hook imap://lindsay.tpope.us/  'set tunnel="ssh sexygeek.us ssh lindsay /usr/sbin/imapd"'
-account-hook imap://tobias.tpope.us/   'set tunnel="ssh sexygeek.us ssh tobias /usr/sbin/imapd"'
+account-hook imap://michael/   'set tunnel="ssh -qax michael /usr/sbin/imapd"'; folder-hook imap://michael/ 'set folder=imap://michael/'
+account-hook imap://buster/    'set tunnel="ssh -qax buster  /usr/sbin/imapd"'; folder-hook imap://buster/  'set folder=imap://buster/'
+account-hook imap://tobias/    'set tunnel="ssh -qax tobias  /usr/sbin/imapd"'; folder-hook imap://tobias/  'set folder=imap://tobias/'
+account-hook imap://lindsay/   'set tunnel="ssh -qax lindsay /usr/sbin/imapd"'; folder-hook imap://lindsay/ 'set folder=imap://lindsay/'
+account-hook imap://gob/       'set tunnel="ssh -qax gob     /usr/sbin/imapd"'; folder-hook imap://gob/     'set folder=imap://gob/'
+account-hook imap://george/    'set tunnel="ssh -qax george  /usr/sbin/imapd"'; folder-hook imap://george/  'set folder=imap://george/'
 
 # }}}1
 # Section: Misc {{{1
@@ -242,9 +236,9 @@ account-hook imap://tobias.tpope.us/   'set tunnel="ssh sexygeek.us ssh tobias /
 `[ -s ~/.mail_aliases ] && echo source ~/.mail_aliases || echo set`
 # Section: Aliases {{{1
 # ---------------------
-alias gob     Tim Pope <tpope@gob.tpope.us>
-alias lucille Tim Pope <tpope@lucille.tpope.us>
 alias michael Tim Pope <tpope@michael.tpope.us>
 alias buster  Tim Pope <tpope@buster.tpope.us>
-alias lindsay Tim Pope <tpope@lindsay.tpope.us>
 alias tobias  Tim Pope <tpope@tobias.tpope.us>
+alias lindsay Tim Pope <tpope@lindsay.tpope.us>
+alias gob     Tim Pope <tpope@gob.tpope.us>
+alias george  Tim Pope <tpope@george.tpope.us>

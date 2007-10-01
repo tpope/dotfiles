@@ -23,15 +23,14 @@ periodic() { rehash }
 export ENV="$HOME/.shrc"
 interactive=1
 . $ENV
-#[ -f $HOME/mbox ] && export MAIL=$HOME/mbox
 
 #domains=(`egrep '^(search|domain)' /etc/resolv.conf 2>/dev/null`)
 #[[ -z $domains ]] || shift 1 domains
 
-off=(gob michael lucille tobias lindsay)
-work=(george arwen tpope-1084 jwxkl81-1061 san-netmon jmwa-netmon atl-netmon)
+boxen=(michael gob tobias lindsay)
+work=(george lucille jwxkl81-1061 bjdxx51-594 san-web san-netmon jmwa-netmon atl-netmon)
 if [ -d "$HOME/friends" ]; then
-    for host in $off; do
+    for host in $boxen; do
         [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
         [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
         : ~${host%.tpope.us}
@@ -57,10 +56,10 @@ fi
 
 namedir() { export $1=$PWD; : ~$1 }
 
-friends=($off buster oscar maeby steve grex $work)
+friends=($boxen buster grex $work)
 
 #for host in $domains; do
-#    off=(${off%.$host})
+#    boxen=(${boxen%.$host})
 #    family=(${family%.$host})
 #    friends=(${friends%.$host})
 #done
@@ -274,7 +273,7 @@ zstyle ':completion::complete:*' ignore-parents parent pwd
 zstyle ':completion::complete:rm::(all-|)files' ignored-patterns
 zstyle ':completion::complete:rmdir::(local-|)directories' ignored-patterns
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*' hosts localhost $friends sexygeek.us cunn.iling.us rebelongto.us
+zstyle ':completion:*' hosts localhost $friends tpope.us cunn.iling.us rebelongto.us
 zstyle ':completion:*' urls http://www.tpope.net/ http://www.google.com/
 zstyle ':completion:*' insert-unambiguous true
 # NO NO NO!!! This makes things SLOW

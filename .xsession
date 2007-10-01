@@ -1,6 +1,5 @@
 #!/bin/sh
-# $Id$
-# -*- sh -*- vim: ft=sh sw=4 sts=4
+# vim:set ft=sh et sw=4 sts=4:
 
 PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
 [ -n "$ENV" ] || ENV="$HOME/.shrc"
@@ -10,7 +9,7 @@ unset STY
 
 xsetroot -solid '#000420'
 
-hosts="gob barry michael lucille maeby lindsay tobias buster"
+hosts="gob michael lucille lindsay tobias buster"
 dpy=`echo ${DISPLAY:-':0.0'} | sed -e 's/localhost//'`
 if echo $dpy|grep '^:' >/dev/null; then
     hname=`hostname`
@@ -26,7 +25,7 @@ fi
 
 if /sbin/ifconfig 2>/dev/null | grep '172\.28\.6' >/dev/null; then
     for host in $hosts; do
-	xauth -i extract - $hname$dpy | ssh -axqoBatchmode=yes $host xauth merge - &
+        xauth -i extract - $hname$dpy | ssh -axqoBatchmode=yes $host xauth merge - &
     done
 fi
 
@@ -37,7 +36,7 @@ xset b 40 440 60
 [ ! -f "$HOME/.xmodmap" ] || xmodmap "$HOME/.xmodmap"
 
 if [ ! -f "$HOME/.xmodmap" -a ! -f "$HOME/.Xmodmap" ] && \
-	xmodmap 2>/dev/null|grep Super >/dev/null; then
+        xmodmap 2>/dev/null|grep Super >/dev/null; then
     xmodmap -e "keysym Super_L = Hyper_L"
     xmodmap -e "keysym Caps_Lock = Super_L"
     xmodmap -e "keysym Scroll_Lock = Hyper_R Scroll_Lock"
@@ -77,12 +76,12 @@ wait
 if [ -x "`which xscreensaver 2>/dev/null`" ]; then
     nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
     case "$hname$dpy" in tobias:0|lucille:0|lindsay:0|maeby:0|buster:0)
-	(xscreensaver-command -watch|while read trash; do
-	    case "$trash" in
-		BLANK*|LOCK*|UNBLANK*) tpope status check "$hname" ;;
-	    esac
-	done
-	) >/dev/null 2>&1 & ;;
+        (xscreensaver-command -watch|while read trash; do
+            case "$trash" in
+                BLANK*|LOCK*|UNBLANK*) tpope status check "$hname" ;;
+            esac
+        done
+        ) >/dev/null 2>&1 & ;;
     esac
 fi
 #[ ! -x "`which btcid-launch 2>/dev/null`" ] || btcid-launch
