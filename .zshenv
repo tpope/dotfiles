@@ -1,5 +1,4 @@
 # ~/.zshenv
-# $Id$
 
 typeset -U path
 for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/bin"; do

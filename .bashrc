@@ -1,5 +1,4 @@
 # ~/.bashrc
-# $Id$
 
 [ "$PS1" ] && interactive=1
 export ENV="$HOME/.shrc"

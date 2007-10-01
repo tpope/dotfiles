@@ -1,6 +1,4 @@
 # ~/.profile
-# $Id$
-# -*- sh -*- vim: ft=sh sw=4 sts=4
 
 interactive=1
 if [ "`basename $0`" = ash ]; then

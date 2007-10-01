@@ -1,5 +1,4 @@
 # ~/.login
-# $Id$
 
 if ( -f "$HOME/.login.local" ) source "$HOME/.login.local"
 

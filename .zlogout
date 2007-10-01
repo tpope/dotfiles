@@ -1,5 +1,4 @@
 # ~/.zlogout, ~/.bash_logout
-# $Id$
 
 #[ `who|grep -c "^$USER\\>"` -le 1 -a "0$SHLVL" -le 1 ] && \
 #    [ -x /usr/bin/sudo -o -x /usr/local/bin/sudo ] && sudo -k

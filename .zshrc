@@ -1,5 +1,4 @@
 # ~/.zshrc
-# $Id$
 
 # Section: Environment {{{1
 # -------------------------

@@ -1,5 +1,5 @@
-# -*- sh -*- vim: ft=sh sw=4 sts=4
-# $Id$
+# ~/.shrc
+# -*- sh -*- vim:set ft=sh et sw=4 sts=4:
 
 # This location of this file is normally in $ENV, so that it is sourced by the
 # bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
@@ -7,19 +7,19 @@
 
 for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
     if [ -d "$dir" ]; then
-	case "$PATH" in
-	    *"$dir"*) ;;
-	    *) PATH="$dir$PATH" ;;
-	esac
+        case "$PATH" in
+            *"$dir"*) ;;
+            *) PATH="$dir$PATH" ;;
+        esac
     fi
 done
 
 for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc; do
     if [ -d "$dir" ]; then
-	case "$PATH" in
-	    *:"$dir":*|*:"$dir"|"$dir":*|"$dir") ;;
-	    *) PATH="$PATH$dir" ;;
-	esac
+        case "$PATH" in
+            *:"$dir":*|*:"$dir"|"$dir":*|"$dir") ;;
+            *) PATH="$PATH$dir" ;;
+        esac
     fi
 done
 
@@ -69,7 +69,7 @@ export PATH RUBYLIB RUBYOPT
 hostname=`hostname|sed -e 's/[.].*//'`
 RSYNC_RSH='ssh -axqoBatchmode=yes'
 CVS_RSH='ssh'
-CVSROOT=':ext:gob:/home/tpope/.cvs'
+CVSROOT=':ext:svn.tpope.net:/home/tpope/.cvs'
 [ "$hostname" != gob ] || CVSROOT="$HOME/.cvs"
 LYNX_CFG="$HOME/.lynx.cfg"
 export RSYNC_RSH CVS_RSH CVSROOT LYNX_CFG
@@ -106,26 +106,26 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
         tty=`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`
     fi
     case "$TERM" in
-	screen*|vt220*)
+        screen*|vt220*)
         [ "$STY" ] || h="$hostname"
         echo -n "k$tty@$h\\"
         echo -n "]1;$tty@$hostname"
         unset h
-	;;
-	xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
+        ;;
+        xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
         echo -n "]1;$tty@$hostname"
-	;;
+        ;;
     esac
     unset tty
 
     execbin=`echo $0|sed -e 's/^-//' -e 's/\.shrc/_/'`
 
     if [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ]; then
-	promptchar='#'
+        promptchar='#'
     else
-	promptchar='$'
-	[ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "$LOGNAME" ] && \
-	umask 002
+        promptchar='$'
+        [ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "$LOGNAME" ] && \
+        umask 002
     fi
 
     PS1="$LOGNAME@$hostname `basename "$execbin"`$promptchar "
@@ -133,78 +133,78 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     #case `basename "$execbin"` in
     #*ksh*)
        #PS1="`whoami`@$hostname$HOME,~,"`'"$promptchar "
-	#;;
+        #;;
     #esac
 
     if [ "`basename "$execbin"`" != sh ]; then
 
         [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
 
-	alias ls='ls -F'
+        alias ls='ls -F'
 
-	alias mv='mv -i'
-	alias cp='cp -i'
-	alias rm="$HOME/bin/tpope rm"
+        alias mv='mv -i'
+        alias cp='cp -i'
+        alias rm="$HOME/bin/tpope rm"
 
-	alias j='jobs'
+        alias j='jobs'
 
-	[ -n "$cygwin" -o -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
-	    alias vi='vim'
+        [ -n "$cygwin" -o -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
+            alias vi='vim'
         #[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
             #alias vi='vim' # -X
 
-	if [ -x "`which dircolors 2>/dev/null`" ]; then
-	    eval `dircolors -b "$HOME/.dir_colors"`
-	    alias ls="ls -F --color=auto"
-	elif [ -x "`which gdircolors 2>/dev/null`" ]; then
-	    eval `gdircolors -b "$HOME/.dir_colors"`
-	    alias ls="gls -F --color=auto"
+        if [ -x "`which dircolors 2>/dev/null`" ]; then
+            eval `dircolors -b "$HOME/.dir_colors"`
+            alias ls="ls -F --color=auto"
+        elif [ -x "`which gdircolors 2>/dev/null`" ]; then
+            eval `gdircolors -b "$HOME/.dir_colors"`
+            alias ls="gls -F --color=auto"
         else
             CLICOLOR=1
             LSCOLORS=ExGxFxdxCxfxexCaCdEaEd
             export CLICOLOR LSCOLORS
-	fi
+        fi
 
         [ -z "$LS_COLORS" ] || case "$TERM" in xterm*|screen*)
             LS_COLORS="`echo "$LS_COLORS"|sed -e 's/01;3/00;9/g'`" ;;
         esac
 
-	if ! grep --color 2>&1 | grep unknown >/dev/null; then
-	    alias grep='grep --color=auto'
-	fi
+        if ! grep --color 2>&1 | grep unknown >/dev/null; then
+            alias grep='grep --color=auto'
+        fi
 
-	if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
-	    alias less='less -R'
-	    alias zless='zless -R'
-	    #PAGER='less -R'
-	fi
+        if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
+            alias less='less -R'
+            alias zless='zless -R'
+            #PAGER='less -R'
+        fi
 
         #unalias stop >/dev/null 2>&1
-	for cmd in `tpope aliases`; do
-	    if [ -n "$cygwin" ] || ! [ -x "`which $cmd 2>/dev/null`" ]; then
-		alias $cmd="$HOME/bin/tpope $cmd"
-	    else
-		eval "${cmd}() { tpope $cmd \"\$@\"; }"
-	    fi
-	done
+        for cmd in `tpope aliases`; do
+            if [ -n "$cygwin" ] || ! [ -x "`which $cmd 2>/dev/null`" ]; then
+                alias $cmd="$HOME/bin/tpope $cmd"
+            else
+                eval "${cmd}() { tpope $cmd \"\$@\"; }"
+            fi
+        done
 
         [ -n "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
         [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
         [ -z "$MAIL" ] || export MAIL
-	if [ -z "$cygwin" -a -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
-	    if finger $LOGNAME 2>/dev/null|grep "^New mail" >/dev/null 2>/dev/null; then
-		echo "You have new mail."
-	    fi
-	elif [ "$LS_COLORS" -a -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
-	    mtime=-1 atime=-1
-	    mtime=`ls -l --time-style=+%s "$MAIL"|awk '{print $6}'`
-	    atime=`ls -ul --time-style=+%s "$MAIL"|awk '{print $6}'`
-	    if [ "`expr $mtime - $atime`" -gt 0 ]; then
-		echo "You have new mail."
-	    fi
-	fi
+        if [ -z "$cygwin" -a -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
+            if finger $LOGNAME 2>/dev/null|grep "^New mail" >/dev/null 2>/dev/null; then
+                echo "You have new mail."
+            fi
+        elif [ "$LS_COLORS" -a -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
+            mtime=-1 atime=-1
+            mtime=`ls -l --time-style=+%s "$MAIL"|awk '{print $6}'`
+            atime=`ls -ul --time-style=+%s "$MAIL"|awk '{print $6}'`
+            if [ "`expr $mtime - $atime`" -gt 0 ]; then
+                echo "You have new mail."
+            fi
+        fi
 
-	set -o emacs -o noclobber >/dev/null 2>&1
+        set -o emacs -o noclobber >/dev/null 2>&1
 
     fi
     export VISUAL BROWSER PAGER LESSOPEN LESSCHARSET PS1
