@@ -1,4 +1,4 @@
-" $Id$
+" ~/.vimrc
 " vim:set ft=vim et tw=78 sw=2 sts=2:
 
 " Section: Options {{{1
@@ -23,9 +23,10 @@ set cmdheight=2
 set complete-=i
 set copyindent
 set dictionary+=/usr/share/dict/words
+set display=lastline
 let &fileencodings = substitute(&fileencodings,"latin1","cp1252,latin1","")
 "set foldlevelstart=1
-set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude=tags\ $*
+set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
 let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 set incsearch       " Incremental search
 set joinspaces
@@ -253,6 +254,10 @@ function! Run()
     elseif expand("%:t") =~ '_test\.rb$'
       compiler rubyunit
       let &makeprg = "ruby"
+      make %
+    elseif expand("%:t") =~ '_spec\.rb$'
+      compiler ruby
+      let &makeprg = "spec"
       make %
     else
       !irb -r"%:p"
