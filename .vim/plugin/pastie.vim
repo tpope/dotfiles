@@ -307,7 +307,6 @@ function! s:PastieRead(file)
     set nomodified
     let url = substitute(a:file,'\c/\%(download/\=\|text/\=\)\=$','','')
     let url = url."/download"
-    let g:reading = url
     let result = system('ruby -rnet/http -e "puts Net::HTTP.get_response(URI.parse(%{'.url.'}))[%{Content-Disposition}]"')
     let fn = matchstr(result,'filename="\zs.*\ze"')
     let type = s:parser(fn)
@@ -345,14 +344,16 @@ endfunction
 function! s:PastieWrite(file)
     let parser=s:parser(&ft)
     let tmp = tempname()
-    let num = matchstr(a:file,'/\zs\d\+\.\@!')
+    let num = matchstr(a:file,'/\@<!/\zs\d\+')
     if num == ''
         let num = 'pastes'
     endif
-    if exists("b:pastie_update") && s:cookies() != ''
-        let url = "/".num."/update"
+    if exists("b:pastie_update") && s:cookies() != '' && num != ""
+        let url = "/pastes/".num
+        let method = "_method=put&"
     else
-        let url = "/".num."/create"
+        let url = "/pastes"
+        let method = ""
     endif
     if exists("b:pastie_display_name")
         let pdn = "&paste[display_name]=".s:urlencode(b:pastie_display_name)
@@ -363,24 +364,27 @@ function! s:PastieWrite(file)
     endif
     silent exe "write ".tmp
     let result = ""
-    let rubycmd = 'print Net::HTTP.start(%{'.s:domain.'}){|h|h.post(%{'.url.'}, %q{paste[parser]='.parser.pdn.'&paste[authorization]=burger&paste[key]=&paste[body]=} + File.read(%q{'.tmp.'}).gsub(/^(.*?) *#\!\! *#{36.chr}/,%{!\!}+92.chr+%{1}).gsub(/[^a-zA-Z0-9_.-]/n) {|s| %{%%%02x} % s[0]},{%{Cookie} => %{'.s:cookies().'}})}[%{Location}]'
+    let rubycmd = 'obj = Net::HTTP.start(%{'.s:domain.'}){|h|h.post(%{'.url.'}, %q{'.method.'paste[parser]='.parser.pdn.'&paste[authorization]=burger&paste[key]=&paste[body]=} + File.read(%q{'.tmp.'}).gsub(/^(.*?) *#\!\! *#{36.chr}/,%{!\!}+92.chr+%{1}).gsub(/[^a-zA-Z0-9_.-]/n) {|s| %{%%%02x} % s[0]},{%{Cookie} => %{'.s:cookies().'}})}; print obj[%{Location}].to_s+%{ }+obj[%{Set-Cookie}].to_s'
     let result = system('ruby -rnet/http -e "'.rubycmd.'"')
+    let redirect = matchstr(result,'^[^ ]*')
+    let cookies  = matchstr(result,'^[^ ]* \zs.*')
+    call s:extractcookiesfromheader(cookies)
     call delete(tmp)
-    if result =~ '^\w\+://'
+    if redirect =~ '^\w\+://'
         set nomodified
         let b:pastie_update = 1
         "silent! let @+ = result
-        silent! let @* = result
-        silent exe "file ".result.s:dl_suffix
+        silent! let @* = redirect
+        silent exe "file ".redirect.s:dl_suffix
         " TODO: make a proper status message
-        echo '"'.result.'" written'
-        silent exe "doautocmd BufWritePost ".result.s:dl_suffix
+        echo '"'.redirect.'" written'
+        silent exe "doautocmd BufWritePost ".redirect.s:dl_suffix
     else
-        if result == 'nil'
-            let result = "Could not post to ".url
+        if redirect == ''
+            let redirect = "Could not post to ".url
         endif
-        let result = substitute(result,'^-e:1:\s*','','')
-        call s:error(result)
+        let redirect = substitute(redirect,'^-e:1:\s*','','')
+        call s:error(redirect)
     endif
 endfunction
 
@@ -427,7 +431,7 @@ endfunction
 
 function! s:cookies()
     if exists("g:pastie_session_id")
-        let cookies = "_session_id=".g:pastie_session_id
+        let cookies = "_pastie_session_id=".g:pastie_session_id
     else
         call s:extractcookies('/')
         if !exists("g:pastie_session_id")
@@ -439,7 +443,7 @@ function! s:cookies()
             endif
             let cookies = ""
         else
-            let cookies = "_session_id=".g:pastie_session_id
+            let cookies = "_pastie_session_id=".g:pastie_session_id
         endif
     endif
     if !exists("g:pastie_account")
@@ -469,13 +473,17 @@ function! s:extractcookies(path)
         let path = '/'.path
     endif
     let cookie = system('ruby -rnet/http -e "print Net::HTTP.get_response(%{'.s:domain.'},%{'.path.'})[%{Set-Cookie}]"')
-    let g:pastie_debug = 1
     if exists("g:pastie_debug")
         let g:pastie_cookies_path = path
         let g:pastie_cookies = cookie
     endif
+    return s:extractcookiesfromheader(cookie)
+endfunction
+
+function! s:extractcookiesfromheader(cookie)
+    let cookie = a:cookie
     if cookie !~ '-e:'
-        let session_id = matchstr(cookie,'\<_session_id=\zs.\{-\}\ze\%([;,]\|$\)')
+        let session_id = matchstr(cookie,'\<_pastie_session_id=\zs.\{-\}\ze\%([;,]\|$\)')
         let account    = matchstr(cookie,'\<account=\zs.\{-\}\ze\%([;,]\|$\)')
         if session_id != ""
             let g:pastie_session_id = session_id
