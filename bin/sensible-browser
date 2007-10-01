@@ -1,6 +1,5 @@
 #!/bin/sh
-# $Id$
-# -*- sh -*- vim:set ft=sh sw=4 sts=4:
+# -*- sh -*- vim:set ft=sh et sw=4 sts=4:
 
 # As the name suggests, picks a sensible web browser based on what's installed
 # and what environment we're in.  The -T option forces a terminal browser, -G
@@ -14,6 +13,10 @@ if [ "$1" = "-T" ]; then
     shift
     terminal=' '
 fi
+
+content_type() {
+    curl -I "$1" 2>/dev/null|grep '^Content-[Tt]ype:'|sed -e 's/^Content-[Tt]ype: *//' -e 's/;.*//'
+}
 
 if [ "$1" = "-dump" ]; then
     shift
@@ -49,70 +52,70 @@ elif [ "`uname`" = Darwin -a -x "`which open 2>/dev/null`" -a -z "$terminal" ]; 
 elif [ "$DISPLAY" -a -z "$terminal" ]; then
     url="$*"
     case "$DISPLAY" in
-	:*|localhost*:0*|127.0.0.1:*|`hostname`*:0*) gui=: ;;
+        :*|localhost*:0*|127.0.0.1:*|`hostname`*:0*) gui=: ;;
     esac
     if [ -e "$url" ]; then
-	case "$url" in
-	    /*) url="file://$url" ;;
-	    *) url="file://`pwd`/$url" ;;
-	esac
+        case "$url" in
+            /*) url="file://$url" ;;
+            *) url="file://`pwd`/$url" ;;
+        esac
     else
         case "$url" in www*) url="http://$url"; esac
     fi
     case "$gui$url" in
-	file:*|/*) ;;
-	*:*|www*|'')
-	for browser in firefox mozilla-firebird mozilla netscape; do
-	    if [ -x "`which $browser 2>/dev/null`" ] && \
-		    xlsclients | grep $browser >/dev/null; then
-		nice -n 1 $browser -remote "openURL($url,new-tab)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
-	    fi
-	done
-	if [ -x "`which opera 2>/dev/null`" ] && \
-		pidof opera >/dev/null; then
-	    nice -n 1 opera -remote "openURL($url,new-page)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
-	fi
-	if [ -x "`which galeon 2>/dev/null`" ] && \
-		xlsclients | grep galeon >/dev/null; then
-	    nice -n 1 galeon -n "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
-	fi
-	if [ -x "`which dcop 2>/dev/null`" ]; then
-	    konq="`dcop 2>/dev/null|grep konqueror|head -1`"
-	    if [ "$konq" ]; then
-		dcop "$konq" 'konqueror-mainwindow#1' newTab "$1" && fvwm_find_browser && exit 0
-	    fi
-	fi
-	[ "$gui" ] && \
-	for browser in $XBROWSERS firefox mozilla-firebird mozilla konqueror opera netscape galeon dillo; do
-	    if [ -x "`which $browser 2>/dev/null`" ]; then
-		case $browser in
-		    mozilla) dir="$HOME/.mozilla/default" ;;
-		    firefox) dir="$HOME/.mozilla/firefox" ;;
-		    mozilla-firebird) dir="$HOME/.phoenix/default" ;;
-		esac
-		[ -d "$dir" ] || new=1
-		nohup nice -n 1 $browser "$@" >/dev/null 2>/dev/null &
-		disown >/dev/null 2>&1
-		sleep 20
-		if [ "$new" -a -d "$dir" ]; then
-		    if killall $browser-bin 2>/dev/null; then
-			echo 'Performing an initial "tpope installer"'
-			sleep 5
-			find "$dir" \( -name "localstore.rdf" -o -name "bookmarks.html" \) -exec rm {} \;
-			tpope installer
-			echo 'Restarting browser so changes will take effect'
-			nohup nice -n 1 $browser "$@" >/dev/null 2>/dev/null &
-			disown >/dev/null 2>&1
-			sleep 20
-		    else
-			echo 'Performing an initial "tpope installer"'
-			tpope installer
-		    fi
-		fi
-		sleep 5
-		exit 0
-	    fi
-	done ;;
+        file:*|/*) ;;
+        *:*|www*|'')
+        for browser in firefox mozilla-firebird mozilla netscape; do
+            if [ -x "`which $browser 2>/dev/null`" ] && \
+                    xlsclients | grep $browser >/dev/null; then
+                nice -n 1 $browser -remote "openURL($url,new-tab)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
+            fi
+        done
+        if [ -x "`which opera 2>/dev/null`" ] && \
+                pidof opera >/dev/null; then
+            nice -n 1 opera -remote "openURL($url,new-page)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
+        fi
+        if [ -x "`which galeon 2>/dev/null`" ] && \
+                xlsclients | grep galeon >/dev/null; then
+            nice -n 1 galeon -n "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
+        fi
+        if [ -x "`which dcop 2>/dev/null`" ]; then
+            konq="`dcop 2>/dev/null|grep konqueror|head -1`"
+            if [ "$konq" ]; then
+                dcop "$konq" 'konqueror-mainwindow#1' newTab "$1" && fvwm_find_browser && exit 0
+            fi
+        fi
+        [ "$gui" ] && \
+        for browser in $XBROWSERS firefox mozilla-firebird mozilla konqueror opera netscape galeon dillo; do
+            if [ -x "`which $browser 2>/dev/null`" ]; then
+                case $browser in
+                    mozilla) dir="$HOME/.mozilla/default" ;;
+                    firefox) dir="$HOME/.mozilla/firefox" ;;
+                    mozilla-firebird) dir="$HOME/.phoenix/default" ;;
+                esac
+                [ -d "$dir" ] || new=1
+                nohup nice -n 1 $browser "$@" >/dev/null 2>/dev/null &
+                disown >/dev/null 2>&1
+                sleep 20
+                if [ "$new" -a -d "$dir" ]; then
+                    if killall $browser-bin 2>/dev/null; then
+                        echo 'Performing an initial "tpope installer"'
+                        sleep 5
+                        find "$dir" \( -name "localstore.rdf" -o -name "bookmarks.html" \) -exec rm {} \;
+                        tpope installer
+                        echo 'Restarting browser so changes will take effect'
+                        nohup nice -n 1 $browser "$@" >/dev/null 2>/dev/null &
+                        disown >/dev/null 2>&1
+                        sleep 20
+                    else
+                        echo 'Performing an initial "tpope installer"'
+                        tpope installer
+                    fi
+                fi
+                sleep 5
+                exit 0
+            fi
+        done ;;
     esac
 fi
 
@@ -120,9 +123,9 @@ if [ "$terminal" = "-dump" -a -x "`which lynx 2>/dev/null`" ]; then
     launch lynx -force_html "$@"
 elif [ -x "`which w3m 2>/dev/null`" ]; then
     if [ "$*" ]; then
-	launch w3m -T text/html "$@"
+        launch w3m -T text/html "$@"
     else
-	launch w3m http://www.google.com/
+        launch w3m http://www.google.com/
     fi
 elif [ -x "`which elinks 2>/dev/null`" ]; then
     launch elinks "$@"
