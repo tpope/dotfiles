@@ -1,9 +1,7 @@
 " Vim syntax file
 " Language:     A68k Assembler
-" Maintainer:   Tim Pope <vim@rebelongto.us>
-" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/asm68a.vim
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
 " Last Change:  2005 Dec 07
-" Version:      $Id$
 
 " Remove any old syntax stuff hanging around
 if version < 600

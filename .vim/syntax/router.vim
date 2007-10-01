@@ -1,9 +1,7 @@
 " Vim syntax file
 " Language:     Router configuration file
-" Maintainer:   Tim Pope <vim@rebelongto.us>
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
 " Last Change:  2005 Dec 13
-" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/router.vim
-" $Id$
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded

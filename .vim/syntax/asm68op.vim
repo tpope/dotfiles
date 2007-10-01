@@ -1,9 +1,7 @@
 " Vim syntax file
 " Language:     68k Assembler Opcodes
-" Maintainer:   Tim Pope <vim@rebelongto.us>
-" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/asm68op.vim
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
 " Last Change:  2005 Dec 07
-" Version:      $Id$
 
   syn case ignore
 

@@ -1,9 +1,7 @@
 " Vim syntax file
 " Language:     A68k Assembler (TI calculator specific)
-" Maintainer:   Tim Pope <vim@rebelongto.us>
-" URL:          http://www.sexygeek.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/syntax/asm68a89.vim
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
 " Last Change:  2006 Jan 12
-" Version:      $Id$
 
 if version < 600
     syntax clear
