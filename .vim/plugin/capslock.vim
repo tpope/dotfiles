@@ -1,5 +1,6 @@
 " capslock.vim - Software Caps Lock
 " Maintainer:   Tim Pope
+" GetLatestVimScripts: 1725 1 :AutoInstall: capslock.vim
 " $Id$
 
 " This plugin enables a software caps lock.  This is advantageous over a
@@ -81,12 +82,14 @@ function! s:enable(mode,...)
 endfunction
 
 function! s:disable(mode)
-    let i = char2nr('A')
-    while i <= char2nr('Z')
-        silent! exe a:mode."unmap" s:buffer nr2char(i)
-        silent! exe a:mode."unmap" s:buffer nr2char(i+32)
-        let i = i + 1
-    endwhile
+    if s:enabled(a:mode)
+        let i = char2nr('A')
+        while i <= char2nr('Z')
+            silent! exe a:mode."unmap" s:buffer nr2char(i)
+            silent! exe a:mode."unmap" s:buffer nr2char(i+32)
+            let i = i + 1
+        endwhile
+    endif
     unlet! b:capslock_persist
     if exists('g:capslock_global')
         unlet! g:capslock_persist
@@ -172,7 +175,8 @@ if exists('g:capslock_command_mode')
     map  <script> :    :<SID>CapsLockDisable
     map  <script> /    /<SID>CapsLockDisable
     map  <script> ?    ?<SID>CapsLockDisable
-    cmap <script> <CR>  <SID>CapsLockDisable<CR>
+    "Sometimes breaks with <C-R>=
+    "cmap <script> <CR>  <SID>CapsLockDisable<CR>
     " Breaks arrow keys
     "cmap <script> <Esc> <SID>CapsLockDisable<Esc>
 endif
