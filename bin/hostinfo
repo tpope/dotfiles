@@ -1,62 +1,61 @@
 #!/bin/sh
-# $Id$
-# -*- sh -*- vim: ft=sh sw=4 sts=4
+# -*- sh -*- vim:set ft=sh et sw=4 sts=4:
 
 # This script handles everything to do with hostnames, particularly
 # colourizing them.
 
 hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="oscar gob lindsay maeby jwxkl81-1061 lucille michael tobias buster steve grex jmwa-netmon atl-netmon san-netmon tpope-1084 george arwen"
-menuhosts="gob michael lucille lindsay tobias oscar buster - george arwen jwxkl81-1061 tpope-1084 san-netmon jmwa-netmon atl-netmon"
+hosts="michael tobias lindsay gob buster jwxkl81-1061 bjdxx51-594 george lucille san-netmon san-web"
+menuhosts="michael tobias lindsay gob buster - george lucille jwxkl81-1061 bjdxx51-594 san-netmon san-web"
 
 gethost() {
     case "$1" in
-    [Aa]|arwen*)        echo arwen ;;
-    [Bb]|atl-netmon*)   echo atl-netmon ;;
-    [Cc]|oscar*)        echo oscar ;;
-    [Ee]|george*)       echo george ;;
-    [Gg]|gob*)          echo gob ;;
+    [Aa]|san-web|san-web.*)       echo san-web ;;
+    [Bb]|buster*)                 echo buster ;;
+    [Dd]|bjdxx51-594*)            echo bjdxx51-594 ;;
+    [Ee]|george*)                 echo george ;;
+    [Gg]|gob*)                    echo gob ;;
     [Jj]|jmwaller*|jwxkl81-1061*) echo jwxkl81-1061 ;;
-    [Ll]|lindsay*)      echo lindsay ;;
-    [Mm]|michael*)      echo michael ;;
-    [Nn]|san-netmon*)   echo san-netmon ;;
-    [Oo]|tobias*)       echo tobias ;;
-    [Rr]|buster*)       echo buster ;;
-    [Ss]|steve*)        echo steve ;;
-    [Tt]|tpope-1084*)   echo tpope-1084 ;;
-    [Uu]|lucille*)      echo lucille ;;
-    [Vv]|jmwa-netmon*)  echo jmwa-netmon ;;
-    [Xx]|grex*)         echo grex ;;
-    [Yy]|maeby*)        echo maeby ;;
-    ?)                  echo localhost ;;
+    [Ll]|lindsay*)                echo lindsay ;;
+    [Mm]|michael*)                echo michael ;;
+    [Nn]|san-netmon*)             echo san-netmon ;;
+    [Oo]|tobias*)                 echo tobias ;;
+    [Uu]|lucille*)                echo lucille ;;
+    ?)                            echo localhost ;;
     *) echo "$1" ;;
 esac
 }
 
 getinfo() {
     `echo $1|tr A-Z.- a-z__` 2>/dev/null || unknown
-    case "$TERM" in screen*|xterm-*) hterm="`echo $hterm|sed -e 's/01;3/00;9/'`" ;;
+    case "$TERM" in screen*|xterm-*|rxvt-unicode) hterm="`echo $hterm|sed -e 's/01;3/00;9/'`" ;;
     esac
 }
 
-gob()         { hcolor=orange; $hcolor;hltr=G;hdom=tpope.us;}
+insertletter() {
+    hltr=`echo $2|tr 'A-Z' 'a-z'`
+    if [ -n "$hltr" ]; then
+        case $1 in *$hltr*) hmenu=`echo "$1"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$1(&$hltr)" ;; esac
+        echo $hmenu
+    else
+        echo $1
+    fi
+}
+
 michael()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
-lindsay()     { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
 tobias()      { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
-lucille()     { hcolor=magenta;$hcolor;hltr=U;hdom=tpope.us;}
-maeby()       { hcolor=yellow; $hcolor;hltr=Y;hdom=tpope.us;}
-buster()      { hcolor=teal;   $hcolor;hltr=R;hdom=tpope.us;}
-oscar()       { hcolor=navy;   $hcolor;hltr=C;hdom=tpope.us;}
-steve()       { hcolor=grey;   $hcolor;hltr=S;hdom=tpope.us;}
-arwen()       { hcolor=brown;  $hcolor;hltr=A;hdom=jmwaller.com;}
+lindsay()     { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
+gob()         { hcolor=teal;   $hcolor;hltr=G;hdom=tpope.us;}
+buster()      { hcolor=orange; $hcolor;hltr=B;hdom=tpope.us;}
 george()      { hcolor=cyan;   $hcolor;hltr=E;hdom=jmwaller.com;}
-jmwa_netmon() { hcolor=blue;   $hcolor;hltr=V;hdom=jmwaller.com;}
-san_netmon()  { hcolor=blue;   $hcolor;hltr=N;hdom=jmwaller.com;}
-atl_netmon()  { hcolor=blue;   $hcolor;hltr=B;hdom=jmwaller.com;}
+lucille()     { hcolor=magenta;$hcolor;hltr=U;hdom=jmwaller.com;}
 jwxkl81_1061(){ hcolor=yellow; $hcolor;hltr=J;hdom=jmwaller.com;}
-tpope_1084()  { hcolor=green;  $hcolor;hltr=T;hdom=jmwaller.com;}
-grex()        { hcolor=white;  $hcolor;hltr=X;hdom=tpope.us;}
+bjdxx51_594() { hcolor=brown;  $hcolor;hltr=D;hdom=jmwaller.com;}
+san_web()     { hcolor=navy;   $hcolor;hltr=A;hdom=jmwaller.com;}
+jmwa_netmon() { hcolor=blue;   $hcolor;hltr= ;hdom=jmwaller.com;}
+san_netmon()  { hcolor=blue;   $hcolor;hltr=N;hdom=jmwaller.com;}
+atl_netmon()  { hcolor=blue;   $hcolor;hltr= ;hdom=jmwaller.com;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
 
 red()         { hterm="00;31";hscrn="   r";hlrgb="#D47F7F";hdrgb="#550000";}
@@ -104,11 +103,11 @@ ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
 hostinfo)
     : ${host:="`hostname`"}
     case "$1" in
-    -c|--host-color) getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
-    -l|--letter) getinfo `gethost ${2:-$host}`; echo $hltr; exit 0 ;;
-    -h|--hostname) echo `gethost ${2:-$host}`; exit 0 ;;
+    -h|--hostname)    echo `gethost ${2:-$host}`; exit 0 ;;
+    -c|--host-color)  getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
+    -l|--letter)      getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
     -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
-    -r|--rgb) getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
+    -r|--rgb)         getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
     -S|--ssh)
         shift
         exec ssh "$@"
@@ -120,7 +119,7 @@ hostinfo)
         exec ssh "$host`suffix $host`" "$@" ;;
     -b|--batch-ssh)
         case "$2" in
-            *.*|-*) host="$2";;
+            *.*|-*) host="$2" ;;
             *) host=`gethost ${2:-$host}` ;;
         esac
         shift; shift
@@ -131,10 +130,18 @@ hostinfo)
         case "`cat /etc/resolv.conf 2>/dev/null`" in
             *$hdom*)
             if [ -x "`which nc 2>/dev/null`" ]; then
-                # Some versions benefit from -q, some choke on it
-                if [ -f /etc/debian_version ]; then
+                if [ -x "$HOME/bin/nc" ]; then
+                    exec "$HOME/bin/nc" "$host" "$3"
+                elif [ -f /etc/debian_version ]; then
+                    # Debian versions benefit from -q, some others choke on it
                     exec nc -q 1 "$host" "$3"
                 else
+                    # Hack around iTerm and nc stupidity
+                    if [ "`uname`" = Darwin ]; then
+                        #ls -l /dev/fd >&2
+                        #echo "Closing stderr...">&2
+                        exec 2>&-
+                    fi
                     exec nc "$host" "$3"
                 fi
             fi
@@ -178,7 +185,7 @@ EOF
         for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
             hltr=`echo $hltr|tr 'A-Z' 'a-z'`
             if [ "$host" != - ]; then
-            case $host in *$hltr*) hmenu=`echo "$host"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$host(&$hltr)" ;; esac
+                hmenu="`insertletter $host $hltr`"
                 echo "AddToMenu MenuFvwmScreens $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
                 echo "AddToMenu MenuFvwmLogins $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm $host"
             else
@@ -186,13 +193,33 @@ EOF
                 echo 'AddToMenu MenuFvwmLogins  "" Nop'
             fi
         done
+
+        if [ -x "`which avahi-browse 2>/dev/null`" ]; then
+            avahi-browse -t _ssh._tcp|awk '{print $4}'|while read host; do
+                case " $menuhosts " in
+                    *" $host "*) ;;
+                    *)
+                    if [ -z "$found" ]; then
+                        found=1
+                        echo 'AddToMenu MenuFvwmScreens "" Nop'
+                        echo 'AddToMenu MenuFvwmLogins  "" Nop'
+                    fi
+                    getinfo `gethost $host`
+                    hmenu="`insertletter $host $hltr`"
+                    echo "AddToMenu MenuFvwmScreens $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
+                    echo "AddToMenu MenuFvwmLogins $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm       $host"
+                    ;;
+                esac
+            done
+        fi
         exit 0
         ;;
+
     --fvwm-keys)
         for host in $hosts; do getinfo `gethost $host`;
             [ "$host" != - ] &&
             echo "Key $hltr A 4   FuncFindXTerm $host" &&
-            echo "Key $hltr A CM  FuncScreenSshXTerm $host" &&
+            #echo "Key $hltr A CM  FuncScreenSshXTerm $host" &&
             echo "Key $hltr A 4S  FuncScreenSshXTerm $host" &&
             echo "Key $hltr A 4C  FuncScreenSshXTerm $host" &&
             echo "Key $hltr A CMS FuncSshXTerm $host" &&
