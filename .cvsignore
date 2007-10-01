@@ -15,3 +15,7 @@
 *.class
 *.org
 a.out
+tags
+CVS
+.svn
+.git
