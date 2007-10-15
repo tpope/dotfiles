@@ -70,19 +70,19 @@ let g:loaded_pastie = 1
 
 augroup pastie
     autocmd!
-    autocmd BufReadPre  http://pastie.caboo.se/*[0-9]?key=*    call s:extractcookies(expand("<amatch>"))
-    autocmd BufReadPost http://pastie.caboo.se/*[0-9]?key=*    call s:PastieSwapout(expand("<amatch>"))
-    autocmd BufReadPost http://pastie.caboo.se/*[0-9]          call s:PastieSwapout(expand("<amatch>"))
-    autocmd BufReadPost http://pastie.caboo.se/*[0-9]/download call s:PastieRead(expand("<amatch>"))
-    autocmd BufReadPost http://pastie.caboo.se/*[0-9]/text     call s:PastieRead(expand("<amatch>"))
-    autocmd BufWriteCmd http://pastie.caboo.se/*[0-9]/download call s:PastieWrite(expand("<amatch>"))
-    autocmd BufWriteCmd http://pastie.caboo.se/*[0-9]/text     call s:PastieWrite(expand("<amatch>"))
-    autocmd BufWriteCmd http://pastie.caboo.se/paste*          call s:PastieWrite(expand("<amatch>"))
+    autocmd BufReadPre  http://pastie.caboo.se/*[0-9]?key=*           call s:extractcookies(expand("<amatch>"))
+    autocmd BufReadPost http://pastie.caboo.se/*[0-9]?key=*           call s:PastieSwapout(expand("<amatch>"))
+    autocmd BufReadPost http://pastie.caboo.se/*[0-9]                 call s:PastieSwapout(expand("<amatch>"))
+    autocmd BufReadPost http://pastie.caboo.se/pastes/*[0-9]/download call s:PastieRead(expand("<amatch>"))
+    autocmd BufReadPost http://pastie.caboo.se/*[0-9].*               call s:PastieRead(expand("<amatch>"))
+    autocmd BufWriteCmd http://pastie.caboo.se/pastes/*[0-9]/download call s:PastieWrite(expand("<amatch>"))
+    autocmd BufWriteCmd http://pastie.caboo.se/*[0-9].*               call s:PastieWrite(expand("<amatch>"))
+    autocmd BufWriteCmd http://pastie.caboo.se/pastes/                call s:PastieWrite(expand("<amatch>"))
 augroup END
 
 let s:domain = "pastie.caboo.se"
 
-let s:dl_suffix = "/text" " Used only for :file
+let s:dl_suffix = ".txt" " Used only for :file
 
 if !exists("g:pastie_destination")
     if version >= 700
@@ -99,7 +99,7 @@ function! s:Pastie(bang,line1,line2,count,...)
     if exists(":tab")
         let tabnr = tabpagenr()
     endif
-    let newfile = "http://".s:domain."/paste/"
+    let newfile = "http://".s:domain."/pastes/"
     let loggedin = 0
     let ft = &ft
     let num = 0
@@ -145,7 +145,7 @@ function! s:Pastie(bang,line1,line2,count,...)
         call s:newwindow()
         let file = "http://".s:domain."/".num.s:dl_suffix
         silent exe 'doautocmd BufReadPre '.file
-        silent exe 'read !ruby -rnet/http -e "r = Net::HTTP.get_response(\%{'.s:domain.'}, \%{/'.num.'/download}); if r.code == \%{200} then print r.body else exit 10+r.code.to_i/100 end"'
+        silent exe 'read !ruby -rnet/http -e "r = Net::HTTP.get_response(\%{'.s:domain.'}, \%{/pastes/'.num.'/download}); if r.code == \%{200} then print r.body else exit 10+r.code.to_i/100 end"'
         if v:shell_error && v:shell_error != 14 && v:shell_error !=15
             return s:error("Something went wrong: shell returned ".v:shell_error)
         else
@@ -305,7 +305,9 @@ function! s:PastieRead(file)
     silent %s/^!!\(.*\)/\1 #!!/e
     exe lnum
     set nomodified
-    let url = substitute(a:file,'\c/\%(download/\=\|text/\=\)\=$','','')
+    let num = matchstr(a:file,'/\@<!/\zs\d\+')
+    let url = "http://".s:domain."/pastes/".num
+    "let url = substitute(a:file,'\c/\%(download/\=\|text/\=\)\=$','','')
     let url = url."/download"
     let result = system('ruby -rnet/http -e "puts Net::HTTP.get_response(URI.parse(%{'.url.'}))[%{Content-Disposition}]"')
     let fn = matchstr(result,'filename="\zs.*\ze"')
