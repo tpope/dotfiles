@@ -210,7 +210,7 @@ function! s:Pastie(bang,line1,line2,count,...)
             silent $put
             1d _
         endif
-        if ft == 'plaintext'
+        if ft == 'plaintext' || ft == 'plain_text'
             "set ft=conf
         elseif ft != '' && sum != ""
             let &ft = ft
@@ -259,9 +259,7 @@ function! s:Pastie(bang,line1,line2,count,...)
             if a:0 != 1 || a:count
                 silent $put
             else
-                if s:parser(file) !~ '^\%(plaintext\)\=$'
-                    let &ft = s:parser(file)
-                endif
+                let &ft = s:filetype(file)
             endif
             silent exe "$read ".substitute(file,' ','\ ','g')
         endwhile
@@ -311,12 +309,7 @@ function! s:PastieRead(file)
     let url = url."/download"
     let result = system('ruby -rnet/http -e "puts Net::HTTP.get_response(URI.parse(%{'.url.'}))[%{Content-Disposition}]"')
     let fn = matchstr(result,'filename="\zs.*\ze"')
-    let type = s:parser(fn)
-    if type == 'plaintext'
-        "set ft=conf
-    else
-        let &ft = type
-    endif
+    let &ft = s:filetype(fn)
     if &ft =~ '^\%(html\|ruby\)$' && getline(1).getline(2).getline(3) =~ '<%'
         set ft=eruby
     endif
@@ -344,7 +337,7 @@ function! s:afterload()
 endfunction
 
 function! s:PastieWrite(file)
-    let parser=s:parser(&ft)
+    let parser = s:parser(&ft)
     let tmp = tempname()
     let num = matchstr(a:file,'/\@<!/\zs\d\+')
     if num == ''
@@ -397,23 +390,40 @@ function! s:error(msg)
     let v:errmsg = a:msg
 endfunction
 
-function! s:parser(type)
-    " Accepts a filename, extension, or vim filetype
+function! s:filetype(type)
+    " Accepts a filename, extension, pastie parser, or vim filetype
     let type = tolower(substitute(a:type,'.*\.','',''))
-    if type =~ '^\%(x\=html\|php\|asp\w*\)$'
+    if type =~ '^\%(x\=html\|asp\w*\)$'
         return 'html'
     elseif type =~ '^\%(eruby\|erb\|rhtml\)$'
-        return 'rhtml'
-    elseif type =~ '^\%(ruby\|rb\|rake\|rxml\|builder\|rjs\|mab\|irbrc\)'
+        return 'eruby'
+    elseif type =~ '^\%(ruby\|ruby_on_rails\|rb\|rake\|builder\|rjs\|irbrc\)'
         return 'ruby'
     elseif type == 'js' || type == 'javascript'
         return 'javascript'
-    elseif type == 'c' || type == 'cpp'
-        return 'c'
-    elseif type == 'diff' || type == 'sql'
+    elseif type == 'c' || type == 'cpp' || type == 'c++'
+        return 'cpp'
+    elseif type =~ '^\%(css\|diff\|java\|php\|python\|sql\|sh\|shell-unix-generic\)$'
         return type
     else
-        return 'plaintext'
+        return ''
+    endif
+endfunction
+
+function! s:parser(type)
+    let type = s:filetype(a:type)
+    if type == 'text' || type == ''
+        return 'plain_text'
+    elseif type == 'eruby'
+        return 'html_rails'
+    elseif type == 'ruby'
+        return 'ruby_on_rails'
+    elseif type == 'sh'
+        return 'shell-unix-generic'
+    elseif type == 'cpp'
+        return 'c++'
+    else
+        return type
     endif
 endfunction
 
