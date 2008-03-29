@@ -22,9 +22,19 @@ gethost() {
     [Nn]|san-netmon*)             echo san-netmon ;;
     [Oo]|tobias*)                 echo tobias ;;
     [Uu]|lucille*)                echo lucille ;;
+    [Yy]|maeby*)                  echo maeby ;;
     ?)                            echo localhost ;;
     *) echo "$1" ;;
 esac
+}
+
+name() {
+    if [ -n "$COMPUTERNAME" ]; then
+        # Windows
+        echo "$COMPUTERNAME"
+    else
+        hostname
+    fi
 }
 
 getinfo() {
@@ -51,7 +61,7 @@ buster()      { hcolor=orange; $hcolor;hltr=B;hdom=tpope.us;}
 maeby()       { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
 george()      { hcolor=cyan;   $hcolor;hltr=E;hdom=jmwaller.com;}
 lucille()     { hcolor=magenta;$hcolor;hltr=U;hdom=jmwaller.com;}
-jwxkl81_1061(){ hcolor=yellow; $hcolor;hltr=J;hdom=jmwaller.com;}
+jwxkl81_1061(){ hcolor=yellow; $hcolor;hltr=W;hdom=jmwaller.com;}
 bjdxx51_594() { hcolor=brown;  $hcolor;hltr=D;hdom=jmwaller.com;}
 san_web()     { hcolor=navy;   $hcolor;hltr=A;hdom=jmwaller.com;}
 jmwa_netmon() { hcolor=blue;   $hcolor;hltr= ;hdom=jmwaller.com;}
@@ -121,7 +131,7 @@ case "$hostinfo" in
 tpope) return ;;
 ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
 hostinfo)
-    : ${host:="`hostname`"}
+    : ${host:="`name`"}
     case "$1" in
     -h|--hostname)    echo `gethost ${2:-$host}`; exit 0 ;;
     -c|--host-color)  getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
@@ -183,53 +193,52 @@ hostinfo)
     cat<<EOF
 DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
-AddToMenu MenuFvwmScreens "Screen" Title
+DestroyMenu MenuFvwmTerminals
+AddTomenu MenuFvwmScreens   MissingSubmenuFunction FuncMissingHostMenu
+AddTomenu MenuFvwmLogins    MissingSubmenuFunction FuncMissingHostMenu
+AddTomenu MenuFvwmTerminals MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmScreens    "Screen" Title
 AddToMenu MenuFvwmLogins     "Login"  Title
-AddToMenu MenuFvwmScreens "& localhost%mini/terminal/left-plain.xpm%"    FuncScreenXTerm
-AddToMenu MenuFvwmLogins "& localhost%mini/terminal/right-plain.xpm%"    FuncXTerm
-AddToMenu MenuFvwmScreens "" Nop
-AddToMenu MenuFvwmLogins  "" Nop
-ChangeMenuStyle Screens MenuFvwmScreens
-ChangeMenuStyle Logins  MenuFvwmLogins
+AddToMenu MenuFvwmTerminals  "Focus"  Title
+AddToMenu MenuFvwmScreens   "& localhost%mini/terminal/left-plain.xpm%"    FuncScreenXTerm
+AddToMenu MenuFvwmLogins    "& localhost%mini/terminal/right-plain.xpm%"   FuncXTerm
+AddToMenu MenuFvwmTerminals "& localhost%mini/terminal/right-plain.xpm%"   FuncFindResource "*@localhost|localhost"
+AddToMenu MenuFvwmScreens    "" Nop
+AddToMenu MenuFvwmLogins     "" Nop
+AddToMenu MenuFvwmTerminals  "" Nop
+#ChangeMenuStyle Screens MenuFvwmScreens
+#ChangeMenuStyle Logins  MenuFvwmLogins
 EOF
         for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
             hltr=`echo $hltr|tr 'A-Z' 'a-z'`
             if [ "$host" != - ]; then
                 hmenu="`insertletter $host $hltr`"
-                echo "AddToMenu MenuFvwmScreens $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
-                echo "AddToMenu MenuFvwmLogins $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm $host"
+                echo "AddToMenu MenuFvwmScreens    $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
+                echo "AddToMenu MenuFvwmLogins    $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm $host"
+                echo "AddToMenu MenuFvwmTerminals $hmenu%mini/terminal/right-$hcolor.xpm% FuncFindXTerm $host"
             else
-                echo 'AddToMenu MenuFvwmScreens "" Nop'
-                echo 'AddToMenu MenuFvwmLogins  "" Nop'
+                echo 'AddToMenu MenuFvwmScreens    "" Nop'
+                echo 'AddToMenu MenuFvwmLogins     "" Nop'
+                echo 'AddToMenu MenuFvwmTerminals  "" Nop'
             fi
         done
 
         if [ -x "`which avahi-browse 2>/dev/null`" ]; then
-            avahi-browse -t _ssh._tcp|awk '{print $4}'|while read host; do
-                case " $menuhosts " in
-                    *" $host "*) ;;
-                    *)
-                    if [ -z "$found" ]; then
-                        found=1
-                        echo 'AddToMenu MenuFvwmScreens "" Nop'
-                        echo 'AddToMenu MenuFvwmLogins  "" Nop'
-                    fi
-                    getinfo `gethost $host`
-                    hmenu="`insertletter $host $hltr`"
-                    echo "AddToMenu MenuFvwmScreens $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
-                    echo "AddToMenu MenuFvwmLogins $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm       $host"
-                    ;;
-                esac
-            done
+            echo 'AddToMenu MenuFvwmScreens   "" Nop'
+            echo 'AddToMenu MenuFvwmLogins    "" Nop'
+            echo 'AddToMenu MenuFvwmTerminals "" Nop'
+            echo 'AddToMenu MenuFvwmScreens   "Discovered &. . ." Popup MenuDiscoveredHostsScreenSsh'
+            echo 'AddToMenu MenuFvwmLogins    "Discovered &. . ." Popup MenuDiscoveredHostsSsh'
+            echo 'AddToMenu MenuFvwmTerminals "Discovered &. . ." Popup MenuDiscoveredHostsFind'
         fi
+
         exit 0
         ;;
 
     --fvwm-keys)
         for host in $hosts; do getinfo `gethost $host`;
             [ "$host" != - ] &&
-            echo "Key $hltr A 4   FuncFindXTerm $host" &&
-            #echo "Key $hltr A CM  FuncScreenSshXTerm $host" &&
+            #echo "Key $hltr A 4   FuncFindXTerm $host" &&
             echo "Key $hltr A 4S  FuncScreenSshXTerm $host" &&
             echo "Key $hltr A 4C  FuncScreenSshXTerm $host" &&
             echo "Key $hltr A CMS FuncSshXTerm $host" &&
@@ -246,10 +255,10 @@ EOF
     if [ "$1" = "-p" ]; then
         RUPTIME=cat
         shift
-    elif [ -x "`which $command 2>/dev/null`" -a "`hostname`" != grex.cyberspace.org ]; then
+    elif [ -x "`which $command 2>/dev/null`" -a "`name`" != grex.cyberspace.org ]; then
         RUPTIME="$command"
     else
-        RUPTIME="finger $command$1@tpope.net"
+        RUPTIME="finger $command$1@tpope.us"
         [ -n "$1" ] && shift
     fi
     AWK='{print $1" "$0}'
