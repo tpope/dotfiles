@@ -7,24 +7,22 @@
 
 # Whoops.  This script wasn't meant to be called as root.  Maybe this is what
 # I meant.
-[ "$EUID" = 0 ] && exec /usr/local/sbin/sync-simpson "$@"
+[ "$EUID" = 0 ] && exec /usr/local/sbin/sync-boxen "$@"
 
 FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
  .profile .bashrc .bash_profile .screenrc .terminfo/? .dir_colors .irbrc \
- .vimrc .vim/[^l]* .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
+ .vimrc .vim/[^b][^p]* .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
- .xsession .Xresources .Eterm .gtkrc .gtkrc-2.0 .netscape/user.js .pixmaps/mi* \
- .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
+ .xsession .Xresources .Eterm/themes .gtkrc .gtkrc-2.0 .netscape/user.js \
+ .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
  bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb \
  "
-# bin/ps-grep bin/rwho bin/ruptime bin/launch bin/runcontrol \
-# bin/start bin/stop bin/restart bin/reload bin/force-reload \
 LOCAL_FILES="\
  .kde/share/apps/konsole .gkrellm .gkrellm2/[^l]* .qt \
- .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
- .vim.local/* .netscape/userContent.css"
+ .gitconfig .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
+ .vim/bundle/home/* .netscape/userContent.css"
 
 RSYNC_RSH="ssh -ax"
 [ -t 0 ] || RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20"
