@@ -20,8 +20,7 @@ if exists("&breakindent")
   set breakindent showbreak=+++
 endif
 set cmdheight=2
-set complete-=i
-set copyindent
+set complete-=i     " Searching includes can be slow
 set dictionary+=/usr/share/dict/words
 set display=lastline
 let &fileencodings = substitute(&fileencodings,"latin1","cp1252,latin1","")
@@ -57,6 +56,7 @@ endif
 set splitbelow      " Split windows at bottom
 set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 set suffixes+=.dvi  " Lower priority in wildcards
+set tags+=../tags,../../tags,../../../tags,../../../../tags
 set timeoutlen=1200 " A little bit more time for macros
 set ttimeoutlen=50  " Make Esc work faster
 if v:version >= 700
@@ -98,9 +98,19 @@ if v:version >= 600
   set mouse=nvi
 endif
 
-if v:version < 602
-  set clipboard+=exclude:screen.*
-elseif $TERM =~ '^screen'
+if v:version < 602 || $DISPLAY =~ '^localhost:' || $DISPLAY == ''
+  set clipboard-=exclude:cons\\\|linux
+  set clipboard+=exclude:cons\\\|linux\\\|screen.*
+  if $TERM =~ '^screen'
+    set mouse=
+  endif
+endif
+
+if !has("gui_running") && $DISPLAY == ''
+  set mouse=
+endif
+
+if $TERM =~ '^screen'
   if exists("+ttymouse") && &ttymouse == ''
     set ttymouse=xterm
   endif
@@ -127,13 +137,18 @@ endif
 let g:allml_global_maps=1
 "let g:c_comment_strings=1
 "let g:capslock_command_mode=1
+let g:EnhCommentifyUseAltKeys = 'Yes'
 let g:EnhCommentifyBindInInsert = 'No'
 let g:EnhCommentifyRespectIndent = 'Yes'
 "let g:Imap_PlaceHolderStart="\xab"
 "let g:Imap_PlaceHolderEnd="\xbb"
 let g:miniBufExplForceSyntaxEnable = 1
-let g:NERD_mapleader = "<Leader>n"
+let g:NERD_mapleader = "<Leader>c"
+let g:NERDMapleader = "<Leader>c"
 let g:NERD_com_in_insert_map = "<M-x>"
+let g:NERDComInInsertMap = "<M-x>"
+let g:NERDShutUp = 1
+let g:VCSCommandDisableMappings = 1
 let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
 let g:Tex_SmartKeyQuote = 0
 let g:treeExplVertical=1
@@ -161,11 +176,12 @@ let g:dbext_default_history_file = "/tmp/dbext_sql_history.txt"
 
 silent! ruby require 'tpope'; require 'vim'
 
+command! -bar -nargs=1 E       :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
-command! -bar -nargs=0 SudoW   :silent write !sudo tee % >/dev/null|edit
+command! -bar -nargs=0 SudoW   :silent exe "write !sudo tee % >/dev/null"|silent edit!
 command! -bar -nargs=* -bang W :write<bang> <args>
-command! -bar -nargs=0 -bang Scratch :silent edit<bang> [Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
+command! -bar -nargs=0 -bang Scratch :silent edit<bang> \[Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
 command! -bar -count=0 RFC     :e http://www.ietf.org/rfc/rfc<count>.txt|setl ro noma
 command! -bar -nargs=* -bang -complete=file Rename :
       \ let v:errmsg = ""|
@@ -175,25 +191,14 @@ command! -bar -nargs=* -bang -complete=file Rename :
       \ endif
 
 function! Synname()
-    let s = synIDattr(synID(line('.'),col('.'),1),'name')
-    return s
+  if exists("*synstack")
+    return map(synstack(line('.'),col('.')),'synIDattr(v:val,"name")')
+  else
+    return synIDattr(synID(line('.'),col('.'),1),'name')
+  endif
 endfunction
 
-function! Invert()
-  if &background=="light"
-    set background=dark
-  else
-    set background=light
-  endif
-  if version < 600
-    if filereadable(expand("~/.vim/colors/tim.vim"))
-      source ~/.vim/colors/tim.vim
-    elseif filereadable(expand("~/.vim/colors/tpope.vim"))
-      source ~/.vim/colors/tpope.vim
-    endif
-  endif
-endfunction
-command! -bar Invert :call Invert()
+command! -bar Invert :let &background = (&background=="light"?"dark":"light")
 
 function! Fancy()
   if &number
@@ -237,7 +242,7 @@ function! Run()
     wa
     let &makeprg = matchstr(getline(1),'^#!\zs.*').' %'
     make
-  elseif &ft == "mail" || &ft == "text" || &ft == "help"
+  elseif &ft == "mail" || &ft == "text" || &ft == "help" || &ft == "gitcommit"
     setlocal spell!
   elseif exists("b:rails_root") && exists(":Rake")
     wa
@@ -275,6 +280,8 @@ function! Run()
       call OpenURL(b:url)
     endif
   elseif &ft == "vim"
+    wa
+    unlet! g:loaded_{expand("%:t:r")}
     source %
   elseif &ft == "sql"
     1,$DBExecRangeSQL
@@ -288,7 +295,6 @@ function! Run()
     else
       make %
     endif
-    "exe "normal :!Eterm -t White -T 'make test' --pause -e make -s test &\<CR>"
   endif
   let &makeprg = old_makeprg
 endfunction
@@ -308,10 +314,6 @@ function! ToTeX()
   silent! s/^\t\+//g
 endfunction
 command! -bar -range=% ToTeX :<line1>,<line2>call ToTeX()
-
-function! InsertCtrlDWrapper()
-  return col('.')>strlen(getline('.'))?"\<C-D>":"\<Del>"
-endfunction
 
 function! InsertQuoteWrapper(char)
   if col('.')>strlen(getline('.')) && strlen(substitute(getline('.'),'[^'.a:char.']','','g')) % 2 == 1
@@ -475,6 +477,14 @@ inoremap <M-A>      <C-O>$
 noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR>       <C-G>u<CR>
+command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
+nnoremap <C-J>      :<C-U>exe 'norm m`'<Bar>exe 'move+'.v:count1<CR>``
+nnoremap <C-K>      m`:move--<CR>``
+if exists(":xnoremap")
+  xnoremap <C-J>      m`:move'>+<CR>``
+  xnoremap <C-K>      m`:move--<CR>``
+endif
+
 if exists("*repeat")
   nnoremap <silent> ]<Space> :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
   nnoremap <silent> [<Space> :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
@@ -490,9 +500,10 @@ function! MoveByOffset(num)
   endif
   let dir   = expand("%:h")
   if dir != ''
-    let dir = dir . '/'
+    let dir .= '/'
   endif
-  let files = split(glob(dir."*[^~]"),"\n")
+  let files = split(glob(dir.".*[^~.]"),"\n")
+  let files += split(glob(dir."*[^~]"),"\n")
   let original = expand("%")
   if a:num < 0
     call reverse(sort(filter(files,'v:val < original')))
@@ -615,6 +626,7 @@ endif
 " --------------------------
 
 if has("autocmd")
+  filetype off " Debian preloads this before the runtimepath is set
   if version>600
     filetype plugin indent on
   else
@@ -641,6 +653,7 @@ if has("autocmd")
           \   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
           \ endif |
           \ set ft=sh | 1
+
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
     "autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_exe=1
     "autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_exe=1
@@ -653,6 +666,7 @@ if has("autocmd")
           \ silent! execute "!chmod ".b:chmod_new." <afile>"|
           \ unlet b:chmod_new|
           \ endif
+
     autocmd BufWritePost,FileWritePost ~/.Xdefaults,~/.Xresources silent! !xrdb -load % >/dev/null 2>&1
     autocmd BufWritePre,FileWritePre /etc/* if &ft == "dns" |
           \ exe "normal msHmt" |
@@ -678,16 +692,18 @@ if has("autocmd")
   augroup END " }}}2
   augroup FTCheck " {{{2
     autocmd!
+    autocmd BufNewFile,BufRead      */apache2/[ms]*-*/* set ft=apache
+    autocmd BufNewFile,BufRead             *named.conf* set ft=named
+    "autocmd BufNewFile,BufRead     *.git/COMMIT_EDITMSG set ft=gitcommit
+    "autocmd BufNewFile,BufRead  *.git/config,.gitconfig set ft=gitconfig
     autocmd BufNewFile,BufRead *Fvwm*             set ft=fvwm
     autocmd BufNewFile,BufRead *.cl[so],*.bbl     set ft=tex
     autocmd BufNewFile,BufRead /var/www/*.module  set ft=php
-    autocmd BufNewFile,BufRead *named.conf*       set ft=named
     autocmd BufNewFile,BufRead *.bst              set ft=bst
     autocmd BufNewFile,BufRead *.vb               set ft=vbnet
     autocmd BufNewFile,BufRead *.tt,*.tt2         set ft=tt2html
     autocmd BufNewFile,BufRead *.pdf              set ft=pdf
     "autocmd BufNewFile,BufRead *.jar              set ft=zipfile
-    autocmd BufNewFile,BufRead *.asm              if getline(1).getline(2).getline(3).getline(4).getline(5).getline(6).getline(7).getline(8).getline(9).getline(10) =~ '\<_ti\d\d' | set ft=asm68a89 | endif
     autocmd BufNewFile,BufRead *.CBL,*.COB,*.LIB  set ft=cobol
     autocmd BufNewFile,BufRead /var/www/*
           \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
@@ -695,15 +711,15 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*  set ft=simpsons
     "autocmd BufRead * if expand("%") =~? '^https\=://.*/$'|setf html|endif
     autocmd BufNewFile,BufRead,StdinReadPost *
-          \ if !did_filetype() &&
-          \   (getline(1) =~ '^!' || getline(2) =~ '^!' || getline(3) =~ '^!'
+          \ if !did_filetype() && (getline(1) =~ '^!!\@!'
+          \   || getline(2) =~ '^!!\@!' || getline(3) =~ '^!'
           \   || getline(4) =~ '^!' || getline(5) =~ '^!') |
           \   setf router |
           \ endif
     autocmd BufRead * if ! did_filetype() && getline(1)." ".getline(2).
           \ " ".getline(3) =~? '<\%(!DOCTYPE \)\=html\>' | setf html | endif
     autocmd BufRead,StdinReadPost * if ! did_filetype() && getline(1) =~ '^%PDF-' | setf pdf | endif
-    autocmd BufNewFile,BufRead *.txt,README,INSTALL if &ft == ""|set ft=text|endif
+    autocmd BufNewFile,BufRead *.txt,README,INSTALL,NEWS,TODO if &ft == ""|set ft=text|endif
     autocmd BufNewFile,BufRead *.erb set ft=eruby
     autocmd BufNewFile,BufRead *.pl.erb let b:eruby_subtype = 'perl'|set ft=eruby
   augroup END " }}}2
@@ -721,7 +737,7 @@ if has("autocmd")
     autocmd FileType xml,xsd,xslt           setlocal ai et sta sw=2 sts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
     autocmd FileType tt2html,htmltt,mason   setlocal ai et sta sw=2 sts=2
-    autocmd FileType text,txt,mail          setlocal noai noet sw=8 sts=8
+    autocmd FileType text,txt,mail          setlocal ai spell com=fb:*,fb:-,n:>
     autocmd FileType cs,vbnet               setlocal foldmethod=syntax fdl=2
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
@@ -734,16 +750,20 @@ if has("autocmd")
     autocmd FileType bst  setlocal smartindent cinkeys-=0# ai sta sw=2 sts=2 comments=:% commentstring=%%s
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ -x\ -Wall\ %
     autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
-    autocmd FileType css  silent! set omnifunc=csscomplete#CompleteCSS
+    autocmd FileType css  silent! setlocal omnifunc=csscomplete#CompleteCSS
     "autocmd FileType eruby setlocal omnifunc=htmlcomplete#CompleteTags
+    autocmd FileType gitcommit setlocal spell
+    autocmd FileType gitrebase nnoremap <buffer> S :Cycle<CR>
+    autocmd FileType haml let b:surround_45 = "- \r"|let b:surround_61 = "= \r"
     autocmd FileType help setlocal ai fo+=2n | silent! setlocal nospell
+    autocmd FileType help nnoremap <silent><buffer> q :q<CR>
     autocmd FileType html setlocal iskeyword+=~
     autocmd FileType java silent! compiler javac | setlocal makeprg=javac\ %
     autocmd FileType mail setlocal tw=70|if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm 1G}' |endif|silent! setlocal spell
     autocmd FileType perl silent! compiler perl | setlocal iskeyword+=: keywordprg=perl\ -e'$c=shift;exec\ q{perldoc\ }.($c=~/^[A-Z]\|::/?q{}:q{-f}).qq{\ $c}'
     autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1 | if !exists("b:current_syntax") | setlocal syntax=postscr | endif
     autocmd FileType python setlocal keywordprg=pydoc
-    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=rake keywordprg=ri | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | imap <buffer> <C-Z> <CR>end<C-O>O
+    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=rake keywordprg=ri comments=:#\  | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | imap <buffer> <C-Z> <CR>end<C-O>O
     autocmd FileType sql map! <buffer> <C-Z> <Esc>`^gUaw`]a
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % wildignore+=*.dvi formatoptions+=l
