@@ -6,20 +6,17 @@
 
 hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="michael tobias lindsay gob buster maeby jwxkl81-1061 bjdxx51-594 george lucille san-netmon san-web"
-menuhosts="michael tobias lindsay gob buster - george lucille jwxkl81-1061 bjdxx51-594 san-netmon san-web"
+hosts="michael tobias lindsay gob buster maeby"
+menuhosts="michael tobias lindsay gob buster maeby"
 
 gethost() {
     case "$1" in
     [Aa]|san-web|san-web.*)       echo san-web ;;
     [Bb]|buster*)                 echo buster ;;
-    [Dd]|bjdxx51-594*)            echo bjdxx51-594 ;;
     [Ee]|george*)                 echo george ;;
     [Gg]|gob*)                    echo gob ;;
-    [Jj]|jmwaller*|jwxkl81-1061*) echo jwxkl81-1061 ;;
     [Ll]|lindsay*)                echo lindsay ;;
     [Mm]|michael*)                echo michael ;;
-    [Nn]|san-netmon*)             echo san-netmon ;;
     [Oo]|tobias*)                 echo tobias ;;
     [Uu]|lucille*)                echo lucille ;;
     [Yy]|maeby*)                  echo maeby ;;

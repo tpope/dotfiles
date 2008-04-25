@@ -73,9 +73,9 @@ fi
 
 [ -n "$ALL_HOSTS" ] || simpson=1
 if [ -n "$simpson" ]; then
-	MY_HOSTS="$MY_HOSTS gob lindsay tobias"
-	ALL_HOSTS="$ALL_HOSTS gob oscar buster lindsay lucille tobias michael maeby maggie barry lupe"
-	LOCAL_HOSTS="$LOCAL_HOSTS gob lindsay lucille tobias michael"
+	MY_HOSTS="$MY_HOSTS gob lindsay tobias michael"
+	ALL_HOSTS="$ALL_HOSTS maeby buster gob lindsay tobias michael"
+	LOCAL_HOSTS="$LOCAL_HOSTS gob lindsay tobias michael"
 fi
 
 if [ -n "$cvs" ]; then
@@ -99,9 +99,9 @@ if [ -n "$web" ]; then
     webget="curl -m8 -s -o"
     [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO"
     rm -f "$wtarfile"
-    if $webget "$wtarfile" http://www.tpope.net/tpope.tar.gz >/dev/null 2>&1; then
+    if $webget "$wtarfile" http://www.tpope.us/tpope.tar.gz >/dev/null 2>&1; then
 	# cygwin environments make it impossible to overwrite an open file, so
-	# so we'll try this hack instead
+	# so we'll use this hack instead
 	exec sh -c "gzip -dc \"$wtarfile\"|tar -xf - -C \"$HOME\"; [ \"$web\" != 2 ] || rm \"$wtarfile\""
     else
 	echo Download failed >&2
@@ -119,11 +119,13 @@ fi
 
 cd "$HOME"
 
+hostname="`hostname|sed -e 's/\..*//'`"
+hostname_f="`hostname -f 2>/dev/null || hostname`"
 if [ "$tarpipe" ]; then
 
     output_progress "Uploading base:   "
     for host in $ALL_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
+	[ "$host" != "$hostname" -a "$host" != "$hostname_f" ] && \
 	tar cf - -X .cvsignore --exclude='*~' $FILES|\
 	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
@@ -132,7 +134,7 @@ if [ "$tarpipe" ]; then
 
     [ "$LOCAL_HOSTS" ] && output_progress "Uploading extra:  " && \
     for host in $LOCAL_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
+	[ "$host" != "$hostname" -a "$host" != "$hostname_f" ] && \
 	tar cf - -X .cvsignore --exclude='*~' $LOCAL_FILES|\
 	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
@@ -146,7 +148,7 @@ if [ "$tgzpipe" ]; then
 
     output_progress "Uploading base:   "
     for host in $ALL_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
+	[ "$host" != "$hostname" -a "$host" != "$hostname_f" ] && \
 	tar cf - -X .cvsignore --exclude='*~' \
 	    $FILES|gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
@@ -155,7 +157,7 @@ if [ "$tgzpipe" ]; then
 
     [ "$LOCAL_HOSTS" ] && output_progress "Uploading extra:  " && \
     for host in $LOCAL_HOSTS; do
-	[ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ] && \
+	[ "$host" != "$hostname" -a "$host" != "$hostname_f" ] && \
 	tar cf - -X .cvsignore --exclude='*~' $LOCAL_FILES |\
 	    gzip -c|$RSYNC_RSH $host 'gzip -cd|tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
@@ -181,8 +183,8 @@ echo $$ > $HOME/.LCK..$NAME
 if [ "$MY_HOSTS" ]; then
 output_progress "Downloading base: "
 for host in $MY_HOSTS; do
-    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ]; then
-	$RSYNC_RSH $host $RSYNC "$FILES" `hostname`: 2>/dev/null &&
+    if [ "$host" != "$hostname" -a "$host" != "$hostname_f" ]; then
+	$RSYNC_RSH $host $RSYNC "$FILES" "$hostname:" 2>/dev/null &&
 	output_progress " $host"
     fi
 done
@@ -191,7 +193,7 @@ fi
 
 output_progress "Uploading base:   "
 for host in $ALL_HOSTS; do
-    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ]; then
+    if [ "$host" != "$hostname" -a "$host" != "$hostname_f" ]; then
 	$RSYNC --delete $FILES $host: 2>/dev/null &&
 	output_progress " $host"
     fi
@@ -201,8 +203,8 @@ output_newline
 if [ "$LOCAL_HOSTS" ]; then
 output_progress "Downloading extra:"
 for host in $LOCAL_HOSTS; do
-    if [ "$host" != "`hostname`" -a "$host" != "`hostname -f 2>/dev/null`" ]; then
-	$RSYNC_RSH $host $RSYNC "$LOCAL_FILES" `hostname`: 2>/dev/null &&
+    if [ "$host" != "$hostname" -a "$host" != "$hostname_f" ]; then
+	$RSYNC_RSH $host $RSYNC "$LOCAL_FILES" "$hostname:" 2>/dev/null &&
 	output_progress " $host"
     fi
 done
@@ -210,7 +212,7 @@ output_newline
 
 output_progress "Uploading extra:  "
 for host in $LOCAL_HOSTS; do
-    if [ "$host" != "`hostname`" ]; then
+    if [ "$host" != "$hostname" ]; then
 	$RSYNC --delete $LOCAL_FILES $host: 2>/dev/null &&
 	output_progress " $host"
     fi

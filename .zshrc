@@ -27,7 +27,6 @@ interactive=1
 #[[ -z $domains ]] || shift 1 domains
 
 boxen=(michael gob tobias lindsay)
-work=(george lucille jwxkl81-1061 bjdxx51-594 san-web san-netmon jmwa-netmon atl-netmon)
 if [ -d "$HOME/friends" ]; then
     for host in $boxen; do
         [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
@@ -55,7 +54,7 @@ fi
 
 namedir() { export $1=$PWD; : ~$1 }
 
-friends=($boxen buster grex $work)
+friends=($boxen buster maeby grex)
 
 #for host in $domains; do
 #    boxen=(${boxen%.$host})
@@ -315,8 +314,8 @@ zstyle ':completion::full:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|[._-/]=* r:
 #zstyle ':completion:*:hosts' hosts ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}} }
 zstyle -e ':completion:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX+1)/3 )) numeric )'
 zstyle ':completion:*' menu select
-zstyle ':completion:*:(xdvi|xpdf|gv):*' menu yes select
-zstyle ':completion:*:(xdvi|xpdf|gv):*' file-sort time
+zstyle ':completion:*:(xdvi|xpdf|gv|mpl):*' menu yes select
+zstyle ':completion:*:(xdvi|xpdf|gv|mplayer):*' file-sort time
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
 zstyle ':completion:*' substitute 1
