@@ -23,7 +23,7 @@ setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java"
 if ( -d "$HOME/java" )  setenv CLASSPATH "${CLASSPATH}:$HOME/java"
 if ( -f "$HOME/.ruby/lib/tpope.rb" ) setenv RUBYOPT "rtpope"
-setenv RUBYLIB  "$HOME/.ruby/lib:$HOME/ruby/lib:$HOME/.ruby"
+setenv RUBYLIB  "$HOME/.ruby/lib:$HOME/.ruby"
 setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
 setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
 if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
@@ -46,10 +46,11 @@ stty -ixon
 setenv VISUAL "$HOME/bin/sensible-editor"
 setenv PAGER "$HOME/bin/sensible-pager"
 setenv BROWSER "$HOME/bin/sensible-browser"
+setenv LESS 'RFX#10'
 setenv LESSOPEN '|lesspipe %s'
 set hostname = `hostname|sed -e 's/[.].*//'`
-setenv CVSROOT ':ext:gob:/home/tpope/.cvs'
-if ( $hostname == gob ) setenv CVSROOT "$HOME/.cvs"
+setenv CVSROOT ':ext:michael:/home/tpope/.cvs'
+if ( $hostname == michael ) setenv CVSROOT "$HOME/.cvs"
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
@@ -161,7 +162,7 @@ else
     setenv LSCOLORS ExGxFxdxCxfxexCaCdEaEd
 endif
 
-grep --color |& grep unknown >/dev/null || alias grep 'grep --color=auto'
+grep --color |& grep unknown >/dev/null || alias grep 'grep --color=auto --exclude="*~"'
 
 if ( -x /usr/bin/finger && -f "$HOME/.hushlogin" ) then
     /usr/bin/finger $USER | grep '^New mail' >&/dev/null && \

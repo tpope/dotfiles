@@ -9,7 +9,7 @@ for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
     if [ -d "$dir" ]; then
         case "$PATH" in
             *"$dir"*) ;;
-            *) PATH="$dir$PATH" ;;
+            *) PATH="$dir:$PATH" ;;
         esac
     fi
 done
@@ -18,7 +18,7 @@ for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games
     if [ -d "$dir" ]; then
         case "$PATH" in
             *:"$dir":*|*:"$dir"|"$dir":*|"$dir") ;;
-            *) PATH="$PATH$dir" ;;
+            *) PATH="$PATH:$dir" ;;
         esac
     fi
 done
@@ -35,41 +35,39 @@ fi
 
 if [ -z "$CLASSPATH" ]; then
     CLASSPATH=.
-    [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
-    [ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
+    [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java"
+    [ -d "$HOME/src/java" ]  && CLASSPATH="$CLASSPATH:$HOME/src/java"
     export CLASSPATH
 fi
 
 if [ -z "$RUBYLIB" ]; then
-    for dir in "$HOME/.ruby/lib" "$HOME/ruby/lib" "$HOME/.ruby"; do
+    for dir in "$HOME/.ruby/lib" "$HOME/.ruby"; do
         case ":$RUBYLIB:" in
             *:"$dir":*) ;;
-            *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB$dir"
+            *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB:$dir"
         esac
     done
     RUBYLIB="`echo "$RUBYLIB"|sed -e s/^://`"
     export RUBYLIB
 fi
-
+[ ! -f "$HOME/.ruby/lib/tpope.rb" ] || RUBYOPT="rtpope"
+export PATH RUBYLIB RUBYOPT
 
 if [ -z "$PERL5LIB" ]; then
     for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
         case ":$PERL5LIB:" in
             *:"$dir":*) ;;
-            *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB$dir"
+            *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB:$dir"
         esac
     done
     PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
     export PERL5LIB
 fi
-[ ! -f "$HOME/.ruby/lib/tpope.rb" ] || RUBYOPT="rtpope"
-
-export PATH RUBYLIB RUBYOPT
 
 hostname=`hostname|sed -e 's/[.].*//'`
 RSYNC_RSH='ssh -axqoBatchmode=yes'
 CVS_RSH='ssh'
-CVSROOT=':ext:svn.tpope.net:/home/tpope/.cvs'
+CVSROOT=':ext:cvs.tpope.net:/home/tpope/.cvs'
 [ "$hostname" != gob ] || CVSROOT="$HOME/.cvs"
 LYNX_CFG="$HOME/.lynx.cfg"
 export RSYNC_RSH CVS_RSH CVSROOT LYNX_CFG
@@ -90,12 +88,13 @@ RSYNC_RSH='ssh -ax'
 [ "$TERM" = linux ] && TMOUT=43200
 
 if [ "$interactive" -o "$_" = "interactive" ] || \
-    echo $0|grep '^[^.]*sh[0-9.-]*$' >/dev/null; then
+    echo $0|\grep '^[^.]*sh[0-9.-]*$' >/dev/null; then
 
     VISUAL="$HOME/bin/sensible-editor"
     BROWSER="$HOME/bin/sensible-browser"
     PAGER="$HOME/bin/sensible-pager"
     [ -x /usr/bin/lesspipe ] && LESSOPEN='|lesspipe %s'
+    LESS="FRX#10"
 
     umask 022
     stty -ixon
@@ -132,7 +131,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     #case `basename "$execbin"` in
     #*ksh*)
-       #PS1="`whoami`@$hostname$HOME,~,"`'"$promptchar "
+       #PS1="`whoami`@$hostname:"'`pwd|sed -e "s,^$HOME,~,"`'"$promptchar "
         #;;
     #esac
 
@@ -169,8 +168,9 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
             LS_COLORS="`echo "$LS_COLORS"|sed -e 's/01;3/00;9/g'`" ;;
         esac
 
-        if ! grep --color 2>&1 | grep unknown >/dev/null; then
-            alias grep='grep --color=auto'
+        if ! grep --color 2>&1 | grep un >/dev/null; then
+            # TODO: egrep
+            alias grep='grep --color=auto --exclude="*~"'
         fi
 
         if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
@@ -207,7 +207,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
         set -o emacs -o noclobber >/dev/null 2>&1
 
     fi
-    export VISUAL BROWSER PAGER LESSOPEN LESSCHARSET PS1
+    export VISUAL BROWSER PAGER LESS LESSOPEN PS1
 fi
 unset promptchar interactive execbin hostname oldterm dir mtime atime cygwin
 fi

@@ -15,13 +15,13 @@ if [ -f "$HOME/.locale" -a -z "$LANG" -a -z "$LC_ALL" ]; then
 fi
 
 CLASSPATH=.
-[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH$HOME/java"
-[ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH$HOME/.java"
+[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH:$HOME/java"
+[ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java"
 
 for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
     case ":$PERL5LIB:" in
         *:"$dir":*) ;;
-        *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB$dir"
+        *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB:$dir"
     esac
 done
 PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
@@ -34,7 +34,7 @@ esac
 for dir in "$HOME/.ruby/lib" "$HOME/ruby/lib" "$HOME/.ruby"; do
     case ":$RUBYLIB:" in
         *:"$dir":*) ;;
-        *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB$dir"
+        *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB:$dir"
     esac
 done
 RUBYLIB="`echo "$RUBYLIB"|sed -e s/^://`"

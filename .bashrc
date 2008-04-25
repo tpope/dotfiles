@@ -2,7 +2,7 @@
 
 [ "$PS1" ] && interactive=1
 export ENV="$HOME/.shrc"
-. $ENV
+. "$ENV"
 unset interactive
 
 if [ "$PS1" ]; then
