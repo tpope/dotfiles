@@ -238,22 +238,24 @@ URxvt.keysym.C-equal:  perl:matcher
 URxvt.font:        UTFFONT
 URxvt.boldFont:
 URxvt.perl-lib:    HOME/perl/urxvt:HOME/.perl/urxvt
-URxvt.perl-ext:    default,searchable-scrollback<C-S-plus>,mark-urls,matcher<1>,dabbrev-expand,selection-pastebin,remote-clipboard,selection-autotransform
+URxvt.perl-ext:    default,searchable-scrollback<C-S-plus>,matcher<C-1>,dabbrev-expand,selection-pastebin,remote-clipboard,selection-autotransform
 URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
 	sub { /\\n/ ? ("join lines with spaces" => sub {  s{^\\s+}{}mg; s/ \*\\n/ /g; s{ $}{}; }) : () }, \n\
+	sub { /./ ? ("string quote" => sub {  s([\\\\\\042$@]|#[{])(\\\\$&)g; s{\\n}{\\\\n}g; s{\\t}{\\\\t}g; s{\\r}{\\\\r}g; s{[\\000-\\037]}{sprintf("%03o",ord($&))}eg; $_ = qq("$_"); }) : () }, \n\
 	sub { /\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/ ? ("quote for irc" => sub { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; }) : () };
 URxvt.urlLauncher: sensible-browser
 !URxvt.matcher.pattern.1:  ^\\B(/\\S+?):(\\d+)(?=:|$)
 !URxvt.matcher.launcher.1: gvim +$2 $1
 !URxvt.matcher.pattern.2: (?:https?:\/\/|ftp:\/\/|news:\/\/|mailto:|file:\/\/|\\bwww\\.)[a-zA-Z0-9\\-\\@;\\/:&=%\\$_.+*~]*\\.(?:gif|jpg|png)\\b
 !URxvt.matcher.launcher.2: feh -Z $0
-URxvt.matcher.button: 1
+!URxvt.matcher.button: 1
 URxvt.selection-pastebin.cmd: scp -p % tpope.us:/var/www/pastebin/
 URxvt.selection-pastebin.url: http:\/\/tpope.us/pastebin/%
 URxvt.remote-selection.store: ssh tpope.us 'cat >/tmp/distributed-selection'
 URxvt.remote-selection.fetch: ssh tpope.us 'cat /tmp/distributed-selection'
 URxvt.selection-autotransform.0: if(/\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/) { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; };
-URxvt.selection-autotransform.1: if(/^irb.*?> /) { s{^irb.*?[>*]\\s*}{}g; s/^=>/#=>/mg;}
+URxvt.selection-autotransform.1: if(/^irb.*?> /) { s{^irb.*?[>*]\\s*}{}mg; s/\\n=>/ #=>/mg; s{\\n$}{};}
+URxvt.selection-autotransform.2: if(m{^[ab]/}) { s{^[ab]/}{}g; }
 
 !## OTHER TERMINALS {{{1
 Aterm*cursorColor:#c09090
