@@ -1,5 +1,5 @@
 " ~/.vimrc
-" vim:set ft=vim et tw=78 sw=2 sts=2:
+" vim:set ft=vim et tw=78 sw=2:
 
 " Section: Options {{{1
 " ---------------------
@@ -342,131 +342,34 @@ function! TemplateFileFunc_pm()
   norm gg4}
 endfunction
 
-if version >= 600
-  runtime! macros/matchit.vim
-endif
+function! GitWho()
+  if executable("git")
+    let email = substitute(system("git config user.email"),'\n$','','')
+  endif
+  return "Tim Pope  <".(exists("email") ? email : "@").">"
+endfunction
+
+runtime! plugin/matchit.vim
+runtime! macros/matchit.vim
 
 " Section: Mappings {{{1
 " ----------------------
 
-"function! s:Eatchar(pat)
-  "let c = nr2char(getchar(0))
-  "return (c =~ a:pat) ? '' : c
-"endfunction
-
-map  <S-Insert> <MiddleMouse>
-map! <S-Insert> <MiddleMouse>
 map Y       y$
 " Don't use Ex mode; use Q for formatting
 map Q       gqj
-" open URL under cursor in browser
-map gb      :call OpenURL(expand("<cfile>"))<CR>
-"vnoremap <C-C> "+y
 nnoremap <silent> <C-L> :nohls<CR><C-L>
+inoremap <C-C> <Esc>`^
+nnoremap zS  r<CR>ddkP=j
+
 nnoremap =p m`=ap``
 nnoremap == ==
-
-imap <F1>   <C-O><F1>
-map <F1>    K<CR>
-if has("gui_running")
-  map <F2>  :Fancy<CR>
-endif
-imap <C-Z> <C-S><CR>
-
-map <F3>    :cnext<CR>
-map <F4>    :cc<CR>
-map <F5>    :cprev<CR>
-map <F6>    :bnext<CR>
-map <F7>    :bprevious<CR>
-map <F8>    :wa<Bar>make<CR>
-map <F9>    :Run<CR>
-map <silent> <F11> :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
-map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
-imap <F12> <C-O><F12>
-map <C-F4>  :bdelete<CR>
-"map <t_%9>  :hardcopy<CR>         " Print Screen
-
-"map <C-Z> :shell<CR>
-" Attribution Fixing
-map <Leader>at gg}jWdWWPX
-"map <Leader>sw :!echo "<cword>"\|aspell -a --<CR>
-map <Leader>S  r<CR>ddkP=j
-map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
-map <Leader>fJ :% call Justify('',3,)<CR>
-map <Leader>fp gqap
-map <Leader>fd :!webster "<cword>"<CR>
-map <Leader>ft :!thesaurus "<cword>"<CR>
-" Merge consecutive empty lines
-map <Leader>fm :g/^\s*$/,/\S/-j<CR>
-map <Leader>v :so ~/.vimrc<CR>
-
-" EnhancedCommentify
-map <silent> \\     <Plug>Traditionalj
-" capslock
-map <Leader>l       <Plug>CapsLockToggle
-imap <C-L>          <Plug>CapsLockToggle
-imap <C-G>c         <Plug>CapsLockToggle
-"imap <C-X>/         <Lt>/<Plug>allmlHtmlComplete
-"map  <Leader>eu     <Plug>allmlUrlEncode
-"map  <Leader>du     <Plug>allmlUrlDecode
-"map  <Leader>ex     <Plug>allmlXmlEncode
-"map  <Leader>dx     <Plug>allmlXmlDecode
-"nmap <Leader>euu    <Plug>allmlLineUrlEncode
-"nmap <Leader>duu    <Plug>allmlLineUrlDecode
-"nmap <Leader>exx    <Plug>allmlLineXmlEncode
-"nmap <Leader>dxx    <Plug>allmlLineXmlDecode
-
 vnoremap     <M-<> <gv
 vnoremap     <M->> >gv
 vnoremap     <Space> I<Space><Esc>gv
 "vnoremap     <BS>    I<Del><Esc>gv
 
-inoremap <C-C> <Esc>`^
-inoremap <C-X><C-A> <C-A>
-
-" Emacs style mappings
-if version >= 600
-  " If at end of a line of spaces, delete back to the previous line.
-  " Otherwise, <Left>
-  inoremap <silent> <C-B> <C-R>=getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<Lt>C-T>\<Lt>Esc>kJs":"\<Lt>Left>"<CR>
-  " If at end of line, decrease indent, else <Del>
-  inoremap <silent> <C-D> <C-R>=col('.')>strlen(getline('.'))?"\<Lt>C-D>":"\<Lt>Del>"<CR>
-  " If at end of line, fix indent, else <Right>
-  inoremap <silent> <C-F> <C-R>=col('.')>strlen(getline('.'))?"\<Lt>C-F>":"\<Lt>Right>"<CR>
-else
-  inoremap <C-B> <Left>
-  inoremap <C-F> <Right>
-endif
-inoremap <C-A>      <C-O>^
-cnoremap <C-A>      <Home>
-cnoremap <C-B>      <Left>
-cnoremap <C-D>      <Del>
-inoremap <C-E>      <End>
-cnoremap <C-F>      <Right>
-"noremap! <C-N>      <Down>
-"noremap! <C-P>      <Up>
-noremap! <M-a>      <C-O>(
-map!     <M-b>      <S-Left>
-noremap! <M-d>      <C-O>dw
-noremap! <M-e>      <C-O>)
-map!     <M-f>      <S-Right>
-noremap! <M-h>      <C-W>
-noremap  <M-l>      guiww
-noremap  <M-u>      gUiww
-noremap! <M-l>      <Esc>guiw`]a
-noremap! <M-u>      <Esc>gUiw`]a
-noremap! <M-{>      <C-O>{
-noremap! <M-}>      <C-O>}
-if !has("gui_running")
-  silent! exe "set <S-Left>=\<Esc>b"
-  silent! exe "set <S-Right>=\<Esc>f"
-  silent! exe "set <F31>=\<Esc>d"
-  map! <F31> <M-d>
-endif
-
-if has("gui_mac")
-  noremap <C-6> <C-^>
-endif
+inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
 
 cnoremap <C-O>      <Up>
 inoremap <M-o>      <C-O>o
@@ -518,13 +421,50 @@ function! MoveByOffset(num)
     exe "norm! \<Esc>"
   endif
 endfunction
-nnoremap <silent> ]o :<C-U>call MoveByOffset(v:count<Bar><Bar>1)<CR>
-nnoremap <silent> [o :<C-U>call MoveByOffset(-(v:count<Bar><Bar>1))<CR>
+nnoremap <silent> ]o :<C-U>call MoveByOffset(v:count1)<CR>
+nnoremap <silent> [o :<C-U>call MoveByOffset(-v:count1)<CR>
 
-inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
+inoremap     <C-X><C-@> <C-A>
+" Emacs style mappings
+inoremap          <C-A> <C-O>^
+cnoremap          <C-A> <Home>
+" If at end of a line of spaces, delete back to the previous line.
+" Otherwise, <Left>
+inoremap <silent> <C-B> <C-R>=getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<Lt>C-D>\<Lt>Esc>kJs":"\<Lt>Left>"<CR>
+cnoremap          <C-B> <Left>
+" If at end of line, decrease indent, else <Del>
+inoremap <silent> <C-D> <C-R>=col('.')>strlen(getline('.'))?"\<Lt>C-D>":"\<Lt>Del>"<CR>
+cnoremap          <C-D> <Del>
+" If at end of line, fix indent, else <Right>
+inoremap <silent> <C-F> <C-R>=col('.')>strlen(getline('.'))?"\<Lt>C-F>":"\<Lt>Right>"<CR>
+inoremap          <C-E> <End>
+cnoremap          <C-F> <Right>
+noremap!          <M-a> <C-O>(
+map!              <M-b> <S-Left>
+noremap!          <M-d> <C-O>dw
+noremap!          <M-e> <C-O>)
+map!              <M-f> <S-Right>
+noremap!          <M-h> <C-W>
+noremap           <M-l> guiww
+noremap           <M-u> gUiww
+noremap!          <M-l> <Esc>guiw`]a
+noremap!          <M-u> <Esc>gUiw`]a
+noremap!          <M-{> <C-O>{
+noremap!          <M-}> <C-O>}
+if !has("gui_running")
+  silent! exe "set <S-Left>=\<Esc>b"
+  silent! exe "set <S-Right>=\<Esc>f"
+  silent! exe "set <F31>=\<Esc>d"
+  map! <F31> <M-d>
+endif
+
+if has("gui_mac")
+  noremap <C-6> <C-^>
+endif
 
 noremap <M-,>        :Smaller<CR>
 noremap <M-.>        :Bigger<CR>
+
 noremap <M-PageUp>   :bprevious<CR>
 noremap <M-PageDown> :bnext<CR>
 noremap <C-Del>      :bdelete<CR>
@@ -550,6 +490,56 @@ noremap! <S-Home>    <Esc><C-W><Up>
 noremap! <S-End>     <Esc><C-W><Down>
 noremap! <S-Up>      <Esc><C-W><Up>
 noremap! <S-Down>    <Esc><C-W><Down>
+
+imap <F1>   <Esc>
+map  <F1>   K
+if has("gui_running")
+  map <F2>  :Fancy<CR>
+endif
+map <F3>    :cnext<CR>
+map <F4>    :cc<CR>
+map <F5>    :cprev<CR>
+map <F6>    :bnext<CR>
+map <F7>    :bprevious<CR>
+map <F8>    :wa<Bar>make<CR>
+map <F9>    :Run<CR>
+map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
+map <silent> <F11> :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
+map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
+imap <F12> <C-O><F12>
+map <C-F4>  :bdelete<CR>
+"map <t_%9>  :hardcopy         " Print Screen
+
+noremap  <S-Insert> <MiddleMouse>
+noremap! <S-Insert> <MiddleMouse>
+
+" open URL under cursor in browser
+nnoremap gb :OpenURL <cfile><CR>
+nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
+nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
+nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
+
+" EnhancedCommentify
+map <silent> \\     <Plug>Traditionalj
+map <Leader>l       <Plug>CapsLockToggle
+imap <C-L>          <Plug>CapsLockToggle
+imap <C-G>c         <Plug>CapsLockToggle
+nmap du             <Plug>SpeedDatingNowUTC
+nmap dx             <Plug>SpeedDatingNowLocal
+"imap <C-X>/         <Lt>/<Plug>allmlHtmlComplete
+"map  <Leader>eu     <Plug>allmlUrlEncode
+"map  <Leader>du     <Plug>allmlUrlDecode
+"map  <Leader>ex     <Plug>allmlXmlEncode
+"map  <Leader>dx     <Plug>allmlXmlDecode
+"nmap <Leader>euu    <Plug>allmlLineUrlEncode
+"nmap <Leader>duu    <Plug>allmlLineUrlDecode
+"nmap <Leader>exx    <Plug>allmlLineXmlEncode
+"nmap <Leader>dxx    <Plug>allmlLineXmlDecode
+map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
+map <Leader>fJ :% call Justify('',3,)<CR>
+" Merge consecutive empty lines
+map <Leader>fm :g/^\s*$/,/\S/-j<CR>
+map <Leader>v  :so ~/.vimrc<CR>
 
 " Section: Abbreviations {{{1
 " ---------------------------
@@ -635,17 +625,30 @@ if has("autocmd")
   augroup FTMisc " {{{2
     autocmd!
     silent! autocmd ColorScheme * call StatusLineColors()
-    autocmd VimEnter * let g:rails_debug=1
-    autocmd VimEnter * if argc() == 0 && expand("<amatch>") == "" | Scratch | endif
+
+    if v:version >= 700 && isdirectory(expand("~/.trash"))
+      autocmd BufWritePre,BufWritePost * if exists("s:backupdir") | set backupext=~ | let &backupdir = s:backupdir | unlet s:backupdir | endif
+      autocmd BufWritePre ~/*
+            \ let s:path = expand("~/.trash").strpart(expand("<afile>:p:~:h"),1) |
+            \ if !isdirectory(s:path) | call mkdir(s:path,"p") | endif |
+            \ let s:backupdir = &backupdir |
+            \ let &backupdir = escape(s:path,'\,').','.&backupdir |
+            \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
+    endif
+
+    "autocmd VimEnter * if argc() == 0 && expand("<amatch>") == "" | Scratch | endif
     autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif
     "autocmd User Rails* silent! Rlcd
-    autocmd User Rails set ts=2
+    autocmd User Rails setlocal ts=2
     "autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.]
           "\ if filereadable(expand("~/.vim/templates/skel.sh")) |
           "\   0r ~/.vim/templates/skel.sh |
           "\   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
           "\ endif |
           "\ set ft=sh | $
+
+    autocmd BufEnter ChangeLog let g:changelog_username = GitWho()
+
     autocmd BufNewFile */init.d/*
           \ if filereadable("/etc/init.d/skeleton") |
           \   0r /etc/init.d/skeleton |
