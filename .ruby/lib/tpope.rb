@@ -1,13 +1,11 @@
-# -*- ruby -*- vim:set ft=ruby sw=2 sts=2 sta et:
-# $Id$
-
 old_current = $LOAD_PATH.pop if $LOAD_PATH.last == '.'
-%w(.ruby/lib ruby/lib .ruby ruby).each do |dir|
+%w(.ruby/lib .ruby src/ruby/lib).each do |dir|
   $LOAD_PATH.unshift(File.expand_path("~/#{dir}"))
 end
-Dir[File.expand_path('~/ruby/*')].each do |dir|
-  $LOAD_PATH << "#{dir}/lib"       if File.directory?("#{dir}/lib")
-  $LOAD_PATH << "#{dir}/trunk/lib" if File.directory?("#{dir}/trunk/lib")
+%w(~/src/ruby/libs/* ~/src/ruby/vendor/*).map {|d| Dir[File.expand_path(d)]}.flatten.each do |dir|
+  if File.directory?("#{dir}/lib")
+    $LOAD_PATH << "#{dir}/lib"
+  end
 end
 $LOAD_PATH << old_current if old_current
 
