@@ -102,10 +102,14 @@ XTerm*color15: #ffffff
 #define ISOENC iso8859-1
 #define UTFENC iso10646-1
 #if WIDTH > 1450
-#define ISOFONT   FIXED-normal--18-*-*-*-c-*-ISOENC
-#define UTFFONT   FIXED-normal--18-*-*-*-c-*-UTFENC
-#define ISOFONT2  FIXED-normal--14-*-*-*-c-*-ISOENC
-#define UTFFONT2  FIXED-normal--14-*-*-*-c-*-UTFENC
+!#define ISOFONT   FIXED-normal--18-*-*-*-c-*-ISOENC
+!#define UTFFONT   FIXED-normal--18-*-*-*-c-*-UTFENC
+#define ISOFONT   -b&h-lucidatypewriter-medium-r-normal-sans-14-*-*-*-m-*-ISOENC
+#define UTFFONT   -b&h-lucidatypewriter-medium-r-normal-sans-14-*-*-*-m-*-UTFENC
+!#define ISOFONT2  FIXED-normal--14-*-*-*-c-*-ISOENC
+!#define UTFFONT2  FIXED-normal--14-*-*-*-c-*-UTFENC
+#define ISOFONT2  FIXED-normal--13-*-*-*-c-80-ISOENC
+#define UTFFONT2  FIXED-normal--13-*-*-*-c-80-UTFENC
 XTerm.fontMenu.font3.Label:     Medium
 #else
 #if WIDTH > 1150
@@ -218,8 +222,11 @@ URxvt*keysym.C-F4: command:\033]710;FIXED-normal--8-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F5: command:\033]710;FIXED-normal--10-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F6: command:\033]710;FIXED-semicondensed--13-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F7: command:\033]710;FIXED-normal--13-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F8: command:\033]710;FIXED-normal--14-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F9: command:\033]710;FIXED-normal--15-*-*-*-c-*-UTFENC\007
+!URxvt*keysym.C-F8: command:\033]710;FIXED-normal--14-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F8: command:\033]710;FIXED-normal--13-*-*-*-c-80-UTFENC\007
+!URxvt*keysym.C-F8: command:\033]710;xft:Mono:pixelsize=13:antialias=false\007
+!URxvt*keysym.C-F9: command:\033]710;FIXED-normal--15-*-*-*-c-*-UTFENC\007
+URxvt*keysym.C-F9: command:\033]710;-b&h-lucidatypewriter-medium-r-normal-sans-14-*-*-*-m-80-UTFENC\007
 URxvt*keysym.C-F10:command:\033]710;FIXED-normal--18-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
