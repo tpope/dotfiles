@@ -27,6 +27,7 @@ user_pref("browser.tabs.extensions.slow_down_autoreload_in_background.enabled", 
 user_pref("browser.tabs.extensions.view_source_tab", true);
 user_pref("browser.tabs.extensions.window_hook_mode", 2);
 user_pref("browser.tabs.loadInBackground", true);
+user_pref("browser.tabs.loadOnNewTab", 1);
 user_pref("browser.tabs.opentabfor.middleclick", true);
 user_pref("browser.tabs.opentabfor.windowopen", true);
 user_pref("browser.throbber.url","http://www.tpope.net/");
