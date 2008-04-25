@@ -1,5 +1,4 @@
-# -*- mode: ruby; ruby-indent-level: 2 -*- vim:set ft=ruby sw=2 sts=2 sta et:
-# $Id$
+# -*- mode: ruby; ruby-indent-level: 2 -*- vim:set ft=ruby et sw=2 sts=2 sta:
 
 ENV['HOME'] ||= ENV['USERPROFILE']
 unless IRB.conf[:LOAD_MODULES].respond_to?(:to_ary)
@@ -7,7 +6,7 @@ unless IRB.conf[:LOAD_MODULES].respond_to?(:to_ary)
 end
 IRB.conf[:AUTO_INDENT]   = true
 IRB.conf[:USE_READLINE]  = true
-IRB.conf[:LOAD_MODULES] |= %w(irb/completion stringio ostruct enumerator)
+IRB.conf[:LOAD_MODULES] |= %w(irb/completion stringio enumerator)
 IRB.conf[:HISTORY_FILE]  = File.expand_path('~/.irb_history.rb') rescue nil
 IRB.conf[:SAVE_HISTORY]  = 50
 IRB.conf[:EVAL_HISTORY]  = 3
@@ -25,8 +24,6 @@ end
 desire 'tpope'
 desire 'rubygems'
 
-Kernel.autoload(:JMWaller, 'jm_waller')
-
 def IRB.rails_root
   conf[:LOAD_MODULES].to_ary.include?('console_app') &&
     conf[:LOAD_MODULES].
@@ -42,9 +39,19 @@ if IRB.rails_root
         find(*args)
       end
       def self.each(*args,&block)
-        find(*args).each(&block)
+        find(:all, *args).each(&block)
+      end
+      def self.first(*args)
+        find(:first, *args)
       end
       extend Enumerable
+      def self.sum(*args)
+        if !block_given? && args[0].respond_to?(:to_sym)
+          ActiveRecord::Calculations::ClassMethods.instance_method(:sum)
+        else
+          Enumerable.instance_method(:sum)
+        end.bind(self).call(*args)
+      end
     end
   end
   desire 'rails_ext'
@@ -53,7 +60,7 @@ else
 end
 desire File.expand_path('~/.irb_local.rb')
 
-$KCODE = 'UTF8' if RUBY_PLATFORM =~ /mswin32/ || ENV['LANG'].to_s =~ /UTF/i
+$KCODE = 'UTF8' if RUBY_VERSION =~ /^1\.8/ && (RUBY_PLATFORM =~ /mswin32/ || ENV['LANG'].to_s =~ /UTF/i)
 
 # def pp(*args)
   # require 'pp'
