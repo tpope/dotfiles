@@ -30,12 +30,12 @@ fi
 
 if [ aliases = "$basename" ]; then
     # Optimization: put this early since it is called for every shell
-    aliases="launch lt lv dm pg gp sb b e p c sursync ruptime rwho status \
+    aliases="launch lt lv dm pg gp sb b e p t c dl sursync ruptime rwho status \
     rclink rc start stop restart reload force-reload mount shutdown tomorrow \
     vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix \
     word ord wor or Word Ord Wor Or"
     PATH=/usr/bin:/usr/sbin:/usr/local/bin
-    for app in apt-get aptitude emerge gem port cardctl rubber xdvi xpdf gv; do
+    for app in apt-get aptitude emerge gem port diff cardctl rubber xdvi xpdf gv; do
         [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
     done
     echo $aliases
@@ -151,8 +151,8 @@ do_clean() {
     if [ ! -d "$HOME/.trash" ]; then
         mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
     fi
-    rm -f "$HOME/bin/xauth-get" "$HOME/bin/start" "$HOME/bin/stop" "$HOME/bin/restart" "$HOME/bin/reload" "$HOME/bin/force-reload" "$HOME/bin/runcontrol" "$HOME/bin/launch" "$HOME/bin/www-browser" "$HOME/bin/ps-grep" "$HOME/.shinit" "$HOME/.zsh/functions/_bibtex" "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/justify.vim" "$HOME/.vim/plugin/matrix.vim" "$HOME/.vim/templates/.skel.cbl.JGZaB2" "$HOME/.pixmaps/mini/terminal/.right-teal.xpm.XM3cFo" "$HOME/.vim/templates/skel.rb" "$HOME/.vim/plugin/templatefile.vim" "$HOME/.terminfo/E/Eterm" "$HOME/.terminfo/E/Eterm-xterm" "$HOME/.irssi/scripts/autorun/autocycle.pl" "$HOME/.irssi/scripts/autorun/notonline.pl"
-    rmdir "$HOME/.terminfo/E" 2>/dev/null
+    rm -f "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/eabbrev.vim" "$HOME/.vim/plugin/subvert.vim" "$HOME/.vim/plugin/plutil.vim" "$HOME/.vim/ftplugin/pdf.vim" "$HOME/.vim/syntax/pdf.vim" "$HOME/.vim/indent/eruby.vim" "$HOME/.vim/syntax/simpsons.vim" "$HOME/.vim/syntax/"asm68* "$HOME/.vim/syntax/c89.vim" "$HOME/.vim/syntax/ti89call.vim" "$HOME/.vim/after/syntax/crontab.vim" "$HOME/.vim/autoload/dot.vim" "$HOME/.vim/plugin/supplant.vim" "$HOME/.irssi/scripts/screen_away.pl" "$HOME/.irssi/scripts/aidle.pl" "$HOME/.irssi/scripts/raw_log_orig.pl" "$HOME/.irssi/scripts/extractvimrc.pl" "$HOME/.irssi/scripts/abbrev.pl"
+    rmdir "$HOME/.vim/indent" "$HOME/.vim/ftplugin" 2>/dev/null
     return 0
 }
 
@@ -293,19 +293,17 @@ case "$basename" in
     ;;
 
     logview|lv)
-        [ "$PAGER" ] || PAGER=more
-        # Pager should already be set or something is wrong
         cd /var/log
         root=
         for file in "$@"; do
             [ -f "$file" -a ! -r "$file" ] && root=as_root
         done
         [ -z "$root" ] || root_init
-        $root exec $PAGER +G "$@"
+        $root exec less "-RFX#10" +G "$@"
         ;;
 
     pg)
-        if [ "$#" = 0 -o -e "$1" ]; then
+        if [ "$#" != 1 -o -e "$1" ]; then
             exec "$HOME/bin/tpope" sensible-pager "$@"
         else
             echo "Warning: use gp instead." >&2
@@ -314,7 +312,7 @@ case "$basename" in
         ;;
 
     ps-grep|gp)
-        LESS="-FRSX"
+        LESS="-FRSX#10"
         export LESS
         (
         arg="$1"; shift
@@ -381,7 +379,7 @@ case "$basename" in
         if inpath less; then
             inpath lesspipe && LESSOPEN='|lesspipe %s'
             export LESSOPEN
-            pager="less -RFX"
+            pager="less -RFX#10"
         elif inpath more; then
             pager="more"
         elif inpath pg; then
@@ -394,6 +392,15 @@ case "$basename" in
         else
             $term $pager "$tempfile"
             rm "$tempfile"
+        fi
+        ;;
+    sensible-tail|t)
+        if inpath less; then
+            inpath lesspipe && LESSOPEN='|lesspipe %s'
+            export LESSOPEN
+            less "-RFX#10" +F "$@"
+        else
+            exec tail -f "$@"
         fi
         ;;
 
@@ -514,6 +521,31 @@ case "$basename" in
                         exec "$HOME/bin/sync-tpope" "$@"
                     fi ;;
 
+    dl)
+        if [ "$HOME/dl" != `pwd` ]; then
+            mkdir -p "$HOME/dl"
+            prefix="~/dl/"
+        fi
+        if [ -n "$2" ]; then
+            out="$2"
+        else
+            out="`echo "$1"|sed -e 's/?.*//'`"
+            out="`basename "$out"`"
+        fi
+        if [ -e "$1" ]; then
+            cp -a "$1" "$prefix$out"
+        elif [ -x "`which wget`" ]; then
+            wget -nv -O "$prefix$out" "$1" || exit "$?"
+        elif [ -x "`which curl`" ]; then
+            curl -s "$1" > "$prefix$out" || exit "$?"
+        elif [ -x "`which lynx`" ]; then
+            lynx -source "$1" > "$prefix$out" || exit "$?"
+        else
+            exit 1
+        fi
+        echo "$prefix$out"
+        ;;
+
     temperature) webget="curl -m8 -s"
         [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
         temp="`$webget http://weather.noaa.gov/weather/current/${1:-KSAT}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
@@ -608,7 +640,7 @@ case "$basename" in
         esac ;;
     emerge|port|gem) no_links
         case "$1" in
-            search) exec "$basename" "$@" ;;
+            search|show|help|server) exec "$basename" "$@" ;;
             *) root_init; as_root exec "$basename" "$@" ;;
         esac ;;
     apt-get|aptitude) no_links
@@ -626,6 +658,19 @@ case "$basename" in
             status|config|ident|info|'') exec "$basename" "$@" ;;
             *) root_init; as_root exec "$basename" "$@" ;;
         esac ;;
+
+    diff)
+        PATH="`echo $PATH|sed -e "s,\\($HOME/bin\\):\\(.*\\),\\2:\\1,"`"
+        if [ -t 1 ]; then
+            if inpath git; then
+                [ "x-uN" = "x$1" ] && shift
+                exec git diff --no-index "$@"
+            else
+                exec diff -uprN "$@" | pager
+            fi
+        else
+            exec diff "$@"
+        fi ;;
 
     aumix) no_links
         if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
@@ -651,15 +696,6 @@ case "$basename" in
         git remote add origin "$1" &&
         git config branch."$head".remote origin &&
         git config branch."$head".merge "refs/heads/$head"
-        ;;
-
-    git-rewrite-email)
-	 s="$1"; d="$2"
-         shift;  shift
-         git-filter-branch --commit-filter "
-         [ \"x\$GIT_AUTHOR_EMAIL\"    = 'x$s' ] && GIT_AUTHOR_EMAIL='$d'
-         [ \"x\$GIT_COMMITTER_EMAIL\" = 'x$s' ] && GIT_COMMITTER_EMAIL='$d'
-         git-commit-tree \"\$@\"" "$@"
         ;;
 
     rds)
@@ -723,8 +759,8 @@ EOF
 
     whois)
         #no_links
-        if [ "$1" != "-H" ]; then
-            exec whois -H "$@"
+        if [ "$1" != "-H" -a -t 1 ]; then
+            exec whois -H "$@" | pager
         else
             exec /usr/bin/whois "$@"
         fi ;;
