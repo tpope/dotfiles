@@ -1,5 +1,4 @@
 # ~/.procmailrc
-# $Id$
 
 PATH=/home/tpope/bin:/usr/local/bin:/usr/bin:/bin
 MAILDIR=$HOME/Mail
@@ -59,6 +58,11 @@ definitely-spam
 probably-spam
 
 :0 h
+* ^From.*MAILER-DAEMON
+* ^To:.*@rebelongto\.us
+bounces
+
+:0 h
 * ^From.*(Mail Delivery System|MAILER-DAEMON)
 * ^To: ...(|.|..|...)@rebelongto\.us
 probably-spam
@@ -74,37 +78,44 @@ probably-spam
 tamuk
 
 :0
-* ^X-BeenThere: debian-knoppix@linuxtag\.org
-#* ^Subject: .*\[debian-knoppix\]
-debian-knoppix
-
-:0
-* ^From debian-knoppix-admin@linuxtag\.org
-debian-knoppix
+* ^List-ID: <git\.vger\.kernel\.org>
+git
 
 :0
 * ^Return-path: .*mutt-users.*@mutt\.org>$
 mutt-users
 
 :0
-* ^Delivered-To: mailing list vim-dev@vim\.org$
-vim-dev
-
-:0
-* ^X-BeenThere: rxvt-unicode@lists\.schmorp\.de$
-rxvt-unicode
+* ^List-Id: ruby-dev\.ruby-lang\.org$
+ruby-dev
 
 :0
 * ^List-Id: ruby-talk\.ruby-lang\.org$
 ruby-talk
 
 :0
-* ^List-Id:.*vim-ruby-devel\.rubyforge\.org\b
-vim-ruby-devel
+* ^List-Id: <rubyonrails-core\.googlegroups\.com>$
+rubyonrails-core
 
 :0
-* ^From: SPNET
-/dev/null
+* ^X-BeenThere: rxvt-unicode@lists\.schmorp\.de$
+rxvt-unicode
+
+:0
+* ^List-Id: <vim_dev\.googlegroups\.com>$
+vim-dev
+
+:0
+* ^List-Id: <vim_use\.googlegroups\.com>$
+vim-use
+
+:0
+* ^List-Id: <vim-experiment\.googlegroups\.com>$
+vim-experiment
+
+:0
+* ^List-Id:.*vim-ruby-devel\.rubyforge\.org\b
+vim-ruby-devel
 
 :0
 * ^Content-Type:.* charset="iso-2022-jp"
@@ -114,6 +125,3 @@ vim-ruby-devel
 * ^From: Arpwatch
 * ^Subject: flip flop
 /dev/null
-
-:0 ic
-| /usr/bin/Mailsound -h tobias
