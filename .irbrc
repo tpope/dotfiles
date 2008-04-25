@@ -167,15 +167,26 @@ class Class
   end
 end
 
-[String, Numeric, TrueClass, FalseClass].each do |klass|
-  klass.inspect_filter {|text| "\e[1;35m#{text}\e[0m"}
+if RUBY_VERSION =~ /^1\.8\b/
+  [String, Numeric, TrueClass, FalseClass].each do |klass|
+    klass.inspect_filter {|text| "\e[1;35m#{text}\e[0m"}
+  end
+  Array.inspect_filter do |text|
+    text[0] == ?% ?  "\e[1;35m#{text}\e[0m" : text
+  end
+  NilClass.inspect_filter {|text| "\e[1;30m#{text}\e[0m"}
+  Symbol.inspect_filter {|text| "\e[1;36m#{text}\e[0m"}
+  Module.inspect_filter {|text| "\e[1;32m#{text}\e[0m"}
+  Object.inspect_filter do |text|
+    text.gsub(/#<([A-Z]\w*(?:::\w+)*)/,"#<\e[1;32m\\1\e[0m")
+  end
 end
-Array.inspect_filter do |text|
-  text[0] == ?% ?  "\e[1;35m#{text}\e[0m" : text
-end
-NilClass.inspect_filter {|text| "\e[1;30m#{text}\e[0m"}
-Symbol.inspect_filter {|text| "\e[1;36m#{text}\e[0m"}
-Module.inspect_filter {|text| "\e[1;32m#{text}\e[0m"}
-Object.inspect_filter do |text|
-  text.gsub(/#<([A-Z]\w*(?:::\w+)*)/,"#<\e[1;32m\\1\e[0m")
+
+begin
+  class Gem::GemPathSearcher
+    def inspect
+      "#<#{self.class.inspect}:#{object_id}>"
+    end
+  end
+rescue NameError
 end
