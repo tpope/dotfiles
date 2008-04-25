@@ -1,9 +1,7 @@
 " Vim color file
 " File:         ~/.vim/colors/tim.vim
 " Author:       Tim Pope <vimNOSPAM@tpope.info>
-" URL:          http://tpope.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/colors/tim.vim
-" Last Change:  2006 May 29
-" Version:      $Id$
+" Last Change:  2007 Oct 01
 
 if version>600
   hi clear
