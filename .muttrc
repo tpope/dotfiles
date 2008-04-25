@@ -11,6 +11,7 @@ set nowait_key
 set record==sent
 set postponed==postponed
 set index_format="%4C %Z %(%b %d %H:%M) %-15.15F (%?l?%4l&%4c?) %s"
+set move=no
 set sort=threads
 set sort_aux=date-received
 set sort_browser=reverse-date
@@ -46,8 +47,8 @@ alternative_order text/enriched text/richtext text/plain text
 unhdr_order *
 hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: X-MimeOLE User-Agent: X-HTTP-UserAgent: X-Mailer: X-Newsreader: X-Editor: X-Operating-System: Subject: X-Spam-Status:
 
-my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
-my_hdr X-All-Your-Base-Are-Belong-To: Us
+# my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
+# my_hdr X-All-Your-Base-Are-Belong-To: Us
 my_hdr X-URL: http://www.tpope.net/
 
 # Header weeding
@@ -62,7 +63,7 @@ ignore X-All-Your-Base-Are-Belong-To X-BFI X-HotPOP-Delivered-To X-Return-Path
 ignore X-eGroups- X-Yahoo-Profile X-Juno-Line-Breaks X-Mailman- X-BeenThere
 ignore X-YahooFilteredBulk X-Header-Overseas X-Header-NoReverseIP
 ignore X-MS- Thread- X-Priority X-ASG- X-ORBL X-Barracuda-Spam-
-ignore X-DMCA X-Abuse X-AntiAbuse X-RFC2646 X-Postfilter
+ignore X-DMCA X-Abuse X-AntiAbuse X-RFC2646 X-Postfilter X-Received
 ignore X-ML- X-MLServer X-Mail-Count Posted X-Complaints-To Complaints-To
 ignore Newsgroups NNTP- X-From-Usenet X-Trace Injection-Info X-rubymirror
 ignore Return-Path Message-ID Received Mime-Version Content-Disposition Path
