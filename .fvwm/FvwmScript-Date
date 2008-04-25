@@ -1,5 +1,4 @@
 # ~/.fvwm/FvwmScript-Date
-# $Id$
 
 WindowTitle {FvwmScript-Hidden}
 WindowSize 72 16

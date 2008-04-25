@@ -1,5 +1,4 @@
 # ~/.fvwm/FvwmScript-Time
-# $Id$
 
 WindowTitle {FvwmScript-Hidden}
 WindowSize 46 22

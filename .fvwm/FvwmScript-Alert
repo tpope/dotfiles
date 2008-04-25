@@ -1,5 +1,4 @@
 # ~/.fvwm/FvwmScript-Alert
-# $Id$
 
 WindowTitle {FvwmScript-Hidden}
 WindowSize 40 22
