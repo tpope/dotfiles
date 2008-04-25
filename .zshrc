@@ -66,26 +66,56 @@ friends=($boxen buster grex $work)
 unset interactive domains host
 # Section: Prompt {{{1
 # --------------------
-local e _find_promptinit hostcolor hostletter hostcode usercolor usercode
+local e _find_promptinit hostcolor hostletter hostcode usercolor dircolor usercode
 e=`echo -ne "\e"`
 
-_find_promptinit=( $^fpath/promptinit(N) )
-if (( $#_find_promptinit >= 1 )) && [[ -r $_find_promptinit[1] ]]; then
-    autoload -U promptinit && promptinit && prompt simpson
-    RPS1=$'%(?..(%{\e[01;35m%}%?%{\e[00m%}%)%<<)'
-else
+git_prompt_info() {
+    if [ -d .svn ]; then
+        ref=.svn
+    else
+        ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
+    fi
+    case "$TERM" in
+        screen*) branchcolor=$'\e[38;5;31m'   ;;
+        *)       branchcolor="$fg_bold[blue]" ;;
+    esac
+    echo "(%{$branchcolor%}${ref#refs/heads/}%{$reset_color%})"
+}
+
+autoload -U colors && colors
+
+# _find_promptinit=( $^fpath/promptinit(N) )
+# if (( $#_find_promptinit >= 1 )) && [[ -r $_find_promptinit[1] ]]; then
+    # autoload -U promptinit && promptinit && prompt simpson
+    # RPS1=$'%(?..(%{\e[01;35m%}%?%{\e[00m%}%)%<<)'
+# else
     if [ -x "$HOME/bin/hostinfo" ]; then
         hostcolor=`$HOME/bin/hostinfo -c`
-        hostletter=`$HOME/bin/hostinfo -l`
+        # hostletter=`$HOME/bin/hostinfo -l`
     else
         hostcolor="01;37"
-        hostletter=
+        # hostletter=
     fi
-    usercolor="01;33"
-    [ $UID = '0' ] && usercolor="01;37"
-    PS1="%{${e}[${usercolor}m%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{${e}[01;34m%}%~%{${e}[00m%}%# "
+
+    local usercolor="$fg_bold[yellow]"
+    local dircolor="$fg_bold[blue]"
+    case "$TERM" in
+        screen*)
+        usercolor=$'\e[38;5;184m'
+        dircolor=$'\e[38;5;27m'
+        ;;
+        xterm*|rxvt-unicode)
+        usercolor=$'\e[93m'
+        dircolor=$'\e[94m'
+        ;;
+    esac
+    [ $UID = '0' ] && usercolor="$fg_bold[white]"
+    reset_color="${e}[00m"
+
+    PROMPT="%{$usercolor%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{$dircolor%}%20<...<%~%<<%{${e}[00m%}%{${e}[00m%}\$(git_prompt_info)%# "
     RPS1="%(?..(%{${e}[01;35m%}%?%{${e}[00m%}%)%<<)"
-fi
+    setopt promptsubst
+# fi
 
 case ${OLDTERM:-$TERM} in
 screen*|vt220*)
