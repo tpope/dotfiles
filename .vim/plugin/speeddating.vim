@@ -1,12 +1,13 @@
 " speeddating.vim - Use CTRL-A/X to increment dates, times, and more
 " Maintainer:   Tim Pope
-" Last Change:  Jan 20, 2008
+" Last Change:
 " GetLatestVimScripts: 2120 1 :AutoInstall: speeddating.vim
 
 " Greatly enhanced <C-A>/<C-X>.  Try these keys on various numbers in the
 " lines below.  You can also give a count (e.g., 4<C-A>).
 
 " Fri, 31 Dec 1999 23:59:59 +0000
+" Fri Dec 31 23:59:59 UTC 1999
 " 2008-01-05T04:59:59Z
 " 1865-04-15
 " 11/Sep/01
@@ -44,8 +45,14 @@
 " d<C-X>  change the timestamp under the cursor to the current local time
 "
 " Caveats:
-" Completely timezone ignorant.
-" Gregorian calendar always used.
+" - Gregorian calendar always used.
+" - Time zone abbreviation support is limited to a few predefined codes on
+"   Windows and other platforms without strftime("%Z") support.  If your time
+"   zone abbreviation is not correctly identified set the g:speeddating_zone
+"   and g:speeddating_zone_dst variables.
+" - Beginning a format with a digit causes Vim to treat leading digits as a
+"   count instead.  To work around this escape it with %[] (e.g.,
+"   %[2]0%0y%0m%0d%* is a decent format for DNS serials).
 
 " Licensed under the same terms as Vim itself.
 
@@ -72,7 +79,7 @@ endfunction
 
 " In Vim, -4 % 3 == -1.  Let's return 2 instead.
 function! s:mod(a,b)
-    if a:a < 0 && a:b > 0 || a:a > 0 && a:b < 0
+    if (a:a < 0 && a:b > 0 || a:a > 0 && a:b < 0) && a:a % a:b != 0
         return (a:a % a:b) + a:b
     else
         return a:a % a:b
@@ -148,7 +155,7 @@ function! s:increment(increment)
             if repl != ""
                 call s:replaceinline(start,end,repl)
                 call setpos('.',[0,line('.'),start+offset,0])
-                silent! call dot#set("\<Plug>SpeedDating" . (a:increment < 0 ? "Down" : "Up"),a:increment < 0 ? -a:increment : a:increment)
+                silent! call repeat#set("\<Plug>SpeedDating" . (a:increment < 0 ? "Down" : "Up"),a:increment < 0 ? -a:increment : a:increment)
                 return
             endif
         endif
@@ -158,7 +165,7 @@ function! s:increment(increment)
     else
         exe "norm! ".-a:increment."\<C-X>"
     endif
-    silent! call dot#set("\<Plug>SpeedDating" . (a:increment < 0 ? "Down" : "Up"),a:increment < 0 ? -a:increment : a:increment)
+    silent! call repeat#set("\<Plug>SpeedDating" . (a:increment < 0 ? "Down" : "Up"),a:increment < 0 ? -a:increment : a:increment)
 endfunction
 
 " }}}1
@@ -347,24 +354,13 @@ endfunction
 " }}}1
 " Time Helpers {{{1
 
-" approximate
-let s:offset = strftime("%d",86400)*24+strftime("%H",86400)-48
-
-let s:days_engl   =["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
-let s:days_abbr   =map(range(86400*3+43200-s:offset*3600,86400*12,86400),'strftime("%a",v:val)')[0:6]
-let s:days_full   =map(range(86400*3+43200-s:offset*3600,86400*12,86400),'strftime("%A",v:val)')[0:6]
-
-let s:months_engl =["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-let s:months_abbr =map(range(86400*2,86400*365,86400*31),'strftime("%b",v:val)')
-let s:months_full =map(range(86400*2,86400*365,86400*31),'strftime("%B",v:val)')
-
 function! s:ary2pat(array)
     return '\%('.join(a:array,'\|').'\)'
     return '\%('.join(map(copy(a:array),'substitute(v:val,"[[:alpha:]]","[\\u&\\l&]","g")'),'\|').'\)'
 endfunction
 
 function! s:initializetime(time)
-    call extend(a:time,{'y':2000,'b':1,'d':0,'h':0,'m':0,'s':0},"keep")
+    call extend(a:time,{'y': '','b':1,'d':0,'h':0,'m':0,'s':0,'o':0},"keep")
     if get(a:time,'b','') !~ '^\d*$'
         let full = index(s:months_full ,a:time.b,0,1) + 1
         let engl = index(s:months_engl ,a:time.b,0,1) + 1
@@ -390,21 +386,38 @@ function! s:initializetime(time)
         let a:time.y = s:roman2arabic(a:time.y)
     elseif a:time.y =~ '^-\=0..'
         let a:time.y = substitute(a:time.y,'0\+','','')
-    elseif a:time.y < 38 && a:time.y >= 0
+    elseif a:time.y < 38 && a:time.y >= 0 && a:time.y != ""
         let a:time.y += 2000
-    elseif a:time.y < 100 && a:time.y >= 0
+    elseif a:time.y < 100 && a:time.y >= 38
         let a:time.y += 1900
     endif
-    if a:time.d == 0 && has_key(a:time,'w')
-        let full = index(s:days_full ,a:time.w,0,1)
-        let engl = index(s:days_engl ,a:time.w,0,1)
-        let abbr = index(s:days_abbr ,a:time.w,0,1)
-        let any = full > 0 ? full : (engl > 0 ? engl : (abbr > 0 ? abbr : a:time.w))
-        let a:time.d = s:mod(any - s:jd(a:time.y,a:time.b,1),7)
+    if has_key(a:time,'w')
+        let full = index(s:days_full,a:time.w,0,1)
+        let engl = index(s:days_engl,a:time.w,0,1)
+        let abbr = index(s:days_abbr,a:time.w,0,1)
+        let a:time.w = full > 0 ? full : (engl > 0 ? engl : (abbr > 0 ? abbr : a:time.w))
+        if a:time.d == 0
+            let a:time.d = s:mod(a:time.w - s:jd(a:time.y,a:time.b,1),7)
+        elseif a:time.y == '' && a:time.b * a:time.d > 0
+            let a:time.y = strftime("%Y")-2
+            while s:mod(s:jd(a:time.y,a:time.b,a:time.d)+1,7) != a:time.w
+                let a:time.y += 1
+            endwhile
+        endif
         call remove(a:time,'w')
     endif
     if a:time.d == 0
         let a:time.d = 1
+    endif
+    if a:time.y == ''
+        let a:time.y = 2000
+    endif
+    if a:time.o =~ '^[+-]\d\d:\=\d\d$'
+        let a:time.o = (a:time.o[0]=="-" ? -1 : 1)*(a:time.o[1:2]*60+matchstr(a:time.o,'\d\d$'))
+    elseif get(a:time,'z','') == g:speeddating_zone
+        let a:time.o = s:offset
+    elseif get(a:time,'z','') == g:speeddating_zone_dst
+        let a:time.o = s:offset_dst
     endif
     return a:time
 endfunction
@@ -500,6 +513,84 @@ function! s:strftime(pattern,time)
     return expanded
 endfunction
 
+function! s:localtime(...)
+    let ts = a:0 ? a:1 : localtime()
+    let time = {
+                \ 'y': +strftime('%Y',ts),
+                \ 'b': +strftime('%m',ts),
+                \ 'd': +strftime('%d',ts),
+                \ 'h': +strftime('%H',ts),
+                \ 'm': +strftime('%M',ts),
+                \ 's': +strftime('%S',ts)}
+    let jd = s:jd(time.y,time.b,time.d) - s:jd(1970,1,1)
+    let real_ts = jd * 86400 + time.h * 3600 + time.m * 60 + time.s
+    let time.o = (real_ts - ts) / 60
+    return time
+endfunction
+
+function! s:formattz(offset)
+    if a:offset < 0
+        let offset = -a:offset
+        let sign = "-"
+    else
+        let offset = a:offset
+        let sign = "+"
+    endif
+    return printf("%s%02d%02d",sign,offset/60,offset%60)
+endfunction
+
+" }}}1
+" Time Data {{{1
+
+let s:offset     = s:localtime((  0+30*365)*86400).o
+if !exists("g:speeddating_zone")
+    let g:speeddating_zone = strftime("%Z",30*365*86400)
+    if g:speeddating_zone == ""
+        let g:speeddating_zone = get({-8:'PST',-7:'MST',-6:'CST',-5:'EST',0:'WET',1:'CET',2:'EET'},s:offset/60,"XST")
+    endif
+endif
+
+let s:offset_dst = s:localtime((180+30*365)*86400).o
+if !exists("g:speeddating_zone_dst")
+    let g:speeddating_zone_dst = strftime("%Z",(180+30*365)*86400)
+    if g:speeddating_zone_dst == ""
+        if s:offset == s:offset_dst
+            let g:speeddating_zone_dst = g:speeddating_zone
+        else
+            let g:speeddating_zone_dst = get({-7:'PDT',-6:'MDT',-5:'CDT',-4:'EDT',1:'WEST',2:'CEST',3:'EEST'},s:offset_dst/60,"XDT")
+        endif
+    endif
+endif
+
+let s:days_engl   =["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+let s:days_abbr   =map(range(86400*3+43200-s:offset*60,86400*12,86400),'strftime("%a",v:val)')[0:6]
+let s:days_full   =map(range(86400*3+43200-s:offset*60,86400*12,86400),'strftime("%A",v:val)')[0:6]
+
+let s:months_engl =["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+let s:months_abbr =map(range(86400*2,86400*365,86400*31),'strftime("%b",v:val)')
+let s:months_full =map(range(86400*2,86400*365,86400*31),'strftime("%B",v:val)')
+
+let s:strftime_items = {
+            \ "a": ['d','w',s:ary2pat(s:days_abbr),   'weekday (abbreviation)',s:days_abbr],
+            \ "A": ['d','w',s:ary2pat(s:days_full),   'weekday (full name)',s:days_full],
+            \ "i": ['d','w',s:ary2pat(s:days_engl),   'weekday (English abbr)',s:days_engl],
+            \ "b": ['b','b',s:ary2pat(s:months_abbr), 'month (abbreviation)',[""]+s:months_abbr],
+            \ "B": ['b','b',s:ary2pat(s:months_full), 'month (full name)',[""]+s:months_full],
+            \ "h": ['b','b',s:ary2pat(s:months_engl), 'month (English abbr)',[""]+s:months_engl],
+            \ "d": ['d','d','[ 0-3]\=\d', 'day   (01-31)',2],
+            \ "H": ['h','h','[ 0-2]\=\d', 'hour  (00-23)',2],
+            \ "I": ['h','h','[ 0-2]\=\d', 'hour  (01-12)',['12', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11']],
+            \ "m": ['b','b','[ 0-1]\=\d', 'month (01-12)',2],
+            \ "M": ['m','m','[ 0-5]\=\d', 'minutes',2],
+            \ "o": ['d','d','[ 0-3]\=\d\%(st\|nd\|rd\|th\)','day  (1st-31st)',s:function("s:ordinalize")],
+            \ "P": ['h','p','[ap]m', 'am/pm',repeat(['am'],12) + repeat(['pm'],12)],
+            \ "S": ['s','s','[ 0-5]\=\d', 'seconds',2],
+            \ "v": ['y','y','[ivxlcdmn]\+','year (roman numerals)',s:function("s:arabic2roman")],
+            \ "y": ['y','y','\d\d','year  (00-99)',s:function("s:modyear")],
+            \ "Y": ['y','y','-\=\d\d\d\=\d\=','year',4],
+            \ "z": ['o','o','[+-]\d\d\d\d','timezone offset',s:function("s:formattz")],
+            \ "Z": [' ','z','[A-Z]\{3,5}','timezone (incomplete)',3]}
+
 " }}}1
 " Time Handler {{{1
 
@@ -508,25 +599,37 @@ function! s:timestamp(utc,count)
         let [start,end,string;caps] = s:findinline('\C'.join(handler.groups,''))
         if string != ""
             let format = substitute(handler.strftime,'\\\([1-9]\)','\=caps[submatch(1)-1]','g')
-            if a:utc
-                let newstring = s:strftime(format,localtime()+a:count*60*15)
-            elseif a:count
-                let newstring = s:strftime(format,localtime()-a:count*60*15)
+            if a:utc || a:count
+                let offset = (a:utc ? 1 : -1) * a:count * 15
+                let time = s:initializetime({'y':1970,'s':localtime()+offset*60,'o':offset})
             else
-                let newstring = s:strftime(format,{
-                            \ 'y': strftime('%Y'),
-                            \ 'b': strftime('%m'),
-                            \ 'd': strftime('%d'),
-                            \ 'h': strftime('%H'),
-                            \ 'm': strftime('%M'),
-                            \ 's': strftime('%S')})
+                let time = s:localtime()
             endif
+            if a:utc && !a:count
+                let time.z = 'UTC'
+            elseif time.o == s:offset
+                let time.z = g:speeddating_zone
+            elseif time.o == s:offset_dst
+                let time.z = g:speeddating_zone_dst
+            elseif time.o == 0
+                let time.z = 'UTC'
+            else
+                let time.z = 'XXT'
+            endif
+            let newstring = s:strftime(format,time)
             call s:replaceinline(start,end,newstring)
             call setpos('.',[0,line('.'),start+strlen(newstring),0])
-            silent! call dot#set("\<Plug>SpeedDatingNow".(a:utc ? "UTC" : "Local"),a:count)
+            silent! call repeat#set("\<Plug>SpeedDatingNow".(a:utc ? "UTC" : "Local"),a:count)
             return ""
         endif
     endfor
+    let [start,end,string;caps] = s:findinline('-\=\<\d\+\>')
+    if string != ""
+        let newstring = localtime() + (a:utc ? 1 : -1) * a:count * 60*15
+        call s:replaceinline(start,end,newstring)
+        call setpos('.',[0,line('.'),start+strlen(newstring),0])
+        silent! call repeat#set("\<Plug>SpeedDatingNow".(a:utc ? "UTC" : "Local"),a:count)
+    endif
 endfunction
 
 function! s:dateincrement(string,offset,increment) dict
@@ -559,30 +662,26 @@ function! s:dateincrement(string,offset,increment) dict
         let i += 1
     endfor
     call s:initializetime(time)
-    let time[char] += a:increment
+    if char == 'o'
+        let inner_offset = partial_matchend - offset - 1
+        let factor = 15
+        if inner_offset <= 0
+            let inner_offset = 0
+            let factor = 1
+        elseif inner_offset > 1
+            let factor = 60
+            let inner_offset = 2
+        endif
+        let time.o += factor * a:increment
+        let time.m += factor * a:increment
+    else
+        let time[char] += a:increment
+        let inner_offset = 0
+    endif
     let format = substitute(self.strftime,'\\\([1-9]\)','\=caps[submatch(1)-1]','g')
     let time_string = s:strftime(format,time)
-    return [time_string, matchend(time_string,partial_pattern)]
+    return [time_string, matchend(time_string,partial_pattern)-inner_offset]
 endfunction
-
-let s:strftime_items = {
-            \ "a": ['d','w',s:ary2pat(s:days_abbr),   'weekday (abbreviation)',s:days_abbr],
-            \ "A": ['d','w',s:ary2pat(s:days_full),   'weekday (full name)',s:days_full],
-            \ "i": ['d','w',s:ary2pat(s:days_engl),   'weekday (English abbr)',s:days_engl],
-            \ "b": ['b','b',s:ary2pat(s:months_abbr), 'month (abbreviation)',[""]+s:months_abbr],
-            \ "B": ['b','b',s:ary2pat(s:months_full), 'month (full name)',[""]+s:months_full],
-            \ "h": ['b','b',s:ary2pat(s:months_engl), 'month (English abbr)',[""]+s:months_engl],
-            \ "d": ['d','d','[ 0-3]\=\d', 'day   (01-31)',2],
-            \ "H": ['h','h','[ 0-2]\=\d', 'hour  (00-23)',2],
-            \ "I": ['h','h','[ 0-2]\=\d', 'hour  (01-12)',['12', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11']],
-            \ "m": ['b','b','[ 0-1]\=\d', 'month (01-12)',2],
-            \ "M": ['m','m','[ 0-5]\=\d', 'minutes',2],
-            \ "o": ['d','d','[ 0-3]\=\d\%(st\|nd\|rd\|th\)','day  (1st-31st)',s:function("s:ordinalize")],
-            \ "P": ['h','p','[ap]m', 'am/pm',repeat(['am'],12) + repeat(['pm'],12)],
-            \ "S": ['s','s','[ 0-5]\=\d', 'seconds',2],
-            \ "v": ['y','y','[ivxlcdmn]\+','year (roman numerals)',s:function("s:arabic2roman")],
-            \ "y": ['y','y','\d\d','year  (00-99)',s:function("s:modyear")],
-            \ "Y": ['y','y','-\=\d\d\d\=\d\=','year',4]}
 
 function! s:timeregexp() dict
     return join(self.groups,'')
@@ -619,10 +718,12 @@ function! s:createtimehandler(format)
             let reader += [item[1]]
             if modifier == '^'
                 let pat = substitute(item[2],'\C\\\@<![[:lower:]]','\u&','g')
-                let regexp += ['\('.pat.'\)']
+            elseif modifier == '0'
+                let pat = substitute(item[2],' \|-\@<!\\=','','g')
             else
-                let regexp += ['\('.item[2].'\)']
+                let pat = item[2]
             endif
+            let regexp += ['\('.pat.'\)']
             let group += 1
             let template .= fragment
             let default .= fragment
@@ -642,12 +743,25 @@ function! s:createtimehandler(format)
             let regexp += ["\\".usergroups[strpart(fragment,1)-1]]
             let template .= regexp[-1]
             let default .= userdefaults[strpart(fragment,1)-1]
+        elseif fragment == '%*'
+            if len(regexp) == 1
+                let regexp = []
+                let targets = []
+            else
+                let regexp += ['\(.*\)']
+            endif
         else
             let regexp += [fragment]
             let template .= fragment
             let default .= fragment
         endif
     endwhile
+    if regexp[-1] == '\(.*\)'
+        call remove(regexp,-1)
+        call remove(targets,-1)
+    else
+        let regexp += ['\>']
+    endif
     return {'source': a:format, 'strftime': template, 'groups': regexp, 'regexp': s:function('s:timeregexp'), 'reader': reader, 'targets': targets, 'default': default, 'increment': s:function('s:dateincrement')}
 endfunction
 
@@ -661,6 +775,7 @@ endfunction
 
 function! s:adddate(master,count,bang)
     if a:master == ""
+        let time = s:initializetime({'y':1970,'s':localtime(),'z': 'UTC'})
         if a:bang && a:count
             silent! call remove(s:time_handlers,a:count - 1)
         elseif a:bang
@@ -673,11 +788,13 @@ function! s:adddate(master,count,bang)
             echo " "
             echo "Expansions:"
             for key in sort(keys(s:strftime_items),s:function("s:comparecase"))
-                echo printf("%2s     %-25s %s",'%'.key,s:strftime_items[key][3],s:strftime('%'.key,localtime()))
+                echo printf("%2s     %-25s %s",'%'.key,s:strftime_items[key][3],s:strftime('%'.key,time))
             endfor
+            echo '%0x    %x with mandatory leading zeros'
             echo '%_x    %x with spaces rather than leading zeros'
             echo '%-x    %x with no leading spaces or zeros'
             echo '%^x    %x in uppercase'
+            echo '%*     at beginning/end, surpress \</\> respectively'
             echo '%[..]  any one character         \([..]\)'
             echo '%?[..] up to one character       \([..]\=\)'
             echo '%1     character from first collection match \1'
@@ -693,7 +810,7 @@ function! s:adddate(master,count,bang)
             let i = 0
             for handler in s:time_handlers
                 let i += 1
-                echo printf("%3d %-32s %-32s",i,handler.source,s:strftime(handler.default,localtime()))
+                echo printf("%3d %-32s %-32s",i,handler.source,s:strftime(handler.default,time))
             endfor
         endif
     elseif a:bang
@@ -715,9 +832,13 @@ command! -bar -bang -count=0 -nargs=? SpeedDatingFormat :call s:adddate(<q-args>
 " }}}1
 " Default Formats {{{1
 
-SpeedDatingFormat %i, %d %h %Y %H:%M:%S         " RFC822, sans timezone
-SpeedDatingFormat %h %_d %H:%M:%S               " syslog
-SpeedDatingFormat %Y-%m-%d%[ T_-]%H:%M:%S%?[Z]  " SQL, etc.
+SpeedDatingFormat %i, %d %h %Y %H:%M:%S %z        " RFC822
+SpeedDatingFormat %i, %h %d, %Y at %I:%M:%S%^P %z " mutt default date format
+SpeedDatingFormat %a %b %_d %H:%M:%S %Z %Y        " default date(1) format
+SpeedDatingFormat %a %h %-d %H:%M:%S %Y %z        " git
+SpeedDatingFormat %h %_d %H:%M:%S                 " syslog
+SpeedDatingFormat %Y-%m-%d%[ T_-]%H:%M:%S %z
+SpeedDatingFormat %Y-%m-%d%[ T_-]%H:%M:%S%?[Z]    " SQL, etc.
 SpeedDatingFormat %Y-%m-%d
 SpeedDatingFormat %-I:%M:%S%?[ ]%^P
 SpeedDatingFormat %-I:%M%?[ ]%^P
@@ -742,13 +863,12 @@ nnoremap <silent> <Plug>SpeedDatingNowLocal :<C-U>call <SID>timestamp(0,v:count)
 nnoremap <silent> <Plug>SpeedDatingNowUTC   :<C-U>call <SID>timestamp(1,v:count)<CR>
 
 if !exists("g:speeddating_no_mappings") || !g:speeddating_no_mappings
-    map  <C-A>      <Plug>SpeedDatingUp
-    map  <C-X>      <Plug>SpeedDatingDown
+    nmap  <C-A>     <Plug>SpeedDatingUp
+    nmap  <C-X>     <Plug>SpeedDatingDown
+    xmap  <C-A>     <Plug>SpeedDatingUp
+    xmap  <C-X>     <Plug>SpeedDatingDown
     nmap d<C-A>     <Plug>SpeedDatingNowUTC
     nmap d<C-X>     <Plug>SpeedDatingNowLocal
-    " Deprecated
-    nmap <Leader>sn <Plug>SpeedDatingNowLocal
-    nmap <Leader>su <Plug>SpeedDatingNowUTC
 endif
 
 " }}}1
