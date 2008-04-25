@@ -553,15 +553,42 @@ function! s:abbrevdot(word,text)
     return a:word . c
   endif
 endfunction
-iabbrev scflead supercalifragilisticexpialidocious
-iabbrev Tqb The quick, brown fox jumps over the lazy dog
 iabbrev <silent> Lorem <C-R>=<SID>abbrevdot("Lorem","Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")<CR>
-iabbrev teh the
-iabbrev seperate separate
-iabbrev relevent relevant
-iabbrev relavent relevant
-iabbrev consistant consistent
-iabbrev anomoly anomaly
+
+runtime! plugin/abolish.vim
+
+if exists(":Abolish")
+Abolish afterword{,s}                         afterward{}
+Abolish anomol{y,ies}                         anomal{}
+Abolish austrail{a,an,ia,ian}                 austral{ia,ian}
+Abolish {c,m}arraige{,s}                      {}arriage{}
+Abolish {,in}consistan{cy,cies,t,tly}         {}consisten{}
+Abolish delimeter{,s}                         delimiter{}
+Abolish {,non}existan{ce,t}                   {}existen{}
+Abolish despara{te,tely,tion}                 despera{}
+Abolish d{e,i}screp{e,a}nc{y,ies}             d{i}screp{a}nc{}
+Abolish euphamis{m,ms,tic,tically}            euphemi{}
+Abolish hense                                 hence
+Abolish {,re}impliment{,able,ation}           {}implement{}
+Abolish improvment{,s}                        improvement{}
+Abolish inherant{,ly}                         inherent{}
+Abolish lastest                               latest
+Abolish lession{,s}                           lesson{}
+Abolish {,un}nec{ce,ces,e}sar{y,ily}          {}nec{es}sar{}
+Abolish persistan{ce,t,tly}                   persisten{}
+Abolish {,ir}releven{ce,cy,t,tly}             {}relevan{}
+Abolish rec{co,com,o}mend{,s,ed,ing,ation}    rec{om}mend{}
+Abolish reproducable                          reproducible
+Abolish resouce{,s}                           resource{}
+Abolish restraunt{,s}                         restaurant{}
+Abolish seperat{e,es,ed,ing,ely,ion,ions,or}  separat{}
+Abolish scflead     supercalifragilisticexpialidocious
+Abolish Tqbf        The quick, brown fox jumps over the lazy dog
+Abolish Lidsa       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+endif
+
+inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M:%S","%a, %d %b %Y %H:%M:%S %z","%Y %b %d","%d-%b-%y","%a %b %d %T %Z %Y"],'strftime(v:val)')+[localtime()]),0)<CR>
+
 iabbrev <silent> Dnormal <C-R>=strftime("%a %b %d %T %Z %Y")<CR>
 iabbrev <silent> Drfc822 <C-R>=strftime("%a, %d %b %Y %H:%M:%S %z")<CR>
 iabbrev <silent> Dsql    <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
