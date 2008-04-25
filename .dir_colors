@@ -40,7 +40,6 @@ TERM screen.linux
 TERM Eterm
 TERM Eterm-xterm
 
-ENDCODE \e[0m\e[0K
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
 # Attribute codes:
