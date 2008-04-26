@@ -3,7 +3,7 @@
 # -*- sh -*- vim:set ft=sh sw=4 sts=4:
 
 # Keeps my configuration files in sync.  Also used to create a tarball of
-# them, and commit them to cvs.
+# them, and commit them to Git.
 
 # Whoops.  This script wasn't meant to be called as root.  Maybe this is what
 # I meant.
@@ -40,6 +40,10 @@ output_newline() {
     echo
 }
 
+tar_out() {
+    ( cd && tar cf - -X .cvsignore --exclude='*~' $FILES "$@" )
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
 	-t)    trusted=1;;
@@ -52,8 +56,8 @@ while [ "$#" -gt 0 ]; do
 	-a) tarball=cat; shift; tarfile="${1:-'tpope.tar'}" ;;
 	-z) tarball="gzip -c"; shift; tarfile="${1:-'tpope.tar.gz'}" ;;
 	-j) tarball="bzip2 -zc"; shift; tarfile="${1:-'tpope.tar.bz2'}" ;;
-	-c) cvs="commit"; shift; break ;;
-	-d) cvs="diff -u"; shift; break ;;
+	-c) git="commit"; shift; break ;;
+	-d) git="diff"; shift; break ;;
 	-w) web=1; shift; wtarfile="${1:-"$HOME/tpope.tar.gz"}"; break ;;
 	-W) web=2; shift; wtarfile="${1:-"$HOME/tpope.tar.gz"}"; break ;;
 	*)
@@ -76,18 +80,19 @@ if [ -n "$simpson" ]; then
 	LOCAL_HOSTS="$LOCAL_HOSTS gob lindsay tobias michael"
 fi
 
-if [ -n "$cvs" ]; then
+if [ -n "$git" ]; then
     umask 022
     mkdir /tmp/tpope-$$
     cd /tmp/tpope-$$
-    cvs -Qf checkout tpope
-    cd
-    $RSYNC $FILES /tmp/tpope-$$/tpope/
-    cd /tmp/tpope-$$/tpope/
-    cvs -q $cvs "$@"
-    $RSYNC $FILES "$HOME"
-    chmod 0644 "$HOME/.ssh/authorized_keys" "$HOME/.ssh/authorized_keys2"
-    cvs -qf release
+    git clone maeby:/var/cache/git/tpope.git >/dev/null || exit 1
+    cd tpope
+    tar_out | tar xf -
+    if [ "commit" = "$git" ]; then
+        git status > /dev/null
+        git commit "$@" && git push
+    else
+        git $git "$@"
+    fi
     cd
     rm -rf /tmp/tpope-$$
     exit 0
@@ -109,9 +114,11 @@ if [ -n "$web" ]; then
 fi
 
 if [ -n "$tarball" ]; then
-    ( cd "$HOME"
-    tar -cf - -X "$HOME/.cvsignore" --exclude='*~' $FILES ${loc:+$LOCAL_FILES})|\
-	$tarball > "$tarfile"
+    if [ "x-" = "x$tarfile" ]; then
+        tar_out ${loc:+$LOCAL_FILES} | $tarball
+    else
+        tar_out ${loc:+$LOCAL_FILES} | $tarball > "$tarfile"
+    fi
     exit
 fi
 
@@ -124,8 +131,7 @@ if [ "$tarpipe" ]; then
     output_progress "Uploading base:   "
     for host in $ALL_HOSTS; do
 	[ "$host" != "$hostname" -a "$host" != "$hostname_f" ] && \
-	tar cf - -X .cvsignore --exclude='*~' $FILES|\
-	    $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
+	tar_out | $RSYNC_RSH $host 'tar xpf -' 2>/dev/null && \
 	    output_progress " $host"
     done
     output_newline
