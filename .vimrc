@@ -3,9 +3,11 @@
 
 " Section: Options {{{1
 " ---------------------
-let &runtimepath = substitute(&runtimepath,'\(\~\|tpope\)/vimfiles\>','\1/.vim','g')
-set runtimepath^=~/.config/vim,~/.vim.local
-set runtimepath+=~/.vim.local/after,~/.config/vim/after
+if has("win32")
+  let &runtimepath = substitute(&runtimepath,'\(\~\|tpope\)/vimfiles\>','\1/.vim','g')
+endif
+silent! call pathogen#runtime_append_all_bundles()
+silent! call pathogen#runtime_prepend("~/src/vim/bundle")
 
 set nocompatible
 set autoindent
