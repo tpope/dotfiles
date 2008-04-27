@@ -292,7 +292,7 @@ function! s:Init()
     endif
     " Pet peeve.  Do people still not close their <p> and <li> tags?
     if exists("g:html_indent_tags") && g:html_indent_tags !~ '\\|p\>'
-        let g:html_indent_tags = g:html_indent_tags.'\|p\|li'
+        let g:html_indent_tags = g:html_indent_tags.'\|p\|li\|dt\|dd'
     endif
     set indentkeys+=!^F
     let b:surround_indent = 1
