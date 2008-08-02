@@ -595,52 +595,6 @@ iabbrev <silent> Dsql    <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
 iabbrev <silent> Dvim    <C-R>=strftime("%Y %b %d")<CR>
 iabbrev <silent> Deuro   <C-R>=strftime("%d-%b-%y")<CR>
 
-" Section: Syntax Highlighting and Colors {{{1
-" --------------------------------------------
-
-function! StatusLineColors()
-  let save = @l
-  redir @l>
-  silent highlight StatusLine
-  redir END
-  let reg = @l
-  let @l = save
-  let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
-  exe "hi User1 ".reg
-  exe "hi User2 ".reg
-  exe "hi User3 ".reg
-  exe "hi User4 ".reg
-  exe "hi User5 ".reg
-endfunction
-
-" Switch syntax highlighting on, when the terminal has colors
-if (&t_Co > 2 || has("gui_running")) && has("syntax")
-  if exists("syntax_on") || exists("syntax_manual")
-  else
-    syntax on
-    "syntax enable
-  endif
-  set list
-  set hlsearch
-else
-
-endif
-
-if has("syntax")
-  hi link User1 StatusLine
-  hi link User2 StatusLine
-  hi link User3 StatusLine
-  hi link User4 StatusLine
-  hi link User5 StatusLine
-  if !exists('g:colors_name')
-    if filereadable(expand("~/.vim/colors/tim.vim"))
-      source ~/.vim/colors/tim.vim
-    elseif filereadable(expand("~/.vim/colors/tpope.vim"))
-      source ~/.vim/colors/tpope.vim
-    endif
-  endif
-endif
-
 " Section: Autocommands {{{1
 " --------------------------
 
@@ -653,6 +607,21 @@ if has("autocmd")
   endif
   augroup FTMisc " {{{2
     autocmd!
+
+    function! StatusLineColors()
+      let save = @l
+      redir @l>
+      silent highlight StatusLine
+      redir END
+      let reg = @l
+      let @l = save
+      let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
+      exe "hi User1 ".reg
+      exe "hi User2 ".reg
+      exe "hi User3 ".reg
+      exe "hi User4 ".reg
+      exe "hi User5 ".reg
+    endfunction
     silent! autocmd ColorScheme * call StatusLineColors()
 
     if v:version >= 700 && isdirectory(expand("~/.trash"))
@@ -816,6 +785,27 @@ if has("autocmd")
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
 endif " has("autocmd")
+
+" Section: Syntax Highlighting and Colors {{{1
+" --------------------------------------------
+
+" Switch syntax highlighting on, when the terminal has colors
+if (&t_Co > 2 || has("gui_running")) && has("syntax")
+  if exists("syntax_on") || exists("syntax_manual")
+  else
+    syntax on
+    "syntax enable
+  endif
+  set list
+  set hlsearch
+  if !exists('g:colors_name')
+    if filereadable(expand("~/.vim/colors/tim.vim"))
+      colorscheme tim
+    elseif filereadable(expand("~/.vim/colors/tpope.vim"))
+      colorscheme tpope
+    endif
+  endif
+endif
 
 " }}}1
 if filereadable(expand("~/.vimrc.local"))
