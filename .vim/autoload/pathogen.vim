@@ -61,7 +61,7 @@ endfunction "}}}1
 
 " Prepend all subdirectories of path to the rtp, and append all after
 " directories in those subdirectories.
-function! pathogen#runtime_prepend(path) " {{{1
+function! pathogen#runtime_prepend_subdirectories(path) " {{{1
   let sep    = pathogen#separator()
   let before = pathogen#glob_directories(a:path.sep."*[^~]")
   let after  = pathogen#glob_directories(a:path.sep."*[^~]".sep."after")
