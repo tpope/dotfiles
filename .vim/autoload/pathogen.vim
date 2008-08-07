@@ -28,6 +28,7 @@ function! pathogen#join(...) abort " {{{1
       let j = 0
       while j < len(list)
         if type(list[j]) == type([])
+          `
           "let path .= "," . pathogen#join(list[j])
         else
           let path .= "," . substitute(list[j],'[\\,]','\\&','g')
@@ -42,16 +43,28 @@ function! pathogen#join(...) abort " {{{1
   return substitute(path,'^,','','')
 endfunction " }}}1
 
+" \ on Windows unless shellslash is set, / everywhere else
+function! pathogen#separator() abort " {{{1
+  return !exists("+shellslash") || &shellslash ? '/' : '\'
+endfunction " }}}1
+
 " Convenience wrapper around glob() which returns a list
 function! pathogen#glob(pattern) abort " {{{1
-  return split(glob(a:pattern),"\n")
+  let files = split(glob(a:pattern),"\n")
+  return map(files,'substitute(v:val,"[".pathogen#separator()."/]$","","")')
+endfunction "}}}1
+
+" Like pathogen#glob(), only limit the results to directories
+function! pathogen#glob_directories(pattern) abort " {{{1
+  return filter(pathogen#glob(a:pattern),'isdirectory(v:val)')
 endfunction "}}}1
 
 " Prepend all subdirectories of path to the rtp, and append all after
 " directories in those subdirectories.
 function! pathogen#runtime_prepend(path) " {{{1
-  let before = pathogen#glob(a:path."/*[^~]")
-  let after  = pathogen#glob(a:path."/*[^~]/after")
+  let sep    = pathogen#separator()
+  let before = pathogen#glob_directories(a:path.sep."*[^~]")
+  let after  = pathogen#glob_directories(a:path.sep."*[^~]".sep."after")
   let rtp = pathogen#split(&rtp)
   let path = expand(a:path)
   call filter(rtp,'v:val[0:strlen(path)-1] !=# path')
@@ -64,6 +77,7 @@ endfunction " }}}1
 " after the original directory.  If no argument is given, 'bundle' is used.
 " Repeated calls with the same arguments are ignored.
 function! pathogen#runtime_append_all_bundles(...) " {{{1
+  let sep = pathogen#separator()
   let name = a:0 ? a:1 : 'bundle'
   if "\n".s:done_bundles =~# "\\M\n".name."\n"
     return ""
@@ -72,9 +86,9 @@ function! pathogen#runtime_append_all_bundles(...) " {{{1
   let list = []
   for dir in pathogen#split(&rtp)
     if dir =~# '\<after$'
-      let list +=  pathogen#glob(substitute(dir,'after$',name.'/*[^~]/after','')) + [dir]
+      let list +=  pathogen#glob_directories(substitute(dir,'after$',name.sep.'*[^~]'.sep.'after','')) + [dir]
     else
-      let list +=  [dir] + pathogen#glob(dir.'/'.name.'/*[^~]')
+      let list +=  [dir] + pathogen#glob_directories(dir.sep.name.sep.'*[^~]')
     endif
   endfor
   let &rtp = pathogen#join(list)
