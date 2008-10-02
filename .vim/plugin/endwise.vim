@@ -1,6 +1,5 @@
 " endwise.vim - EndWise
 " Author:   Tim Pope <vimNOSPAM@tpope.info>
-" $Id$
 
 " Distributable under the same terms as Vim itself (see :help license)
 
@@ -69,16 +68,6 @@ function! s:mysearchpair(beginpat,endpat,synpat)
     return line
 endfunction
 
-"function! s:docrend(always)
-    "let val = s:crend(a:always)
-    "let g:val = val
-    "if val != ""
-        "exe 'norm! "_s'.val
-    "else
-        "exe 'norm! "_s'
-    "endif
-"endfunction
-
 function! s:crend(always)
     let n = ""
     if !exists("b:endwise_addition") || !exists("b:endwise_words") || !exists("b:endwise_syngroups")
@@ -94,17 +83,10 @@ function! s:crend(always)
     let lnum = line('.') - 1
     let space = matchstr(getline(lnum),'^\s*')
     let col  = match(getline(lnum),beginpat) + 1
-    "let word  = matchstr(getline(lnum),'^\s*\zs\w\+')
     let word  = matchstr(getline(lnum),beginpat)
-    "let wordpat = '\%('.substitute(b:endwise_words,',','\\|','g').'\)'
-    "let wordpat = beginpat
     let endpat = substitute(word,'.*',b:endwise_addition,'')
     let y = n.endpat."\<C-O>O"
     let endpat = '\<'.substitute(wordchoice,'.*',b:endwise_addition,'').'\>'
-    let g:beginpat = beginpat
-    let g:endpat  = endpat
-    let g:synpat = synpat
-    let g:word = word
     if a:always
         return y
     elseif col <= 0 || synIDattr(synID(lnum,col,1),'name') !~ '^'.synpat.'$'
@@ -125,8 +107,6 @@ function! s:crend(always)
     endif
     if even
         return n
-    "elseif getline(line('.') + 1) =~ '\S' && getline(line('.') + 1) !~ '^'.space
-        "return n
     endif
     return y
 endfunction
@@ -139,7 +119,6 @@ function! s:synname()
     endwhile
 
     let s = synIDattr(synID(line('.'),col('.'),1),'name')
-    "let t = synIDattr(synID(line('.')+1,indent(line('.')+1)+1,1),'name')
     let g:endwise_syntaxes = g:endwise_syntaxes . line('.').','.col('.')."=".s."\n"
     let s:lastline = line('.')
     return s
