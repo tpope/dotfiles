@@ -20,9 +20,9 @@ augroup endwise " {{{1
     au!
     autocmd FileType ruby
                 \ let b:endwise_addition = '\=submatch(0)=="{" ? "}" : "end"' |
-                \ let b:endwise_words = 'module,class,def' |
-                \ let b:endwise_pattern = '^\s*\zs\%(module\|class\|def\)\>' |
-                \ let b:endwise_syngroups = 'rubyModule,rubyClass,rubyDefine'
+                \ let b:endwise_words = 'module,class,def,if,unless,case,while,until,begin,do' |
+                \ let b:endwise_pattern = '^\s*\zs\%(module\|class\|def\|if\|unless\|case\|while\|until\|for\|\|begin\)\>\%(.*[^.:@$]\<end\>\)\@!\|\<do\ze\%(\s*|.*|\)\=\s*$' |
+                \ let b:endwise_syngroups = 'rubyModule,rubyClass,rubyDefine,rubyControl,rubyConditional,rubyRepeat'
     autocmd FileType vb,vbnet,aspvbs
                 \ let b:endwise_addition = 'End &' |
                 \ let b:endwise_words = 'Function,Sub,Class,Module,Enum,Namespace' |
