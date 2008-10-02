@@ -1,5 +1,6 @@
 " endwise.vim - EndWise
-" Author:   Tim Pope <vimNOSPAM@tpope.info>
+" Author:       Tim Pope <vimNOSPAM@tpope.info>
+" Version:      1.0
 
 " Distributable under the same terms as Vim itself (see :help license)
 
