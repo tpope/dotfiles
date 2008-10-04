@@ -130,6 +130,7 @@ highlight Title         guifg=Magenta ctermfg=Magenta
 highlight VisualNOS     gui=none cterm=none
 call s:hibg("Visual"    ,"#555577","LightBlue",83)
 call s:hibg("VisualNOS" ,"#444444","DarkBlue",81)
+call s:hibg("MatchParen","#1100AA","DarkBlue",18)
 highlight WarningMsg    guifg=Red ctermfg=Red
 highlight Error         ctermbg=DarkRed
 highlight SpellBad      ctermbg=DarkRed
@@ -138,16 +139,15 @@ highlight SpellRare     ctermbg=DarkMagenta
 highlight SpellCap      ctermbg=DarkBlue
 highlight SpellLocal    ctermbg=DarkCyan
 
-highlight Folded        guibg=#1100aa ctermbg=DarkBlue
 call s:hibg("Folded"    ,"#110077","DarkBlue",17)
 call s:hifg("Folded"    ,"#aaddee","LightCyan",63)
 highlight FoldColumn    none
 high link FoldColumn    Folded
-highlight DiffAdd     ctermbg=4 guibg=DarkBlue
-highlight DiffChange  ctermbg=5 guibg=DarkMagenta
-highlight DiffDelete  ctermfg=12 ctermbg=6 gui=bold guifg=Blue guibg=DarkCyan
+highlight DiffAdd       ctermbg=4 guibg=DarkBlue
+highlight DiffChange    ctermbg=5 guibg=DarkMagenta
+highlight DiffDelete    ctermfg=12 ctermbg=6 gui=bold guifg=Blue guibg=DarkCyan
 highlight DiffText      ctermbg=DarkRed
-highlight DiffText    cterm=bold ctermbg=9 gui=bold guibg=Red
+highlight DiffText      cterm=bold ctermbg=9 gui=bold guibg=Red
 
 highlight Pmenu         guifg=White ctermfg=White gui=bold cterm=bold
 highlight PmenuSel      guifg=White ctermfg=White gui=bold cterm=bold
