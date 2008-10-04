@@ -7,7 +7,7 @@ if has("win32")
   let &runtimepath = substitute(&runtimepath,'\(\~\|tpope\)/vimfiles\>','\1/.vim','g')
 endif
 silent! call pathogen#runtime_append_all_bundles()
-silent! call pathogen#runtime_prepend("~/src/vim/bundle")
+silent! call pathogen#runtime_prepend_subdirectories("~/src/vim/bundle")
 
 set nocompatible
 set autoindent
