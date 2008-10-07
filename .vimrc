@@ -303,37 +303,6 @@ function! Run()
 endfunction
 command! -bar Run :call Run()
 
-command! -bar SQL :edit SQL|set ft=sql bt=nofile
-
-function! ToTeX()
-  silent! s/\%u201c/``/g
-  silent! s/\%u201d/''/g
-  silent! s/\%u2018/`/g
-  silent! s/\%u2019/'/g
-  silent! s/\%u2014/---/g
-  silent! s/\%u2026/\\ldots{}/g
-  silent! s/ - /---/g
-  silent! s/ -$/---%/g
-  silent! s/^\t\+//g
-endfunction
-command! -bar -range=% ToTeX :<line1>,<line2>call ToTeX()
-
-function! InsertQuoteWrapper(char)
-  if col('.')>strlen(getline('.')) && strlen(substitute(getline('.'),'[^'.a:char.']','','g')) % 2 == 1
-    return a:char
-    "if synIDattr(synID(line('.'),col('.'),1),'name') =~ 'String'
-    "endif
-  elseif getline('.')[col('.')-1] == a:char && getline('.')[col('.')-2] != "\\"
-    return "\<Right>"
-  else
-    return a:char.a:char."\<Left>"
-  endif
-endfunction
-if version >= 600
-  "inoremap <silent> " <C-R>=InsertQuoteWrapper('"')<CR>
-  "inoremap <silent> ' <C-R>=InsertQuoteWrapper("'")<CR>
-endif
-
 function! TemplateFileFunc_pm()
   let module = expand("%:p:r")
   let module = substitute(module,'.*\<\(perl\d*\%([\/][0-9.]*\)\=\|lib\|auto\)[\/]','','')
@@ -546,18 +515,6 @@ map <Leader>v  :so ~/.vimrc<CR>
 
 " Section: Abbreviations {{{1
 " ---------------------------
-function! s:abbrevdot(word,text)
-  let c = nr2char(getchar(0))
-  if c == '.' || c == ''
-    return a:text . '.'
-  else
-    return a:word . c
-  endif
-endfunction
-iabbrev <silent> Lorem <C-R>=<SID>abbrevdot("Lorem","Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")<CR>
-
-runtime! plugin/abolish.vim
-
 if exists(":Abolish")
 Abolish afterword{,s}                         afterward{}
 Abolish anomol{y,ies}                         anomal{}
