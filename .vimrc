@@ -28,7 +28,6 @@ set display=lastline
 if has("eval")
   let &fileencodings = substitute(&fileencodings,"latin1","cp1252","")
 endif
-"set foldlevelstart=1
 set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
 if has("eval")
   let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
@@ -49,7 +48,6 @@ if version >= 700
 endif
 set modelines=5     " Debian likes to disable this
 set mousemodel=popup
-"set nohidden       " Disallow hidden buffers
 set pastetoggle=<F2>
 set scrolloff=1
 set showcmd         " Show (partial) command in status line.
@@ -81,9 +79,8 @@ if exists("&guifont")
     set guifont=Monaco:h12
   elseif has("unix")
     if &guifont == ""
-      set guifont=bitstream\ vera\ sans\ mono\ 11 ",fixed
+      set guifont=bitstream\ vera\ sans\ mono\ 11
     endif
-    "set guioptions-=T guioptions-=m
     set guioptions-=e
   elseif has("win32")
     set guifont=Consolas:h11,Courier\ New:h10
@@ -100,7 +97,7 @@ endif
 if v:version >= 600
   set autoread
   set foldmethod=marker
-  set printoptions=paper:letter ",syntax:n
+  set printoptions=paper:letter
   set sidescrolloff=5
   set mouse=nvi
 endif
@@ -487,7 +484,7 @@ imap <C-G>c         <Plug>CapsLockToggle
 nmap du             <Plug>SpeedDatingNowUTC
 nmap dx             <Plug>SpeedDatingNowLocal
 " Merge consecutive empty lines and clean up trailing whitespace
-map <Leader>fm :g/^\s*$/,/\S/-j|%s/\s\+$//<CR>
+map <Leader>fm :g/^\s*$/,/\S/-j<Bar>%s/\s\+$//<CR>
 map <Leader>v  :so ~/.vimrc<CR>
 
 " Section: Abbreviations {{{1
@@ -554,16 +551,8 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    "autocmd VimEnter * if argc() == 0 && expand("<amatch>") == "" | Scratch | endif
     autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif
-    "autocmd User Rails* silent! Rlcd
     autocmd User Rails setlocal ts=2
-    "autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.]
-          "\ if filereadable(expand("~/.vim/templates/skel.sh")) |
-          "\   0r ~/.vim/templates/skel.sh |
-          "\   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
-          "\ endif |
-          "\ set ft=sh | $
 
     autocmd BufEnter ChangeLog let g:changelog_username = GitWho()
 
@@ -576,8 +565,6 @@ if has("autocmd")
           \ set ft=sh | 1
 
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
-    "autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_exe=1
-    "autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_exe=1
     autocmd BufNewFile  * let b:chmod_exe=1
     autocmd BufWritePre * if exists("b:chmod_exe") |
           \ unlet b:chmod_exe |
@@ -594,29 +581,16 @@ if has("autocmd")
           \ exe "gl/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
           \ exe "normal g`tztg`s" |
           \ endif
-"    autocmd BufWritePre,FileWritePre */.vim/*.vim,*/.vim.*/*.vim,~/.vimrc* exe "normal msHmt" |
-"          \ %s/^\(" Last [Cc]hange:\s\+\).*/\=submatch(1).strftime("%Y %b %d")/e |
-"          \ exe "normal `tzt`s"
-"    autocmd BufRead /usr/* setlocal patchmode=.org
     autocmd BufReadPre *.pdf setlocal binary
-    "autocmd BufReadPre *.doc setlocal readonly
-    "autocmd BufReadCmd *.doc execute "0read! antiword \"<afile>\""|$delete|1|set nomodifiable
     autocmd BufReadCmd *.jar call zip#Browse(expand("<amatch>"))
     autocmd FileReadCmd *.doc execute "read! antiword \"<afile>\""
     autocmd CursorHold,BufWritePost,BufReadPost,BufLeave *
       \ if isdirectory(expand("<amatch>:h")) | let &swapfile = &modified | endif
-    "if version >= 700
-      "autocmd SwapExists * let v:swapchoice = "e" | echohl MoreMsg | echomsg 'Swap file "'.fnamemodify(v:swapname,':~:.').'" already exists!' | echohl None
-    "else
-      "set shortmess+=A
-    "endif
   augroup END " }}}2
   augroup FTCheck " {{{2
     autocmd!
-    autocmd BufNewFile,BufRead      */apache2/[ms]*-*/* set ft=apache
-    autocmd BufNewFile,BufRead             *named.conf* set ft=named
-    "autocmd BufNewFile,BufRead     *.git/COMMIT_EDITMSG set ft=gitcommit
-    "autocmd BufNewFile,BufRead  *.git/config,.gitconfig set ft=gitconfig
+    autocmd BufNewFile,BufRead */apache2/[ms]*-*/* set ft=apache
+    autocmd BufNewFile,BufRead       *named.conf* set ft=named
     autocmd BufNewFile,BufRead *Fvwm*             set ft=fvwm
     autocmd BufNewFile,BufRead *.cl[so],*.bbl     set ft=tex
     autocmd BufNewFile,BufRead /var/www/*.module  set ft=php
@@ -624,13 +598,11 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.vb               set ft=vbnet
     autocmd BufNewFile,BufRead *.tt,*.tt2         set ft=tt2html
     autocmd BufNewFile,BufRead *.pdf              set ft=pdf
-    "autocmd BufNewFile,BufRead *.jar              set ft=zipfile
     autocmd BufNewFile,BufRead *.CBL,*.COB,*.LIB  set ft=cobol
     autocmd BufNewFile,BufRead /var/www/*
           \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
     autocmd BufNewFile,BufRead /etc/udev/*.rules set ft=udev
     autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*  set ft=simpsons
-    "autocmd BufRead * if expand("%") =~? '^https\=://.*/$'|setf html|endif
     autocmd BufNewFile,BufRead,StdinReadPost *
           \ if !did_filetype() && (getline(1) =~ '^!!\@!'
           \   || getline(2) =~ '^!!\@!' || getline(3) =~ '^!'
@@ -672,7 +644,6 @@ if has("autocmd")
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ -x\ -Wall\ %
     autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
     autocmd FileType css  silent! setlocal omnifunc=csscomplete#CompleteCSS
-    "autocmd FileType eruby setlocal omnifunc=htmlcomplete#CompleteTags
     autocmd FileType gitcommit setlocal spell
     autocmd FileType gitrebase nnoremap <buffer> S :Cycle<CR>
     autocmd FileType haml let b:surround_45 = "- \r"|let b:surround_61 = "= \r"
@@ -700,7 +671,6 @@ if has("autocmd")
           \ endif
     autocmd FileType vbnet        runtime! indent/vb.vim
     autocmd FileType vim  setlocal ai et sta sw=4 sts=4 keywordprg=:help | map! <buffer> <C-Z> <C-X><C-V>
-    "autocmd BufWritePost ~/.vimrc   so ~/.vimrc
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
@@ -714,7 +684,6 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
   if exists("syntax_on") || exists("syntax_manual")
   else
     syntax on
-    "syntax enable
   endif
   set list
   set hlsearch
