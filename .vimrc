@@ -25,10 +25,14 @@ set cmdheight=2
 set complete-=i     " Searching includes can be slow
 set dictionary+=/usr/share/dict/words
 set display=lastline
-let &fileencodings = substitute(&fileencodings,"latin1","cp1252,latin1","")
+if has("eval")
+  let &fileencodings = substitute(&fileencodings,"latin1","cp1252","")
+endif
 "set foldlevelstart=1
 set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
-let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
+if has("eval")
+  let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
+endif
 set incsearch       " Incremental search
 set joinspaces
 set laststatus=2    " Always show status line
@@ -137,6 +141,8 @@ elseif has("mac")
 endif
 
 " Plugin Settings {{{2
+if has("eval")
+let g:is_bash = 1
 let g:allml_global_maps=1
 "let g:c_comment_strings=1
 "let g:capslock_command_mode=1
@@ -172,13 +178,17 @@ let g:surround_61 = "<%= \r %>"
 let g:surround_{char2nr('8')} = "/* \r */"
 let g:surround_indent = 1
 let g:dbext_default_history_file = "/tmp/dbext_sql_history.txt"
+endif
 
 " }}}2
 " Section: Commands {{{1
 " -----------------------
 
-silent! ruby require 'tpope'; require 'vim'
+if has("ruby")
+  silent! ruby require 'tpope'; require 'vim'
+endif
 
+if has("eval")
 command! -bar -nargs=1 E       :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
@@ -235,6 +245,11 @@ function! OpenURL(url)
   redraw!
 endfunction
 command! -nargs=1 OpenURL :call OpenURL(<q-args>)
+" open URL under cursor in browser
+nnoremap gb :OpenURL <cfile><CR>
+nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
+nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
+nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
 
 function! Run()
   let old_makeprg = &makeprg
@@ -321,8 +336,10 @@ function! GitWho()
   return "Tim Pope  <".(exists("email") ? email : "@").">"
 endfunction
 
-runtime! plugin/matchit.vim
-runtime! macros/matchit.vim
+  runtime! plugin/matchit.vim
+  runtime! macros/matchit.vim
+  runtime! plugin/abolish.vim
+endif
 
 " Section: Mappings {{{1
 " ----------------------
@@ -330,7 +347,9 @@ runtime! macros/matchit.vim
 map Y       y$
 " Don't use Ex mode; use Q for formatting
 map Q       gqj
-nnoremap <silent> <C-L> :nohls<CR><C-L>
+if exists(":nohls")
+  nnoremap <silent> <C-L> :nohls<CR><C-L>
+endif
 inoremap <C-C> <Esc>`^
 nnoremap zS  r<CR>ddkP=j
 
@@ -352,7 +371,9 @@ inoremap <M-A>      <C-O>$
 noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR>       <C-G>u<CR>
-command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
+if has("eval")
+  command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
+endif
 nnoremap <C-J>      :<C-U>exe 'norm m`'<Bar>exe 'move+'.v:count1<CR>``
 nnoremap <C-K>      m`:move--<CR>``
 if exists(":xnoremap")
@@ -368,6 +389,7 @@ else
   nnoremap          [<Space> O<Space><C-U><Esc>+
 endif
 
+if has("eval")
 function! MoveByOffset(num)
   if a:num == 0
     exe "norm! \<Esc>"
@@ -397,6 +419,7 @@ function! MoveByOffset(num)
 endfunction
 nnoremap <silent> ]o :<C-U>call MoveByOffset(v:count1)<CR>
 nnoremap <silent> [o :<C-U>call MoveByOffset(-v:count1)<CR>
+endif
 
 inoremap     <C-X><C-@> <C-A>
 " Emacs style mappings
@@ -486,12 +509,6 @@ map <C-F4>  :bdelete<CR>
 
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
-
-" open URL under cursor in browser
-nnoremap gb :OpenURL <cfile><CR>
-nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
-nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
-nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
 
 " EnhancedCommentify
 map <silent> \\     <Plug>Traditionalj
