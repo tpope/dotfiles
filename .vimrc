@@ -358,7 +358,6 @@ nnoremap == ==
 vnoremap     <M-<> <gv
 vnoremap     <M->> >gv
 vnoremap     <Space> I<Space><Esc>gv
-"vnoremap     <BS>    I<Del><Esc>gv
 
 inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
 
@@ -462,32 +461,6 @@ endif
 noremap <M-,>        :Smaller<CR>
 noremap <M-.>        :Bigger<CR>
 
-noremap <M-PageUp>   :bprevious<CR>
-noremap <M-PageDown> :bnext<CR>
-noremap <C-Del>      :bdelete<CR>
-noremap <M-Up>       :bprevious<CR>
-noremap <M-Down>     :bnext<CR>
-noremap <M-Left>     :tabprevious<CR>
-noremap <M-Right>    :tabnext<CR>
-noremap <S-Left>     :bprevious<CR>
-noremap <S-Right>    :bnext<CR>
-noremap <C-Up>       <C-W><Up>
-noremap <C-Down>     <C-W><Down>
-noremap <C-Left>     <C-W><Left>
-noremap <C-Right>    <C-W><Right>
-noremap <S-Home>     <C-W><Up>
-noremap <S-End>      <C-W><Down>
-noremap <S-Up>       <C-W><Up>
-noremap <S-Down>     <C-W><Down>
-noremap! <C-Up>      <Esc><C-W><Up>
-noremap! <C-Down>    <Esc><C-W><Down>
-noremap! <C-Left>    <Esc><C-W><Left>
-noremap! <C-Right>   <Esc><C-W><Right>
-noremap! <S-Home>    <Esc><C-W><Up>
-noremap! <S-End>     <Esc><C-W><Down>
-noremap! <S-Up>      <Esc><C-W><Up>
-noremap! <S-Down>    <Esc><C-W><Down>
-
 map  <F1>   <Esc>
 map! <F1>   <Esc>
 if has("gui_running")
@@ -496,16 +469,11 @@ endif
 map <F3>    :cnext<CR>
 map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
-map <F6>    :bnext<CR>
-map <F7>    :bprevious<CR>
 map <F8>    :wa<Bar>make<CR>
 map <F9>    :Run<CR>
 map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
 map <silent> <F11> :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
-map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
-imap <F12> <C-O><F12>
 map <C-F4>  :bdelete<CR>
-"map <t_%9>  :hardcopy         " Print Screen
 
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
@@ -518,19 +486,8 @@ imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
 nmap du             <Plug>SpeedDatingNowUTC
 nmap dx             <Plug>SpeedDatingNowLocal
-"imap <C-X>/         <Lt>/<Plug>allmlHtmlComplete
-"map  <Leader>eu     <Plug>allmlUrlEncode
-"map  <Leader>du     <Plug>allmlUrlDecode
-"map  <Leader>ex     <Plug>allmlXmlEncode
-"map  <Leader>dx     <Plug>allmlXmlDecode
-"nmap <Leader>euu    <Plug>allmlLineUrlEncode
-"nmap <Leader>duu    <Plug>allmlLineUrlDecode
-"nmap <Leader>exx    <Plug>allmlLineXmlEncode
-"nmap <Leader>dxx    <Plug>allmlLineXmlDecode
-map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
-map <Leader>fJ :% call Justify('',3,)<CR>
-" Merge consecutive empty lines
-map <Leader>fm :g/^\s*$/,/\S/-j<CR>
+" Merge consecutive empty lines and clean up trailing whitespace
+map <Leader>fm :g/^\s*$/,/\S/-j|%s/\s\+$//<CR>
 map <Leader>v  :so ~/.vimrc<CR>
 
 " Section: Abbreviations {{{1
