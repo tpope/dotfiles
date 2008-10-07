@@ -325,7 +325,7 @@ if [ -x /usr/etc/renice -a ! -x "$HOME/bin/renice" ]; then
 fi
 [ -z "$links" ] || echo "Creating symlinks."
 
-if inpath crontab; then
+if inpath crontab && [ ! -f "$HOME/.sandbox" ]; then
     crontab -l >/tmp/crontab.original.$$ 2>/dev/null
     cron="$?"
 crontab -l 2>&1 >/dev/null | grep "no crontab" >/dev/null && cron=n
@@ -384,7 +384,7 @@ if [ ! -f "$HOME/.ssh/id_rsa" ]; then
     echo "Generating ssh key."
 fi
 zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
-if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null; then
+if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null && [ ! -f "$HOME/.sandbox" ]; then
     if grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
 	:
     else
