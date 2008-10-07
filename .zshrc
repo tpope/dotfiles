@@ -6,6 +6,7 @@
 setopt rmstarsilent histignoredups
 setopt noclobber nonomatch
 setopt completeinword extendedglob
+setopt autocd
 
 if [[ $ZSH_VERSION == 4.<->* ]]; then
     setopt histexpiredupsfirst histreduceblanks
@@ -65,56 +66,52 @@ friends=($boxen buster maeby grex)
 unset interactive domains host
 # Section: Prompt {{{1
 # --------------------
-local e _find_promptinit hostcolor hostletter hostcode usercolor dircolor usercode
 e=`echo -ne "\e"`
 
 git_prompt_info() {
     if [ -d .svn ]; then
         ref=.svn
     else
-        ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
+        ref=${$(git symbolic-ref HEAD 2> /dev/null)#refs/heads/} || \
+        ref=${$(git rev-parse HEAD 2>/dev/null)[1][1,7]} || \
+        return
     fi
     case "$TERM" in
         screen*) branchcolor=$'\e[38;5;31m'   ;;
         *)       branchcolor="$fg_bold[blue]" ;;
     esac
-    echo "(%{$branchcolor%}${ref#refs/heads/}%{$reset_color%})"
+    case "$ref" in ????????????????????*) ref="${ref[1,17]}..." ;; esac
+    echo "(%{$branchcolor%}${ref}%{$reset_color%})"
 }
 
 autoload -U colors && colors
 
-# _find_promptinit=( $^fpath/promptinit(N) )
-# if (( $#_find_promptinit >= 1 )) && [[ -r $_find_promptinit[1] ]]; then
-    # autoload -U promptinit && promptinit && prompt simpson
-    # RPS1=$'%(?..(%{\e[01;35m%}%?%{\e[00m%}%)%<<)'
-# else
-    if [ -x "$HOME/bin/hostinfo" ]; then
-        hostcolor=`$HOME/bin/hostinfo -c`
-        # hostletter=`$HOME/bin/hostinfo -l`
-    else
-        hostcolor="01;37"
-        # hostletter=
-    fi
+if [ -x "$HOME/bin/hostinfo" ]; then
+    hostcolor=`$HOME/bin/hostinfo -c`
+    # hostletter=`$HOME/bin/hostinfo -l`
+else
+    hostcolor="01;37"
+    # hostletter=
+fi
 
-    local usercolor="$fg_bold[yellow]"
-    local dircolor="$fg_bold[blue]"
-    case "$TERM" in
-        screen*)
-        usercolor=$'\e[38;5;184m'
-        dircolor=$'\e[38;5;27m'
-        ;;
-        xterm*|rxvt-unicode)
-        usercolor=$'\e[93m'
-        dircolor=$'\e[94m'
-        ;;
-    esac
-    [ $UID = '0' ] && usercolor="$fg_bold[white]"
-    reset_color="${e}[00m"
+local usercolor="$fg_bold[yellow]"
+local dircolor="$fg_bold[blue]"
+case "$TERM" in
+    screen*)
+    usercolor=$'\e[38;5;184m'
+    dircolor=$'\e[38;5;27m'
+    ;;
+    xterm*|rxvt-unicode)
+    usercolor=$'\e[93m'
+    dircolor=$'\e[94m'
+    ;;
+esac
+[ $UID = '0' ] && usercolor="$fg_bold[white]"
+reset_color=$'\e[00m'
 
-    PROMPT="%{$usercolor%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{$dircolor%}%20<...<%~%<<%{${e}[00m%}%{${e}[00m%}\$(git_prompt_info)%# "
-    RPS1="%(?..(%{${e}[01;35m%}%?%{${e}[00m%}%)%<<)"
-    setopt promptsubst
-# fi
+PROMPT="%{$usercolor%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{$dircolor%}%20<...<%~%<<%{${e}[00m%}%{${e}[00m%}\$(git_prompt_info)%# "
+RPS1="%(?..(%{${e}[01;35m%}%?%{${e}[00m%}%)%<<)"
+setopt promptsubst
 
 case ${OLDTERM:-$TERM} in
 screen*|vt220*)
@@ -141,14 +138,15 @@ screen*|vt220*)
     preexec () {local tty="`print -P "%l@"|sed -e s,/,-,g`"
                 local cmd="$1"
                 case "$cmd" in
-                    ???????????*) cmd="`echo "$cmd"|sed -e 's/ .*//g'`" ;;
+                    ???????????*) cmd="${cmd%% *}" ;;
                 esac
                 case "$cmd" in
-                    ???????????*) cmd="`echo "$cmd"|sed -e 's,.*/,,g'`" ;;
+                    ???????????*) cmd="${cmd%%/*}" ;;
                 esac
+                cmd=$(echo -n "$cmd"|tr '\0-\037%$' '.')
                 # print -Pn "\e]1;\a\e]1;$tty%m*\a"
                 print -Pn "\e]2;$screenhs"
-                print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
+                print -Pnr " (%24>..>$cmd"
                 print -Pn ") [%l]\a"
                 if [ "$STY" ]; then
                     print -Pn "\ek$cmd@\e\\"
@@ -176,7 +174,7 @@ linux) ;;
     ;;
 esac
 
-unset _find_promptinit hostcolor hostletter hostcode usercolor usercode
+unset hostcolor hostletter hostcode dircolor usercolor usercode
 unset e
 # Section: Keybindings {{{1
 # -------------------------
