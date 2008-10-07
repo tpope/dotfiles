@@ -488,8 +488,8 @@ noremap! <S-End>     <Esc><C-W><Down>
 noremap! <S-Up>      <Esc><C-W><Up>
 noremap! <S-Down>    <Esc><C-W><Down>
 
-imap <F1>   <Esc>
-map  <F1>   K
+map  <F1>   <Esc>
+map! <F1>   <Esc>
 if has("gui_running")
   map <F2>  :Fancy<CR>
 endif
@@ -511,6 +511,7 @@ noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
 
 " EnhancedCommentify
+map <Plug>Traditional \ci
 map <silent> \\     <Plug>Traditionalj
 map <Leader>l       <Plug>CapsLockToggle
 imap <C-L>          <Plug>CapsLockToggle
