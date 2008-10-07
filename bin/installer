@@ -241,11 +241,9 @@ if [ ! -d "$HOME/.trash" ]; then
     chmod 0700 "$HOME/.trash"
     directories=1
 fi
-if [ ! -d "$HOME/dl" ]; then
-    if [ -d "$HOME/downloads" ]; then
-	mv "$HOME/downloads" "$HOME/dl"
-	ln -s dl "$HOME/downloads"
-	chmod 0755 "$HOME/dl"
+if [ ! -e "$HOME/dl" ]; then
+    if [ -d "$HOME/Downloads" ]; then
+	ln -s Downloads "$HOME/dl"
 	directories=1
     elif [ -d "$HOME/.mozilla" -o -f "$HOME/.lynx.cfg" ]; then
 	mkdir "$HOME/dl"
