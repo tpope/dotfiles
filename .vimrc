@@ -630,7 +630,7 @@ if has("autocmd")
     autocmd FileType xml,xsd,xslt           setlocal ai et sta sw=2 sts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
     autocmd FileType tt2html,htmltt,mason   setlocal ai et sta sw=2 sts=2
-    autocmd FileType text,txt,mail          setlocal ai spell com=fb:*,fb:-,n:>
+    autocmd FileType text,txt,mail          setlocal ai com=fb:*,fb:-,n:>
     autocmd FileType cs,vbnet               setlocal foldmethod=syntax fdl=2
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
