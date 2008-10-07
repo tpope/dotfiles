@@ -3,16 +3,16 @@
 include "/usr/share/themes/ThinIce/gtk-2.0/gtkrc"
 
 style "default" {
-    font_name = "Bitstream Vera Sans 9"
+    font_name = "DejaVu Sans 9"
     base[NORMAL] = "#ffffff"
 }
 
 style "serif" = "default" {
-    font_name = "Bitstream Vera Serif 9"
+    font_name = "DejaVu Serif 9"
 }
 
 style "mono" = "default" {
-    font_name = "Bitstream Vera Sans Mono 9"
+    font_name = "DejaVu Sans Mono 9"
 }
 
 widget_class "*Notebook*" style "serif"

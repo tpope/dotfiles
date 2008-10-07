@@ -7,7 +7,7 @@ if has("win32")
   let &runtimepath = substitute(&runtimepath,'\(\~\|tpope\)/vimfiles\>','\1/.vim','g')
 endif
 silent! call pathogen#runtime_append_all_bundles()
-silent! call pathogen#runtime_prepend("~/src/vim/bundle")
+silent! call pathogen#runtime_prepend_subdirectories("~/src/vim/bundle")
 
 set nocompatible
 set autoindent
@@ -25,10 +25,13 @@ set cmdheight=2
 set complete-=i     " Searching includes can be slow
 set dictionary+=/usr/share/dict/words
 set display=lastline
-let &fileencodings = substitute(&fileencodings,"latin1","cp1252,latin1","")
-"set foldlevelstart=1
+if has("eval")
+  let &fileencodings = substitute(&fileencodings,"latin1","cp1252","")
+endif
 set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
-let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
+if has("eval")
+  let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
+endif
 set incsearch       " Incremental search
 set joinspaces
 set laststatus=2    " Always show status line
@@ -45,7 +48,6 @@ if version >= 700
 endif
 set modelines=5     " Debian likes to disable this
 set mousemodel=popup
-"set nohidden       " Disallow hidden buffers
 set pastetoggle=<F2>
 set scrolloff=1
 set showcmd         " Show (partial) command in status line.
@@ -57,6 +59,7 @@ if exists("+spelllang")
 endif
 set splitbelow      " Split windows at bottom
 set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
+set statusline=[%n]\ %<%.99f\ %h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%=%-16(\ %l,%c-%v\ %)%P
 set suffixes+=.dvi  " Lower priority in wildcards
 set tags+=../tags,../../tags,../../../tags,../../../../tags
 set timeoutlen=1200 " A little bit more time for macros
@@ -76,9 +79,8 @@ if exists("&guifont")
     set guifont=Monaco:h12
   elseif has("unix")
     if &guifont == ""
-      set guifont=bitstream\ vera\ sans\ mono\ 11 ",fixed
+      set guifont=bitstream\ vera\ sans\ mono\ 11
     endif
-    "set guioptions-=T guioptions-=m
     set guioptions-=e
   elseif has("win32")
     set guifont=Consolas:h11,Courier\ New:h10
@@ -95,7 +97,7 @@ endif
 if v:version >= 600
   set autoread
   set foldmethod=marker
-  set printoptions=paper:letter ",syntax:n
+  set printoptions=paper:letter
   set sidescrolloff=5
   set mouse=nvi
 endif
@@ -136,6 +138,8 @@ elseif has("mac")
 endif
 
 " Plugin Settings {{{2
+if has("eval")
+let g:is_bash = 1
 let g:allml_global_maps=1
 "let g:c_comment_strings=1
 "let g:capslock_command_mode=1
@@ -171,13 +175,17 @@ let g:surround_61 = "<%= \r %>"
 let g:surround_{char2nr('8')} = "/* \r */"
 let g:surround_indent = 1
 let g:dbext_default_history_file = "/tmp/dbext_sql_history.txt"
+endif
 
 " }}}2
 " Section: Commands {{{1
 " -----------------------
 
-silent! ruby require 'tpope'; require 'vim'
+if has("ruby")
+  silent! ruby require 'tpope'; require 'vim'
+endif
 
+if has("eval")
 command! -bar -nargs=1 E       :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
@@ -234,6 +242,11 @@ function! OpenURL(url)
   redraw!
 endfunction
 command! -nargs=1 OpenURL :call OpenURL(<q-args>)
+" open URL under cursor in browser
+nnoremap gb :OpenURL <cfile><CR>
+nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
+nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
+nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
 
 function! Run()
   let old_makeprg = &makeprg
@@ -302,37 +315,6 @@ function! Run()
 endfunction
 command! -bar Run :call Run()
 
-command! -bar SQL :edit SQL|set ft=sql bt=nofile
-
-function! ToTeX()
-  silent! s/\%u201c/``/g
-  silent! s/\%u201d/''/g
-  silent! s/\%u2018/`/g
-  silent! s/\%u2019/'/g
-  silent! s/\%u2014/---/g
-  silent! s/\%u2026/\\ldots{}/g
-  silent! s/ - /---/g
-  silent! s/ -$/---%/g
-  silent! s/^\t\+//g
-endfunction
-command! -bar -range=% ToTeX :<line1>,<line2>call ToTeX()
-
-function! InsertQuoteWrapper(char)
-  if col('.')>strlen(getline('.')) && strlen(substitute(getline('.'),'[^'.a:char.']','','g')) % 2 == 1
-    return a:char
-    "if synIDattr(synID(line('.'),col('.'),1),'name') =~ 'String'
-    "endif
-  elseif getline('.')[col('.')-1] == a:char && getline('.')[col('.')-2] != "\\"
-    return "\<Right>"
-  else
-    return a:char.a:char."\<Left>"
-  endif
-endfunction
-if version >= 600
-  "inoremap <silent> " <C-R>=InsertQuoteWrapper('"')<CR>
-  "inoremap <silent> ' <C-R>=InsertQuoteWrapper("'")<CR>
-endif
-
 function! TemplateFileFunc_pm()
   let module = expand("%:p:r")
   let module = substitute(module,'.*\<\(perl\d*\%([\/][0-9.]*\)\=\|lib\|auto\)[\/]','','')
@@ -351,8 +333,10 @@ function! GitWho()
   return "Tim Pope  <".(exists("email") ? email : "@").">"
 endfunction
 
-runtime! plugin/matchit.vim
-runtime! macros/matchit.vim
+  runtime! plugin/matchit.vim
+  runtime! macros/matchit.vim
+  runtime! plugin/abolish.vim
+endif
 
 " Section: Mappings {{{1
 " ----------------------
@@ -360,7 +344,9 @@ runtime! macros/matchit.vim
 map Y       y$
 " Don't use Ex mode; use Q for formatting
 map Q       gqj
-nnoremap <silent> <C-L> :nohls<CR><C-L>
+if exists(":nohls")
+  nnoremap <silent> <C-L> :nohls<CR><C-L>
+endif
 inoremap <C-C> <Esc>`^
 nnoremap zS  r<CR>ddkP=j
 
@@ -369,7 +355,6 @@ nnoremap == ==
 vnoremap     <M-<> <gv
 vnoremap     <M->> >gv
 vnoremap     <Space> I<Space><Esc>gv
-"vnoremap     <BS>    I<Del><Esc>gv
 
 inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw." sts=".&sts.':','')<CR>
 
@@ -382,7 +367,9 @@ inoremap <M-A>      <C-O>$
 noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
 inoremap <CR>       <C-G>u<CR>
-command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
+if has("eval")
+  command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
+endif
 nnoremap <C-J>      :<C-U>exe 'norm m`'<Bar>exe 'move+'.v:count1<CR>``
 nnoremap <C-K>      m`:move--<CR>``
 if exists(":xnoremap")
@@ -398,13 +385,16 @@ else
   nnoremap          [<Space> O<Space><C-U><Esc>+
 endif
 
+if has("eval")
 function! MoveByOffset(num)
   if a:num == 0
     exe "norm! \<Esc>"
     return
   endif
   let dir   = expand("%:h")
-  if dir != ''
+  if dir == '.'
+    let dir = ''
+  elseif dir != ''
     let dir .= '/'
   endif
   let files = split(glob(dir.".*[^~.]"),"\n")
@@ -425,6 +415,7 @@ function! MoveByOffset(num)
 endfunction
 nnoremap <silent> ]o :<C-U>call MoveByOffset(v:count1)<CR>
 nnoremap <silent> [o :<C-U>call MoveByOffset(-v:count1)<CR>
+endif
 
 inoremap     <C-X><C-@> <C-A>
 " Emacs style mappings
@@ -467,96 +458,37 @@ endif
 noremap <M-,>        :Smaller<CR>
 noremap <M-.>        :Bigger<CR>
 
-noremap <M-PageUp>   :bprevious<CR>
-noremap <M-PageDown> :bnext<CR>
-noremap <C-Del>      :bdelete<CR>
-noremap <M-Up>       :bprevious<CR>
-noremap <M-Down>     :bnext<CR>
-noremap <M-Left>     :tabprevious<CR>
-noremap <M-Right>    :tabnext<CR>
-noremap <S-Left>     :bprevious<CR>
-noremap <S-Right>    :bnext<CR>
-noremap <C-Up>       <C-W><Up>
-noremap <C-Down>     <C-W><Down>
-noremap <C-Left>     <C-W><Left>
-noremap <C-Right>    <C-W><Right>
-noremap <S-Home>     <C-W><Up>
-noremap <S-End>      <C-W><Down>
-noremap <S-Up>       <C-W><Up>
-noremap <S-Down>     <C-W><Down>
-noremap! <C-Up>      <Esc><C-W><Up>
-noremap! <C-Down>    <Esc><C-W><Down>
-noremap! <C-Left>    <Esc><C-W><Left>
-noremap! <C-Right>   <Esc><C-W><Right>
-noremap! <S-Home>    <Esc><C-W><Up>
-noremap! <S-End>     <Esc><C-W><Down>
-noremap! <S-Up>      <Esc><C-W><Up>
-noremap! <S-Down>    <Esc><C-W><Down>
-
-imap <F1>   <Esc>
-map  <F1>   K
+map  <F1>   <Esc>
+map! <F1>   <Esc>
 if has("gui_running")
   map <F2>  :Fancy<CR>
 endif
 map <F3>    :cnext<CR>
 map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
-map <F6>    :bnext<CR>
-map <F7>    :bprevious<CR>
 map <F8>    :wa<Bar>make<CR>
 map <F9>    :Run<CR>
 map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
 map <silent> <F11> :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
-map <F12>   :![ -z "$STY" ] \|\| screen<CR><CR>
-imap <F12> <C-O><F12>
 map <C-F4>  :bdelete<CR>
-"map <t_%9>  :hardcopy         " Print Screen
 
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
 
-" open URL under cursor in browser
-nnoremap gb :OpenURL <cfile><CR>
-nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
-nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
-nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
-
 " EnhancedCommentify
+map <Plug>Traditional \ci
 map <silent> \\     <Plug>Traditionalj
 map <Leader>l       <Plug>CapsLockToggle
 imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
 nmap du             <Plug>SpeedDatingNowUTC
 nmap dx             <Plug>SpeedDatingNowLocal
-"imap <C-X>/         <Lt>/<Plug>allmlHtmlComplete
-"map  <Leader>eu     <Plug>allmlUrlEncode
-"map  <Leader>du     <Plug>allmlUrlDecode
-"map  <Leader>ex     <Plug>allmlXmlEncode
-"map  <Leader>dx     <Plug>allmlXmlDecode
-"nmap <Leader>euu    <Plug>allmlLineUrlEncode
-"nmap <Leader>duu    <Plug>allmlLineUrlDecode
-"nmap <Leader>exx    <Plug>allmlLineXmlEncode
-"nmap <Leader>dxx    <Plug>allmlLineXmlDecode
-map <Leader>fj {:.,/^ *$/-2 call Justify('',3,)<CR>
-map <Leader>fJ :% call Justify('',3,)<CR>
-" Merge consecutive empty lines
-map <Leader>fm :g/^\s*$/,/\S/-j<CR>
+" Merge consecutive empty lines and clean up trailing whitespace
+map <Leader>fm :g/^\s*$/,/\S/-j<Bar>%s/\s\+$//<CR>
 map <Leader>v  :so ~/.vimrc<CR>
 
 " Section: Abbreviations {{{1
 " ---------------------------
-function! s:abbrevdot(word,text)
-  let c = nr2char(getchar(0))
-  if c == '.' || c == ''
-    return a:text . '.'
-  else
-    return a:word . c
-  endif
-endfunction
-iabbrev <silent> Lorem <C-R>=<SID>abbrevdot("Lorem","Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")<CR>
-
-runtime! plugin/abolish.vim
-
 if exists(":Abolish")
 Abolish afterword{,s}                         afterward{}
 Abolish anomol{y,ies}                         anomal{}
@@ -567,9 +499,9 @@ Abolish delimeter{,s}                         delimiter{}
 Abolish {,non}existan{ce,t}                   {}existen{}
 Abolish despara{te,tely,tion}                 despera{}
 Abolish d{e,i}screp{e,a}nc{y,ies}             d{i}screp{a}nc{}
-Abolish euphamis{m,ms,tic,tically}            euphemi{}
+Abolish euphamis{m,ms,tic,tically}            euphemis{}
 Abolish hense                                 hence
-Abolish {,re}impliment{,able,ation}           {}implement{}
+Abolish {,re}impliment{,s,ing,ed,ation}       {}implement{}
 Abolish improvment{,s}                        improvement{}
 Abolish inherant{,ly}                         inherent{}
 Abolish lastest                               latest
@@ -582,6 +514,7 @@ Abolish reproducable                          reproducible
 Abolish resouce{,s}                           resource{}
 Abolish restraunt{,s}                         restaurant{}
 Abolish seperat{e,es,ed,ing,ely,ion,ions,or}  separat{}
+Abolish segument{,s}                          segment{}
 Abolish scflead     supercalifragilisticexpialidocious
 Abolish Tqbf        The quick, brown fox jumps over the lazy dog
 Abolish Lidsa       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
@@ -608,22 +541,6 @@ if has("autocmd")
   augroup FTMisc " {{{2
     autocmd!
 
-    function! StatusLineColors()
-      let save = @l
-      redir @l>
-      silent highlight StatusLine
-      redir END
-      let reg = @l
-      let @l = save
-      let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
-      exe "hi User1 ".reg
-      exe "hi User2 ".reg
-      exe "hi User3 ".reg
-      exe "hi User4 ".reg
-      exe "hi User5 ".reg
-    endfunction
-    silent! autocmd ColorScheme * call StatusLineColors()
-
     if v:version >= 700 && isdirectory(expand("~/.trash"))
       autocmd BufWritePre,BufWritePost * if exists("s:backupdir") | set backupext=~ | let &backupdir = s:backupdir | unlet s:backupdir | endif
       autocmd BufWritePre ~/*
@@ -634,16 +551,8 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    "autocmd VimEnter * if argc() == 0 && expand("<amatch>") == "" | Scratch | endif
-    autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif
-    "autocmd User Rails* silent! Rlcd
+    autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif | colorscheme vividchalk
     autocmd User Rails setlocal ts=2
-    "autocmd BufNewFile *bin/?,*bin/??,*bin/???,*bin/*[^.][^.][^.][^.]
-          "\ if filereadable(expand("~/.vim/templates/skel.sh")) |
-          "\   0r ~/.vim/templates/skel.sh |
-          "\   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
-          "\ endif |
-          "\ set ft=sh | $
 
     autocmd BufEnter ChangeLog let g:changelog_username = GitWho()
 
@@ -656,8 +565,6 @@ if has("autocmd")
           \ set ft=sh | 1
 
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
-    "autocmd BufNewFile *bin/*,*/init.d/* let b:chmod_exe=1
-    "autocmd BufNewFile *.sh,*.tcl,*.pl,*.py,*.rb let b:chmod_exe=1
     autocmd BufNewFile  * let b:chmod_exe=1
     autocmd BufWritePre * if exists("b:chmod_exe") |
           \ unlet b:chmod_exe |
@@ -674,29 +581,16 @@ if has("autocmd")
           \ exe "gl/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
           \ exe "normal g`tztg`s" |
           \ endif
-"    autocmd BufWritePre,FileWritePre */.vim/*.vim,*/.vim.*/*.vim,~/.vimrc* exe "normal msHmt" |
-"          \ %s/^\(" Last [Cc]hange:\s\+\).*/\=submatch(1).strftime("%Y %b %d")/e |
-"          \ exe "normal `tzt`s"
-"    autocmd BufRead /usr/* setlocal patchmode=.org
     autocmd BufReadPre *.pdf setlocal binary
-    "autocmd BufReadPre *.doc setlocal readonly
-    "autocmd BufReadCmd *.doc execute "0read! antiword \"<afile>\""|$delete|1|set nomodifiable
     autocmd BufReadCmd *.jar call zip#Browse(expand("<amatch>"))
     autocmd FileReadCmd *.doc execute "read! antiword \"<afile>\""
     autocmd CursorHold,BufWritePost,BufReadPost,BufLeave *
       \ if isdirectory(expand("<amatch>:h")) | let &swapfile = &modified | endif
-    "if version >= 700
-      "autocmd SwapExists * let v:swapchoice = "e" | echohl MoreMsg | echomsg 'Swap file "'.fnamemodify(v:swapname,':~:.').'" already exists!' | echohl None
-    "else
-      "set shortmess+=A
-    "endif
   augroup END " }}}2
   augroup FTCheck " {{{2
     autocmd!
-    autocmd BufNewFile,BufRead      */apache2/[ms]*-*/* set ft=apache
-    autocmd BufNewFile,BufRead             *named.conf* set ft=named
-    "autocmd BufNewFile,BufRead     *.git/COMMIT_EDITMSG set ft=gitcommit
-    "autocmd BufNewFile,BufRead  *.git/config,.gitconfig set ft=gitconfig
+    autocmd BufNewFile,BufRead */apache2/[ms]*-*/* set ft=apache
+    autocmd BufNewFile,BufRead       *named.conf* set ft=named
     autocmd BufNewFile,BufRead *Fvwm*             set ft=fvwm
     autocmd BufNewFile,BufRead *.cl[so],*.bbl     set ft=tex
     autocmd BufNewFile,BufRead /var/www/*.module  set ft=php
@@ -704,13 +598,11 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.vb               set ft=vbnet
     autocmd BufNewFile,BufRead *.tt,*.tt2         set ft=tt2html
     autocmd BufNewFile,BufRead *.pdf              set ft=pdf
-    "autocmd BufNewFile,BufRead *.jar              set ft=zipfile
     autocmd BufNewFile,BufRead *.CBL,*.COB,*.LIB  set ft=cobol
     autocmd BufNewFile,BufRead /var/www/*
           \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
     autocmd BufNewFile,BufRead /etc/udev/*.rules set ft=udev
     autocmd BufNewFile,BufRead *[0-9BM][FG][0-9][0-9]*  set ft=simpsons
-    "autocmd BufRead * if expand("%") =~? '^https\=://.*/$'|setf html|endif
     autocmd BufNewFile,BufRead,StdinReadPost *
           \ if !did_filetype() && (getline(1) =~ '^!!\@!'
           \   || getline(2) =~ '^!!\@!' || getline(3) =~ '^!'
@@ -738,7 +630,7 @@ if has("autocmd")
     autocmd FileType xml,xsd,xslt           setlocal ai et sta sw=2 sts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
     autocmd FileType tt2html,htmltt,mason   setlocal ai et sta sw=2 sts=2
-    autocmd FileType text,txt,mail          setlocal ai spell com=fb:*,fb:-,n:>
+    autocmd FileType text,txt,mail          setlocal ai com=fb:*,fb:-,n:>
     autocmd FileType cs,vbnet               setlocal foldmethod=syntax fdl=2
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
@@ -752,7 +644,6 @@ if has("autocmd")
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ -x\ -Wall\ %
     autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
     autocmd FileType css  silent! setlocal omnifunc=csscomplete#CompleteCSS
-    "autocmd FileType eruby setlocal omnifunc=htmlcomplete#CompleteTags
     autocmd FileType gitcommit setlocal spell
     autocmd FileType gitrebase nnoremap <buffer> S :Cycle<CR>
     autocmd FileType haml let b:surround_45 = "- \r"|let b:surround_61 = "= \r"
@@ -780,7 +671,6 @@ if has("autocmd")
           \ endif
     autocmd FileType vbnet        runtime! indent/vb.vim
     autocmd FileType vim  setlocal ai et sta sw=4 sts=4 keywordprg=:help | map! <buffer> <C-Z> <C-X><C-V>
-    "autocmd BufWritePost ~/.vimrc   so ~/.vimrc
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
@@ -794,7 +684,6 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
   if exists("syntax_on") || exists("syntax_manual")
   else
     syntax on
-    "syntax enable
   endif
   set list
   set hlsearch
