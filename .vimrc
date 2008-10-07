@@ -374,7 +374,9 @@ function! MoveByOffset(num)
     return
   endif
   let dir   = expand("%:h")
-  if dir != ''
+  if dir == '.'
+    let dir = ''
+  elseif dir != ''
     let dir .= '/'
   endif
   let files = split(glob(dir.".*[^~.]"),"\n")
