@@ -551,7 +551,7 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif
+    autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif | colorscheme vividchalk
     autocmd User Rails setlocal ts=2
 
     autocmd BufEnter ChangeLog let g:changelog_username = GitWho()
