@@ -57,6 +57,7 @@ if exists("+spelllang")
 endif
 set splitbelow      " Split windows at bottom
 set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
+set statusline=[%n]\ %<%.99f\ %h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%=%-16(\ %l,%c-%v\ %)%P
 set suffixes+=.dvi  " Lower priority in wildcards
 set tags+=../tags,../../tags,../../../tags,../../../../tags
 set timeoutlen=1200 " A little bit more time for macros
@@ -607,22 +608,6 @@ if has("autocmd")
   endif
   augroup FTMisc " {{{2
     autocmd!
-
-    function! StatusLineColors()
-      let save = @l
-      redir @l>
-      silent highlight StatusLine
-      redir END
-      let reg = @l
-      let @l = save
-      let reg = substitute(substitute(reg,'^\nStatusLine\s*\S*','',''),'\n',' ','g')
-      exe "hi User1 ".reg
-      exe "hi User2 ".reg
-      exe "hi User3 ".reg
-      exe "hi User4 ".reg
-      exe "hi User5 ".reg
-    endfunction
-    silent! autocmd ColorScheme * call StatusLineColors()
 
     if v:version >= 700 && isdirectory(expand("~/.trash"))
       autocmd BufWritePre,BufWritePost * if exists("s:backupdir") | set backupext=~ | let &backupdir = s:backupdir | unlet s:backupdir | endif
