@@ -18,6 +18,15 @@ if &cp || (exists("g:loaded_rails") && g:loaded_rails) && !(exists("g:rails_debu
 endif
 let g:loaded_rails = 1
 
+" Apparently, the nesting level within Vim when the Ruby interface is
+" initialized determines how much stack space Ruby gets.  In previous
+" versions of rails.vim, sporadic stack overflows occured when omnicomplete
+" was used.  This was apparently due to rails.vim having first initialized
+" ruby deep in a nested function call.
+if has("ruby")
+  silent! ruby nil
+endif
+
 " Utility Functions {{{1
 
 function! s:error(str)
@@ -64,7 +73,7 @@ call s:SetOptDefault("rails_subversion",0)
 call s:SetOptDefault("rails_default_file","README")
 call s:SetOptDefault("rails_default_database","")
 call s:SetOptDefault("rails_root_url",'http://localhost:3000/')
-call s:SetOptDefault("rails_modelines",1)
+call s:SetOptDefault("rails_modelines",0)
 call s:SetOptDefault("rails_menu",1)
 call s:SetOptDefault("rails_gnu_screen",1)
 call s:SetOptDefault("rails_history_size",5)
@@ -143,7 +152,7 @@ command! -bar -bang -nargs=* -complete=dir Rails :if s:autoload()|call RailsNewA
 " }}}1
 " Menus {{{1
 
-if !exists("g:rails_tabstop") && !(g:rails_menu && has("menu"))
+if !(g:rails_menu && has("menu"))
   finish
 endif
 
@@ -295,69 +304,6 @@ augroup railsPluginMenu
   autocmd User BufLeaveRails call s:menuBufLeave()
   " g:RAILS_HISTORY hasn't been set when s:InitPlugin() is called.
   autocmd VimEnter *         call s:ProjectMenu()
-augroup END
-
-" }}}1
-" Tab Hacks {{{1
-
-if !exists("g:rails_tabstop")
-  finish
-endif
-
-function! s:tabstop()
-  if !exists("b:rails_root")
-    return 0
-  elseif &filetype !~ '^\%(ruby\|eruby\|haml\|dryml\|liquid\|html\|css\|sass\|yaml\|javascript\)$'
-    return 0
-  elseif exists("b:rails_tabstop")
-    return b:rails_tabstop
-  elseif exists("g:rails_tabstop")
-    return g:rails_tabstop
-  endif
-endfunction
-
-function! s:breaktabs()
-  let ts = s:tabstop()
-  if ts
-    if exists("s:retab_in_process")
-      unlet s:retab_in_process
-      let line = line('.')
-      lockmarks silent! undo
-      lockmarks exe line
-    else
-      let &l:tabstop = 2
-      setlocal noexpandtab
-      let mod = &l:modifiable
-      setlocal modifiable
-      let line = line('.')
-      " FIXME: when I say g/^\s/, only apply to those lines
-      lockmarks retab!
-      lockmarks exe line
-      let &l:modifiable = mod
-    endif
-    let &l:tabstop = ts
-    let &l:softtabstop = ts
-    let &l:shiftwidth = ts
-  endif
-endfunction
-
-function! s:fixtabs()
-  let ts = s:tabstop()
-  if ts && ! &l:expandtab && !exists("s:retab_in_process")
-    let s:retab_in_process = 1
-    let &l:tabstop = 2
-    setlocal expandtab
-    let line = line('.')
-    lockmarks retab
-    lockmarks exe line
-    let &l:tabstop = ts
-  endif
-endfunction
-
-augroup railsPluginTabstop
-  autocmd!
-  autocmd BufWritePost,BufReadPost * call s:breaktabs()
-  autocmd BufWritePre              * call s:fixtabs()
 augroup END
 
 " }}}1
