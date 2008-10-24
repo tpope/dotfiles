@@ -1,6 +1,6 @@
 " pathogen.vim - path option manipulation
 " Maintainer:   Tim Pope
-" Last Change:  Apr 26, 2008
+" Last Change:  Oct 24, 2008
 
 " Install in ~/.vim/autoload (or ~\vimfiles\autoload).
 "
@@ -27,12 +27,11 @@ function! pathogen#join(...) abort " {{{1
       let list = a:000[i]
       let j = 0
       while j < len(list)
-        if type(list[j]) == type([])
-          `
-          "let path .= "," . pathogen#join(list[j])
-        else
-          let path .= "," . substitute(list[j],'[\\,]','\\&','g')
+        let escaped = substitute(list[j],'[\\, ]','\\&','g')
+        if exists("+shellslash") && !&shellslash
+          let escaped = substitute(escaped,'^\(\w:\\\)\\','\1','')
         endif
+        let path .= ',' . escaped
         let j += 1
       endwhile
     else
