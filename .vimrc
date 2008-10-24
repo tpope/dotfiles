@@ -165,6 +165,7 @@ let g:rails_default_database='sqlite3'
 let g:rails_menu=1
 let g:rubyindent_match_parentheses=0
 let g:ruby_minlines=500
+let g:rubycomplete_buffer_loading=1
 let g:rubycomplete_rails=1
 if !has("gui_running")
   let g:showmarks_enable=0
