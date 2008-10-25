@@ -695,6 +695,12 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
       colorscheme tpope
     endif
   endif
+
+  augroup RCSyntax
+    autocmd!
+    autocmd Syntax css  syn sync minlines=50
+    autocmd Syntax csh  hi link cshBckQuote Special | hi link cshExtVar PreProc | hi link cshSubst PreProc | hi link cshSetVariables Identifier
+  augroup END
 endif
 
 " }}}1

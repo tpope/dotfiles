@@ -151,7 +151,7 @@ do_clean() {
     if [ ! -d "$HOME/.trash" ]; then
         mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
     fi
-    rm -f "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/plutil.vim" "$HOME/.vim/ftplugin/pdf.vim" "$HOME/.vim/syntax/pdf.vim" "$HOME/.vim/indent/eruby.vim" "$HOME/.vim/syntax/simpsons.vim" "$HOME/.vim/syntax/"asm68* "$HOME/.vim/syntax/c89.vim" "$HOME/.vim/syntax/ti89call.vim" "$HOME/.vim/after/syntax/crontab.vim" "$HOME/.vim/autoload/bundle.vim" "$HOME/.vim/autoload/rtp.vim" "$HOME/.zsh/functions/prompt_simpson_setup"
+    rm -f "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/plutil.vim" "$HOME/.vim/ftplugin/pdf.vim" "$HOME/.vim/syntax/pdf.vim" "$HOME/.vim/indent/eruby.vim" "$HOME/.vim/syntax/simpsons.vim" "$HOME/.vim/syntax/"asm68* "$HOME/.vim/syntax/c89.vim" "$HOME/.vim/syntax/ti89call.vim" "$HOME/.vim/after/syntax/crontab.vim" "$HOME/.vim/autoload/bundle.vim" "$HOME/.vim/autoload/rtp.vim" "$HOME/.zsh/functions/prompt_simpson_setup" "$HOME/.vim/after/syntax/csh.vim" "$HOME/.vim/after/syntax/mail.vim" "$HOME/.vim/after/syntax/syncolor.vim" "$HOME/.vim/after/syntax/zsh.vim"
     return 0
 }
 
