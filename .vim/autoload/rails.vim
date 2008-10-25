@@ -13,7 +13,7 @@
 if &cp || exists("g:autoloaded_rails")
   finish
 endif
-let g:autoloaded_rails = '3.0'
+let g:autoloaded_rails = '3.1'
 
 let s:cpo_save = &cpo
 set cpo&vim
@@ -197,7 +197,7 @@ function! s:lastopeningline(pattern,limit,...)
     let line -= 1
   endwhile
   let lend = s:endof(line)
-  if line > a:limit && lend >= (a:0 ? a:1 : line("."))
+  if line > a:limit && (lend < 0 || lend >= (a:0 ? a:1 : line(".")))
     return line
   else
     return -1
@@ -363,7 +363,7 @@ function! s:error(str)
 endfunction
 
 function! s:debug(str)
-  if g:rails_debug
+  if exists("g:rails_debug") && g:rails_debug
     echohl Debug
     echomsg a:str
     echohl None
@@ -805,6 +805,7 @@ function! rails#new_app_command(bang,...)
     let c += 1
   endwhile
   let dir = expand(dir)
+  let append = ""
   if g:rails_default_database != "" && str !~ '-d \|--database='
     let append .= " -d ".g:rails_default_database
   endif
@@ -831,7 +832,7 @@ function! s:app_tags_command() dict
   else
     return s:error("ctags not found")
   endif
-  exe "!".cmd." -f ".s:escarg(self.path("tmp/tags"))." -R ".s:escarg(self.path())
+  exe "!".cmd." -f ".s:escarg(self.path("tmp/tags"))." --exclude=facebox.js --exclude=jquery.template.js -R ".s:escarg(self.path())
 endfunction
 
 call s:add_methods('app',['tags_command'])
@@ -894,8 +895,6 @@ function! s:app_rake_tasks() dict
 endfunction
 
 call s:add_methods('app', ['rake_tasks'])
-
-" Depends: s:sub, s:lastmethodline, s:getopt, s;rquote, s:QuickFixCmdPre, ...
 
 " Current directory
 let s:efm='%D(in\ %f),'
@@ -970,7 +969,7 @@ endfunction
 
 function! s:Rake(bang,lnum,arg)
   let self = rails#app()
-  let lnum = a:lnum < 0 ? line('.') : a:lnum
+  let lnum = a:lnum < 0 ? 0 : a:lnum
   let oldefm = &efm
   if a:bang
     let &l:errorformat = s:efm_backtrace
@@ -1031,14 +1030,8 @@ function! s:Rake(bang,lnum,arg)
     exe "!".&makeprg." routes"
     call s:QuickFixCmdPost()
   elseif t =~ '^fixtures-yaml\>' && lnum
-    let cnum = lnum
-    let label = ""
-    while cnum > 0 && label == ""
-      let label = matchstr(getline(cnum),'^\w\+\ze:')
-      let cnum -= 1
-    endwhile
     call s:QuickFixCmdPre()
-    exe "!".&makeprg." db:fixtures:identify LABEL=".label
+    exe "!".&makeprg." db:fixtures:identify LABEL=".s:lastmethod(lnum)
     call s:QuickFixCmdPost()
   elseif t =~ '^fixtures\>' && lnum == 0
     exe "make db:fixtures:load FIXTURES=".s:sub(fnamemodify(RailsFilePath(),':r'),'^.{-}/fixtures/','')
@@ -1054,7 +1047,7 @@ function! s:Rake(bang,lnum,arg)
   elseif t =~ '^spec\>'
     if RailsFilePath() =~# '\<spec/spec_helper\.rb$'
       make spec SPEC_OPTS=
-    elseif a:lnum > 0 || (a:lnum == -1 && search('\C^\s*\(describe\|context\)\>','bWnc') > search('\C^end\>','bWn'))
+    elseif lnum > 0
       exe 'make spec SPEC="%:p" SPEC_OPTS=--line='.lnum
     else
       make spec SPEC="%:p" SPEC_OPTS=
@@ -1106,9 +1099,6 @@ endfunction
 
 " }}}1
 " Preview {{{1
-
-" Depends: s:getopt, s:sub, s:controller, s:lastmethod
-" Provides: s:initOpenURL
 
 function! s:initOpenURL()
   if !exists(":OpenURL")
@@ -1218,8 +1208,6 @@ endfunction
 " }}}1
 " Script Wrappers {{{1
 
-" Depends: s:rquote, s:sub, s:getopt, ..., s:pluginList, ...
-
 function! s:BufScriptWrappers()
   command! -buffer -bar -nargs=*       -complete=customlist,s:Complete_script   Rscript       :call rails#app().script_command(<bang>0,<f-args>)
   command! -buffer -bar -nargs=*       -complete=customlist,s:Complete_console  Rconsole      :call s:warn("Warning: :Rconsole has been deprecated in favor of :Rscript")|call rails#app().script_command(<bang>0,'console',<f-args>)
@@ -1312,7 +1300,12 @@ function! s:app_server_command(bang,arg) dict
       return
     endif
   endif
-  if has("win32") || has("win64") || (exists("$STY") && !has("gui_running") && s:getopt("gnu_screen","abg") && executable("screen"))
+  if has_key(self,'options') && has_key(self.options,'gnu_screen')
+    let screen = self.options.gnu_screen
+  else
+    let screen = g:rails_gnu_screen
+  endif
+  if has("win32") || has("win64") || (exists("$STY") && !has("gui_running") && screen && executable("screen"))
     call self.background_ruby_command(s:rquote("script/server")." ".a:arg)
   else
     "--daemon would be more descriptive but lighttpd does not support it
@@ -1469,12 +1462,12 @@ function! s:BufNavCommands()
   command!   -buffer -bar -nargs=* -bang    -complete=customlist,s:Complete_edit RSedit      :call s:Edit(<bang>0,<count>,'S',<f-args>)
   command!   -buffer -bar -nargs=* -bang    -complete=customlist,s:Complete_edit RVedit      :call s:Edit(<bang>0,<count>,'V',<f-args>)
   command!   -buffer -bar -nargs=* -bang    -complete=customlist,s:Complete_edit RTedit      :call s:Edit(<bang>0,<count>,'T',<f-args>)
-  command! -buffer -bar -nargs=0 A  :call s:Alternate(<bang>0,"")
-  command! -buffer -bar -nargs=0 AE :call s:Alternate(<bang>0,"E")
-  command! -buffer -bar -nargs=0 AS :call s:Alternate(<bang>0,"S")
-  command! -buffer -bar -nargs=0 AV :call s:Alternate(<bang>0,"V")
-  command! -buffer -bar -nargs=0 AT :call s:Alternate(<bang>0,"T")
-  command! -buffer -bar -nargs=0 AN :call s:Related(<bang>0,"")
+  command! -buffer -bar -nargs=* -complete=customlist,s:Complete_find    A  :call s:Alternate(<bang>0,"", <f-args>)
+  command! -buffer -bar -nargs=* -complete=customlist,s:Complete_find    AE :call s:Alternate(<bang>0,"E",<f-args>)
+  command! -buffer -bar -nargs=* -complete=customlist,s:Complete_find    AS :call s:Alternate(<bang>0,"S",<f-args>)
+  command! -buffer -bar -nargs=* -complete=customlist,s:Complete_find    AV :call s:Alternate(<bang>0,"V",<f-args>)
+  command! -buffer -bar -nargs=* -complete=customlist,s:Complete_find    AT :call s:Alternate(<bang>0,"T",<f-args>)
+  command! -buffer -bar -nargs=* -complete=customlist,s:Complete_related AN :call s:Related(<bang>0,"" ,<f-args>)
   command! -buffer -bar -nargs=* -complete=customlist,s:Complete_related R  :call s:Related(<bang>0,"" ,<f-args>)
   command! -buffer -bar -nargs=* -complete=customlist,s:Complete_related RE :call s:Related(<bang>0,"E",<f-args>)
   command! -buffer -bar -nargs=* -complete=customlist,s:Complete_related RS :call s:Related(<bang>0,"S",<f-args>)
@@ -1564,14 +1557,14 @@ function! s:Complete_find(ArgLead, CmdLine, CursorPos)
 endfunction
 
 function! s:Complete_edit(ArgLead, CmdLine, CursorPos)
-  return rails#app().relglob("",s:fuzzyglob(a:ArgLead))
+  return s:completion_filter(rails#app().relglob("",s:fuzzyglob(a:ArgLead)),a:ArgLead)
 endfunction
 
 function! s:Complete_related(ArgLead, CmdLine, CursorPos)
   if a:ArgLead =~# '^\u'
     return s:Complete_find(a:ArgLead, a:CmdLine, a:CursorPos)
   else
-    return s:Complete_edit(a:ArgLead, a:CmdLine, a:CursorPos)
+    return filter(s:Complete_edit(a:ArgLead, a:CmdLine, a:CursorPos),'v:val !~# "^\\u"')
   endif
 endfunction
 
@@ -1885,10 +1878,10 @@ function! s:completion_filter(results,A)
   call filter(results,'v:val !~# "\\~$"')
   let filtered = filter(copy(results),'s:startswith(v:val,a:A)')
   if !empty(filtered) | return filtered | endif
-  let regex = s:sub(a:A,'.','&.*')
-  let filtered = filter(copy(results),'v:val =~ "^".regex')
+  let regex = s:gsub(a:A,'.','[&].*')
+  let filtered = filter(copy(results),'v:val =~# "^".regex')
   if !empty(filtered) | return filtered | endif
-  let filtered = filter(copy(results),'v:val =~ regex')
+  let filtered = filter(copy(results),'v:val =~# regex')
   return filtered
 endfunction
 
@@ -2044,7 +2037,6 @@ function! s:libList(A,L,P)
   let all = rails#app().relglob('lib/',"**/*",".rb")
   if RailsFilePath() =~ '\<vendor/plugins/.'
     let path = s:sub(RailsFilePath(),'<vendor/plugins/[^/]*/\zs.*','lib/')
-    let g:path = path
     let all = rails#app().relglob(path,"**/*",".rb") + all
   endif
   return s:autocamelize(all,a:A)
@@ -2148,9 +2140,18 @@ function! s:EditSimpleRb(bang,cmd,name,target,prefix,suffix)
 endfunction
 
 function! s:migrationfor(file)
+  let self = rails#app()
   let tryagain = 0
   let arg = a:file
-  if arg =~ '^\d$'
+  if arg =~ '^0\+$'
+    if self.has_file('db/schema.rb')
+      return 'db/schema.rb'
+    elseif self.has_file('db/'.s:environment().'_structure.sql')
+      return 'db/'.s:environment().'_structure.sql'
+    else
+      return 'db/schema.rb'
+    endif
+  elseif arg =~ '^\d$'
     let glob = '00'.arg.'_*.rb'
   elseif arg =~ '^\d\d$'
     let glob = '0'.arg.'_*.rb'
@@ -2522,15 +2523,16 @@ function! s:findedit(cmd,files,...) abort
   endif
   if file == ''
     let testcmd = "edit"
+  elseif isdirectory(rails#app().path(file))
+    let arg = file == "." ? rails#app().path() : rails#app().path(file)
+    let testcmd = s:editcmdfor(cmd).' '.(a:0 ? a:1 . ' ' : '').s:escarg(arg)
+    exe testcmd
+    return
   elseif rails#app().path() =~ '://' || cmd =~ 'edit' || cmd =~ 'split'
     if file !~ '^/' && file !~ '^\w:' && file !~ '://'
       let file = s:escarg(rails#app().path(file))
     endif
     let testcmd = s:editcmdfor(cmd).' '.(a:0 ? a:1 . ' ' : '').file
-  elseif isdirectory(rails#app().path(file))
-    let testcmd = s:editcmdfor(cmd).' '.(a:0 ? a:1 . ' ' : '').s:escarg(rails#app().path(file))
-    exe testcmd
-    return
   else
     let testcmd = cmd.' '.(a:0 ? a:1 . ' ' : '').file
   endif
@@ -2550,13 +2552,17 @@ function! s:edit(cmd,file,...)
   endif
 endfunction
 
-function! s:Alternate(bang,cmd)
-  let cmd = a:cmd.(a:bang?"!":"")
-  let file = s:AlternateFile()
-  if file != ""
-    call s:findedit(cmd,file)
+function! s:Alternate(bang,cmd,...)
+  if a:0
+    return call('s:Find',[a:bang,1,a:cmd]+a:000)
   else
-    call s:warn("No alternate file is defined")
+    let cmd = a:cmd.(a:bang?"!":"")
+    let file = s:AlternateFile()
+    if file != ""
+      call s:findedit(cmd,file)
+    else
+      call s:warn("No alternate file is defined")
+    endif
   endif
 endfunction
 
@@ -2766,8 +2772,6 @@ endfunction
 " }}}1
 " Partial Extraction {{{1
 
-" Depends: s:error, s:sub, s:viewspattern, s:warn
-
 function! s:Extract(bang,...) range abort
   if a:0 == 0 || a:0 > 1
     return s:error("Incorrect number of arguments")
@@ -2908,8 +2912,6 @@ endfunction
 " }}}1
 " Migration Inversion {{{1
 
-" Depends: s:sub, s:endof, s:gsub, s:error
-
 function! s:mkeep(str)
   " Things to keep (like comments) from a migration statement
   return matchstr(a:str,' #[^{].*')
@@ -3015,6 +3017,9 @@ function! s:Invert(bang)
   if !beg || !end
     return s:error(err)
   endif
+  if foldclosed(beg) > 0
+    exe beg."foldopen!"
+  endif
   if beg + 1 < end
     exe (beg+1).",".(end-1)."delete _"
   endif
@@ -3073,8 +3078,6 @@ let s:app_prototype.cache = s:cache_prototype
 " }}}1
 " Syntax {{{1
 
-" Depends: s:gsub, cache functions
-
 function! s:resetomnicomplete()
   if exists("+completefunc") && &completefunc == 'syntaxcomplete#Complete'
     if exists("g:loaded_syntax_completion")
@@ -3088,22 +3091,22 @@ endfunction
 function! s:helpermethods()
   return ""
         \."atom_feed auto_discovery_link_tag auto_link "
-        \."benchmark button_to button_to_function "
-        \."cache capture cdata_section check_box check_box_tag collection_select concat content_for content_tag content_tag_for country_options_for_select country_select cycle "
+        \."benchmark button_to button_to_function button_to_remote "
+        \."cache capture cdata_section check_box check_box_tag collection_select concat content_for content_tag content_tag_for current_cycle cycle "
         \."date_select datetime_select debug define_javascript_functions distance_of_time_in_words distance_of_time_in_words_to_now div_for dom_class dom_id draggable_element draggable_element_js drop_receiving_element drop_receiving_element_js "
         \."error_message_on error_messages_for escape_javascript escape_once evaluate_remote_response excerpt "
         \."field_set_tag fields_for file_field file_field_tag form form_for form_remote_for form_remote_tag form_tag "
         \."hidden_field hidden_field_tag highlight "
         \."image_path image_submit_tag image_tag input "
         \."javascript_cdata_section javascript_include_tag javascript_path javascript_tag "
-        \."label label_tag link_to link_to_function link_to_if link_to_remote link_to_unless link_to_unless_current "
+        \."l label label_tag link_to link_to_function link_to_if link_to_remote link_to_unless link_to_unless_current localize "
         \."mail_to markdown "
         \."number_to_currency number_to_human_size number_to_percentage number_to_phone number_with_delimiter number_with_precision "
         \."observe_field observe_form option_groups_from_collection_for_select options_for_select options_from_collection_for_select "
         \."partial_path password_field password_field_tag path_to_image path_to_javascript path_to_stylesheet periodically_call_remote pluralize "
         \."radio_button radio_button_tag remote_form_for remote_function reset_cycle "
         \."sanitize sanitize_css select select_date select_datetime select_day select_hour select_minute select_month select_second select_tag select_time select_year simple_format sortable_element sortable_element_js strip_links strip_tags stylesheet_link_tag stylesheet_path submit_tag submit_to_remote "
-        \."tag text_area text_area_tag text_field text_field_tag textilize textilize_without_paragraph time_ago_in_words time_select time_zone_options_for_select time_zone_select truncate "
+        \."t tag text_area text_area_tag text_field text_field_tag textilize textilize_without_paragraph time_ago_in_words time_select time_zone_options_for_select time_zone_select translate truncate "
         \."update_page update_page_tag url_for "
         \."visual_effect "
         \."word_wrap"
@@ -3404,9 +3407,6 @@ endfunction
 " }}}1
 " Statusline {{{1
 
-" Depends: nothing!
-" Provides: s:BufInitStatusline
-
 function! s:addtostatus(letter,status)
   let status = a:status
   if status !~ 'Rails' && g:rails_statusline
@@ -3492,9 +3492,6 @@ endfunction
 " }}}1
 " Mappings {{{1
 
-" Depends: nothing!
-" Exports: s:BufMappings
-
 function! s:BufMappings()
   nnoremap <buffer> <silent> <Plug>RailsAlternate  :<C-U>A<CR>
   nnoremap <buffer> <silent> <Plug>RailsRelated    :<C-U>R<CR>
@@ -3530,8 +3527,6 @@ endfunction
 
 " }}}1
 " Project {{{
-
-" Depends: s:gsub, s:escarg, s:warn, s:sub, s:relglob
 
 function! s:Project(bang,arg)
   let rr = rails#app().path()
@@ -3657,8 +3652,6 @@ endfunction
 " }}}1
 " Database {{{1
 
-" Depends: s:environment, s:rv, reloadability
-
 function! s:extractdbvar(str,arg)
   return matchstr("\n".a:str."\n",'\n'.a:arg.'=\zs.\{-\}\ze\n')
 endfunction
@@ -3764,8 +3757,6 @@ call s:add_methods('app', ['dbext_settings'])
 
 " }}}1
 " Abbreviations {{{1
-
-" Depends: s:sub, s:gsub, s:string, s:linepeak, s:error
 
 function! s:selectiveexpand(pat,good,default,...)
   if a:0 > 0

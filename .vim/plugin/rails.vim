@@ -66,12 +66,11 @@ function! s:SetOptDefault(opt,val)
   endif
 endfunction
 
-call s:SetOptDefault("rails_level",3)
 call s:SetOptDefault("rails_statusline",1)
 call s:SetOptDefault("rails_syntax",1)
 call s:SetOptDefault("rails_mappings",1)
 call s:SetOptDefault("rails_abbreviations",1)
-call s:SetOptDefault("rails_expensive",1+0*(has("win32")||has("win32unix")))
+call s:SetOptDefault("rails_expensive",1)
 call s:SetOptDefault("rails_dbext",g:rails_expensive)
 call s:SetOptDefault("rails_default_file","README")
 call s:SetOptDefault("rails_default_database","")
@@ -80,7 +79,6 @@ call s:SetOptDefault("rails_modelines",0)
 call s:SetOptDefault("rails_menu",1)
 call s:SetOptDefault("rails_gnu_screen",1)
 call s:SetOptDefault("rails_history_size",5)
-call s:SetOptDefault("rails_debug",0)
 call s:SetOptDefault("rails_generators","controller\nintegration_test\nmailer\nmigration\nmodel\nobserver\nplugin\nresource\nscaffold\nsession_migration")
 if g:rails_dbext
   if exists("g:loaded_dbext") && executable("sqlite3") && ! executable("sqlite")
@@ -128,7 +126,7 @@ function! s:Detect(filename)
       return s:BufInit(fn)
     endif
     let ofn = fn
-    let fn = fnamemodify(ofn,':s?\(.*\)[\/]\(app\|config\|db\|doc\|lib\|log\|public\|script\|spec\|test\|tmp\|vendor\)\($\|[\/].*$\)?\1?')
+    let fn = fnamemodify(ofn,':s?\(.*\)[\/]\(app\|config\|db\|doc\|features\|lib\|log\|public\|script\|spec\|stories\|test\|tmp\|vendor\)\($\|[\/].*$\)?\1?')
   endwhile
   return 0
 endfunction
@@ -205,7 +203,7 @@ function! s:CreateMenus() abort
     exe menucmd.g:rails_installed_menu.'.&Other\ files.Application\ &README :find doc/README_FOR_APP<CR>'
     exe menucmd.g:rails_installed_menu.'.&Other\ files.&Environment :find config/environment.rb<CR>'
     exe menucmd.g:rails_installed_menu.'.&Other\ files.&Database\ Configuration :find config/database.yml<CR>'
-    exe menucmd.g:rails_installed_menu.'.&Other\ files.Database\ &Schema :call <SID>findschema()<CR>'
+    exe menucmd.g:rails_installed_menu.'.&Other\ files.Database\ &Schema :Rmigration 0<CR>'
     exe menucmd.g:rails_installed_menu.'.&Other\ files.R&outes :find config/routes.rb<CR>'
     exe menucmd.g:rails_installed_menu.'.&Other\ files.&Test\ Helper :find test/test_helper.rb<CR>'
     exe menucmd.g:rails_installed_menu.'.-FSep- :'
@@ -266,7 +264,7 @@ function! s:menuBufEnter()
     silent! exe 'aunmenu       '.menu.'.Generate'
     silent! exe 'aunmenu       '.menu.'.Destroy'
     if rails#app().cache.needs('rake_tasks') || empty(rails#app().rake_tasks())
-      exe substitute(s:menucmd(300),'<script>','<script> <silent>','').g:rails_installed_menu.'.Rake\ &tasks\	:Rake.Fill\ this\ menu :call rails#app().rake_tasks()<Bar>call <SID>menuBufEnter()<CR>'
+      exe substitute(s:menucmd(300),'<script>','<script> <silent>','').g:rails_installed_menu.'.Rake\ &tasks\	:Rake.Fill\ this\ menu :call rails#app().rake_tasks()<Bar>call <SID>menuBufLeave()<Bar>call <SID>menuBufEnter()<CR>'
     else
       let i = 0
       while i < len(rails#app().rake_tasks())
@@ -308,17 +306,6 @@ function! s:menuprompt(vimcmd,prompt)
     return ""
   endif
   exe a:vimcmd." ".res
-endfunction
-
-function! s:findschema()
-  let env = exists('$RAILS_ENV') ? $RAILS_ENV : "development"
-  if filereadable(b:rails_root."/db/schema.rb")
-    edit `=b:rails_root.'/db/schema.rb'`
-  elseif filereadable(b:rails_root.'/db/'.env.'_structure.sql')
-    edit `=b:rails_root.'/db/'.env.'_structure.sql'`
-  else
-    return s:error("Schema not found: try :Rake db:schema:dump")
-  endif
 endfunction
 
 call s:CreateMenus()
