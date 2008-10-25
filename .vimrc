@@ -488,6 +488,8 @@ nmap dx             <Plug>SpeedDatingNowLocal
 map <Leader>fm :g/^\s*$/,/\S/-j<Bar>%s/\s\+$//<CR>
 map <Leader>v  :so ~/.vimrc<CR>
 
+inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M:%S","%a, %d %b %Y %H:%M:%S %z","%Y %b %d","%d-%b-%y","%a %b %d %T %Z %Y"],'strftime(v:val)')+[localtime()]),0)<CR>
+
 " Section: Abbreviations {{{1
 " ---------------------------
 if exists(":Abolish")
@@ -520,14 +522,6 @@ Abolish scflead     supercalifragilisticexpialidocious
 Abolish Tqbf        The quick, brown fox jumps over the lazy dog
 Abolish Lidsa       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
 endif
-
-inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M:%S","%a, %d %b %Y %H:%M:%S %z","%Y %b %d","%d-%b-%y","%a %b %d %T %Z %Y"],'strftime(v:val)')+[localtime()]),0)<CR>
-
-iabbrev <silent> Dnormal <C-R>=strftime("%a %b %d %T %Z %Y")<CR>
-iabbrev <silent> Drfc822 <C-R>=strftime("%a, %d %b %Y %H:%M:%S %z")<CR>
-iabbrev <silent> Dsql    <C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR>
-iabbrev <silent> Dvim    <C-R>=strftime("%Y %b %d")<CR>
-iabbrev <silent> Deuro   <C-R>=strftime("%d-%b-%y")<CR>
 
 " Section: Autocommands {{{1
 " --------------------------
