@@ -2,31 +2,24 @@
 
 startup_message off
 shell -$SHELL
-#sorendition =s KW
 hardstatus on
-# hardstatus lastline "%H: <%n> %?%h%:%t%?"
 hardstatus lastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
 escape ^\\\ # Ctrl+\ as escape command.
 bindkey ^Q command
 defnonblock on
 defscrollback 1024
-#nonblock on
-#bindkey ^^ command
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* WS=\E[8;%d;%dt
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* ti@:te@:G0
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;8)\007
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* XT
 termcapinfo Eterm*|linux* C8
-# termcapinfo * "" Co#256
 termcapinfo rxvt*|Eterm* "" *7=\E[8$:%i=\E[c:#4=\E[d:#2=\E[7$
 termcapinfo xterm*      "" *7=\E[2F:%i=\E[2C:#4=\E[2D:#2=\E[2H
 defflow off
-#time "%c:%s %M %d %H%? %l%?"
 windowlist string "%3n %{= dd}%?%h%:%t%?%=%f%{-}"
 caption    string "%?%F%{y}%?%3n %{= wk}%?%h%:%t%?%{-}"
 activity "Activity in window %n (%t)^G^G"
 bell_msg "Bell in window %n (%t)^G"
-#setenv LD_PRELOAD "$LD_PRELOAD_SCREEN"
 
 bind  j next
 bind ^J next
@@ -37,10 +30,8 @@ bind  ` select 0
 bind  e screen -ln vim
 bind ^E screen -ln vim
 bind  R screen -fn -ln irb
-#bind ^ stuff "^^"
 bind ^O colon "screen -ln ssh "
 bind  o colon "screen -ln ssh "
-# bind  S eval "height 51" "hardstatus alwayslastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "split"
 bind  S eval "height 50" "split"
 bind  Q eval "hardstatus message '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "only" "height 24"
 bind ^U screen -ln -fn -t uptime sh -c 'echo -ne "\e]0;Uptime\a"; export TERMINAL=1; while clear >/tmp/ruptime.$$; do echo "HOST      STATUS       TIME        USERS   LOAD" >>/tmp/ruptime.$$; tpope ruptime >>/tmp/ruptime.$$; if [ `(cat /tmp/ruptime.$$; tpope rwho)|wc -l` -le 22 ]; then echo >>/tmp/ruptime.$$; tpope rwho >>/tmp/ruptime.$$; fi; cat /tmp/ruptime.$$; rm -f /tmp/ruptime.$$; sleep 15; done'
@@ -83,13 +74,10 @@ bind -c shiftalt A copy  # Up
 bind -c shiftalt B colon
 bind -c shiftalt C next
 bind -c shiftalt D prev
-#bind -c shiftalt F <END>
-#bind -c shiftalt H <HOME>
 bind -c shiftalt P windowlist -b # F1
 bind -c shiftalt Q screen
 bind -c shiftalt R select 0
 bind -c shiftalt S select 1
-#bind -c shiftalt ~ stuff ^D
 bind -c shiftalt ~ command -c ssh
 bind -c shiftalt 0 stuff ^[[20
 bind -c shiftalt 1 stuff ^[[21
@@ -123,14 +111,9 @@ bindkey ^[Od      prev
 bindkey ^[^[[3~   detach # Alt+Delete
 bindkey ^[[3;3~   detach
 
-#bindkey ^[[23~    windowlist -b
-#bindkey ^[O2P     windowlist -b
 bindkey ^[[24~    screen
-#bindkey ^[O2Q     screen
 bindkey ^[[25~    select 0
-#bindkey ^[O2R     select 0
 bindkey ^[[26~    select 1
-#bindkey ^[O2S     select 1
 bindkey ^[[28~    select 2
 bindkey ^[[15;2~  select 2
 bindkey ^[[29~    select 3
