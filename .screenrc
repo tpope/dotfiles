@@ -9,6 +9,7 @@ hardstatus lastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
 escape ^\\\ # Ctrl+\ as escape command.
 bindkey ^Q command
 defnonblock on
+defscrollback 1024
 #nonblock on
 #bindkey ^^ command
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* WS=\E[8;%d;%dt
