@@ -110,9 +110,6 @@ bindkey ^[[1;2	command -c shiftalt # XTerm Newest Shift
 bindkey ^[[1;3	command -c shiftalt # XTerm Newest Alt
 #bindkey ^[[1;5	command -c shiftalt # XTerm Newest Ctrl
 
-bindkey ^[^?      other # Alt+Backspace
-bindkey ^[^H      other
-bindkey "^[ "     other
 bindkey "^[^I"    focus # Alt+Tab
 bindkey ^[[Z      focus # Shift+Tab
 bindkey ^[[a      copy  # Rxvt/Eterm Shift
