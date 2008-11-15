@@ -20,6 +20,8 @@ if has("balloon_eval") && has("unix")
 endif
 if exists("&breakindent")
   set breakindent showbreak=+++
+elseif has("gui_running")
+  set showbreak=\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ +++
 endif
 set cmdheight=2
 set complete-=i     " Searching includes can be slow
@@ -74,26 +76,6 @@ set wildmode=longest:full,full
 set wildignore+=*~
 set winaltkeys=no
 
-if exists("&guifont")
-  if has("mac")
-    set guifont=Monaco:h12
-  elseif has("unix")
-    if &guifont == ""
-      set guifont=bitstream\ vera\ sans\ mono\ 11
-    endif
-    set guioptions-=e
-  elseif has("win32")
-    set guifont=Consolas:h11,Courier\ New:h10
-  endif
-endif
-
-if !has("gui_running")
-  set background=dark
-  set notitle noicon
-else
-  set background=light
-endif
-
 if v:version >= 600
   set autoread
   set foldmethod=marker
@@ -110,7 +92,7 @@ if v:version < 602 || $DISPLAY =~ '^localhost:' || $DISPLAY == ''
   endif
 endif
 
-if !has("gui_running") && $DISPLAY == ''
+if !has("gui_running") && $DISPLAY == '' || !has("gui")
   set mouse=
 endif
 
@@ -188,8 +170,6 @@ endif
 
 if has("eval")
 command! -bar -nargs=1 E       :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
-command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
-command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
 command! -bar -nargs=0 SudoW   :silent exe "write !sudo tee % >/dev/null"|silent edit!
 command! -bar -nargs=* -bang W :write<bang> <args>
 command! -bar -nargs=0 -bang Scratch :silent edit<bang> \[Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
@@ -216,7 +196,7 @@ function! Fancy()
     if has("gui_running")
       let &columns=&columns-12
     endif
-    set nonumber foldcolumn=0
+    windo set nonumber foldcolumn=0
     if exists("+cursorcolumn")
       set nocursorcolumn nocursorline
     endif
@@ -224,9 +204,9 @@ function! Fancy()
     if has("gui_running")
       let &columns=&columns+12
     endif
-    set number foldcolumn=4
+    windo set number foldcolumn=4
     if exists("+cursorcolumn")
-      set cursorcolumn cursorline
+      set cursorline
     endif
   endif
 endfunction
@@ -456,9 +436,6 @@ if has("gui_mac")
   noremap <C-6> <C-^>
 endif
 
-noremap <M-,>        :Smaller<CR>
-noremap <M-.>        :Bigger<CR>
-
 map  <F1>   <Esc>
 map! <F1>   <Esc>
 if has("gui_running")
@@ -546,7 +523,6 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    autocmd GUIEnter * set title icon cmdheight=2 lines=25 columns=80 | if has("diff") && &diff | set columns=165 | endif | colorscheme vividchalk
     autocmd User Rails setlocal ts=2
 
     autocmd BufEnter ChangeLog let g:changelog_username = GitWho()
@@ -671,11 +647,30 @@ if has("autocmd")
   augroup END "}}}2
 endif " has("autocmd")
 
-" Section: Syntax Highlighting and Colors {{{1
-" --------------------------------------------
+" Section: Visual {{{1
+" --------------------
 
 " Switch syntax highlighting on, when the terminal has colors
 if (&t_Co > 2 || has("gui_running")) && has("syntax")
+  function! s:initialize_font()
+    if exists("&guifont")
+      if has("mac")
+        set guifont=Monaco:h12
+      elseif has("unix")
+        if &guifont == ""
+          set guifont=bitstream\ vera\ sans\ mono\ 11
+        endif
+      elseif has("win32")
+        set guifont=Consolas:h11,Courier\ New:h10
+      endif
+    endif
+  endfunction
+
+  command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
+  command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
+  noremap <M-,>        :Smaller<CR>
+  noremap <M-.>        :Bigger<CR>
+
   if exists("syntax_on") || exists("syntax_manual")
   else
     syntax on
@@ -690,8 +685,14 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
     endif
   endif
 
-  augroup RCSyntax
+  augroup RCVisual
     autocmd!
+
+    autocmd VimEnter *  set background=dark notitle noicon
+    autocmd GUIEnter *  set background=light title icon cmdheight=2 lines=25 columns=80 guioptions-=e
+    autocmd GUIEnter *  if has("diff") && &diff | set columns=165 | endif
+    autocmd GUIEnter *  colorscheme vividchalk
+    autocmd GUIEnter *  call s:initialize_font()
     autocmd Syntax css  syn sync minlines=50
     autocmd Syntax csh  hi link cshBckQuote Special | hi link cshExtVar PreProc | hi link cshSubst PreProc | hi link cshSetVariables Identifier
   augroup END
