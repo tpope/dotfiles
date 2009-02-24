@@ -235,9 +235,6 @@ function! Run()
   elseif exists("b:rails_root") && exists(":Rake")
     wa
     Rake
-  elseif &ft == "perl"
-    wa
-    !perl -w %
   elseif &ft == "ruby"
     wa
     if executable(expand("%:p")) || getline(1) =~ '^#!'
@@ -255,11 +252,6 @@ function! Run()
     else
       !irb -r"%:p"
     endif
-  elseif &ft == "python"
-    wa
-    !python %
-  elseif &ft == "sh"
-    !sh %
   elseif &ft == "html" || &ft == "xhtml" || &ft == "php" || &ft == "aspvbs" || &ft == "aspperl"
     wa
     if !exists("b:url")
@@ -270,7 +262,7 @@ function! Run()
   elseif &ft == "vim"
     wa
     unlet! g:loaded_{expand("%:t:r")}
-    source %
+    return 'source %'
   elseif &ft == "sql"
     1,$DBExecRangeSQL
   elseif expand("%:e") == "tex"
@@ -285,26 +277,9 @@ function! Run()
     endif
   endif
   let &makeprg = old_makeprg
+  return ""
 endfunction
-command! -bar Run :call Run()
-
-function! TemplateFileFunc_pm()
-  let module = expand("%:p:r")
-  let module = substitute(module,'.*\<\(perl\d*\%([\/][0-9.]*\)\=\|lib\|auto\)[\/]','','')
-  if module =~ '^/' || module =~ '^[A-Za-z]:'
-    let module = fnamemodify(module,':t')
-  endif
-  let module = substitute(module,'[\/]','::','g')
-  silent! exe "%s/@MODULE@/".module."/g"
-  norm gg4}
-endfunction
-
-function! GitWho()
-  if executable("git")
-    let email = substitute(system("git config user.email"),'\n$','','')
-  endif
-  return "Tim Pope  <".(exists("email") ? email : "@").">"
-endfunction
+command! -bar Run :execute Run()
 
   runtime! plugin/matchit.vim
   runtime! macros/matchit.vim
@@ -483,8 +458,6 @@ if has("autocmd")
     endif
 
     autocmd User Rails setlocal ts=2
-
-    autocmd BufEnter ChangeLog let g:changelog_username = GitWho()
 
     autocmd BufNewFile */init.d/*
           \ if filereadable("/etc/init.d/skeleton") |
