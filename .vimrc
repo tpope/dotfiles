@@ -461,7 +461,9 @@ inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M
 " --------------------------
 
 if has("autocmd")
-  filetype off " Debian preloads this before the runtimepath is set
+  if $HOME !~# '^/Users/'
+    filetype off " Debian preloads this before the runtimepath is set
+  endif
   if version>600
     filetype plugin indent on
   else
