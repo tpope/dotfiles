@@ -120,42 +120,34 @@ elseif has("mac")
 endif
 
 " Plugin Settings {{{2
+
 if has("eval")
 let g:is_bash = 1
-let g:allml_global_maps=1
-"let g:c_comment_strings=1
-"let g:capslock_command_mode=1
+let g:lisp_rainbow = 1
+" let g:rubyindent_match_parentheses = 0
+let g:ruby_minlines = 500
+let g:rubycomplete_buffer_loading = 1
+let g:rubycomplete_rails = 1
+let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
+
+let g:allml_global_maps = 1
 let g:EnhCommentifyUseAltKeys = 'Yes'
 let g:EnhCommentifyBindInInsert = 'No'
 let g:EnhCommentifyRespectIndent = 'Yes'
-"let g:Imap_PlaceHolderStart="\xab"
-"let g:Imap_PlaceHolderEnd="\xbb"
 let g:miniBufExplForceSyntaxEnable = 1
-let g:NERD_mapleader = "<Leader>c"
-let g:NERDMapleader = "<Leader>c"
-let g:NERD_com_in_insert_map = "<M-x>"
-let g:NERDComInInsertMap = "<M-x>"
+let g:NERDCreateDefaultMappings = 0
+let g:NERDSpaceDelims = 1
 let g:NERDShutUp = 1
 let g:VCSCommandDisableMappings = 1
-let g:Tex_CompileRule_dvi='latex -interaction=nonstopmode -src-specials $*'
+let g:Tex_CompileRule_dvi = 'latex -interaction=nonstopmode -src-specials $*'
 let g:Tex_SmartKeyQuote = 0
-let g:treeExplVertical=1
-let g:lisp_rainbow=1
-let g:rails_search_url = "http://www.railsapi.org/methods/search_form?api_method[name]=%s"
-"let g:rails_level=9
-let g:rails_default_database='sqlite3'
-let g:rails_menu=1
-let g:rubyindent_match_parentheses=0
-let g:ruby_minlines=500
-let g:rubycomplete_buffer_loading=1
-let g:rubycomplete_rails=1
 if !has("gui_running")
-  let g:showmarks_enable=0
+  let g:showmarks_enable = 0
 endif
-let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 let g:surround_45 = "<% \r %>"
 let g:surround_61 = "<%= \r %>"
 let g:surround_{char2nr('8')} = "/* \r */"
+let g:surround_{char2nr('s')} = " \r"
 let g:surround_indent = 1
 let g:dbext_default_history_file = "/tmp/dbext_sql_history.txt"
 endif
@@ -453,9 +445,7 @@ map <C-F4>  :bdelete<CR>
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
 
-" EnhancedCommentify
-map <Plug>Traditional \ci
-map <silent> \\     <Plug>Traditionalj
+map \\              <Plug>NERDCommenterInvert
 map <Leader>l       <Plug>CapsLockToggle
 imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
@@ -485,7 +475,7 @@ Abolish {,re}impliment{,s,ing,ed,ation}       {}implement{}
 Abolish improvment{,s}                        improvement{}
 Abolish inherant{,ly}                         inherent{}
 Abolish lastest                               latest
-Abolish lession{,s}                           lesson{}
+Abolish {les,compar,compari}sion{,s}          {les,compari,compari}son{}
 Abolish {,un}nec{ce,ces,e}sar{y,ily}          {}nec{es}sar{}
 Abolish persistan{ce,t,tly}                   persisten{}
 Abolish {,ir}releven{ce,cy,t,tly}             {}relevan{}
