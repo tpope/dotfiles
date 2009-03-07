@@ -318,52 +318,6 @@ inoremap <CR>       <C-G>u<CR>
 if has("eval")
   command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
 endif
-nnoremap <C-J>      :<C-U>exe 'norm m`'<Bar>exe 'move+'.v:count1<CR>``
-nnoremap <C-K>      m`:move--<CR>``
-if exists(":xnoremap")
-  xnoremap <C-J>      m`:move'>+<CR>``
-  xnoremap <C-K>      m`:move--<CR>``
-endif
-
-if exists("*repeat")
-  nnoremap <silent> ]<Space> :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
-  nnoremap <silent> [<Space> :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
-else
-  nnoremap          ]<Space> o<Space><C-U><Esc>-
-  nnoremap          [<Space> O<Space><C-U><Esc>+
-endif
-
-if has("eval")
-function! MoveByOffset(num)
-  if a:num == 0
-    exe "norm! \<Esc>"
-    return
-  endif
-  let dir   = expand("%:h")
-  if dir == '.'
-    let dir = ''
-  elseif dir != ''
-    let dir .= '/'
-  endif
-  let files = split(glob(dir.".*[^~.]"),"\n")
-  let files += split(glob(dir."*[^~]"),"\n")
-  let original = expand("%")
-  if a:num < 0
-    call reverse(sort(filter(files,'v:val < original')))
-  else
-    call sort(filter(files,'v:val > original'))
-  end
-  let num = a:num < 0 ? -a:num : a:num
-  let file = get(files,num-1,"")
-  if file != ""
-    edit `=file`
-  else
-    exe "norm! \<Esc>"
-  endif
-endfunction
-nnoremap <silent> ]o :<C-U>call MoveByOffset(v:count1)<CR>
-nnoremap <silent> [o :<C-U>call MoveByOffset(-v:count1)<CR>
-endif
 
 inoremap     <C-X><C-@> <C-A>
 " Emacs style mappings
