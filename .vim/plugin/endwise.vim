@@ -36,7 +36,6 @@ augroup END " }}}1
 
 " Maps {{{1
 
-
 if maparg("<Plug>DiscretionaryEnd") == ""
     inoremap <silent> <SID>DiscretionaryEnd <C-R>=<SID>crend(0)<CR>
     inoremap <silent> <SID>AlwaysEnd        <C-R>=<SID>crend(1)<CR>
