@@ -1,11 +1,9 @@
-" unimpaired.vim - Pairs of bracket maps
-" Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
+" unimpaired.vim - Pairs of handy bracket maps
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.org>
+" Version:      1.0
 
-" Exit quickly when:
-" - this plugin was already loaded (or disabled)
-" - when 'compatible' is set
-if (exists("g:loaded_unimpaired") && g:loaded_unimpaired) || &cp || v:version < 700
-    finish
+if exists("g:loaded_unimpaired") || &cp || v:version < 700
+  finish
 endif
 let g:loaded_unimpaired = 1
 
@@ -93,7 +91,7 @@ endfunction
 
 " HTML entities {{{2
 
-let g:impaired_html_entities = {
+let g:unimpaired_html_entities = {
       \ 'nbsp':     160, 'iexcl':    161, 'cent':     162, 'pound':    163,
       \ 'curren':   164, 'yen':      165, 'brvbar':   166, 'sect':     167,
       \ 'uml':      168, 'copy':     169, 'ordf':     170, 'laquo':    171,
@@ -177,7 +175,7 @@ function! s:XmlEntityDecode(str)
   let str = substitute(str,'\c&quot;','"','g')
   let str = substitute(str,'\c&gt;','>','g')
   let str = substitute(str,'\c&lt;','<','g')
-  let str = substitute(str,'\C&\(\w*\);','\=nr2char(get(g:impaired_html_entities,submatch(1),63))','g')
+  let str = substitute(str,'\C&\(\%(amp;\)\@!\w*\);','\=nr2char(get(g:unimpaired_html_entities,submatch(1),63))','g')
   return substitute(str,'\c&amp;','\&','g')
 endfunction
 
@@ -188,7 +186,8 @@ endfunction
 
 function! s:Transform(algorithm,type)
   let sel_save = &selection
-  let &selection = "inclusive"
+  let cb_save = &clipboard
+  set selection=inclusive clipboard-=unnamed
   let reg_save = @@
   if a:type =~ '^\d\+$'
     silent exe 'norm! ^v'.a:type.'$hy'
@@ -203,8 +202,9 @@ function! s:Transform(algorithm,type)
   endif
   let @@ = s:{a:algorithm}(@@)
   norm! gvp
-  let &selection = sel_save
   let @@ = reg_save
+  let &selection = sel_save
+  let &clipboard = cb_save
   if a:type =~ '^\d\+$'
     silent! call repeat#set("\<Plug>unimpairedLine".a:algorithm,a:type)
   endif
