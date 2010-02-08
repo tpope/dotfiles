@@ -130,7 +130,7 @@ let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_rails = 1
 let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 
-let g:allml_global_maps = 1
+let g:ragtag_global_maps = 1
 let g:EnhCommentifyUseAltKeys = 'Yes'
 let g:EnhCommentifyBindInInsert = 'No'
 let g:EnhCommentifyRespectIndent = 'Yes'
@@ -493,7 +493,7 @@ if has("autocmd")
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
     autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o <C-U># $I<C-V>d$<Esc>o <C-U><C-X>^<Esc>o <C-U><C-G>u
     autocmd FileType c,cpp,cs,java,perl,javscript,php,aspperl,tex,css let b:surround_101 = "\r\n}"
-    autocmd User     allml                  inoremap <buffer> <C-J> <Down>
+    autocmd User     ragtag                 inoremap <buffer> <C-J> <Down>
     autocmd FileType tt2html,htmltt if !exists("b:current_syntax") | setlocal syntax=html | endif
     autocmd FileType aspvbs,vbnet setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
     autocmd FileType asp*         runtime! indent/html.vim
