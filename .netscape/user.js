@@ -27,7 +27,7 @@ user_pref("browser.tabs.extensions.slow_down_autoreload_in_background.enabled", 
 user_pref("browser.tabs.extensions.view_source_tab", true);
 user_pref("browser.tabs.extensions.window_hook_mode", 2);
 user_pref("browser.tabs.loadInBackground", true);
-user_pref("browser.tabs.loadOnNewTab", 1);
+user_pref("browser.tabs.loadOnNewTab", 2);
 user_pref("browser.tabs.opentabfor.middleclick", true);
 user_pref("browser.tabs.opentabfor.windowopen", true);
 user_pref("browser.throbber.url","http://www.tpope.net/");
@@ -58,6 +58,7 @@ user_pref("editor.html_editor", "gvim %f");
 user_pref("editor.image_editor", "gimp %f");
 user_pref("editor.use_html_editor", 1);
 user_pref("extensions.disabledObsolete", true);
+user_pref("general.warnOnAboutConfig", false);
 user_pref("imageblocker.enable", true);
 user_pref("keyconfig.main.trp_key_ScrollLeft", "][H][][goDoCommand('cmd_scrollLeft');");
 user_pref("keyconfig.main.trp_key_ScrollLineDown", "][J][][goDoCommand('cmd_scrollLineDown');");
@@ -65,6 +66,7 @@ user_pref("keyconfig.main.trp_key_ScrollLineUp", "][K][][goDoCommand('cmd_scroll
 user_pref("keyconfig.main.trp_key_ScrollRight", "][L][][goDoCommand('cmd_scrollRight');");
 //user_pref("keyconfig.main.trp2_key_ScrollPageUp", "][][VK_BACK][goDoCommand('cmd_scrollPageUp');");
 user_pref("keyconfig.main.trp_key_ScrollPageUp", "][-][][goDoCommand('cmd_scrollPageUp');");
+user_pref("keyconfig.main.trp_key_ScrollPageUp", "][B][][goDoCommand('cmd_scrollPageUp');");
 //user_pref("keyconfig.main.xxx_key19_cmd_handleBackspace", "!][][");
 //user_pref("keyconfig.main.key_findAgain", "][N][");
 user_pref("keyconfig.main.key_findPrevious", "shift][N][");
