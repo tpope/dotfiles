@@ -1,60 +1,7 @@
-" speeddating.vim - Use CTRL-A/X to increment dates, times, and more
-" Maintainer:   Tim Pope
-" Last Change:
+" speeddating.vim - Use CTRL-A/CTRL-X to increment dates, times, and more
+" Maintainer:   Tim Pope <vimNOSPAM@tpope.org>
+" Version:      20100219
 " GetLatestVimScripts: 2120 1 :AutoInstall: speeddating.vim
-
-" Greatly enhanced <C-A>/<C-X>.  Try these keys on various numbers in the
-" lines below.  You can also give a count (e.g., 4<C-A>).
-
-" Fri, 31 Dec 1999 23:59:59 +0000
-" Fri Dec 31 23:59:59 UTC 1999
-" 2008-01-05T04:59:59Z
-" 1865-04-15
-" 11/Sep/01
-" January 14th, 1982
-" 11:55 AM
-" 3rd
-" XXXVIII
-
-" Try selecting the following lines in visual line mode, positioning the
-" cursor in the last column (so it's on top of a number), and pressing <C-A>.
-
-"        I
-"       II
-"      III
-"       IV
-"        V
-
-" Also try below to see what happens when the field is missing (alphabetical
-" characters can be used in visual mode only, as they overlap with roman
-" numerals):
-
-" Z
-" 
-" 
-" 
-" 
-" 
-" 
-
-" The :SpeedDatingFormat command can be used to define custom date and time
-" formats.  Invoke ":SpeedDatingFormat!" for help.
-"
-" Two additional mappings:
-" d<C-A>  change the timestamp under the cursor to the current time in UTC
-" d<C-X>  change the timestamp under the cursor to the current local time
-"
-" Caveats:
-" - Gregorian calendar always used.
-" - Time zone abbreviation support is limited to a few predefined codes on
-"   Windows and other platforms without strftime("%Z") support.  If your time
-"   zone abbreviation is not correctly identified set the g:speeddating_zone
-"   and g:speeddating_zone_dst variables.
-" - Beginning a format with a digit causes Vim to treat leading digits as a
-"   count instead.  To work around this escape it with %[] (e.g.,
-"   %[2]0%0y%0m%0d%* is a decent format for DNS serials).
-
-" Licensed under the same terms as Vim itself.
 
 " Initialization {{{1
 
@@ -386,7 +333,7 @@ function! s:initializetime(time)
         let a:time.y = s:roman2arabic(a:time.y)
     elseif a:time.y =~ '^-\=0..'
         let a:time.y = substitute(a:time.y,'0\+','','')
-    elseif a:time.y < 38 && a:time.y >= 0 && a:time.y != ""
+    elseif a:time.y < 38 && a:time.y >= 0 && ''.a:time.y != ''
         let a:time.y += 2000
     elseif a:time.y < 100 && a:time.y >= 38
         let a:time.y += 1900
@@ -409,7 +356,7 @@ function! s:initializetime(time)
     if a:time.d == 0
         let a:time.d = 1
     endif
-    if a:time.y == ''
+    if ''.a:time.y == ''
         let a:time.y = 2000
     endif
     if a:time.o =~ '^[+-]\d\d:\=\d\d$'
@@ -662,6 +609,7 @@ function! s:dateincrement(string,offset,increment) dict
         let i += 1
     endfor
     call s:initializetime(time)
+    let inner_offset = 0
     if char == 'o'
         let inner_offset = partial_matchend - offset - 1
         let factor = 15
@@ -674,9 +622,16 @@ function! s:dateincrement(string,offset,increment) dict
         endif
         let time.o += factor * a:increment
         let time.m += factor * a:increment
+    elseif char == 'b'
+        let time.b += a:increment
+        let goal = time.b
+        call s:normalizetime(time)
+        while time.b != goal
+            let time.d += time.b < goal ? 1 : -1
+            call s:normalizetime(time)
+        endwhile
     else
         let time[char] += a:increment
-        let inner_offset = 0
     endif
     let format = substitute(self.strftime,'\\\([1-9]\)','\=caps[submatch(1)-1]','g')
     let time_string = s:strftime(format,time)
@@ -751,7 +706,7 @@ function! s:createtimehandler(format)
                 let regexp += ['\(.*\)']
             endif
         else
-            let regexp += [fragment]
+            let regexp += [escape(fragment,'.*^$[\]~')]
             let template .= fragment
             let default .= fragment
         endif
