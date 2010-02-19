@@ -150,4 +150,10 @@ class String
     end
     t & 255
   end
+  if RUBY_VERSION == '1.8.7' && method_defined?(:chars)
+    undef chars
+    def chars(*args,&block)
+      ActiveSupport::Multibyte::Chars.new(self)
+    end
+  end
 end
