@@ -59,7 +59,6 @@ if exists("+spelllang")
   set spelllang=en_us
 endif
 set splitbelow      " Split windows at bottom
-set statusline=%5*[%n]%*\ %1*%<%.99f%*\ %2*%h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%*%=%-16(\ %3*%l,%c-%v%*\ %)%4*%P%*
 set statusline=[%n]\ %<%.99f\ %h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%=%-16(\ %l,%c-%v\ %)%P
 set suffixes+=.dvi  " Lower priority in wildcards
 set tags+=../tags,../../tags,../../../tags,../../../../tags
@@ -561,7 +560,6 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
     syntax on
   endif
   set list
-  set hlsearch
   if !exists('g:colors_name')
     if filereadable(expand("~/.vim/colors/tim.vim"))
       colorscheme tim
