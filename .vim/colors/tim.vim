@@ -74,7 +74,7 @@ else
   "hi TabLineSel term=bold cterm=bold gui=bold
   if &t_Co > 8
     hi StatusLine term=bold,reverse ctermbg=White ctermfg=Black cterm=none guifg=White
-    hi StatusLineNC term=reverse ctermbg=Grey cterm=none guifg=White
+    hi StatusLineNC term=reverse ctermbg=Grey ctermfg=Black cterm=none guifg=White
     hi User1   term=bold,reverse ctermbg=White ctermfg=DarkBlue gui=bold guifg=Blue guibg=White
     hi User2   term=bold,reverse ctermbg=White ctermfg=DarkGreen gui=bold guifg=DarkGreen guibg=White
     hi User3   term=bold,reverse ctermbg=White ctermfg=Brown gui=bold guifg=Brown guibg=White
