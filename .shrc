@@ -23,6 +23,9 @@ for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games
     fi
 done
 
+HASHROCKET_DIR="$HOME/src/hashrocket"
+[ ! -r "$HASHROCKET_DIR/dotmatrix/.hashrc" ] || . "$HASHROCKET_DIR/dotmatrix/.hashrc"
+
 case "$PATH" in
     "$HOME"/bin:*) ;;
     *) PATH="$HOME/bin:$PATH" ;;
