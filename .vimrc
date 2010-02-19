@@ -4,7 +4,7 @@
 " Section: Options {{{1
 " ---------------------
 if has("win32")
-  let &runtimepath = substitute(&runtimepath,'\(\~\|tpope\)/vimfiles\>','\1/.vim','g')
+  let &runtimepath = substitute(&runtimepath,'\(Documents and Settings[\\/][^\\/]*\)[\\/]\zsvimfiles\>','.vim','g')
 endif
 silent! call pathogen#runtime_append_all_bundles()
 silent! call pathogen#runtime_prepend_subdirectories("~/src/vim/bundle")
