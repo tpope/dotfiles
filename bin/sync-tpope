@@ -17,11 +17,11 @@ FILES="\
  .xsession .Xresources .Eterm/themes .gtkrc .gtkrc-2.0 .netscape/user.js \
  .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
  bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
- bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb \
+ bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb .gitconfig \
  "
 LOCAL_FILES="\
  .kde/share/apps/konsole .gkrellm .gkrellm2/[^l]* .qt \
- .gitconfig .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
+ .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
  .vim/bundle/home/* .netscape/userContent.css"
 
 RSYNC_RSH="ssh -ax"
