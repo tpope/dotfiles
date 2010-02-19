@@ -749,7 +749,7 @@ EOF
         elif [ "`uname`" = Darwin ] && inpath rmm; then
             exec rmm "$@"
         else
-            exec rm -i "$@"
+            exec rm "$@"
         fi ;;
 
     ri) no_links; exec ri -f bs "$@" ;;
