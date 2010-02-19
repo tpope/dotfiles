@@ -59,7 +59,7 @@ if exists("+spelllang")
   set spelllang=en_us
 endif
 set splitbelow      " Split windows at bottom
-set statusline=[%n]\ %<%.99f\ %h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%=%-16(\ %l,%c-%v\ %)%P
+set statusline=[%n]\ %<%.99f\ %h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%{exists('*rails#statusline')?rails#statusline():''}%{exists('*fugitive#statusline')?fugitive#statusline():''}%#ErrorMsg#%{exists('*SyntasticStatuslineFlag')?SyntasticStatuslineFlag():''}%*%=%-16(\ %l,%c-%v\ %)%P
 set suffixes+=.dvi  " Lower priority in wildcards
 set tags+=../tags,../../tags,../../../tags,../../../../tags
 set timeoutlen=1200 " A little bit more time for macros
@@ -128,7 +128,6 @@ let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_rails = 1
 let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 
-let g:ragtag_global_maps = 1
 let g:EnhCommentifyUseAltKeys = 'Yes'
 let g:EnhCommentifyBindInInsert = 'No'
 let g:EnhCommentifyRespectIndent = 'Yes'
@@ -136,16 +135,20 @@ let g:miniBufExplForceSyntaxEnable = 1
 let g:NERDCreateDefaultMappings = 0
 let g:NERDSpaceDelims = 1
 let g:NERDShutUp = 1
+let g:NERDTreeHijackNetrw = 0
+let g:ragtag_global_maps = 1
+let g:space_disable_select_mode = 1
+let g:syntastic_enable_signs = 1
+let g:syntastic_auto_loc_list = 1
 let g:VCSCommandDisableMappings = 1
 let g:Tex_CompileRule_dvi = 'latex -interaction=nonstopmode -src-specials $*'
 let g:Tex_SmartKeyQuote = 0
-if !has("gui_running")
-  let g:showmarks_enable = 0
-endif
-let g:surround_45 = "<% \r %>"
-let g:surround_61 = "<%= \r %>"
+let g:showmarks_enable = has("gui_running")
+let g:surround_{char2nr('-')} = "<% \r %>"
+let g:surround_{char2nr('=')} = "<%= \r %>"
 let g:surround_{char2nr('8')} = "/* \r */"
 let g:surround_{char2nr('s')} = " \r"
+let g:surround_{char2nr('^')} = "/^\r$/"
 let g:surround_indent = 1
 let g:dbext_default_history_file = "/tmp/dbext_sql_history.txt"
 endif
@@ -281,7 +284,6 @@ command! -bar Run :execute Run()
 
   runtime! plugin/matchit.vim
   runtime! macros/matchit.vim
-  runtime! plugin/abolish.vim
 endif
 
 " Section: Mappings {{{1
@@ -363,6 +365,7 @@ endif
 map <F3>    :cnext<CR>
 map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
+map <silent> <F6>    :if exists(':Gstatus')<Bar>exe 'Gstatus'<Bar>else<Bar>ls<Bar>endif<CR>
 map <F8>    :wa<Bar>make<CR>
 map <F9>    :Run<CR>
 map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
@@ -399,6 +402,8 @@ if has("autocmd")
   augroup FTMisc " {{{2
     autocmd!
 
+    autocmd FocusGained * if !has('win32') | silent! call fugitive#reload_status() | endif
+    autocmd SourcePre */macros/less.vim set laststatus=0 cmdheight=1
     if v:version >= 700 && isdirectory(expand("~/.trash"))
       autocmd BufWritePre,BufWritePost * if exists("s:backupdir") | set backupext=~ | let &backupdir = s:backupdir | unlet s:backupdir | endif
       autocmd BufWritePre ~/*
@@ -409,7 +414,7 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    autocmd User Rails setlocal ts=2
+    autocmd User Rails-javascript setlocal ts=2
 
     autocmd BufNewFile */init.d/*
           \ if filereadable("/etc/init.d/skeleton") |
