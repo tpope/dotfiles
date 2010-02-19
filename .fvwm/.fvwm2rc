@@ -344,6 +344,9 @@ Style xcolorsel StaysOnTop
 Style Gpsdrive  NoPPosition
 Style x0rfbserver NoTitle, ClickToFocus, GrabFocusOff, NoHandles, BorderWidth 1, Icon norm/network.xpm, MiniIcon mini/network.xpm, WindowListSkip
 Style DOTTY     NoUSPosition
+# bittorrent
+Style python NoUSPosition
+Style frame  NoUSPosition
 
 Style desktop_window Sticky, NoTitle, NoHandles, StaysOnBottom, StaysPut, Layer 0 0
 Style editres   Icon editres.xpm, MiniIcon mini.x2.xpm
@@ -471,10 +474,8 @@ Key grave       A   4S  FuncChatScreenSshXTerm
 Key grave       A   4M  FuncChatScreenSshXTermShared
 Key slash       A   4   FuncFindOrLaunchWebBrowser
 Key slash       A   4S  FuncWebBrowserClipboard
-Key W           A   4   FuncFindOrLaunchWebBrowser
-Key W           A   4S  FuncWebBrowserClipboard
 Key D           A   4   FuncFindOrLaunchWebBrowser
-Key W           A   4S  FuncWebBrowserClipboard
+Key D           A   4S  FuncWebBrowserClipboard
 
 # }}}2
 # Desks {{{2
@@ -1022,12 +1023,14 @@ Key C           A   4   Exec exec tpope media toggle
 Key V           A   4   Exec exec tpope media stop
 Key B           A   4   Exec exec tpope media next
 
-Key XF86AudioLowerVolume A A Exec exec aumix -v -5
-Key XF86AudioRaiseVolume A A Exec exec aumix -v +5
+Key XF86AudioLowerVolume A A Exec exec aumix -w -5
+Key XF86AudioRaiseVolume A A Exec exec aumix -w +5
 Key Home        A   4   Exec exec aumix -w +5
 Key End         A   4   Exec exec aumix -w -5
 Key Home        A   5   Exec exec aumix -v +5
 Key End         A   5   Exec exec aumix -v -5
+Key XF86BrightnessAdjust A A Exec exec xbacklight -steps 1 +20
+Key XF86ContrastAdjust   A A Exec exec xbacklight -steps 1 -20
 
 Key Execute     A   A   Exec exec tpope media toggle
 Key Cancel      A   A   Exec exec tpope media stop
@@ -1239,6 +1242,7 @@ PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo + I ModuleSynchro
 + I Module FvwmButtons FvwmButtonsBottom
 + I Module FvwmCommandS
 + I Module FvwmEvent
++ I Module FvwmForm
 + I Module FvwmProxy
 + I UnsetEnv fvwm_titlefont
 + I UnsetEnv fvwm_iconfont
