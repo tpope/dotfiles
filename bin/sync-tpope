@@ -20,9 +20,8 @@ FILES="\
  bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb .gitconfig \
  "
 LOCAL_FILES="\
- .kde/share/apps/konsole .gkrellm .gkrellm2/[^l]* .qt \
- .gnupg/pubring.gpg .irssi .pork/porkrc .pork/scract.pl \
- .vim/bundle/home/* .netscape/userContent.css"
+ .gnupg/pubring.gpg .netscape/userContent.css .vim/bundle/home/* \
+ .pork/porkrc .pork/scract.pl .kde/share/apps/konsole .qt"
 
 RSYNC_RSH="ssh -ax"
 [ -t 0 ] || RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20"
