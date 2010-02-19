@@ -22,6 +22,10 @@ module Kernel
   rescue SystemStackError
     i
   end
+
+  def r(*objects)
+    raise RuntimeError, objects.map{|o|o.inspect}.join("\n"), caller
+  end
 end
 
 class Symbol
