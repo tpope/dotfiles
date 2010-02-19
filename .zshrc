@@ -228,6 +228,8 @@ zle -N new-screen
 
 zle -N edit-command-line
 bindkey '^[e' edit-command-line
+bindkey '^X^E' edit-command-line
+bindkey -M vicmd v edit-command-line
 
 ;;
 esac
