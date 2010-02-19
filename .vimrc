@@ -157,10 +157,6 @@ endif
 " Section: Commands {{{1
 " -----------------------
 
-if has("ruby")
-  silent! ruby require 'tpope'; require 'vim'
-endif
-
 if has("eval")
 command! -bar -nargs=1 E       :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
 command! -bar -nargs=0 SudoW   :silent exe "write !sudo tee % >/dev/null"|silent edit!
