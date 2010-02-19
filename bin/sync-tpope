@@ -12,7 +12,7 @@
 FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
  .profile .bashrc .bash_profile .screenrc .terminfo/? .dir_colors .irbrc \
- .vimrc .vim/[^b][^p]* .muttrc .urlview .mailcap .procmailrc .gnupg/gpg.conf \
+ .vimrc .vim/[^b][^p]* .muttrc .urlview .mailcap .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
  .xsession .Xresources .Eterm/themes .gtkrc .gtkrc-2.0 .netscape/user.js \
  .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
