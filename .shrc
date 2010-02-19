@@ -140,6 +140,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
         [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
 
         alias ls='ls -F'
+        alias ll='ls -lF'
 
         alias mv='mv -i'
         alias cp='cp -i'
@@ -169,8 +170,8 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
         esac
 
         if ! grep --color 2>&1 | grep un >/dev/null; then
-            # TODO: egrep
-            alias grep='grep --color=auto --exclude="*~"'
+            alias grep='grep --color=auto --exclude="*~" --exclude=tags'
+            alias egrep='egrep --color=auto --exclude="*~" --exclude=tags'
         fi
 
         if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
