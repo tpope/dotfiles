@@ -547,7 +547,7 @@ case "$basename" in
 
     temperature) webget="curl -m8 -s"
         [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
-        temp="`$webget http://weather.noaa.gov/weather/current/${1:-KJSO}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
+        temp="`$webget http://weather.noaa.gov/weather/current/${1:-KJAX}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
         case "$temp" in
             ?????*) echo "$temp" ;;
             ????)  echo " $temp" ;;
