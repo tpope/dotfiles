@@ -56,14 +56,6 @@ lindsay()     { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
 gob()         { hcolor=teal;   $hcolor;hltr=G;hdom=tpope.us;}
 buster()      { hcolor=orange; $hcolor;hltr=B;hdom=tpope.us;}
 maeby()       { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
-george()      { hcolor=cyan;   $hcolor;hltr=E;hdom=jmwaller.com;}
-lucille()     { hcolor=magenta;$hcolor;hltr=U;hdom=jmwaller.com;}
-jwxkl81_1061(){ hcolor=yellow; $hcolor;hltr=W;hdom=jmwaller.com;}
-bjdxx51_594() { hcolor=brown;  $hcolor;hltr=D;hdom=jmwaller.com;}
-san_web()     { hcolor=navy;   $hcolor;hltr=A;hdom=jmwaller.com;}
-jmwa_netmon() { hcolor=blue;   $hcolor;hltr= ;hdom=jmwaller.com;}
-san_netmon()  { hcolor=blue;   $hcolor;hltr=N;hdom=jmwaller.com;}
-atl_netmon()  { hcolor=blue;   $hcolor;hltr= ;hdom=jmwaller.com;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
 
 red()         { hterm="00;31";hscrn="   r";hlrgb="#D47F7F";hdrgb="#550000";}
@@ -162,10 +154,10 @@ hostinfo)
             ;;
         esac
         if [ "$hdom" = tpope.net -a -x "`which nc 2>/dev/null`" ]; then
-                exec_nc "$host.$hdom" "$3"
+            exec_nc "$host.$hdom" "$3"
         fi
-        if [ "$hdom" = jmwaller.com ]; then
-            exec ssh -ax jmwa nc -q 1 "$host" "$3" 2>/dev/null
+        if [ "$hdom" = hshrckt.com ]; then
+            exec ssh -ex ci.hshrckt.com nc -q 1 "$host.local" "$3" 2>/dev/null
         fi
         exec ssh -ax trp nc -q 1 "$host" "$3" 2>/dev/null
         ;;
