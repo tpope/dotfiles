@@ -576,6 +576,7 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
     autocmd GUIEnter *  if has("diff") && &diff | set columns=165 | endif
     autocmd GUIEnter *  colorscheme vividchalk
     autocmd GUIEnter *  call s:initialize_font()
+    autocmd GUIEnter *  let $GIT_EDITOR = 'false'
     autocmd Syntax css  syn sync minlines=50
     autocmd Syntax csh  hi link cshBckQuote Special | hi link cshExtVar PreProc | hi link cshSubst PreProc | hi link cshSetVariables Identifier
   augroup END
