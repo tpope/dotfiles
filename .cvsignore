@@ -2,6 +2,7 @@
 *.old
 *.OLD
 .*.sw?
+.sw?
 .viminfo
 .*.lock
 *.local
