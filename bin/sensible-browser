@@ -71,6 +71,10 @@ elif [ "$DISPLAY" -a -z "$terminal" ]; then
                 nice -n 1 $browser -remote "openURL($url,new-tab)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
             fi
         done
+        if [ -x "`which google-chrome 2>/dev/null`" ] && \
+                pidof google-chrome >/dev/null; then
+            nice -n 1 google-chrome "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
+        fi
         if [ -x "`which opera 2>/dev/null`" ] && \
                 pidof opera >/dev/null; then
             nice -n 1 opera -remote "openURL($url,new-page)" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0

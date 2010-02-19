@@ -289,6 +289,7 @@ Style gecko             UseStyle www-browser, MiniIcon mozilla.mini.xpm
 Style Firefox-bin       UseStyle www-browser, MiniIcon mozilla.mini.xpm
 Style Navigator         UseStyle www-browser, MiniIcon mini.netscape.xpm
 Style Opera             UseStyle www-browser, MiniIcon opera.xpm
+Style Google-chrome     UseStyle www-browser
 Style Galeon            UseStyle www-browser
 Style dillo             UseStyle www-browser
 Style links             UseStyle www-browser
@@ -1835,11 +1836,11 @@ AddToFunc   FuncFvwmFormRun
 # Web Browser Functions {{{2
 DestroyFunc FuncFindWebBrowser
 AddToFunc FuncFindWebBrowser
-+ I FuncFindResource "WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo"
++ I FuncFindResource "WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|Google-chrome|konqueror|dillo"
 
 DestroyFunc FuncFindOrLaunchWebBrowser
 AddToFunc FuncFindOrLaunchWebBrowser
-+ I None ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|konqueror|dillo", AcceptsFocus) Exec exec sensible-browser $*
++ I None ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|Google-chrome|konqueror|dillo", AcceptsFocus) Exec exec sensible-browser $*
 + I FuncFindWebBrowser
 
 DestroyFunc FuncSmartWebBrowser
