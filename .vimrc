@@ -398,6 +398,7 @@ if has("autocmd")
   augroup FTMisc " {{{2
     autocmd!
 
+    autocmd FocusLost   * wall
     autocmd FocusGained * if !has('win32') | silent! call fugitive#reload_status() | endif
     autocmd SourcePre */macros/less.vim set laststatus=0 cmdheight=1
     if v:version >= 700 && isdirectory(expand("~/.trash"))
