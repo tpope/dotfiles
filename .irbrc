@@ -33,27 +33,6 @@ end
 if IRB.rails_root
   # Rails
   IRB.conf[:HISTORY_FILE] = File.join(IRB.rails_root,'tmp','irb_history.rb')
-  module ActiveRecord
-    class Base
-      def self.[](*args)
-        find(*args)
-      end
-      def self.each(*args,&block)
-        find(:all, *args).each(&block)
-      end
-      def self.first(*args)
-        find(:first, *args)
-      end
-      extend Enumerable
-      def self.sum(*args)
-        if !block_given? && args[0].respond_to?(:to_sym)
-          ActiveRecord::Calculations::ClassMethods.instance_method(:sum)
-        else
-          Enumerable.instance_method(:sum)
-        end.bind(self).call(*args)
-      end
-    end
-  end
   desire 'rails_ext'
 else
   desire 'active_support'
@@ -66,75 +45,6 @@ $KCODE = 'UTF8' if RUBY_VERSION =~ /^1\.8/ && (RUBY_PLATFORM =~ /mswin32/ || ENV
   # require 'pp'
   # PrettyPrint.send(:pp, *args)
 # end
-
-class Object
-
-  def doc(method = nil)
-    method = ri_topic(method) unless method.to_s =~ /[#:]/
-    exec_ri(method.to_s)
-  end
-
-  private
-  def ri_topic(method = nil)
-    return self.class.to_s unless method
-    self.class.ancestors.each do |anc|
-      if anc.instance_methods(false).include?(method.to_s)
-        return anc == Kernel ? "#{method}" : "#{anc}##{method}"
-      end
-    end
-    self.class.ancestors.each do |anc|
-      if anc.private_instance_methods(false).include?(method.to_s)
-        return "#{anc}##{method}"
-      end
-    end
-    return "#{self.class}##{method}"
-  end
-
-  def exec_ri(*args)
-    system('ri','-f','bs',*args)
-  end
-
-end
-
-class Module
-
-  def doc!(method = nil)
-    if method
-      klass = ancestors.detect do |anc|
-        anc.instance_methods(false).include?(method.to_s)
-      end
-      exec_ri("#{klass||self}##{method}")
-    else
-      exec_ri(to_s)
-    end
-  end
-
-  private
-
-  def ri_topic(method = nil)
-    if method.to_s == "new"
-      ancestors.each do |anc|
-        if anc.private_instance_methods(false).include?('initialize')
-          return "#{anc}::#{method}"
-        end
-      end
-    end
-    if method
-      ancestors.each do |anc|
-        if anc.methods(false).include?(method.to_s)
-          return "#{anc}::#{method}"
-        end
-      end
-    end
-    super
-  end
-
-  def method_missing(method,*args)
-    super unless args.empty?
-    doc! method or super
-  end if false
-
-end
 
 module Enumerable
   def count_by(&block)
