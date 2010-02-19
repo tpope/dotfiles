@@ -5,6 +5,7 @@ endif
 Abolish afterword{,s}                         afterward{}
 Abolish anomol{y,ies}                         anomal{}
 Abolish austrail{a,an,ia,ian}                 austral{ia,ian}
+Abolish cal{a,e}nder{,s}                      cal{e}ndar{}
 Abolish {c,m}arraige{,s}                      {}arriage{}
 Abolish {,in}consistan{cy,cies,t,tly}         {}consisten{}
 Abolish delimeter{,s}                         delimiter{}
@@ -26,7 +27,7 @@ Abolish reproducable                          reproducible
 Abolish resouce{,s}                           resource{}
 Abolish restraunt{,s}                         restaurant{}
 Abolish seperat{e,es,ed,ing,ely,ion,ions,or}  separat{}
-Abolish segument{,s}                          segment{}
+Abolish segument{,s,ed,ation}                 segment{}
 Abolish scflead     supercalifragilisticexpialidocious
 Abolish Tqbf        The quick, brown fox jumps over the lazy dog
 Abolish Lidsa       Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
