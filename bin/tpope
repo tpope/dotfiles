@@ -190,6 +190,10 @@ status() {
             rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
             *) echo "Unknown status command $1" >&2 ;;
         esac
+    elif [ -f "$HOME/.activity" -a "$1" = activity ]; then
+        exec cat "$HOME/.activity"
+    elif [ -f "$HOME/.away" -a "$1" = away ]; then
+        exec cat "$HOME/.away"
     elif ping -c 1 tpope.us >/dev/null 2>&1; then
         unset DISPLAY
         if [ "$#" = 2 -a -z "$2" ]; then
@@ -231,10 +235,13 @@ case "$basename" in
         *) exit 1 ;;
     esac ;;
 
-    chat|c) if [ -z "$*" ]; then
-            exec hostinfo -S michael -t '$HOME/.irssi/Chat-script' $hostname
+    chat|c)
+        if [ "$hostname" = maeby -a -z "$*" ]; then
+            "$HOME/.irssi/Chat-script" $hostname
+        elif [ -z "$*" ]; then
+            exec hostinfo -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname
         else
-            exec hostinfo -S michael -t '$HOME/.irssi/Chat-script' "$@"
+            exec hostinfo -S tpope.net -t '$HOME/.irssi/Chat-script' "$@"
         fi ;;
 
     clean) do_clean "$@" ;;
