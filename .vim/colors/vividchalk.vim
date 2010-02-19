@@ -1,8 +1,8 @@
 " Vim color scheme
 " Name:         vividchalk.vim
 " Author:       Tim Pope <vimNOSPAM@tpope.info>
+" Version:      2.0
 " GetLatestVimScripts: 1891 1 :AutoInstall: vividchalk.vim
-" $Id$
 
 " Based on the Vibrank Ink theme for TextMate
 " Distributable under the same terms as Vim itself (see :help license)
@@ -119,7 +119,7 @@ highlight Directory     none
 high link Directory     Identifier
 highlight ErrorMsg      guibg=Red ctermbg=DarkRed guifg=NONE ctermfg=NONE
 highlight Search        guifg=NONE ctermfg=NONE gui=none cterm=none
-call s:hibg("Search"    ,"#555555","Black",81)
+call s:hibg("Search"    ,"#555555","DarkBlue",81)
 highlight IncSearch     guifg=White guibg=Black ctermfg=White ctermbg=Black
 highlight MoreMsg       guifg=#00AA00 ctermfg=Green
 highlight LineNr        guifg=#DDEEFF ctermfg=White
