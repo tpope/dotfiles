@@ -35,7 +35,7 @@ if [ aliases = "$basename" ]; then
     vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix \
     word ord wor or Word Ord Wor Or"
     PATH=/usr/bin:/usr/sbin:/usr/local/bin
-    for app in apt-get aptitude emerge gem port diff cardctl rubber xdvi xpdf gv; do
+    for app in apt-get aptitude emerge port diff cardctl rubber xdvi xpdf gv; do
         [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
     done
     echo $aliases
@@ -637,7 +637,7 @@ case "$basename" in
             '') exec "$basename" "$@" ;;
             *) root_init; as_root exec "$basename" "$@" ;;
         esac ;;
-    emerge|port|gem) no_links
+    emerge|port) no_links
         case "$1" in
             search|show|help|server) exec "$basename" "$@" ;;
             *) root_init; as_root exec "$basename" "$@" ;;
