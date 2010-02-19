@@ -6,6 +6,7 @@ hardstatus on
 hardstatus lastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
 escape ^\\\ # Ctrl+\ as escape command.
 bindkey ^Q command
+bindkey ^Z command
 defnonblock on
 defscrollback 1024
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* WS=\E[8;%d;%dt
@@ -26,6 +27,7 @@ bind ^J next
 bind  k prev
 bind ^K prev
 bind  K kill
+bind  z stuff ^Z
 bind  ` select 0
 bind  S eval "height 50" "split"
 bind  Q eval "hardstatus message '%H:  %-Lw%34>[%n*%f %t]%+Lw'" "only" "height 24"
