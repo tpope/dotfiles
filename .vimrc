@@ -29,7 +29,7 @@ set display=lastline
 if has("eval")
   let &fileencodings = substitute(&fileencodings,"latin1","cp1252","")
 endif
-set grepprg=grep\ -nH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
+set grepprg=grep\ -rnH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
 if has("eval")
   let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 endif
