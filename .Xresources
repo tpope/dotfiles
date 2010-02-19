@@ -187,6 +187,10 @@ XTerm-white*VT100*color14: #00aaaa
 XTerm-white*VT100*color15: #000000
 
 !## RXVT {{{1
+#define UNIVGA -bolkhov-vga-medium-r-normal--16-*-*-*-c-80-UTFENC
+#define TERMINUS14 -*-terminus-medium-r-normal--14-*-*-*-c-*-UTFENC
+#define TERMINUS16 -*-terminus-medium-r-normal--16-*-*-*-c-*-UTFENC
+
 Rxvt*scrollBar:    false
 Rxvt*background:   #000000
 Rxvt*foreground:   #aaaaaa
@@ -214,7 +218,11 @@ Rxvt*cursorColor:  #90c090
 URxvt.cursorColor: #90c0c0
 URxvt.underlineColor: #777777
 !URxvt.termName:    rxvt
+#if WIDTH > 1450
+URxvt*keysym.C-F1: command:\033]710;TERMINUS16,UTFFONT\007
+#else
 URxvt*keysym.C-F1: command:\033]710;UTFFONT\007
+#endif
 URxvt*keysym.C-F2: command:\033]710;FIXED-normal--6-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F3: command:\033]710;FIXED-normal--7-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F4: command:\033]710;FIXED-normal--8-*-*-*-c-*-UTFENC\007
@@ -223,10 +231,8 @@ URxvt*keysym.C-F5: command:\033]710;FIXED-normal--10-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F6: command:\033]710;FIXED-semicondensed--13-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F7: command:\033]710;FIXED-normal--13-*-*-*-c-*-UTFENC\007
 !URxvt*keysym.C-F8: command:\033]710;FIXED-normal--14-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F8: command:\033]710;FIXED-normal--13-*-*-*-c-80-UTFENC\007
-!URxvt*keysym.C-F8: command:\033]710;xft:Mono:pixelsize=13:antialias=false\007
-!URxvt*keysym.C-F9: command:\033]710;FIXED-normal--15-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F9: command:\033]710;-b&h-lucidatypewriter-medium-r-normal-sans-14-*-*-*-m-80-UTFENC\007
+URxvt*keysym.C-F8: command:\033]710;TERMINUS14,FIXED-normal--13-*-*-*-c-80-UTFENC\007
+URxvt*keysym.C-F9: command:\033]710;TERMINUS16,FIXED-normal--18-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F10:command:\033]710;FIXED-normal--18-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
@@ -235,7 +241,12 @@ URxvt*keysym.C-0:  command:\033]721;12\007
 URxvt.keysym.C-comma:  perl:dabbrev-expand:\\\\w
 URxvt.keysym.C-period: perl:dabbrev-expand:\\\\w./-
 URxvt.keysym.C-equal:  perl:matcher
+URxvt.keysym.C-grave:  perl:matcher:list
+#if WIDTH > 1450
+URxvt.font: TERMINUS16,UTFFONT
+#else
 URxvt.font:        UTFFONT
+#endif
 URxvt.boldFont:
 URxvt.perl-lib:    HOME/perl/urxvt:HOME/.perl/urxvt
 URxvt.perl-ext:    default,searchable-scrollback<C-S-plus>,matcher<C-1>,dabbrev-expand,selection-pastebin,remote-clipboard,selection-autotransform
@@ -256,6 +267,7 @@ URxvt.remote-selection.fetch: ssh tpope.us 'cat /tmp/distributed-selection'
 URxvt.selection-autotransform.0: if(/\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/) { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; };
 URxvt.selection-autotransform.1: if(/^irb.*?> /) { s{^irb.*?[>*]\\s*}{}mg; s/\\n=>/ #=>/mg; s{\\n$}{};}
 URxvt.selection-autotransform.2: if(m{^[ab]/}) { s{^[ab]/}{}g; }
+URxvt.selection-autotransform.3: s/^([^:\\s]*):(\\d+)(:|:in)?$/+$2 $1/g;
 
 !## OTHER TERMINALS {{{1
 Aterm*cursorColor:#c09090
