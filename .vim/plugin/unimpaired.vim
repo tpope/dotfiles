@@ -1,6 +1,6 @@
-" unimpaired.vim - Pairs of handy bracket maps
+" unimpaired.vim - Pairs of handy bracket mappings
 " Maintainer:   Tim Pope <vimNOSPAM@tpope.org>
-" Version:      1.0
+" Version:      1.1
 
 if exists("g:loaded_unimpaired") || &cp || v:version < 700
   finish
@@ -13,11 +13,16 @@ set cpo&vim
 " Next and previous {{{1
 
 function! s:MapNextFamily(map,cmd)
-    let end = ' ".(v:count ? v:count : "")<CR>'
-    execute 'nnoremap <silent> ['.        a:map .' :<C-U>exe "'.a:cmd.'previous'.end
-    execute 'nnoremap <silent> ]'.        a:map .' :<C-U>exe "'.a:cmd.'next'    .end
-    execute 'nnoremap <silent> ['.toupper(a:map).' :<C-U>exe "'.a:cmd.'first'   .end
-    execute 'nnoremap <silent> ]'.toupper(a:map).' :<C-U>exe "'.a:cmd.'last'    .end
+  let map = '<Plug>unimpaired'.toupper(a:map)
+  let end = ' ".(v:count ? v:count : "")<CR>'
+  execute 'nmap <silent> '.map.'Previous :<C-U>exe "'.a:cmd.'previous'.end
+  execute 'nmap <silent> '.map.'Next     :<C-U>exe "'.a:cmd.'next'.end
+  execute 'nmap <silent> '.map.'First    :<C-U>exe "'.a:cmd.'first'.end
+  execute 'nmap <silent> '.map.'Last     :<C-U>exe "'.a:cmd.'last'.end
+  execute 'nmap <silent> ['.        a:map .' '.map.'Previous'
+  execute 'nmap <silent> ]'.        a:map .' '.map.'Next'
+  execute 'nmap <silent> ['.toupper(a:map).' '.map.'First'
+  execute 'nmap <silent> ]'.toupper(a:map).' '.map.'Last'
 endfunction
 
 call s:MapNextFamily('a','')
@@ -36,8 +41,10 @@ function! s:FileByOffset(num)
   elseif dir != ''
     let dir .= '/'
   endif
-  let files = split(glob(dir.".*[^~.]"),"\n")
-  let files += split(glob(dir."*[^~]"),"\n")
+  let files = split(glob(dir.".*"),"\n")
+  let files += split(glob(dir."*"),"\n")
+  call filter(files,'v:val !=# "." && v:val !=# ".."')
+  call filter(files,'v:val[-4:-1] !=# ".swp" && v:val[-1:-1] !=# "~"')
   if a:num < 0
     call reverse(sort(filter(files,'v:val < original')))
   else
@@ -48,19 +55,30 @@ function! s:FileByOffset(num)
   return file
 endfunction
 
-nnoremap <silent> ]o :<C-U>edit `=<SID>FileByOffset(v:count1)`<CR>
-nnoremap <silent> [o :<C-U>edit `=<SID>FileByOffset(-v:count1)`<CR>
+nnoremap <silent> <Plug>unimpairedONext     :<C-U>edit `=<SID>FileByOffset(v:count1)`<CR>
+nnoremap <silent> <Plug>unimpairedOPrevious :<C-U>edit `=<SID>FileByOffset(-v:count1)`<CR>
+
+nmap ]o <Plug>unimpairedONext
+nmap [o <Plug>unimpairedOPrevious
 
 " }}}1
 " Line operations {{{1
 
-nnoremap <silent> [<Space> :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
-nnoremap <silent> ]<Space> :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
+nnoremap <silent> <Plug>unimpairedBlankUp   :<C-U>put!=repeat(nr2char(10),v:count)<Bar>']+1<CR>
+nnoremap <silent> <Plug>unimpairedBlankDown :<C-U>put =repeat(nr2char(10),v:count)<Bar>'[-1<CR>
 
-nnoremap <silent> [e       m`:move--<CR>``
-nnoremap <silent> ]e       :<C-U>exe 'norm m`'<Bar>exe 'move+'.v:count1<CR>``
-xnoremap <silent> [e       m`:move--<CR>``
-xnoremap <silent> ]e       m`:move'>+<CR>``
+nmap [<Space> <Plug>unimpairedBlankUp
+nmap ]<Space> <Plug>unimpairedBlankDown
+
+nnoremap <silent> <Plug>unimpairedMoveUp   :<C-U>exe 'norm m`'<Bar>exe 'move--'.v:count1<CR>``
+nnoremap <silent> <Plug>unimpairedMoveDown :<C-U>exe 'norm m`'<Bar>exe 'move+'.v:count1<CR>``
+xnoremap <silent> <Plug>unimpairedMoveUp   :<C-U>exe 'norm m`'<Bar>exe '''<,''>move--'.v:count1<CR>``
+xnoremap <silent> <Plug>unimpairedMoveDown :<C-U>exe 'norm m`'<Bar>exe '''<,''>move''>+'.v:count1<CR>``
+
+nmap [e <Plug>unimpairedMoveUp
+nmap ]e <Plug>unimpairedMoveDown
+xmap [e <Plug>unimpairedMoveUp
+xmap ]e <Plug>unimpairedMoveDown
 
 " }}}1
 " Encoding and decoding {{{1
