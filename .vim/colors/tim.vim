@@ -1,7 +1,7 @@
 " Vim color file
 " File:         ~/.vim/colors/tim.vim
 " Author:       Tim Pope <vimNOSPAM@tpope.info>
-" Last Change:  2007 Oct 01
+" Last Change:  2011 May 02
 
 if version>600
   hi clear
@@ -44,11 +44,6 @@ if &background=="light"
   "hi TabLineSel term=bold cterm=none gui=bold
   hi StatusLine term=bold,inverse cterm=none ctermfg=White ctermbg=0
   hi StatusLineNC term=bold,inverse cterm=none ctermfg=grey ctermbg=Black
-  hi User1 ctermfg=LightBlue ctermbg=Black gui=bold guifg=DodgerBlue guibg=Black
-  hi User2 ctermfg=LightGreen ctermbg=Black gui=bold guifg=Green guibg=Black
-  hi User3 ctermfg=Yellow ctermbg=Black gui=bold guifg=Yellow guibg=Black
-  hi User4 ctermfg=LightRed ctermbg=Black gui=bold guifg=IndianRed1 guibg=Black
-  hi User5 ctermfg=LightCyan ctermbg=Black gui=bold guifg=Cyan guibg=Black
   hi SpellErrors ctermfg=Red guifg=Red cterm=underline gui=underline term=reverse
   hi MatchParen  term=reverse ctermbg=LightCyan guibg=Cyan
   " }}}1
@@ -75,19 +70,9 @@ else
   if &t_Co > 8
     hi StatusLine term=bold,reverse ctermbg=White ctermfg=Black cterm=none guifg=White
     hi StatusLineNC term=reverse ctermbg=Grey ctermfg=Black cterm=none guifg=White
-    hi User1   term=bold,reverse ctermbg=White ctermfg=DarkBlue gui=bold guifg=Blue guibg=White
-    hi User2   term=bold,reverse ctermbg=White ctermfg=DarkGreen gui=bold guifg=DarkGreen guibg=White
-    hi User3   term=bold,reverse ctermbg=White ctermfg=Brown gui=bold guifg=Brown guibg=White
-    hi User4   term=bold,reverse ctermbg=White ctermfg=DarkRed gui=bold guifg=Red guibg=White
-    hi User5   term=bold,reverse ctermbg=White ctermfg=DarkCyan gui=bold guifg=DarkCyan guibg=White
   elseif &t_Co > 2
     hi StatusLine term=bold,reverse cterm=bold,reverse ctermfg=White ctermbg=Black guifg=White
     hi StatusLineNC term=reverse cterm=reverse ctermfg=Grey guifg=White
-    hi User1   term=bold,reverse cterm=reverse ctermfg=White ctermbg=Blue gui=bold guifg=Blue guibg=White
-    hi User2   term=bold,reverse cterm=reverse ctermfg=White ctermbg=DarkGreen gui=bold guifg=DarkGreen guibg=White
-    hi User3   term=bold,reverse cterm=reverse ctermfg=White ctermbg=Brown gui=bold guifg=Brown guibg=White
-    hi User4   term=bold,reverse cterm=reverse ctermfg=White ctermbg=Red gui=bold guifg=Red guibg=White
-    hi User5   term=bold,reverse cterm=reverse ctermfg=White ctermbg=DarkCyan gui=bold guifg=DarkCyan guibg=White
   endif
   hi SpellLocal  ctermbg=DarkGreen
   hi SpellErrors ctermfg=LightRed guifg=Red cterm=underline gui=underline term=reverse
