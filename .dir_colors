@@ -82,8 +82,6 @@ EXEC 01;32
 .CMD 00;32
 .class 00;32
 .sh 00;32
-.pl 00;32
-.py 00;32
 
 # archives or compressed (bright red)
 .arj 01;31
@@ -108,48 +106,6 @@ EXEC 01;32
 .cab 01;31
 .CAB 01;31
 
-# image formats
-.jpg 01;35
-.JPG 01;35
-.jpeg 01;35
-.JPEG 01;35
-.png 01;35
-.gif 01;35
-.bmp 01;35
-.pbm 01;35
-.pgm 01;35
-.pnm 01;35
-.ppm 01;35
-.tga 01;35
-.xbm 01;35
-.xpm 01;35
-.tif 01;35
-.xcf 01;35
-.ico 01;35
-
-# video formats
-.mpg 01;35
-.MPG 01;35
-.mpeg 01;35
-.avi 01;35
-.AVI 01;35
-.asf 01;35
-.wmv 01;35
-.rm 01;35
-.mov 01;35
-
-# sound formats
-.wav 01;35
-.au 01;35
-.mp3 01;35
-.ogg 01;35
-.pvf 01;35
-.ra 01;35
-.ram 01;35
-.pls 01;35
-.m3u 01;35
-.wma 01;35
-
 # backup and temporary files
 *~ 01;30
 *- 01;30
@@ -170,63 +126,19 @@ EXEC 01;32
 .idx 01;30
 .blg 01;30
 
-# config files
-.conf 00;36
-.config 00;36
-.cnf 00;36
-*Conf 00;36
-*Config 00;36
-.cfg 00;36
-.CFG 00;36
-.ini 00;36
-.INI 00;36
-
 # system libraries, etc.
 .so 00;33
 .o 00;33
 .a 00;33
 .dll 00;33
 
-# data and help files
-.dat 00;35
-.DAT 00;35
-.db 00;35
-.DB 00;35
-.dba 00;35
-.pdb 00;33
-.PDB 00;33
-
-#.0 00;33
-#.1 00;33
-#.2 00;33
-#.3 00;33
-#.4 00;33
-#.5 00;33
-#.6 00;33
-#.7 00;33
-#.8 00;33
-#.9 00;33
-
 # text and document files
-.TXT 01;33
-.htm 01;33
-*html 01;33
-.css 01;33
-.xml 01;33
 .pdf 01;33
 .dvi 01;33
 .ps 01;33
 .eps 01;33
-.tex 01;33
-.bib 01;33
 
-# source code
-.c 00;31
-.cpp 00;31
-.c++ 00;31
-.cc 00;31
-.C 00;31
-.h 00;31
+# patches
 .diff 00;31
 .patch 00;31
 
@@ -238,7 +150,3 @@ EXEC 01;32
 *core 01;37
 .lnk 01;36
 .url 01;36
-
-# needs to come first
-*rc 00;36
-
