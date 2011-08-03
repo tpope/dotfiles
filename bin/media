@@ -38,6 +38,17 @@ mediaaction() {
 	    [Rr]ew)    perl -MXmms -e "time '-$time'" ;;
 	esac
 	return 0
+    elif pidof amarok >/dev/null 2>&1; then
+	exec >/dev/null 2>&1
+	case "$1" in
+            [Qq]uit)   pkill amarok ;;
+            [Ss]top)   amarok --stop ;;
+	    [Pp]lay|[Rr]esume) amarok --play ;;
+	    [Pp]ause)  amarok --pause ;;
+	    [Tt]oggle) amarok --play-pause ;;
+	    [Nn]ext)   amarok --next ;;
+	esac
+	return 0
     elif [ -p "/tmp/.TV-$USER/tvtimefifo-`hostname`" ] && pidof tvtime >/dev/null 2>&1; then
 	exec >/dev/null 2>&1
 	case "$1" in
