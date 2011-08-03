@@ -32,7 +32,7 @@ if [ aliases = "$basename" ]; then
     # Optimization: put this early since it is called for every shell
     aliases="launch lt lv dm pg gp sb b e p t c dl sursync ruptime rwho status \
     rclink rc start stop restart reload force-reload mount shutdown tomorrow \
-    vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix \
+    vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix swap \
     word ord wor or Word Ord Wor Or"
     PATH=/usr/bin:/usr/sbin:/usr/local/bin
     for app in apt-get aptitude emerge port diff cardctl rubber xdvi xpdf gv; do
@@ -462,6 +462,13 @@ case "$basename" in
             exec sensible-editor "$@"
         fi
     ;;
+
+    swap)
+        set -e
+        mv "$2" "$1.$$"
+        mv "$1" "$2"
+        mv "$1.$$" "$1"
+        ;;
 
     x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
