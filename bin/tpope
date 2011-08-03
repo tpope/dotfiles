@@ -236,7 +236,7 @@ case "$basename" in
     esac ;;
 
     chat|c)
-        if [ "$hostname" = maeby -a -z "$*" ]; then
+        if [ "$hostname" = roxy -a -z "$*" ]; then
             "$HOME/.irssi/Chat-script" $hostname
         elif [ -z "$*" ]; then
             exec hostinfo -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname

@@ -27,7 +27,7 @@ interactive=1
 #domains=(`egrep '^(search|domain)' /etc/resolv.conf 2>/dev/null`)
 #[[ -z $domains ]] || shift 1 domains
 
-boxen=(michael gob tobias lindsay)
+boxen=(matthew todd lucas gideon)
 if [ -d "$HOME/friends" ]; then
     for host in $boxen; do
         [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
@@ -55,7 +55,7 @@ fi
 
 namedir() { export $1=$PWD; : ~$1 }
 
-friends=($boxen buster maeby grex)
+friends=($boxen roxy grex)
 
 #for host in $domains; do
 #    boxen=(${boxen%.$host})

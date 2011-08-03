@@ -74,16 +74,16 @@ fi
 
 [ -n "$ALL_HOSTS" ] || simpson=1
 if [ -n "$simpson" ]; then
-	MY_HOSTS="$MY_HOSTS gob lindsay tobias michael"
-	ALL_HOSTS="$ALL_HOSTS maeby buster gob lindsay tobias michael"
-	LOCAL_HOSTS="$LOCAL_HOSTS gob lindsay tobias michael"
+	MY_HOSTS="$MY_HOSTS gideon lucas todd matthew"
+	ALL_HOSTS="$ALL_HOSTS roxy gideon lucas todd matthew"
+	LOCAL_HOSTS="$LOCAL_HOSTS gideon lucas todd matthew"
 fi
 
 if [ -n "$git" ]; then
     umask 022
     mkdir /tmp/tpope-$$
     cd /tmp/tpope-$$
-    git clone maeby:/var/cache/git/tpope.git >/dev/null || exit 1
+    git clone roxy:/var/cache/git/tpope.git >/dev/null || exit 1
     cd tpope
     tar_out | tar xf -
     if [ "commit" = "$git" ]; then
