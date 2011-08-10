@@ -83,6 +83,21 @@ xmap ]e <Plug>unimpairedMoveDown
 " }}}1
 " Encoding and decoding {{{1
 
+function! s:LatexEncode(str)
+  let map = {'_': '\_', '$': '\$', '{': '\{', '}': '\}', '&': '\&', '\': '\textbackslash'}
+  return substitute(a:str,'.','\=get(map,submatch(0),submatch(0))','g')
+endfunction
+
+function! s:LatexDecode(str)
+  let map = {'n': "\n", 'r': "\r", 't': "\t", 'b': "\b", 'f': "\f", 'e': "\e", 'a': "\001", 'v': "\013", '"': '"', '\': '\', "'": "'"}
+  let str = a:str
+  if str =~ '^\s*".\{-\}\\\@<!\%(\\\\\)*"\s*\n\=$'
+    let str = substitute(substitute(str,'^\s*\zs"','',''),'"\ze\s*\n\=$','','')
+  endif
+  let str = substitute(str,'\\n\%(\n$\)\=','\n','g')
+  return substitute(str,'\\\(\o\{1,3\}\|x\x\{1,2\}\|u\x\{1,4\}\|.\)','\=get(map,submatch(1),nr2char("0".substitute(submatch(1),"^[Uu]","x","")))','g')
+endfunction
+
 function! s:StringEncode(str)
   let map = {"\n": 'n', "\r": 'r', "\t": 't', "\b": 'b', "\f": '\f', '"': '"', '\': '\'}
   return substitute(a:str,"[\001-\033\\\\\"]",'\="\\".get(map,submatch(0),printf("%03o",char2nr(submatch(0))))','g')
@@ -246,6 +261,8 @@ function! s:MapTransform(algorithm, key)
   exe 'nmap '.a:key.a:key[strlen(a:key)-1].' <Plug>unimpairedLine'.a:algorithm
 endfunction
 
+call s:MapTransform('LatexEncode','[Y')
+call s:MapTransform('LatexDecode',']Y')
 call s:MapTransform('StringEncode','[y')
 call s:MapTransform('StringDecode',']y')
 call s:MapTransform('UrlEncode','[u')
