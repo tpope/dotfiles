@@ -2,11 +2,6 @@ old_current = $LOAD_PATH.pop if $LOAD_PATH.last == '.'
 %w(.ruby/lib .ruby src/ruby/lib).each do |dir|
   $LOAD_PATH.unshift(File.expand_path("~/#{dir}"))
 end
-%w(~/src/ruby/libs/* ~/src/ruby/vendor/*).map {|d| Dir[File.expand_path(d)]}.flatten.each do |dir|
-  if File.directory?("#{dir}/lib")
-    $LOAD_PATH << "#{dir}/lib"
-  end
-end
 $LOAD_PATH << old_current if old_current
 
 $LOAD_PATH.uniq!
@@ -24,13 +19,13 @@ module Kernel
   end
 
   def r(*objects)
-    raise RuntimeError, objects.map{|o|o.inspect}.join("\n"), caller
+    raise RuntimeError, objects.map { |o| o.inspect }.join("\n"), caller
   end
 end
 
 class Symbol
   def to_proc
-    Proc.new { |*args| args.shift.__send__(self,*args) }
+    Proc.new { |*args| args.shift.__send__(self, *args) }
   end unless method_defined?(:to_proc)
 end
 
@@ -40,18 +35,9 @@ class Integer
   end
 end
 
-module Enumerable
-  def reduce(op,arg=nil)
-    b = lambda { |m,o| m.send(op,o) }
-    arg.nil? ? inject(&b) : inject(arg,&b)
-  end unless method_defined?(:reduce)
-end
-
 class Object
 
-  def __class__
-    Kernel.instance_method(:class).bind(self).call
-  end
+  alias __class__ class
 
   def tap
     yield(self) if block_given?
@@ -64,11 +50,6 @@ class Object
 
   def meta_eval(&block)
     metaclass.instance_eval(&block)
-  end
-
-  def returning(value)
-    yield(value)
-    value
   end
 
   def ls(object = self)
@@ -90,6 +71,7 @@ end
 class Time
   PROCESS_ATTRIBUTES = [:utime, :stime, :cutime, :cstime, :other]
   Process = Struct.new(*PROCESS_ATTRIBUTES)
+
   class Process
     def inspect
       final = "#<#{self.class.inspect} "
@@ -100,10 +82,11 @@ class Time
       final << ">"
     end
   end
+
   def self.measure(count = 1, &block)
     attrs = PROCESS_ATTRIBUTES[0..-2]
-    sum  = lambda {|pt| attrs.map {|a| pt[a]}.inject(&:+)}
-    diff = lambda {|o1,o2,method,c| (o2.send(method)-o1.send(method))/c }
+    sum  = lambda { |pt| attrs.map {|a| pt[a]}.inject(&:+)}
+    diff = lambda { |o1,o2,method,c| (o2.send(method)-o1.send(method))/c }
     t1 = Time.now
     p1 = ::Process.times
     count.times(&block)
@@ -125,23 +108,6 @@ module IRB
   end
 end
 
-module Tpope
-  def self.status
-    `tpope status`.chomp
-  end
-  def self.const_missing(const)
-    begin
-      require File.join('tpope',const.to_s.downcase)
-    rescue LoadError
-    end
-    if const_defined?(const)
-      const_get(const)
-    else
-      super
-    end
-  end
-end
-
 class String
   def checksum
     t = 0
@@ -150,9 +116,10 @@ class String
     end
     t & 255
   end
+
   if RUBY_VERSION == '1.8.7' && method_defined?(:chars)
     undef chars
-    def chars(*args,&block)
+    def chars(*args, &block)
       ActiveSupport::Multibyte::Chars.new(self)
     end
   end
