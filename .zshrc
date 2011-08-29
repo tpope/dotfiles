@@ -12,7 +12,7 @@ if [[ $ZSH_VERSION == 4.<->* ]]; then
     setopt histexpiredupsfirst histreduceblanks
 fi
 
-fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc)
+fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc ~/.rvm/scripts/zsh/Completion)
 watch=(notme)
 [ -f "$HOME/.friends" ] && watch=(`cat "$HOME/.friends"`)
 HISTSIZE=100
@@ -22,7 +22,8 @@ periodic() { rehash }
 
 export ENV="$HOME/.shrc"
 interactive=1
-. $ENV
+. "$ENV"
+[ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
 
 #domains=(`egrep '^(search|domain)' /etc/resolv.conf 2>/dev/null`)
 #[[ -z $domains ]] || shift 1 domains

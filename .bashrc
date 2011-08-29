@@ -4,6 +4,7 @@
 export ENV="$HOME/.shrc"
 . "$ENV"
 unset interactive
+[ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
 
 if [ "$PS1" ]; then
 # If running interactively, then:
