@@ -1,39 +1,38 @@
 # ~/.fvwm/FvwmScript-Date
 
-WindowTitle {FvwmScript-Hidden}
-WindowSize 72 16
+# WindowTitle {FvwmScript-Hidden}
+WindowSize 108 16
 ForeColor {Black}
 
 # the following should be commented out if the Calendar is used outside
 # of FvwmButtons
-WindowPosition -71 -15
+WindowPosition -87 -15
 
 Init
  Begin
-  Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
+  Set $date =(GetOutput {exec date '+%Y-%m-%d %H:%M'} 1 -1)
   ChangeTitle 1 $date
   ChangeFont  1 "-adobe-helvetica-medium-r-*--12-*-*-*-p-*-iso8859-1"
  End
 
 PeriodicTasks
  Begin
-  If (RemainderOfDiv (GetTime) 600)==0 Then
-   Set $date =(GetOutput {exec date '+%Y-%m-%d'} 1 -1)
-  If (RemainderOfDiv (GetTime) 600)==0 Then
+  If (RemainderOfDiv (GetTime) 60)==0 Then
+   Set $date =(GetOutput {exec date '+%Y-%m-%d %H:%M'} 1 -1)
+  If (RemainderOfDiv (GetTime) 60)==0 Then
    ChangeTitle 1 $date
  End
 
 Widget 1
 Property
- Position 0 0
- Size 72 16
+ Position -3 -1
+ Size 108 16
  Type ItemDraw
  Flags Center NoReliefString
- Title {YYYY-mm-dd}
+ Title {YYYY-mm-dd HH:MM}
 Main
  Case message of
   SingleClic :
   Begin
   End
 End
-

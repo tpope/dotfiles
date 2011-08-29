@@ -68,17 +68,16 @@ PipeRead "if fvwm --version >/dev/null 2>&1; then echo Fvwm25; else echo Fvwm24;
 #DestroyModuleConfig FvwmTheme: *
 CleanupColorsets
 #*FvwmTheme:
-#Colorset 6 DGradient 256 LightSteelBlue SteelBlue, fg black, bg LightSteelBlue
-SetEnv BACK       #666
-SetEnv FORE       #BBB
-SetENV FORESHAD   #555
-SetEnv HIBACK     #AAA
+SetEnv BACK       #C9C9C9
+SetEnv FORE       #777
+SetEnv FORESHAD   #999
+SetEnv HIBACK     #B3B3B3
 SetEnv HIFORE     #000
 SetEnv HIFORESHAD #FFF
 
 Colorset 1 fg $[FORE], fgsh $[BACK], bg $[BACK], Transparent, IconAlpha 60
 Colorset 2 fg $[HIFORE], fgsh $[HIBACK], bg $[HIBACK], IconAlpha 100
-Colorset 3 fg Black, fgsh $[HIFORESHAD], bg #DDD, IconAlpha 50
+Colorset 3 fg Black, fgsh White, bg $[BACK], IconAlpha 50
 PipeRead '\
 fvwm --version >/dev/null 2>&1 || ft="*FvwmTheme:"; \
 if xdpyinfo 2>&1|grep "depth of root window: *[23]" >/dev/null; then \
@@ -290,6 +289,7 @@ Style Firefox-bin       UseStyle www-browser, MiniIcon mozilla.mini.xpm
 Style Navigator         UseStyle www-browser, MiniIcon mini.netscape.xpm
 Style Opera             UseStyle www-browser, MiniIcon opera.xpm
 Style Google-chrome     UseStyle www-browser
+Style Chromium-browser  UseStyle www-browser
 Style Galeon            UseStyle www-browser
 Style dillo             UseStyle www-browser
 Style links             UseStyle www-browser
@@ -311,6 +311,7 @@ Style Xawtv     UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style aumix     UseStyle Media, MiniIcon aumix.mini.xpm
 Style Inkscape  UseStyle Media
+Style Amarok    UseStyle Media
 
 # }}}2
 # Game Styles {{{2
@@ -443,7 +444,7 @@ AddToFunc FuncFindEditor
 
 DestroyFunc FuncFindMediaProgram
 AddToFunc FuncFindMediaProgram
-+ I FuncFindResource "Gimp|Inkscape|feh|MPlayer|xmms|Xawtv|tvtime|aumix"
++ I FuncFindResource "Gimp|Inkscape|feh|MPlayer|xmms|Amarok|Xawtv|tvtime|aumix"
 
 # }}}2
 # Applications {{{2
@@ -1023,24 +1024,15 @@ Key C           A   4   Exec exec tpope media toggle
 Key V           A   4   Exec exec tpope media stop
 Key B           A   4   Exec exec tpope media next
 
-Key XF86AudioLowerVolume A A Exec exec aumix -w -5
-Key XF86AudioRaiseVolume A A Exec exec aumix -w +5
+Key XF86AudioLowerVolume A A Exec exec amixer set Master 5%-
+Key XF86AudioRaiseVolume A A Exec exec amixer set Master 5%+
 Key Home        A   4   Exec exec aumix -w +5
 Key End         A   4   Exec exec aumix -w -5
 Key Home        A   5   Exec exec aumix -v +5
 Key End         A   5   Exec exec aumix -v -5
-Key XF86BrightnessAdjust A A Exec exec xbacklight -steps 1 +20
-Key XF86ContrastAdjust   A A Exec exec xbacklight -steps 1 -20
 
 Key Execute     A   A   Exec exec tpope media toggle
 Key Cancel      A   A   Exec exec tpope media stop
-#Key leftanglebracket A A Exec exec tpope media prev
-#Key rightanglebracket A A Exec exec tpope media next
-#Key XF86Back A  A       FakeKeypress modifiers 1 press Left
-#Key XF86Forward A  A    FakeKeypress modifiers 1 press Right
-Key XF86Back    A   A   Exec sleep .5; exec xte 'keydown Meta_L' 'key Left' 'keyup Meta_L'
-Key XF86Forward A   A   Exec sleep .5; exec xte 'keydown Meta_L' 'key Right' 'keyup Meta_L'
-Key XF86Go      A   A   Exec sleep .5; exec xte 'keydown Meta_L' 'key Right' 'keyup Meta_L'
 Key XF86Standby   A A   Exec exec xscreensaver-command -activate
 Key XF86AudioStop A A   Exec exec media stop
 Key XF86AudioPlay A A   Exec exec media toggle
@@ -1413,6 +1405,7 @@ DestroyMenu MenuFvwmMultimedia
 AddToMenu MenuFvwmMultimedia "Multimedia" Title
 + MissingSubmenuFunction FuncMenuMusic
 + "&Aumix%aumix.mini.xpm%"      Exec exec aumix
+FuncAddIfExists MenuFvwmMultimedia "Pa&vucontrol%menu/monitoring.xpm%" pavucontrol
 + "&Gimp%menu/gimp.xpm%"        FuncExec Gimp "exec gimp"
 FuncAddIfExists MenuFvwmMultimedia "In&kscape%mini.inkscape.png%" inkscape
 PipeRead 'if [ -x "`which tvtime 2>/dev/null`" ]; then \
@@ -1423,7 +1416,9 @@ echo "+ \\"Xaw&TV%menu/graphics.xpm%\\" Exec exec xawtv"; fi'
 PipeRead 'if [ -x "`which beep-media-player 2>/dev/null`" ]; then \
 echo "+ \\"Beep &Media Player%menu/music.xpm%\\" Exec exec beep-media-player -m"; \
 elif [ -x "`which xmms 2>/dev/null`" ]; then \
-echo "+ \\"X&MMS%menu/music.xpm%\\" Exec exec xmms -m"; fi'
+echo "+ \\"X&MMS%menu/music.xpm%\\" Exec exec xmms -m"; \
+elif [ -x "`which amarok 2>/dev/null`" ]; then \
+echo "+ \\"A&marok%menu/music.xpm%\\" Exec exec amarok"; fi'
 
 PipeRead 'if [ -x "`which gmplayer 2>/dev/null`" ]; then \
 echo "+ \\"MPlay&er%menu/video.xpm%\\" Exec exec gmplayer"; \
@@ -1840,7 +1835,7 @@ AddToFunc   FuncFvwmFormRun
 # Web Browser Functions {{{2
 DestroyFunc FuncFindWebBrowser
 AddToFunc FuncFindWebBrowser
-+ I FuncFindResource "WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|Google-chrome|konqueror|dillo"
++ I FuncFindResource "WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|Google-chrome|Chromium-browser|konqueror|dillo"
 
 DestroyFunc FuncFindOrLaunchWebBrowser
 AddToFunc FuncFindOrLaunchWebBrowser
@@ -1908,7 +1903,7 @@ AddToFunc FuncScreenXTerm
 
 DestroyFunc FuncSshXTerm
 AddToFunc FuncSshXTerm
-+ I Exec exec x-terminal-emulator -ut -name ssh@$0 -T ssh@$0 -e hostinfo -S $0 -t
++ I Exec exec x-terminal-emulator -ut -name ssh@$0 -T ssh@$0 -e hostinfo -S $0 -tX
 
 DestroyFunc FuncFindXTerm
 AddToFunc FuncFindXTerm
@@ -1927,6 +1922,8 @@ AddToFunc FuncMusicPlay
         echo Exec exec beep-media-player \\""$0"\\"; \
     elif [ -x "`which xmms 2>/dev/null`" ]; then \
         echo Exec exec xmms \\""$0"\\"; \
+    elif [ -x "`which amarok 2>/dev/null`" ]; then \
+        echo Exec exec amarok \\""$0"\\"; \
     fi'
 
 DestroyFunc FuncMenuMusic
@@ -2099,62 +2096,7 @@ AddToFunc AutohideHide
 # Modules Config {{{1
 # FvwmBacker Config {{{2
 
-#DestroyFunc FuncSetRootAPM
-#AddToFunc FuncSetRootAPM I Piperead "\
-# if test -x /usr/bin/apm && /usr/bin/apm 2>/dev/null | grep \
-#    'AC off-line, battery status high' >/dev/null 2>/dev/null; then \
-#  xsetroot -solid rgb:`expr substr 369 $0 1`0/`expr substr 369 $1 1`0/`expr substr 369 $2 1`0; \
-# elif test -x /usr/bin/apm && /usr/bin/apm 2>/dev/null | grep \
-#    'AC off-line, battery status ' >/dev/null 2>/dev/null; then \
-#  xsetroot -solid black; \
-# else \
-#  xsetroot -solid rgb:`expr substr 48C $0 1`0/`expr substr 48C $1 1`0/`expr substr 48C $2 1`0; \
-# fi >/dev/null 2>/dev/null"
-
-#DestroyModuleConfig FvwmBacker: *
-
-#*FvwmBacker: Command (Desk 0, Page 0 0) FuncSetRootAPM 0 1 1
-#*FvwmBacker: Command (Desk 0, Page 1 0) FuncSetRootAPM 0 1 2
-#*FvwmBacker: Command (Desk 0, Page 2 0) FuncSetRootAPM 0 1 3
-#*FvwmBacker: Command (Desk 0, Page 0 1) FuncSetRootAPM 0 2 1
-#*FvwmBacker: Command (Desk 0, Page 1 1) FuncSetRootAPM 0 2 2
-#*FvwmBacker: Command (Desk 0, Page 2 1) FuncSetRootAPM 0 2 3
-#*FvwmBacker: Command (Desk 0, Page 0 2) FuncSetRootAPM 0 3 1
-#*FvwmBacker: Command (Desk 0, Page 1 2) FuncSetRootAPM 0 3 2
-#*FvwmBacker: Command (Desk 0, Page 2 2) FuncSetRootAPM 0 3 3
-
-#*FvwmBacker: Command (Desk 1, Page 0 0) FuncSetRootAPM 1 1 0
-#*FvwmBacker: Command (Desk 1, Page 1 0) FuncSetRootAPM 1 2 0
-#*FvwmBacker: Command (Desk 1, Page 2 0) FuncSetRootAPM 1 3 0
-#*FvwmBacker: Command (Desk 1, Page 0 1) FuncSetRootAPM 2 1 0
-#*FvwmBacker: Command (Desk 1, Page 1 1) FuncSetRootAPM 2 2 0
-#*FvwmBacker: Command (Desk 1, Page 2 1) FuncSetRootAPM 2 3 0
-#*FvwmBacker: Command (Desk 1, Page 0 2) FuncSetRootAPM 3 1 0
-#*FvwmBacker: Command (Desk 1, Page 1 2) FuncSetRootAPM 3 2 0
-#*FvwmBacker: Command (Desk 1, Page 2 2) FuncSetRootAPM 3 3 0
-
-#*FvwmBacker: Command (Desk 2, Page 0 0) FuncSetRootAPM 1 0 1
-#*FvwmBacker: Command (Desk 2, Page 1 0) FuncSetRootAPM 2 0 1
-#*FvwmBacker: Command (Desk 2, Page 2 0) FuncSetRootAPM 3 0 1
-#*FvwmBacker: Command (Desk 2, Page 0 1) FuncSetRootAPM 1 0 2
-#*FvwmBacker: Command (Desk 2, Page 1 1) FuncSetRootAPM 2 0 2
-#*FvwmBacker: Command (Desk 2, Page 2 1) FuncSetRootAPM 3 0 2
-#*FvwmBacker: Command (Desk 2, Page 0 2) FuncSetRootAPM 1 0 3
-#*FvwmBacker: Command (Desk 2, Page 1 2) FuncSetRootAPM 2 0 3
-#*FvwmBacker: Command (Desk 2, Page 2 2) FuncSetRootAPM 3 0 3
-
-#Read FvwmBacker-Fancy Quiet
-DestroyModuleConfig FvwmBacker: *
-#*FvwmBacker: Command (Desk 0) -solid #018
-#*FvwmBacker: Command (Desk 1) -solid #027
-#*FvwmBacker: Command (Desk 2) -solid #036
-#*FvwmBacker: Command (Desk 3) -solid #045
-#*FvwmBacker: Command (Desk 4) -solid #054
-#*FvwmBacker: Command (Desk 5) -solid #063
-#*FvwmBacker: Command (Desk 6) -solid #072
-#*FvwmBacker: Command (Desk 7) -solid #081
-#*FvwmBacker: Command (Desk 8) -solid #090
-PipeRead 'for i in `seq 0 8`; do echo "*FvwmBacker: Command (Desk $i) Colorset 4$i"; done'
+Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) PipeRead 'for i in `seq 0 8`; do echo "*FvwmBacker: Command (Desk $i) Colorset 4$i"; done'
 
 # }}}2
 # FvwmButtons Config {{{2
@@ -2162,9 +2104,9 @@ SetEnv screen_width $[vp.width]
 # Dual head
 PipeRead 'if [ `expr $[vp.width] / $[vp.height]` -gt 2 ]; then echo SetEnv screen_width `expr $[vp.width] / 2`; fi'
 PipeRead 'echo SetEnv pager_width `expr 39 \\* $[vp.width] / $[vp.height] \\* 8 / 2`'
-PipeRead 'echo SetEnv right_width `expr $[pager_width] + 45`'
+PipeRead 'echo SetEnv right_width `expr $[pager_width] + 55`'
 PipeRead 'echo SetEnv right_inner_width `expr $[right_width] - 1`'
-PipeRead 'echo SetEnv width `expr $[screen_width] / 2 - 63 - $[pager_width]`'
+PipeRead 'echo SetEnv width `expr $[screen_width] / 2 - 73 - $[pager_width]`'
 # FvwmButtonsBottom Config {{{3
 #+-----+-----~-----+-------+-------+-------+--+----------+
 #| O O |FvwmIconMan|  1st  |       |  8th  |/\|YYYY-MM-DD|
@@ -2187,10 +2129,8 @@ DestroyModuleConfig FvwmButtonsBottom: *
 *FvwmButtonsBottom: (End)
 *FvwmButtonsBottom: ($[right_width]x20, Frame 0, Padding 1 1, Container(Columns $[right_inner_width], Rows 19, Frame 0, Padding 0 0))
 *FvwmButtonsBottom: ($[pager_width]x19, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsBottom: (8x8, Padding 3 3, Frame 1, Back $[fvwm_mybg], Panel(up, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 7")
-*FvwmButtonsBottom: (36x8, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Date" "Module FvwmScript FvwmScript-Date")
-*FvwmButtonsBottom: (20x11, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
-*FvwmButtonsBottom: (24x11, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
+*FvwmButtonsBottom: (54x7, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
+*FvwmButtonsBottom: (54x12, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --no-shrink")
 *FvwmButtonsBottom: (End)
 # }}}3
 # FvwmButtonsTop Config {{{3
@@ -2215,10 +2155,8 @@ DestroyModuleConfig FvwmButtonsTop: *
 *FvwmButtonsTop: (End)
 *FvwmButtonsTop: ($[right_width]x20, Frame 0, Padding 1 1, Container(Columns $[right_inner_width], Rows 19, Frame 0, Padding 0 0, Back $[fvwm_mybg]))
 *FvwmButtonsTop: ($[pager_width]x19, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsTop: (20x11, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Alert" "Module FvwmScript FvwmScript-Alert")
-*FvwmButtonsTop: (24x11, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Time" "Module FvwmScript FvwmScript-Time")
-*FvwmButtonsTop: (8x8, Padding 3 3, Frame 1, Back $[fvwm_mybg], Panel(down, indicator, position Module mlr right, steps 0) FvwmPagerSubPanel "Module FvwmPager FvwmPagerSubPanel 0 7")
-*FvwmButtonsTop: (36x8, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-Date" "Module FvwmScript FvwmScript-Date")
+*FvwmButtonsTop: (54x7, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
+*FvwmButtonsTop: (54x12, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --no-shrink")
 *FvwmButtonsTop: (End)
 # }}}3
 UnsetEnv screen_width
