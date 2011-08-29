@@ -5,7 +5,7 @@
 # bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
 # .zshrc, .bashrc, and .profile, respectively.
 
-for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin; do
+for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin"; do
     if [ -d "$dir" ]; then
         case "$PATH" in
             *"$dir"*) ;;

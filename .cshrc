@@ -7,7 +7,7 @@ if ( { test -t 1 } && $?TERM ) then
     "]I.kde/share/icons/`hostname|sed -e 's/[.].*//'`.xpm\" # "
 endif
 
-foreach dir ( /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/bin" )
+foreach dir ( /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin" )
     if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/lib/surfraw /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc )
