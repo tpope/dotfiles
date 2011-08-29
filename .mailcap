@@ -8,6 +8,7 @@ text/xml; sensible-browser '%s'; description="XML Text"; nametemplate=%s.xml; te
 text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
 text/richtext; richtext -t; description="Rich Text"; copiousoutput
 text/x-vcalendar; korganizer '%s'; description="vCalendar File"; test=test -n "$DISPLAY"
+audio/x-amzxml; "$HOME/Music/clamz.sh" '%s'; description="Amazon MP3 Download"
 text/*; sensible-pager '%s'; edit=vim '%s'; needsterminal; test=test -t 0
 text/*; gvim -Rf '%s'; edit=gvim -f '%s'; test=test -n "$DISPLAY" -a ! -t 0
 video/*; mplayer -quiet -vo fb,fa '%s'; description="Video"; needsterminal; test=test -z "$DISPLAY" -a -t 0
@@ -22,7 +23,7 @@ image/*; anytopnm '%s' | pnmscale -xysize 80 46 | ppmtopgm | pgmtopbm | pbmtoasc
 image/x-xpm; vim -R '%s'; edit=vim '%s'; description="XPM Image"; needsterminal
 application/msword; openoffice '%s'\; sleep 1; description="Micro$oft Word Document"; test=test -n "$DISPLAY" -a -x "`which openoffice 2>/dev/null`"
 application/msword; antiword '%s'; description="Micro$oft Word Document"; copiousoutput
-application/x-bittorrent; btget '%s'; description="BitTorrent File"; test=test -x "$HOME/bin/btget"
+application/x-bittorrent; transmission '%s'; description="BitTorrent File"; test=test -n "$DISPLAY"
 #application/excel; openoffice %s
 #application/msexcel; openoffice %s
 #application/vnd.ms-excel; openoffice %s

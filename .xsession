@@ -29,7 +29,6 @@ if /sbin/ifconfig 2>/dev/null | grep '172\.28\.6' >/dev/null; then
     done
 fi
 
-xset m 3 3
 xset r rate 600 30
 xset b 40 440 60
 
@@ -87,6 +86,8 @@ fi
 #[ ! -x "`which btcid-launch 2>/dev/null`" ] || btcid-launch
 [ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
 [ ! -x "`which imwheel 2>/dev/null`" ] || imwheel -k -b 000067 2>/dev/null &
+[ ! -x "`which pulseaudio 2>/dev/null`" ] || pulseaudio &
+[ ! -x "`which bluetooth-applet 2>/dev/null`" ] || bluetooth-applet &
 [ ! -f "$HOME/.lircrc" ] || irexec &
 [ ! -f "$HOME/.lircrc" ] || irxevent &
 [ ! -x /usr/bin/q-agent ] || eval `/usr/bin/q-agent &`
@@ -98,9 +99,10 @@ tpope status rehash
 
 [ -f "$HOME/.xsession.local" ] && . "$HOME/.xsession.local"
 
-#if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
-#    exec $sshagent gnome-session
-#fi
+if [ -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
+    export WINDOW_MANAGER=fvwm2
+    # exec $sshagent gnome-session
+fi
 
 for wm in fvwm2 icewm startkde fluxbox enlightenment mwm twm xterm; do
     [ -x "`which $wm 2>/dev/null`" ] && exec $sshagent $wm

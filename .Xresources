@@ -218,7 +218,9 @@ Rxvt*cursorColor:  #90c090
 URxvt.cursorColor: #90c0c0
 URxvt.underlineColor: #777777
 !URxvt.termName:    rxvt
-#if WIDTH > 1450
+#if WIDTH > 1800
+URxvt*keysym.C-F1:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
+#elif WIDTH > 1450
 URxvt*keysym.C-F1: command:\033]710;TERMINUS16,UTFFONT\007
 #else
 URxvt*keysym.C-F1: command:\033]710;UTFFONT\007
@@ -242,7 +244,9 @@ URxvt.keysym.C-comma:  perl:dabbrev-expand:\\\\w
 URxvt.keysym.C-period: perl:dabbrev-expand:\\\\w./-
 URxvt.keysym.C-equal:  perl:matcher
 URxvt.keysym.C-grave:  perl:matcher:list
-#if WIDTH > 1450
+#if WIDTH > 1800
+URxvt.font: FIXED-normal--20-*-*-*-c-*-UTFENC
+#elif WIDTH > 1450
 URxvt.font: TERMINUS16,UTFFONT
 #else
 URxvt.font:        UTFFONT
@@ -343,4 +347,7 @@ XScreenSaver.ignoreUninstalledPrograms: true
 XScreenSaver.loadURL: sensible-browser '%s'
 XScreensaver.captureStderr: false
 XScreensaver.overlayStderr: false
+! }}}1
+!## XCOLORSEL {{{1
+Xcolorsel*displayFormat: #rrggbb
 ! }}}1
