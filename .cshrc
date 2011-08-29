@@ -76,10 +76,10 @@ else
 endif
 
 if ( $?tcsh ) then
-    if ( -x "$HOME/bin/hostinfo" ) then
-	set hostcolor = `$HOME/bin/hostinfo -c`
-	set hostletter = `$HOME/bin/hostinfo -l`
-	set hostcode = `$HOME/bin/hostinfo -s`
+    if ( -x "$HOME/bin/tpope" ) then
+	set hostcolor = `$HOME/bin/tpope hostman -c`
+	set hostletter = `$HOME/bin/tpope hostman -l`
+	set hostcode = `$HOME/bin/tpope hostman -s`
     else
 	set hostcolor = `00;33`
 	set hostletter = ``

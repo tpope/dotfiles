@@ -87,12 +87,10 @@ git_prompt_info() {
 
 autoload -U colors && colors
 
-if [ -x "$HOME/bin/hostinfo" ]; then
-    hostcolor=`$HOME/bin/hostinfo -c`
-    # hostletter=`$HOME/bin/hostinfo -l`
+if [ -x "$HOME/bin/tpope" ]; then
+    hostcolor=`$HOME/bin/tpope hostman -c`
 else
     hostcolor="01;37"
-    # hostletter=
 fi
 
 local usercolor="$fg_bold[yellow]"
@@ -116,8 +114,8 @@ setopt promptsubst
 
 case ${OLDTERM:-$TERM} in
 screen*|vt220*)
-    if [ -x "$HOME/bin/hostinfo" ]; then
-        hostcode=`$HOME/bin/hostinfo -s`
+    if [ -x "$HOME/bin/tpope" ]; then
+        hostcode=`$HOME/bin/tpope hostman -s`
     else
         hostcode="+b W"
     fi

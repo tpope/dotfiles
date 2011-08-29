@@ -11,18 +11,18 @@ if [ "$PS1" ]; then
 
 #set -o noclobber
 
-hostname=`"$HOME/bin/hostinfo"`
-#hostname=`"$HOME/bin/hostinfo"|sed -e 's/[.].*//'`
 
 # don't put duplicate lines in the history
 export HISTCONTROL=ignoredups
 # In fact, let's not use a history file at all
 export HISTFILE=
 
-if [ -x "$HOME/bin/hostinfo" ]; then
-    hostcolor=`"$HOME/bin/hostinfo" -c`
-    hostcode=`"$HOME/bin/hostinfo" -s`
+if [ -x "$HOME/bin/tpope" ]; then
+    hostname=`"$HOME/bin/tpope" hostinfo`
+    hostcolor=`"$HOME/bin/tpope" hostinfo -c`
+    hostcode=`"$HOME/bin/tpope" hostinfo -s`
 else
+    hostname=`hostname`
     hostcolor="01;37"
     hostcode="+b W"
 fi
@@ -74,8 +74,8 @@ Eterm*)
     ;;
 linux*) ;;
 *)
-    if [ -x "$HOME/bin/hostinfo" ]; then
-        hostletter=`"$HOME/bin/hostinfo" -l`
+    if [ -x "$HOME/bin/tpope" ]; then
+        hostletter=`"$HOME/bin/tpope" hostinfo -l`
     fi
     PS1=$hostletter'\$ '
     unset hostletter

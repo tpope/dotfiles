@@ -197,9 +197,9 @@ status() {
     elif ping -c 1 tpope.us >/dev/null 2>&1; then
         unset DISPLAY
         if [ "$#" = 2 -a -z "$2" ]; then
-            exec hostinfo -b tpope.us tpope status "$1" -c
+            exec tpope hostman -b tpope.us tpope status "$1" -c
         else
-            exec hostinfo -b tpope.us tpope status "$@"
+            exec tpope hostman -b tpope.us tpope status "$@"
         fi
     else
         exit 2
@@ -224,7 +224,7 @@ case "$basename" in
             no_links
             exec br "$@"
         else
-            hostinfo --batch-ssh michael br "$@"
+            tpope hostman --batch-ssh michael br "$@"
         fi ;;
 
     char) case "$1" in
@@ -239,9 +239,9 @@ case "$basename" in
         if [ "$hostname" = roxy -a -z "$*" ]; then
             "$HOME/.irssi/Chat-script" $hostname
         elif [ -z "$*" ]; then
-            exec hostinfo -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname
+            exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname
         else
-            exec hostinfo -S tpope.net -t '$HOME/.irssi/Chat-script' "$@"
+            exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' "$@"
         fi ;;
 
     clean) do_clean "$@" ;;
@@ -482,6 +482,7 @@ case "$basename" in
     ;;
 
     hostinfo) exec "$HOME/bin/hostinfo" "$@" ;;
+    hostman)  exec "$HOME/bin/hostinfo" "$@" ;;
     ruptime)  exec "$HOME/bin/hostinfo" -u "$@" ;;
     rwho)     exec "$HOME/bin/hostinfo" -w "$@" ;;
     ssh)      exec "$HOME/bin/hostinfo" --ssh "$@" ;;
@@ -606,7 +607,7 @@ case "$basename" in
     Wor)  w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w"   "$@" |pager ;;
     Or)   w="`wordtrans "$1"`"; shift; $Words | egrep    "$w"    "$@" |pager ;;
 
-    xauth-get) exec hostinfo --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
+    xauth-get) exec tpope hostman --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
     xssc|xscc)
         case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
         export DISPLAY
