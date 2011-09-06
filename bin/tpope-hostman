@@ -114,7 +114,7 @@ exec_nc() {
 case "$hostinfo" in
 tpope) return ;;
 ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
-hostinfo)
+hostinfo|hostman|tpope-hostman)
     : ${host:="`name`"}
     case "$1" in
     -h|--hostname)    echo `gethost ${2:-$host}`; exit 0 ;;
@@ -273,5 +273,5 @@ EOF
         shift; shift
         exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
 
-    *) echo Warning: invalid command ;;
+    *) echo Warning: invalid command "$hostinfo" ;;
 esac

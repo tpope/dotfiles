@@ -16,7 +16,7 @@ FILES="\
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
  .xsession .Xresources .Eterm/themes .gtkrc .gtkrc-2.0 .netscape/user.js \
  .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
- bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/hostinfo \
+ bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/tpope-hostman \
  bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb .gitconfig \
  "
 LOCAL_FILES="\
