@@ -193,6 +193,17 @@ bindkey -r "^Q"
 bindkey "\eb"   emacs-backward-word
 bindkey "\ef"   emacs-forward-word
 
+bindkey -M viins "^A" beginning-of-line
+bindkey -M viins "^B" backward-char
+bindkey -M viins "^D" delete-char-or-list
+bindkey -M viins "^E" end-of-line
+bindkey -M viins "^F" forward-char
+bindkey -M viins "^K" kill-line
+bindkey -M viins "^N" next-history
+bindkey -M viins "^P" previous-history
+
+bindkey "^X^[" vi-cmd-mode
+
 case $ZSH_VERSION in
 3.*) ;;
 *)

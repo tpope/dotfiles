@@ -1,0 +1,13 @@
+set keymap vi-insert
+Control-a: beginning-of-line
+Control-b: backward-char
+Control-d: delete-char
+Control-e: end-of-line
+Control-f: forward-char
+Control-k: kill-line
+Control-n: next-history
+Control-p: previous-history
+set keymap emacs-ctlx
+v: vi-editing-mode
+Control-v: "\C-xv\e"
+Escape: "\C-xv\e"
