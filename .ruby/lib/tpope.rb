@@ -1,10 +1,10 @@
-old_current = $LOAD_PATH.pop if $LOAD_PATH.last == '.'
-%w(.ruby/lib .ruby src/ruby/lib).each do |dir|
-  $LOAD_PATH.unshift(File.expand_path("~/#{dir}"))
-end
-$LOAD_PATH << old_current if old_current
+$:.unshift(*%w(~/src/ruby/lib ~/.ruby ~/.ruby/lib).map {|d| File.expand_path d})
+$:.unshift('.') if $:.delete('.')
+$:.uniq!
 
-$LOAD_PATH.uniq!
+Gem.path.grep(/@global$/).each do |gemset|
+  $: |= Dir.glob("#{gemset}/gems/*").map { |gem| "#{gem}/lib" }
+end if defined?(Bundler)
 
 begin
   require 'rubygems'
@@ -12,60 +12,13 @@ rescue LoadError
 end
 
 module Kernel
-  def stack_size(i=caller.size)
-    stack_size(i+1)
-  rescue SystemStackError
-    i
-  end
-
   def r(*objects)
     raise RuntimeError, objects.map { |o| o.inspect }.join("\n"), caller
   end
 end
 
-class Symbol
-  def to_proc
-    Proc.new { |*args| args.shift.__send__(self, *args) }
-  end unless method_defined?(:to_proc)
-end
-
-class Integer
-  def prime?
-    '1' * self !~ /^1?$|^(11+?)\1+$/
-  end
-end
-
 class Object
-
   alias __class__ class
-
-  def tap
-    yield(self) if block_given?
-    self
-  end if RUBY_VERSION =~ /^1\.8/
-
-  def metaclass
-    class << self; self; end
-  end
-
-  def meta_eval(&block)
-    metaclass.instance_eval(&block)
-  end
-
-  def ls(object = self)
-    (object.methods - Class.instance_methods).sort!
-  end
-
-  def lsi(object)
-    (object.instance_methods - Object.instance_methods).sort!
-  end
-
-end
-
-class Module
-  def lsi(object = self)
-    super(object)
-  end
 end
 
 class Time
@@ -96,31 +49,4 @@ class Time
     Time::Process.new(*attrs.map {|a| diff[p1,p2,a,count]} + [other])
   end
 
-end
-
-module IRB
-  def self.on_exec
-    if caller.size == 1 && caller.first.sub(/:\d+$/,'') == $0
-      yield if block_given?
-      require 'irb'
-      IRB.start($0)
-    end
-  end
-end
-
-class String
-  def checksum
-    t = 0
-    each_byte do |b|
-      t += b
-    end
-    t & 255
-  end
-
-  if RUBY_VERSION == '1.8.7' && method_defined?(:chars)
-    undef chars
-    def chars(*args, &block)
-      ActiveSupport::Multibyte::Chars.new(self)
-    end
-  end
 end
