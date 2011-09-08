@@ -83,7 +83,7 @@ if [ -n "$git" ]; then
     umask 022
     mkdir /tmp/tpope-$$
     cd /tmp/tpope-$$
-    git clone roxy:/var/cache/git/tpope.git >/dev/null || exit 1
+    git clone git@github.com:tpope/tpope.git >/dev/null || exit 1
     cd tpope
     tar_out | tar xf -
     if [ "commit" = "$git" ]; then
