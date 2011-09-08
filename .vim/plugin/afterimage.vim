@@ -1,6 +1,6 @@
 " afterimage.vim - Edit binary files by converting them to text
 " Maintainer:   Tim Pope <vimNOSPAM@tpope.org>
-" Version:      2.0
+" Version:      2.1
 
 " Licensed under the same terms as Vim itself.
 
@@ -14,7 +14,7 @@ augroup afterimage
 
   if !exists("#BufWriteCmd#*.png")
     autocmd BufReadPre,FileReadPre    *.png,*.gif  setlocal bin
-    autocmd BufReadPost,FileReadPost  *.png,*.gif  if AfterimageReadPost("convert %s xpm:%s")|setf xpm|endif|setlocal nobin
+    autocmd BufReadPost,FileReadPost  *.png,*.gif  if AfterimageReadPost("convert %s xpm:%s")|set ft=xpm|endif|setlocal nobin
     autocmd BufWriteCmd,FileWriteCmd  *.png call AfterimageWriteCmd("convert %s png:%s")
     autocmd BufWriteCmd,FileWriteCmd  *.gif call AfterimageWriteCmd("convert %s gif:%s")
   endif
