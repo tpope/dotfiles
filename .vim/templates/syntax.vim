@@ -4,7 +4,7 @@
 " Filenames:    *.@BASENAME@
 
 if exists("b:current_syntax")
-    finish
+  finish
 endif
 
 syn case ignore
@@ -18,4 +18,4 @@ hi def link @BASENAME@String            String
 
 let b:current_syntax = "@BASENAME@"
 
-" vim:set sts=4 sw=4:
+" vim:set sts=2 sw=2:

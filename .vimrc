@@ -4,10 +4,11 @@
 " Section: Options {{{1
 " ---------------------
 if has("win32")
-  let &runtimepath = substitute(&runtimepath,'\(Documents and Settings[\\/][^\\/]*\)[\\/]\zsvimfiles\>','.vim','g')
+  let &runtimepath = substitute(&runtimepath,'\(Documents and Settings\|Users\)[\\/][^\\/,]*[\\/]\zsvimfiles\>','.vim','g')
 endif
-silent! call pathogen#runtime_append_all_bundles()
-silent! call pathogen#runtime_prepend_subdirectories("~/src/vim/bundle")
+silent! call pathogen#infect()
+silent! call pathogen#infect("~/src/vim/vendor")
+silent! call pathogen#infect("~/src/vim/bundle")
 
 set nocompatible
 set autoindent
@@ -29,23 +30,18 @@ set display=lastline
 if has("eval")
   let &fileencodings = substitute(&fileencodings,"latin1","cp1252","")
 endif
-set grepprg=grep\ -rnH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude='*.svn-base'\ --exclude='*.tmp'\ --exclude=tags\ $*
+set fileformats=unix,dos,mac
+set grepprg=grep\ -rnH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude=tags
 if has("eval")
   let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 endif
 set incsearch       " Incremental search
-set joinspaces
 set laststatus=2    " Always show status line
-if has("mac")
-  silent! set nomacatsui
+set lazyredraw
+if (&termencoding ==# 'utf-8' || &encoding ==# 'utf-8') && version >= 700
+  let &listchars = "tab:\u21e5\u00b7,trail:\u2423,extends:\u21c9,precedes:\u21c7,nbsp:\u26ad"
 else
-  set lazyredraw
-endif
-"let &listchars="tab:\<M-;>\<M-7>,trail:\<M-7>"
-set listchars=tab:>\ ,trail:-
-set listchars+=extends:>,precedes:<
-if version >= 700
-  set listchars+=nbsp:+
+  set listchars=tab:>\ ,trail:-,extends:>,precedes:<
 endif
 set modelines=5     " Debian likes to disable this
 set mousemodel=popup
@@ -58,12 +54,16 @@ set smarttab        " sw at the start of the line, sts everywhere else
 if exists("+spelllang")
   set spelllang=en_us
 endif
+set spellfile=~/.vim/spell/en.utf-8.add
 set splitbelow      " Split windows at bottom
-set statusline=[%n]\ %<%.99f\ %h%w%m%r%{exists('*CapsLockStatusline')?CapsLockStatusline():''}%y%{exists('*rails#statusline')?rails#statusline():''}%{exists('*fugitive#statusline')?fugitive#statusline():''}%#ErrorMsg#%{exists('*SyntasticStatuslineFlag')?SyntasticStatuslineFlag():''}%*%=%-16(\ %l,%c-%v\ %)%P
+set statusline=[%n]\ %<%.99f\ %h%w%m%r%{SL('CapsLockStatusline')}%y%{SL('fugitive#statusline')}%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}%*%=%-14.(%l,%c%V%)\ %P
 set suffixes+=.dvi  " Lower priority in wildcards
 set tags+=../tags,../../tags,../../../tags,../../../../tags
 set timeoutlen=1200 " A little bit more time for macros
 set ttimeoutlen=50  " Make Esc work faster
+if exists('+undofile')
+  set undofile
+endif
 if v:version >= 700
   set viminfo=!,'20,<50,s10,h
 endif
@@ -71,7 +71,7 @@ set visualbell
 set virtualedit=block
 set wildmenu
 set wildmode=longest:full,full
-set wildignore+=*~
+set wildignore+=*~,*.aux,tags
 set winaltkeys=no
 
 if v:version >= 600
@@ -122,7 +122,8 @@ endif
 if has("eval")
 let g:is_bash = 1
 let g:lisp_rainbow = 1
-" let g:rubyindent_match_parentheses = 0
+let g:liquid_highlight_types = ['vim', 'ruby', 'html', 'javascript', 'css', 'erb=eruby', 'bash=sh', 'jinja=liquid', 'html+erb=eruby.html', 'html+jinja=liquid.html']
+let g:netrw_list_hide = '^\.,^tags$'
 let g:ruby_minlines = 500
 let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_rails = 1
@@ -143,7 +144,7 @@ let g:syntastic_auto_loc_list = 1
 let g:VCSCommandDisableMappings = 1
 let g:Tex_CompileRule_dvi = 'latex -interaction=nonstopmode -src-specials $*'
 let g:Tex_SmartKeyQuote = 0
-let g:showmarks_enable = has("gui_running")
+let g:showmarks_enable = 0
 let g:surround_{char2nr('-')} = "<% \r %>"
 let g:surround_{char2nr('=')} = "<%= \r %>"
 let g:surround_{char2nr('8')} = "/* \r */"
@@ -158,6 +159,14 @@ endif
 " -----------------------
 
 if has("eval")
+function! SL(function)
+  if exists('*'.a:function)
+    return call(a:function,[])
+  else
+    return ''
+  endif
+endfunction
+
 command! -bar -nargs=1 -complete=file E :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
 command! -bar -nargs=0 SudoW   :setl nomod|silent exe 'write !sudo tee % >/dev/null'|let &mod = v:shell_error
 command! -bar -nargs=* -bang W :write<bang> <args>
@@ -220,61 +229,79 @@ nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><
 
 function! Run()
   let old_makeprg = &makeprg
-  let cmd = matchstr(getline(1),'^#!\zs[^ ]*')
-  if exists("b:run_command")
-    exe b:run_command
-  elseif cmd != '' && executable(cmd)
-    wa
-    let &makeprg = matchstr(getline(1),'^#!\zs.*').' %'
-    make
-  elseif &ft == "mail" || &ft == "text" || &ft == "help" || &ft == "gitcommit"
-    setlocal spell!
-  elseif exists("b:rails_root") && exists(":Rake")
-    wa
-    Rake
-  elseif &ft == "ruby"
-    wa
-    if executable(expand("%:p")) || getline(1) =~ '^#!'
-      compiler ruby
-      let &makeprg = "ruby"
-      make %
-    elseif expand("%:t") =~ '_test\.rb$'
-      compiler rubyunit
-      let &makeprg = "ruby"
-      make %
-    elseif expand("%:t") =~ '_spec\.rb$'
-      compiler ruby
-      let &makeprg = "spec"
-      make %
-    else
-      !irb -r"%:p"
-    endif
-  elseif &ft == "html" || &ft == "xhtml" || &ft == "php" || &ft == "aspvbs" || &ft == "aspperl"
-    wa
-    if !exists("b:url")
-      call OpenURL(expand("%:p"))
-    else
-      call OpenURL(b:url)
-    endif
-  elseif &ft == "vim"
-    wa
-    unlet! g:loaded_{expand("%:t:r")}
-    return 'source %'
-  elseif &ft == "sql"
-    1,$DBExecRangeSQL
-  elseif expand("%:e") == "tex"
-    wa
-    exe "normal :!rubber -f %:r && xdvi %:r >/dev/null 2>/dev/null &\<CR>"
-  else
-    wa
-    if &makeprg =~ "%"
+  let old_errorformat = &errorformat
+  try
+    let cmd = matchstr(getline(1),'^#!\zs[^ ]*')
+    if exists('b:run_command')
+      exe b:run_command
+    elseif cmd != '' && executable(cmd)
+      wa
+      let &makeprg = matchstr(getline(1),'^#!\zs.*').' %'
       make
-    else
+    elseif &ft == 'mail' || &ft == 'text' || &ft == 'help' || &ft == 'gitcommit'
+      setlocal spell!
+    elseif exists('b:rails_root') && exists(':Rake')
+      wa
+      Rake
+    elseif &ft == 'cucumber'
+      wa
+      compiler cucumber
       make %
+    elseif &ft == 'ruby'
+      wa
+      if executable(expand('%:p')) || getline(1) =~ '^#!'
+        compiler ruby
+        let &makeprg = 'ruby'
+        make %
+      elseif expand('%:t') =~ '_test\.rb$'
+        compiler rubyunit
+        let &makeprg = 'ruby'
+        make %
+      elseif expand('%:t') =~ '_spec\.rb$'
+        compiler rspec
+        let &makeprg = 'rspec'
+        make %
+      elseif &makeprg ==# 'bundle'
+        make
+      elseif executable('pry') && exists('b:rake_root')
+        execute '!pry -I"'.b:rake_root.'/lib" -r"%:p"'
+      elseif executable('pry')
+        !pry -r"%:p"
+      else
+        !irb -r"%:p"
+      endif
+    elseif &ft == 'html' || &ft == 'xhtml' || &ft == 'php' || &ft == 'aspvbs' || &ft == 'aspperl'
+      wa
+      if !exists('b:url')
+        call OpenURL(expand('%:p'))
+      else
+        call OpenURL(b:url)
+      endif
+    elseif &ft == 'vim'
+      w
+      unlet! g:loaded_{expand('%:t:r')}
+      return 'source %'
+    elseif &ft == 'sql'
+      1,$DBExecRangeSQL
+    elseif expand('%:e') == 'tex'
+      wa
+      exe "normal :!rubber -f %:r && xdvi %:r >/dev/null 2>/dev/null &\<CR>"
+    elseif &ft == 'dot'
+      let &makeprg = 'dotty'
+      make %
+    else
+      wa
+      if &makeprg =~ '%'
+        make
+      else
+        make %
+      endif
     endif
-  endif
-  let &makeprg = old_makeprg
-  return ""
+    return ''
+  finally
+    let &makeprg = old_makeprg
+    let &errorformat = old_errorformat
+  endtry
 endfunction
 command! -bar Run :execute Run()
 
@@ -285,9 +312,10 @@ endif
 " Section: Mappings {{{1
 " ----------------------
 
+digraph ./ 8230
+
 nnoremap Y  y$
-" Don't use Ex mode; use Q for formatting
-map Q       gqj
+nnoremap Q  :<C-U>q<CR>
 if exists(":nohls")
   nnoremap <silent> <C-L> :nohls<CR><C-L>
 endif
@@ -319,6 +347,7 @@ inoremap     <C-X><C-@> <C-A>
 " Emacs style mappings
 inoremap          <C-A> <C-O>^
 cnoremap          <C-A> <Home>
+cnoremap     <C-X><C-A> <C-A>
 " If at end of a line of spaces, delete back to the previous line.
 " Otherwise, <Left>
 inoremap <silent> <C-B> <C-R>=getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<Lt>C-D>\<Lt>Esc>kJs":"\<Lt>Left>"<CR>
@@ -361,7 +390,8 @@ endif
 map <F3>    :cnext<CR>
 map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
-map <silent> <F6>    :if exists(':Gstatus')<Bar>exe 'Gstatus'<Bar>else<Bar>ls<Bar>endif<CR>
+nmap <silent> <F6> :if &previewwindow<Bar>pclose<Bar>elseif exists(':Gstatus')<Bar>exe 'Gstatus'<Bar>else<Bar>ls<Bar>endif<CR>
+nmap <silent> <F7> :if exists(':Glcd')<Bar>exe 'Glcd'<Bar>elseif exists(':Rlcd')<Bar>exe 'Rlcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
 map <F8>    :wa<Bar>make<CR>
 map <F9>    :Run<CR>
 map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
@@ -371,7 +401,6 @@ map <C-F4>  :bdelete<CR>
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
 
-map \\              <Plug>NERDCommenterInvert
 map <Leader>l       <Plug>CapsLockToggle
 imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
@@ -382,19 +411,6 @@ map <Leader>fm :g/^\s*$/,/\S/-j<Bar>%s/\s\+$//<CR>
 map <Leader>v  :so ~/.vimrc<CR>
 
 inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M:%S","%a, %d %b %Y %H:%M:%S %z","%Y %b %d","%d-%b-%y","%a %b %d %T %Z %Y"],'strftime(v:val)')+[localtime()]),0)<CR>
-
-inoremap <silent> <Bar>   <Bar><Esc>:call <SID>align()<CR>a
-
-function! s:align()
-  let p = '^\s*|\s.*\s|\s*$'
-  if exists(':Tabularize') && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
-    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
-    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
-    Tabularize/|/l1
-    normal! 0
-    call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
-  endif
-endfunction
 
 " Section: Autocommands {{{1
 " --------------------------
@@ -411,7 +427,7 @@ if has("autocmd")
   augroup FTMisc " {{{2
     autocmd!
 
-    autocmd FocusLost   * wall
+    autocmd FocusLost   * silent! wall
     autocmd FocusGained * if !has('win32') | silent! call fugitive#reload_status() | endif
     autocmd SourcePre */macros/less.vim set laststatus=0 cmdheight=1
     if v:version >= 700 && isdirectory(expand("~/.trash"))
@@ -425,6 +441,7 @@ if has("autocmd")
     endif
 
     autocmd User Rails-javascript setlocal ts=2
+    autocmd User Fugitive if filereadable(fugitive#buffer().repo().dir('fugitive.vim')) | source `=fugitive#buffer().repo().dir('fugitive.vim')` | endif
 
     autocmd BufNewFile */init.d/*
           \ if filereadable("/etc/init.d/skeleton") |
@@ -465,16 +482,15 @@ if has("autocmd")
     autocmd BufNewFile,BufRead /var/www/*.module  set ft=php
     autocmd BufNewFile,BufRead *.vb               set ft=vbnet
     autocmd BufNewFile,BufRead *.CBL,*.COB,*.LIB  set ft=cobol
-    autocmd BufNewFile,BufRead *.feature,*.story  set ft=cucumber
     autocmd BufNewFile,BufRead /var/www/*
           \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
     autocmd BufNewFile,BufRead /etc/udev/*.rules set ft=udev
-    autocmd BufNewFile,BufRead,StdinReadPost *
-          \ if !did_filetype() && (getline(1) =~ '^!!\@!'
-          \   || getline(2) =~ '^!!\@!' || getline(3) =~ '^!'
-          \   || getline(4) =~ '^!' || getline(5) =~ '^!') |
-          \   setf router |
-          \ endif
+    " autocmd BufNewFile,BufRead,StdinReadPost *
+          " \ if !did_filetype() && (getline(1) =~ '^!!\@!'
+          " \   || getline(2) =~ '^!!\@!' || getline(3) =~ '^!'
+          " \   || getline(4) =~ '^!' || getline(5) =~ '^!') |
+          " \   setf router |
+          " \ endif
     autocmd BufRead * if ! did_filetype() && getline(1)." ".getline(2).
           \ " ".getline(3) =~? '<\%(!DOCTYPE \)\=html\>' | setf html | endif
     autocmd BufNewFile,BufRead *.txt,README,INSTALL,NEWS,TODO if &ft == ""|set ft=text|endif
@@ -484,10 +500,11 @@ if has("autocmd")
     autocmd FileType c,cpp,cs,java          setlocal ai et sta sw=4 sts=4 cin
     autocmd FileType sh,csh,tcsh,zsh        setlocal ai et sta sw=4 sts=4
     autocmd FileType tcl,perl,python        setlocal ai et sta sw=4 sts=4
+    autocmd FileType markdown,liquid        setlocal ai et sta sw=2 sts=2 tw=72
     autocmd FileType javascript             setlocal ai et sta sw=2 sts=2 ts=2 cin isk+=$
     autocmd FileType php,aspperl,aspvbs,vb  setlocal ai et sta sw=4 sts=4
     autocmd FileType apache,sql,vbnet       setlocal ai et sta sw=4 sts=4
-    autocmd FileType tex,css                setlocal ai et sta sw=2 sts=2
+    autocmd FileType tex,css,scss           setlocal ai et sta sw=2 sts=2
     autocmd FileType html,xhtml,wml,cf      setlocal ai et sta sw=2 sts=2
     autocmd FileType xml,xsd,xslt           setlocal ai et sta sw=2 sts=2 ts=2
     autocmd FileType eruby,yaml,ruby        setlocal ai et sta sw=2 sts=2
@@ -498,13 +515,14 @@ if has("autocmd")
     autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby imap <buffer> <C-X>& <C-X>!<Esc>o <C-U># $I<C-V>d$<Esc>o <C-U><C-X>^<Esc>o <C-U><C-G>u
     autocmd FileType c,cpp,cs,java,perl,javscript,php,aspperl,tex,css let b:surround_101 = "\r\n}"
     autocmd User     ragtag                 if &sw == 8 | setlocal sw=2 sts=2 ts=2 | endif
+    autocmd FileType apache       setlocal commentstring=#\ %s
     autocmd FileType aspvbs,vbnet setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
     autocmd FileType asp*         runtime! indent/html.vim
     autocmd FileType bst  setlocal ai sta sw=2 sts=2
     autocmd FileType cobol setlocal ai et sta sw=4 sts=4 tw=72 makeprg=cobc\ -x\ -Wall\ %
     autocmd FileType cs   silent! compiler cs | setlocal makeprg=gmcs\ %
     autocmd FileType css  silent! setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType cucumber silent! compiler cucumber | imap <buffer><expr> <Tab> pumvisible() ? "\<C-N>" : (CucumberComplete(1,'') >= 0 ? "\<C-X>\<C-O>" : (getline('.') =~ '\S' ? ' ' : "\<C-I>"))
+    autocmd FileType cucumber silent! compiler cucumber | setl makeprg=cucumber\ "%:p" | imap <buffer><expr> <Tab> pumvisible() ? "\<C-N>" : (CucumberComplete(1,'') >= 0 ? "\<C-X>\<C-O>" : (getline('.') =~ '\S' ? ' ' : "\<C-I>"))
     autocmd FileType git,gitcommit setlocal foldmethod=syntax foldlevel=1
     autocmd FileType gitcommit setlocal spell
     autocmd FileType gitrebase nnoremap <buffer> S :Cycle<CR>
@@ -515,7 +533,16 @@ if has("autocmd")
     autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm gg}' |endif|silent! setlocal spell
     autocmd FileType perl silent! compiler perl
     autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1
-    autocmd FileType ruby silent! compiler ruby | setlocal tw=79 isfname+=: makeprg=rake comments=:#\  | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))' | imap <buffer> <C-Z> <CR>end<C-O>O
+    autocmd FileType ruby setlocal tw=79 isfname+=: comments=:#\  " | let &includeexpr = 'tolower(substitute(substitute('.&includeexpr.',"\\(\\u\\+\\)\\(\\u\\l\\)","\\1_\\2","g"),"\\(\\l\\|\\d\\)\\(\\u\\)","\\1_\\2","g"))'
+    autocmd FileType ruby
+          \ if expand('%') =~# '_test\.rb$' |
+          \   compiler rubyunit | setl makeprg=testrb\ \"%:p\" |
+          \ elseif expand('%') =~# '_spec\.rb$' |
+          \   compiler rspec | setl makeprg=rspec\ \"%:p\" |
+          \ else |
+          \   compiler ruby | setl makeprg=ruby\ -wc\ \"%:p\" |
+          \ endif
+    autocmd User Bundler if &makeprg !~ 'bundle' | setl makeprg^=bundle\ exec\  | endif
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % formatoptions+=l
     autocmd FileType tex if exists("*IMAP")|
@@ -529,7 +556,7 @@ if has("autocmd")
           \ call IMAP('`"\','`"\',"tex")|
           \ endif
     autocmd FileType vbnet        runtime! indent/vb.vim
-    autocmd FileType vim  setlocal ai et sta sw=2 sts=2 keywordprg=:help | map! <buffer> <C-Z> <C-X><C-V>
+    autocmd FileType vim  setlocal ai et sta sw=2 sts=2 keywordprg=:help
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
@@ -578,7 +605,7 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
     autocmd VimEnter *  if !has("gui_running") | set background=dark notitle noicon | endif
     autocmd GUIEnter *  set background=light title icon cmdheight=2 lines=25 columns=80 guioptions-=T
     autocmd GUIEnter *  if has("diff") && &diff | set columns=165 | endif
-    autocmd GUIEnter *  colorscheme vividchalk
+    autocmd GUIEnter *  silent! colorscheme vividchalk
     autocmd GUIEnter *  call s:initialize_font()
     autocmd GUIEnter *  let $GIT_EDITOR = 'false'
     autocmd Syntax css  syn sync minlines=50
