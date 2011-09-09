@@ -197,7 +197,7 @@ Style *         IconGrid 56 72, IconSize 48 48
 Style *         HilightFore $[HIFORE], ForeColor $[FORE]
 Style *         HilightBack $[HIBACK], BackColor $[BACK]
 Style *         Colorset 1, HilightColorset 2
-Style *         BorderWidth 4, HandleWidth 4, NoStickStipples
+Style *         BorderWidth 3, HandleWidth 3, NoStickStipples
 Style *         MwmFunctions, MwmDecor, MwmButtons, HintOverride
 Style NotStealth SloppyFocus, FPClickToFocus, GrabFocus, GrabFocusTransient
 Style NotStealth CirculateHit, WindowListHit
