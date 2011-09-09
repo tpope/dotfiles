@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm -f .git/tags
+ctags --tag-relative -f .git/tags --exclude=.git --languages=-javascript,sql -R

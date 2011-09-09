@@ -1,0 +1,14 @@
+#!/bin/sh
+
+.git/hooks/ctags >/dev/null 2>&1 &
+
+if [ $1 != 0000000000000000000000000000000000000000 ]; then
+  if command -v hookup >/dev/null; then
+    hookup post-checkout "$@"
+  elif [ $3 = 1 -a -f Gemfile ] && command -v bundle >/dev/null &&
+    git diff --name-only $1 $2 | egrep -q '^Gemfile|\.gemspec$'
+  then
+    (unset GIT_DIR; exec bundle) | grep -v '^Using ' | grep -v ' is complete'
+    true
+  fi
+fi

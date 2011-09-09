@@ -23,6 +23,8 @@
 	grep = auto
 [github]
 	user = tpope
+[init]
+	templatedir = ~/.git_template
 [interactive]
 	singlekey = true
 [help]
