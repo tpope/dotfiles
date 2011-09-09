@@ -1,9 +1,19 @@
+[alias]
+	one = show -s --pretty='format:%h (%s)'
+	recursive-update = "!sh -c 'find \"${@-.}\" -type d -name .git -exec dirname {} \\; -exec git --git-dir={} remote update \\;' recursive-update"
+	ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
+	rlog = !sh -c 'git log --color \"$@\"|fmt -s -w 79|less -FRSX' git-rlog
+	summary = log --abbrev-commit --pretty=oneline --author="Tim.Pope" --since=last.mon --reverse
+[branch]
+	autosetupmerge = always
+	autosetuprebase = always
 [core]
 	excludesfile = ~/.cvsignore
 	pager = less -S
-[user]
-	name = Tim Pope
-	email = code@tpop"e.ne"t
+[diff "ruby"]
+	funcname = "^ *\\(\\(def\\) .*\\)"
+[diff "image"]
+	textconv = identify
 [color]
 	ui = auto
 	diff = auto
@@ -11,26 +21,28 @@
 	branch = auto
 	interactive = auto
 	grep = auto
-[branch]
-	autosetupmerge = always
-	autosetuprebase = always
+[github]
+	user = tpope
+[interactive]
+	singlekey = true
 [help]
 	autocorrect = 10
 [merge]
 	summary = true
+[merge "bundle"]
+	name = bundle
+	driver = bundle
+[merge "railsschema"]
+	name = newer Rails schema version
+	driver = hookup resolve-schema %A %O %B %L
 [push]
 	default = tracking
+[rebase]
+	autosquash = true
+[user]
+	name = Tim Pope
+	email = code@tpop"e.ne"t
 [web]
 	browser = dillo
 [browser "dillo"]
-	path = /home/tpope/bin/sensible-browser
-[diff "ruby"]
-	funcname = "^ *\\(\\(def\\) .*\\)"
-[diff "vim"]
-	funcname = "^ *\\(\\(fu\\|aug\\).*\\)"
-[alias]
-	one = show -s --pretty='format:%h (%s)'
-	recursive-update = "!sh -c 'find \"${@-.}\" -type d -name .git -exec dirname {} \\; -exec git --git-dir={} remote update \\;' recursive-update"
-	rlog = !sh -c 'git log --color \"$@\"|fmt -s -w 79|less -FRSX' git-rlog
-	update = !ruby ~/src/ruby/vendor/gx/git-update.rb
-	summary = log --abbrev-commit --pretty=oneline --author="Tim.Pope" --since=last.mon --reverse
+	path = sensible-browser
