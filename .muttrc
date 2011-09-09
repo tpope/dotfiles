@@ -68,6 +68,7 @@ ignore X-ML- X-MLServer X-Mail-Count Posted X-Complaints-To Complaints-To
 ignore Newsgroups NNTP- X-From-Usenet X-Trace Injection-Info X-rubymirror
 ignore Return-Path Message-ID Received Mime-Version Content-Disposition Path
 ignore Content-Type Content-Length Status Lines "From "
+ignore X-Twitter X-Campaignid X-Forwarded-To X-Forwarded-For X-DKIM X-DomainKeys
 
 # Section: Bindings {{{1
 # ----------------------
@@ -219,7 +220,7 @@ lists mutt-users speedseductionlist zaurus-general debian-knoppix
 # ------------------
 `mutt -v|grep +USE_IMAP >/dev/null && echo set imap_list_subscribed=yes || echo set`
 
-account-hook . 'unset imap_user imap_pass tunnel'; folder-hook . 'set folder="$HOME/Mail" record="=sent"'
+account-hook . 'unset imap_user tunnel'; folder-hook . 'set folder="$HOME/Mail" record="=sent"'
 
 account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
 account-hook imap://michael/   'set tunnel="ssh -qax michael /usr/sbin/imapd"'; folder-hook imap://michael/ 'set folder=imap://michael/'

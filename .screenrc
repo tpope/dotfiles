@@ -9,14 +9,15 @@ bindkey ^Q command
 bindkey ^Z command
 defnonblock on
 defscrollback 1024
+defflow off
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* WS=\E[8;%d;%dt
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* ti@:te@:G0
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* hs:ts=\E]2;:fs=\007:ds=\E]2;8)\007
 termcapinfo xterm*|rxvt*|kterm*|Eterm*|putty*|dtterm* XT
 termcapinfo Eterm*|linux* C8
+termcapinfo * "" Co#256
 termcapinfo rxvt*|Eterm* "" *7=\E[8$:%i=\E[c:#4=\E[d:#2=\E[7$
 termcapinfo xterm*      "" *7=\E[2F:%i=\E[2C:#4=\E[2D:#2=\E[2H
-defflow off
 windowlist string "%3n %{= dd}%?%h%:%t%?%=%f%{-}"
 caption    string "%?%F%{y}%?%3n %{= wk}%?%h%:%t%?%{-}"
 activity "Activity in window %n (%t)^G^G"

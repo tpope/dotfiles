@@ -26,13 +26,8 @@ done
 HASHROCKET_DIR="$HOME/src/hashrocket"
 [ ! -r "$HASHROCKET_DIR/dotmatrix/.hashrc" ] || . "$HASHROCKET_DIR/dotmatrix/.hashrc"
 
-case "$PATH" in
-    "$HOME"/bin:*) ;;
-    *) PATH="$HOME/bin:$PATH" ;;
-esac
-
 if [ -z "$LANG" -a -z "$LC_ALL" -a -f "$HOME/.locale" ]; then
-    LANG="`cat "$HOME/.locale"`"
+    LANG=`cat "$HOME/.locale"`
     export LANG
 fi
 
@@ -77,8 +72,8 @@ export RSYNC_RSH CVS_RSH CVSROOT LYNX_CFG
 
 ulim="ulimit -S -u"
 $ulim >/dev/null 2>/dev/null || ulim="ulimit -S -p"
-unum=256
-[ -z "$CRON" ] || unum=128
+unum=512
+[ -z "$CRON" ] || unum=256
 cunum="`$ulim 2>/dev/null`"
 case "$cunum" in [0-9]*) ;; *) cunum=65535 ;; esac
 [ "$unum" -ge "$cunum" ] || $ulim "$unum" 2>/dev/null
@@ -130,7 +125,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
         umask 002
     fi
 
-    PS1="$LOGNAME@$hostname `basename "$execbin"`$promptchar "
+    PS1="$LOGNAME@$hostname `basename $execbin`$promptchar "
 
     #case `basename "$execbin"` in
     #*ksh*)

@@ -259,11 +259,6 @@ URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
 	sub { /./ ? ("string quote" => sub {  s([\\\\\\042$@]|#[{])(\\\\$&)g; s{\\n}{\\\\n}g; s{\\t}{\\\\t}g; s{\\r}{\\\\r}g; s{[\\000-\\037]}{sprintf("%03o",ord($&))}eg; $_ = qq("$_"); }) : () }, \n\
 	sub { /\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/ ? ("quote for irc" => sub { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; }) : () };
 URxvt.urlLauncher: sensible-browser
-!URxvt.matcher.pattern.1:  ^\\B(/\\S+?):(\\d+)(?=:|$)
-!URxvt.matcher.launcher.1: gvim +$2 $1
-!URxvt.matcher.pattern.2: (?:https?:\/\/|ftp:\/\/|news:\/\/|mailto:|file:\/\/|\\bwww\\.)[a-zA-Z0-9\\-\\@;\\/:&=%\\$_.+*~]*\\.(?:gif|jpg|png)\\b
-!URxvt.matcher.launcher.2: feh -Z $0
-!URxvt.matcher.button: 1
 URxvt.selection-pastebin.cmd: scp -p % tpope.us:/var/www/pastebin/
 URxvt.selection-pastebin.url: http:\/\/tpope.us/pastebin/%
 URxvt.remote-selection.store: ssh tpope.us 'cat >/tmp/distributed-selection'

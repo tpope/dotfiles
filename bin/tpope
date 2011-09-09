@@ -507,8 +507,6 @@ case "$basename" in
     screen|s)
     if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
         TERM=rxvt-unicode
-    elif [ "$TERM" = "rxvt-unicode" -a ! -f /usr/share/terminfo/r/rxvt-unicode ]; then
-        TERM=rxvt
     fi
     exec screen "$@"
     ;;
@@ -696,20 +694,25 @@ case "$basename" in
         SUBDIRECTORY_OK=1
         . git-sh-setup
         [ -n "$1" ] || usage
-        head="`git branch|grep '^\* '|cut -b 3-`"
+        umask 002
         trap 'rm -rf /tmp/git-publish.$$' EXIT
         mkdir -m 02700 /tmp/git-publish.$$
-        umask 002
         dir=/tmp/git-publish.$$/repo.git
-        git clone --bare "$GIT_DIR" $dir
-        GIT_CONFIG=$dir/config git-config --add core.sharedrepository group
-        find $dir -type d -exec chmod g+ws {} \;
-        chmod +x $dir/hooks/post-update
-        touch $dir/git-daemon-export-ok
-        scp -pqr $dir "$1" || exit 1
+        GIT_DIR="$dir" git init --quiet --shared=group
+        GIT_DIR="$dir" git config --remove-section receive
+        chmod +x "$dir/hooks/post-update"
+        touch "$dir/git-daemon-export-ok"
+        #git clone --bare "$GIT_DIR" $dir
+        #GIT_CONFIG=$dir/config git-config --add core.sharedrepository group
+        #find $dir -type d -exec chmod g+ws {} \;
+        #chmod +x $dir/hooks/post-update
+        #touch $dir/git-daemon-export-ok
+        cp "$GIT_DIR/description" "$dir/description"
+        scp -pqr "$dir" "$1" || exit 1
         git remote add origin "$1" &&
-        git config branch."$head".remote origin &&
-        git config branch."$head".merge "refs/heads/$head"
+        git config branch.master.remote origin &&
+        git config branch.master.merge "refs/heads/master" &&
+        git push origin "master:refs/heads/master"
         ;;
 
     rds)

@@ -12,7 +12,7 @@ if [[ $ZSH_VERSION == 4.<->* ]]; then
     setopt histexpiredupsfirst histreduceblanks
 fi
 
-fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc ~/.rvm/scripts/zsh/Completion)
+fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc ~/.rvm/scripts/zsh/Completion $HASHROCKET_DIR/dotmatrix/.zsh/functions)
 watch=(notme)
 [ -f "$HOME/.friends" ] && watch=(`cat "$HOME/.friends"`)
 HISTSIZE=100
@@ -108,7 +108,7 @@ esac
 [ $UID = '0' ] && usercolor="$fg_bold[white]"
 reset_color=$'\e[00m'
 
-PROMPT="%{$usercolor%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{$dircolor%}%20<...<%~%<<%{${e}[00m%}%{${e}[00m%}\$(git_prompt_info)%# "
+PROMPT="%{$usercolor%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{$dircolor%}%30<...<%~%<<%{${e}[00m%}%{${e}[00m%}\$(git_prompt_info)%# "
 RPS1="%(?..(%{${e}[01;35m%}%?%{${e}[00m%}%)%<<)"
 setopt promptsubst
 
@@ -257,6 +257,7 @@ esac
 alias lsd='ls -ld *(-/DN)' # directories only
 alias sb='noglob sensible-browser'
 alias zmv='noglob zmv'
+alias ru='noglob ru'
 
 which sudo >/dev/null && alias sudo='sudo ' # this makes $1 expand as an alias
 
@@ -301,8 +302,6 @@ zstyle -e ':completion:*' completer '
             reply=(_complete _ignored:complete _prefix _complete:full _correct _approximate)
         fi' #'
 zstyle ':completion::prefix:*' completer _complete _ignored:complete
-#zstyle ':completion:*' completer _complete _ignored _prefix
-#zstyle ':completion:*' completions 1
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' glob 1
 zstyle ':completion::complete:*:(all-|)files' ignored-patterns '*\~' '(|*/)CVS'
@@ -321,11 +320,9 @@ zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character 
 zstyle ':completion:*' local localhost /var/www public_html
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}'
 zstyle ':completion::full:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|[._-/]=* r:|=* l:|[._-/]=* l:|=*'
-#zstyle ':completion:*:hosts' hosts ${(A)_cache_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}} }
 zstyle -e ':completion:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX+1)/3 )) numeric )'
 zstyle ':completion:*' menu select
 zstyle ':completion:*:(xdvi|xpdf|gv|mpl):*' menu yes select
-zstyle ':completion:*:(xdvi|xpdf|gv|mplayer):*' file-sort time
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
 zstyle ':completion:*' substitute 1
@@ -334,7 +331,6 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 zstyle ':completion:*' users tpope root $USER ${watch/notme/}
 zstyle ':completion:*' verbose true
 zstyle ':completion:*:rm:*' ignore-line yes
-#zstyle ':completion:*:rsync:*:files' command ssh -a -x '${words[CURRENT]%:*}' ls -d1F '${${:-${${${:-${words[CURRENT]#*:}-}:h}/${slash}(#e)/}/\*}/#.$slash/}' 2>/dev/null
 zstyle :compinstall filename "$HOME/.zshrc"
 
 autoload -U compinit

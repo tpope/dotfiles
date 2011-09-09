@@ -11,8 +11,8 @@
 
 FILES="\
  .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
- .profile .bashrc .bash_profile .inputrc .screenrc .terminfo/? .dir_colors \
- .vimrc .vim/[^b][^p]* .muttrc .urlview .mailcap .gnupg/gpg.conf \
+ .profile .bashrc .bash_profile .inputrc .screenrc .tmux.conf .dir_colors \
+ .terminfo/? .vimrc .vim/[acdimpst]* .muttrc .urlview .mailcap .gnupg/gpg.conf \
  .cvsignore .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 .gitconfig \
  .xsession .Xresources .Eterm/themes .gtkrc .gtkrc-2.0 .netscape/user.js \
  .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-* .fvwm/.fvwm-menu-headlines \
