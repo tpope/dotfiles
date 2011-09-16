@@ -1,10 +1,10 @@
 $:.unshift(*%w(~/src/ruby/lib ~/.ruby ~/.ruby/lib).map {|d| File.expand_path d})
 $:.unshift('.') if $:.delete('.')
-$:.uniq!
 
 Gem.path.grep(/@global$/).each do |gemset|
-  $: |= Dir.glob("#{gemset}/gems/*").map { |gem| "#{gem}/lib" }
+  $:.concat(Dir.glob("#{gemset}/gems/*").map { |gem| "#{gem}/lib" })
 end if defined?(Bundler)
+$:.uniq!
 
 begin
   require 'rubygems'
