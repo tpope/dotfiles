@@ -233,8 +233,6 @@ Style Chat@* UseStyle chat
 Style @* Icon norm/terminal-special.xpm, MiniIcon mini/terminal/left-white.xpm
 Style @localhost Icon norm/terminal.xpm, MiniIcon mini/terminal.xpm
 #, IconOverride
-Style HiddenConsole Sticky, WindowListSkip, Notitle, StaysOnTop, NoHandles, CirculateSkip
-Style HiddenConsole WindowShadeSteps 100, ResizeHintOverride, BorderWidth 0
 
 # }}}2
 # Fvwm Module Styles {{{2
@@ -1524,14 +1522,9 @@ FuncTakeToDeskAndPage $i 0 0; done'
 DestroyMenu MenuHeadlines
 AddToMenu   MenuHeadlines "Headlines" Title
 + MissingSubmenuFunction FuncMenuHeadlines
-Test (f $[HOME]/.fvwm/.fvwm-menu-headlines/extension.pl) + "SexyGeek%sexygeek.png%"   Popup sexygeek
 + "Slashdot%slashdot.png%"     Popup slashdot
 + "Kuro5hin%kuro5hin.png%"     Popup kuro5hin
-+ "BBSpot%bbspot.png%"         Popup bbspot
-+ "FreshMeat%freshmeat.png%"   Popup freshmeat
-+ "LinuxToday%linuxtoday.png%" Popup linuxtoday
 + "CNN%cnn.png%"               Popup cnn
-+ "BBC%bbc.png%"               Popup bbc
 + ""           Nop
 + "Reset all%menu/restart.xpm%" FuncResetHeadlines
 
@@ -1975,13 +1968,8 @@ AddToFunc   FuncMenuHeadlines
 
 DestroyFunc FuncResetHeadlines
 AddToFunc   FuncResetHeadlines
-+ I DestroyMenu sexygeek
 + I DestroyMenu slashdot
 + I DestroyMenu kuro5hin
-+ I DestroyMenu bbspot
-+ I DestroyMenu freshmeat
-+ I DestroyMenu linuxtoday
-+ I DestroyMenu kde-news
 + I DestroyMenu cnn
 # }}}2
 # Next Edge Functions {{{2
@@ -1999,7 +1987,6 @@ AddToFunc FuncNextEdgeDown
         -a `expr $[w.y] + $[w.height]` -gt $0  \
         && echo SetEnv edge_w `expr $[w.y] + $[w.height]` \
         || echo Nop"
-#+ I PipeRead "test $edge_w -gt $1 && echo SetEnv edge_w $1"
 
 DestroyFunc FuncNextEdgeUp
 AddToFunc FuncNextEdgeUp
@@ -2014,7 +2001,6 @@ AddToFunc FuncNextEdgeUp
         -a `expr $[w.y] + $[w.height]` -lt $0  \
         && echo SetEnv edge_w `expr $[w.y] + $[w.height]` \
         || echo Nop"
-#+ I PipeRead "test $edge_w -lt $1 && echo SetEnv edge_w $1"
 
 DestroyFunc FuncNextEdgeRight
 AddToFunc FuncNextEdgeRight
@@ -2029,7 +2015,6 @@ AddToFunc FuncNextEdgeRight
         -a `expr $[w.x] + $[w.width]` -gt $0  \
         && echo SetEnv edge_w `expr $[w.x] + $[w.width]` \
         || echo Nop"
-#+ I PipeRead "test $edge_w -gt $1 && echo SetEnv edge_w $1"
 
 DestroyFunc FuncNextEdgeLeft
 AddToFunc FuncNextEdgeLeft
@@ -2044,50 +2029,6 @@ AddToFunc FuncNextEdgeLeft
         -a `expr $[w.x] + $[w.width]` -lt $0 \
         && echo SetEnv edge_w `expr $[w.x] + $[w.width]`  \
         || echo Nop"
-#+ I PipeRead "test $edge_w -lt $1 && echo SetEnv edge_w $1"
-
-# }}}2
-# Autohide Functions {{{2
-#####
-# Autohide console example: http://dev.gentoo.org/~taviso/screenshots/autohide_console.png
-##################
-DestroyFunc StartHiddenConsole
-AddToFunc StartHiddenConsole
-+ I Exec exec urxvt +sb -geometry 144x8+0+0 -name HiddenConsole
-+ I Wait HiddenConsole
-+ I Next (HiddenConsole) Resize $[vp.width]p 9
-+ I Autohide HiddenConsole 0 0 N
-
-# XXX: This doesnt change focus, should it?
-DestroyFunc HiddenConsoleKeyBinding
-AddToFunc HiddenConsoleKeyBinding
-+ I ThisWindow (Shaded) FuncAutoEnter
-+ I TestRc (NoMatch) NoWindow FuncAutoEnter
-
-# Set the delays on Showing and Hiding here for the AutoHide functions.
-DestroyFunc FuncAutoEnter
-AddToFunc FuncAutoEnter I Autohide HiddenConsole 500 500 N
-
-####
-# These functions modified from the functions provided in the fvwm FAQ.
-# http://www.fvwm.org/documentation/faq/#7.17
-#################
-AddToFunc Autohide
-+ I ThisWindow ($0) Deschedule $[w.id]
-+ I TestRc (!Match) Deschedule -$[w.id]
-+ I ThisWindow ($0) ThisWindow (shaded) AutohideShow $1 $3
-+ I TestRc (!Match) All ($0, !shaded) AutohideHide $2 $3
-
-AddToFunc AutohideShow
-+ I Schedule $0 -$[w.id] WindowShade $1 off
-+ I Schedule $0 -$[w.id] Raise
-+ I Schedule $0 -$[w.id] Deschedule $[w.id]
-+ I Schedule $0 -$[w.id] Deschedule -$[w.id]
-
-AddToFunc AutohideHide
-+ I Schedule $0 $[w.id] WindowShade $1 on
-+ I Schedule $0 $[w.id] Deschedule $[w.id]
-+ I Schedule $0 $[w.id] Deschedule -$[w.id]
 
 # }}}2
 # }}}1
@@ -2163,21 +2104,7 @@ UnsetEnv right_width
 UnsetEnv right_inner_width
 UnsetEnv width
 # }}}2
-# FvwmEvent Config {{{2
-DestroyModuleConfig FvwmEvent: *
-*FvwmEvent: Cmd
-*FvwmEvent: StartDelay 3
-#*FvwmEvent: PassId
-#*FvwmEvent: startup 'Exec exec sdplay /usr/lib/openoffice/share/gallery/sounds/curve.wav'
-#*FvwmEvent: new_desk "PipeRead 'echo SendToModule FvwmButtons ChangeButton menu Title `expr $$[desk.n] + 1`'"
-# *FvwmEvent: shutdown 'Exec exec sdplay /usr/lib/openoffice/share/gallery/sounds/beam.wav'
-#*FvwmEvent: add_window 'ThisWindow ("The GIMP") PipeRead "[ x$[cw.width] = x192 -o x$[cw.width] = x250 ] && echo StickAcrossPages'
-#*FvwmEvent: unknown /usr/lib/openoffice/share/gallery/sounds/ok.wav
-#*FvwmEvent: iconify /usr/lib/openoffice/share/gallery/sounds/ok.wav
-#*FvwmEvent: deiconify bong.au
-# }}}2
 # FvwmIconMan Config {{{2
-# this FvwmIconMan setup is for swallowing in button bar example
 DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *numManagers 1
 *FvwmIconMan: *Resolution  page
@@ -2214,58 +2141,6 @@ DestroyModuleConfig FvwmIconMan: *
 DestroyModuleConfig FvwmScript: *
 *FvwmScript: DefaultBack $[fvwm_mybg]
 *FvwmScript: DefaultFont $[fvwm_modulefont]
-# }}}2
-# FvwmPager Config {{{2
-
-DestroyModuleConfig FvwmPagerSubPanel: *
-*FvwmPagerSubPanel: Rows 2
-*FvwmPagerSubPanel: Columns 4
-*FvwmPagerSubPanel: Geometry 800x300-3000-3000
-*FvwmPagerSubPanel: Font none
-*FvwmPagerSubPanel: SmallFont 5x7
-*FvwmPagerSubPanel: MiniIcons
-*FvwmPagerSubPanel: SloppyFocus
-*FvwmPagerSubPanel: Balloons
-*FvwmPagerSubPanel: BalloonFont "xft:Bitstream Vera Sans:style=Roman:size=7:antialias=True"
-*FvwmPagerSubPanel: BalloonFore White
-*FvwmPagerSubPanel: Hilight White
-*FvwmPagerSubPanel: NoDeskHilight
-*FvwmPagerSubPanel: WindowColorsets 1 2
-PipeRead 'for i in `seq 0 7`; do echo "*FvwmPagerSubPanel: DeskColor $i \\#0`expr $i + 1``expr 8 - $i`"; done'
-PipeRead 'for i in `seq 0 8`; do echo "*FvwmPagerSubPanel: Colorset $i 4$i"; done'
-*FvwmPagerSubPanel: Label 0 "First"
-*FvwmPagerSubPanel: Label 1 "Second"
-*FvwmPagerSubPanel: Label 2 "Third"
-*FvwmPagerSubPanel: Label 3 "Fourth"
-*FvwmPagerSubPanel: Label 4 "Fifth"
-*FvwmPagerSubPanel: Label 5 "Sixth"
-*FvwmPagerSubPanel: Label 6 "Seventh"
-*FvwmPagerSubPanel: Label 7 "Eighth"
-*FvwmPagerSubPanel: Label 8 "Ninth"
-
-*FvwmPager: Geometry 400x300
-*FvwmPager: Font none
-# }}}2
-# FvwmPagerInlineIII Config {{{2
-
-DestroyModuleConfig FvwmPagerInlineIII: *
-*FvwmPagerInlineIII: Rows 1
-*FvwmPagerInlineIII: Columns 3
-*FvwmPagerInlineIII: Geometry 144x38-3000-3000
-*FvwmPagerInlineIII: Font none
-*FvwmPagerInlineIII: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
-#*FvwmPagerInlineIII: SmallFont micro
-*FvwmPagerInlineIII: Hilight White
-*FvwmPagerInlineIII: DeskColor 0 #00FCFC
-*FvwmPagerInlineIII: DeskPixmap 0 cyan_47x38.xpm
-*FvwmPagerInlineIII: DeskColor 1 #FCFC00
-*FvwmPagerInlineIII: DeskPixmap 1 yellow_47x38.xpm
-*FvwmPagerInlineIII: DeskColor 2 #FC00FC
-*FvwmPagerInlineIII: DeskPixmap 2 magenta_47x38.xpm
-*FvwmPagerInlineIII: Label 0 "_ABCDEFGH"
-*FvwmPagerInlineIII: Label 1 "IJKLMNOPQ"
-*FvwmPagerInlineIII: Label 2 "RSTUVWXYZ"
-
 # }}}2
 # FvwmPagerInline Config {{{2
 
@@ -2390,8 +2265,6 @@ DestroyModuleConfig  FvwmForm-Run: *
 # }}}1
 # Other Config Files {{{1
 
-Read ConfigFvwmIconBox
-Read ConfigFvwmTaskBar
 
 Read /etc/X11/fvwm/menudefs.hook Quiet
 Read menudefs.hook Quiet
