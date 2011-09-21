@@ -374,7 +374,7 @@ IgnoreModifiers 2
 
 # Bookmarking {{{2
 
-PipeRead 'for k in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do \
+PipeRead 'for k in E T Y U I O P; do \
  echo Key $$k A 4   FuncFindResource \\$$$$\\[FVWM_BOOKMARK_$$k]; \
  echo Key $$k A CM  FuncFindResource \\$$$$\\[FVWM_BOOKMARK_$$k]; \
  echo Key $$k A 4S  SetEnv FVWM_BOOKMARK_$$k \\"\\$$\\[w.iconname\\]\\"; \
@@ -396,27 +396,15 @@ Key U           A   4   FuncFindBookmark U
 Key I           A   4   FuncFindBookmark I FuncFindMediaProgram
 Key O           A   4   FuncFindBookmark O FuncFindOffice
 Key P           A   4   FuncFindBookmark P FuncFindDesktop
-Key backslash   A   4   FuncFindMediaProgram
 Key semicolon   A   4   FuncFindEditor
-Key semicolon   A   4S  Exec exec sensible-editor
+Key semicolon   A   4M  Exec exec sensible-editor
 Key period      A   4   FuncFindTerminal
 Key comma       A   4   FuncFindGameEtc
-
-Key T           A   5   FuncFindTerminal
-Key Y           A   5   FuncFindGameEtc
-Key I           A   5   FuncFindMediaProgram
-Key O           A   5   FuncFindOffice
-Key P           A   5   FuncFindDesktop
 
 DestroyFunc FuncFindBookmark
 AddToFunc   FuncFindBookmark
 + I Test (EnvIsSet FVWM_BOOKMARK_$0)  FuncFindResource $$[FVWM_BOOKMARK_$0]
 + I TestRc (NoMatch) $1
-
-DestroyFunc FuncFindO
-AddToFunc   FuncFindO
-+ I Test (EnvIsSet FVWM_BOOKMARK_O)  FuncFindResource $[FVWM_BOOKMARK_O]
-+ I TestRc (NoMatch) FuncFindOffice
 
 DestroyFunc FuncFindDesktop
 AddToFunc FuncFindDesktop
@@ -446,46 +434,76 @@ AddToFunc FuncFindMediaProgram
 # Applications {{{2
 
 Key Escape      A   SCM EscapeFunc
-Key BackSpace   A   5   Exec sleep 1; xscreensaver-command -lock || exec xlock
-Key L           A   5   Exec sleep 1; xscreensaver-command -lock || exec xlock
-Key W           A   5   FuncFindOrLaunchWebBrowser
+Key BackSpace   A   4   Exec sleep 1; xscreensaver-command -lock || exec xlock
 
-#Key K           A   5   Direction Center (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
-Key T           A   5   ScanForWindow South East (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
-Key Y           A   5   ScanForWindow North West (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+# Key comma       A   4   ScanForWindow South East (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+# Key period      A   4   ScanForWindow North West (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 
-Key Space       A   CM  FuncScreenXTerm
-Key Space       A   4C  FuncScreenXTerm
-Key Space       A   4S  FuncScreenXTerm
-Key Space       A   4   FuncFindResource "*@localhost|localhost"
 Key XF86Terminal A  A   FuncScreenXTerm
+Key Space       A   CM  FuncScreenXTerm
+Key Space       A   4S  FuncScreenXTerm
+Key Space       A   4M  FuncScreenXTerm
+Key Space       A   4   FuncFindResource "*@localhost|localhost"
+Key Z           A   CM  FuncScreenXTerm
+Key Z           A   4S  FuncScreenXTerm
+Key Z           A   4M  FuncScreenXTerm
+Key Z           A   4   FuncFindResource "*@localhost|localhost"
 
 Key Space       A   SCM FuncXTerm
-Key Space       A   4M  FuncXTerm
+Key Space       A   4C  FuncXTerm
+# Key Space       A   4S  FuncXTerm
 
+Key F           A   4   Menu MenuFvwmTerminals Root c c
+Key F           A   4S  Menu MenuFvwmScreens Root c c
+Key F           A   4M  Menu MenuFvwmScreens Root c c
+Key F           A   4C  Menu MenuFvwmLogins Root c c
+Key S           A   4   Menu MenuFvwmTerminals Root c c
+Key S           A   4S  Menu MenuFvwmScreens Root c c
+Key S           A   4M  Menu MenuFvwmScreens Root c c
+Key S           A   4C  Menu MenuFvwmLogins Root c c
+
+Key XF86Mail    A   A   FuncChatScreenSshXTerm
+Key grave       A   C   FuncChatFind
+Key grave       A   CS  FuncChatScreenSshXTerm
 Key apostrophe  A   4   FuncChatFind
 Key apostrophe  A   4S  FuncChatScreenSshXTerm
 Key apostrophe  A   4M  FuncChatScreenSshXTermShared
 Key grave       A   4   FuncChatFind
-Key grave       A   4S  FuncChatScreenSshXTerm
-Key grave       A   4M  FuncChatScreenSshXTermShared
+Key grave       A   4C  FuncChatScreenSshXTermShared
+Key grave       A   4S  FuncChatScreenSshXTermShared
+Key grave       A   4M  FuncChatScreenSshXTerm
+Key C           A   4   FuncChatFind
+Key C           A   4C  FuncChatScreenSshXTermShared
+Key C           A   4S  FuncChatScreenSshXTermShared
+Key C           A   4M  FuncChatScreenSshXTerm
+
+Key XF86WWW      A  A   FuncFindOrLaunchWebBrowser
+Key XF86HomePage A  A   FuncFindOrLaunchWebBrowser
 Key slash       A   4   FuncFindOrLaunchWebBrowser
 Key slash       A   4S  FuncWebBrowserClipboard
 Key D           A   4   FuncFindOrLaunchWebBrowser
-Key D           A   4S  FuncWebBrowserClipboard
+Key D           A   4M  FuncWebBrowserClipboard
+Key X           A   4   FuncFindOrLaunchWebBrowser
+Key X           A   4M  FuncWebBrowserClipboard
+
+# }}}2
+# Mouse Emulation {{{2
+
+Key Left        A   4   CursorMove -5 0
+Key Right       A   4   CursorMove +5 0
+Key Up          A   4   CursorMove 0 -5
+Key Down        A   4   CursorMove 0 +5
+
+Key Left        A   S4  CursorMove -1p 0
+Key Right       A   S4  CursorMove +1p 0
+Key Up          A   S4  CursorMove 0 -1p
+Key Down        A   S4  CursorMove 0 +1p
 
 # }}}2
 # Desks {{{2
 
-#Key Left        A   4   Scroll -100000 0
-#Key Right       A   4   Scroll  100000 0
-#Key Up          A   4   Scroll 0 -100000
-#Key Down        A   4   Scroll  0 100000
 Key Next        A   4   GotoDesk +1 0 7
 Key Prior       A   4   GotoDesk -1 0 7
-Key Next        A   5   GotoDesk +1 0 7
-Key Prior       A   5   GotoDesk -1 0 7
-#Key minus       A   4   Next (FvwmButtonsBottom, CirculateHit) FuncMoveButtonsToTop
 
 Key Next        A   CM  GotoDesk +1 0 7
 Key Prior       A   CM  GotoDesk -1 0 7
@@ -498,21 +516,6 @@ Key Prior       A   SCM FuncTakeToDesk -1 0 7
 
 Key Next        A   M4  MoveToDesk +1 0 7
 Key Prior       A   M4  MoveToDesk -1 0 7
-
-Key Left        A   5   CursorMove -5 0
-Key Right       A   5   CursorMove +5 0
-Key Up          A   5   CursorMove 0 -5
-Key Down        A   5   CursorMove 0 +5
-
-Key Left        A   45  CursorMove -1p 0
-Key Right       A   45  CursorMove +1p 0
-Key Up          A   45  CursorMove 0 -1p
-Key Down        A   45  CursorMove 0 +1p
-
-Key Left        A   S5  CursorMove -1p 0
-Key Right       A   S5  CursorMove +1p 0
-Key Up          A   S5  CursorMove 0 -1p
-Key Down        A   S5  CursorMove 0 +1p
 
 PipeRead 'for i in `seq 0 8`; do echo Key \
  `expr $i + 1` A 4 \
@@ -541,11 +544,9 @@ Key Delete      A   MS  Menu MenuMoveToDesktop
 
 Key Escape      A   4   WindowList Root c c NoDeskSort NoCurrentDeskTitle ShowPage SelectOnRelease
 Key Escape      A   CM  WindowList Root c c NoDeskSort NoCurrentDeskTitle ShowPage SelectOnRelease
-Key Delete      A   4   Menu MenuFvwmQuitVerify Root c c
 Key Delete      A   CM  Menu MenuFvwmQuitVerify Root c c
 
 Key BackSpace   A   4   GotoDeskAndPage prev
-#Key BackSpace   A   5   GotoDeskAndPage prev
 
 # }}}2
 # Quadrants {{{2
@@ -556,10 +557,10 @@ AddToFunc FuncWindowWarp
 + I PointerWindow Focus
 + I PointerWindow FuncWarpToTitle
 
-Key Q           A   4   FuncWindowWarp 25 25
-Key A           A   4   FuncWindowWarp 25 75
-Key W           A   4   FuncWindowWarp 75 25
-Key S           A   4   FuncWindowWarp 75 75
+Key F           A   4   FuncWindowWarp 25 25
+Key V           A   4   FuncWindowWarp 25 75
+Key G           A   4   FuncWindowWarp 75 25
+Key B           A   4   FuncWindowWarp 75 75
 
 # }}}2
 # Directional Focus {{{2
@@ -569,41 +570,37 @@ Key Right       A   CM  Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocu
 Key Up          A   CM  Direction North (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 Key Down        A   CM  Direction South (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 
-#Key H           A   5   Direction West  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
-#Key J           A   5   Direction South (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
-#Key K           A   5   Direction North (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
-#Key L           A   5   Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
-
 Key H           A   4   Direction West  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 Key J           A   4   Direction South (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 Key K           A   4   Direction North (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 Key L           A   4   Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key H           A   CS  Direction West  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key J           A   CS  Direction South (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key K           A   CS  Direction North (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
+Key L           A   CS  Direction East  (CurrentDesk, AcceptsFocus) FuncFlipFocusWindow
 
 # }}}2
 # Menus {{{2
-
-Key F1          A   4   FuncMenuFvwmRoot
-Key F2          A   4   FuncFvwmFormRun
-Key F2          A   S4  Read .FvwmForm-RunLast Quiet
-Key F3          A   4   Menu MenuFvwmWindowOps Interior 0 0 Nop
-Key F3          A   S4  FuncFvwmForm FvwmForm-Talk
 
 Key Escape      A   C   FuncMenuFvwmRoot
 Key Escape      A   S   Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F1          A   M   FuncMenuFvwmRoot
 Key F1          A   SM  Menu MenuFvwmWindowOps Interior 0 0 Nop
 Key F2          A   M   FuncFvwmFormRun
-#Key F2          A   SM  Read .FvwmForm-RunLast Quiet
+Key F2          A   CM  Read .FvwmForm-RunLast Quiet
 Key F2          A   SM  FuncFvwmForm FvwmForm-Talk
 
+Key A           A   4   FuncMenuFvwmRoot
+Key A           A   4M  Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
+Key A           A   4C  Exec exec import $[HOME]/selection-`date +%Y-%m-%d_%H-%M-%S`.png
+Key A           A   4S  Exec exec import $[HOME]/selection-`date +%Y-%m-%d_%H-%M-%S`.png
 Key M           A   4   FuncMenuFvwmRoot
-Key M           A   5   FuncMenuFvwmRoot
-Key R           A   4   FuncFvwmFormRun
-Key R           A   5   FuncFvwmFormRun
+Key M           A   4M  Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
+Key M           A   4C  Exec exec import $[HOME]/selection-`date +%Y-%m-%d_%H-%M-%S`.png
+Key M           A   4S  Exec exec import $[HOME]/selection-`date +%Y-%m-%d_%H-%M-%S`.png
 
-Key F           A   4   Menu MenuFvwmTerminals Root c c
-Key F           A   4S  Menu MenuFvwmScreens Root c c
-Key F           A   4M  Menu MenuFvwmLogins Root c c
+Key R           A   4   FuncFvwmFormRun
+Key R           A   4M  FuncFvwmForm FvwmForm-Talk
 
 # }}}2
 # Window Cycling {{{2
@@ -626,8 +623,6 @@ Key F           A   4M  Menu MenuFvwmLogins Root c c
 #Key Tab         A   SC4 Prev [$c] FuncFlipFocusWindow
 #Key Tab         A   M4  WindowList Root c c NoDeskSort SelectOnRelease Super_L NoCurrentDeskTitle
 #Key Tab         A   SM4 Prev FuncFlipFocusWindow
-Key Tab         A   5   Next FuncFocusWindow
-Key Tab         A   S5  Prev FuncFocusWindow
 Key Tab         A   M   WindowList Root c c NoDeskSort SelectOnRelease Meta_L NoCurrentDeskTitle CurrentAtEnd ShowPage
 Key Tab         A   SM  WindowList Root c c NoDeskSort SelectOnRelease Meta_L NoCurrentDeskTitle ShowPage
 #Key Tab         A   C   Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
@@ -636,7 +631,7 @@ Key Tab         A   4   Next (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindo
 Key Tab         A   S4  Prev (CurrentPage, !Iconic, AcceptsFocus) FuncFocusWindow
 Key Tab         A   CM  Next (CurrentPage, AcceptsFocus) FuncFocusWindow
 Key Tab         A   SCM Prev (CurrentPage, AcceptsFocus) FuncFocusWindow
-#Key Tab         A   S4  SendToModule FvwmProxy ShowToggle
+Key Tab         A   S4  SendToModule FvwmProxy ShowToggle
 
 # }}}2
 # Window Movement {{{2
@@ -810,25 +805,20 @@ Key Down  WTSF12468 SM  PackWrapperDown
 Key Left  WTSF12468 SM  PackWrapperLeft
 Key Right WTSF12468 SM  PackWrapperRight
 
-Key Up    WTSF12468 4   SnapWrapperUp
-Key Down  WTSF12468 4   SnapWrapperDown
-Key Left  WTSF12468 4   SnapWrapperLeft
-Key Right WTSF12468 4   SnapWrapperRight
+# Key Up    WTSF12468 4   SnapWrapperUp
+# Key Down  WTSF12468 4   SnapWrapperDown
+# Key Left  WTSF12468 4   SnapWrapperLeft
+# Key Right WTSF12468 4   SnapWrapperRight
 
-Key H           A   4S  SnapWrapperLeft
-Key J           A   4S  SnapWrapperDown
-Key K           A   4S  SnapWrapperUp
-Key L           A   4S  SnapWrapperRight
+Key H           A   4CM SnapWrapperLeft
+Key J           A   4CM SnapWrapperDown
+Key K           A   4CM SnapWrapperUp
+Key L           A   4CM SnapWrapperRight
 
-Key H           A   4SC PackWrapperLeft
-Key J           A   4SC PackWrapperDown
-Key K           A   4SC PackWrapperUp
-Key L           A   4SC PackWrapperRight
-
-Key H           A   5   PackWrapperLeft
-Key J           A   5   PackWrapperDown
-Key K           A   5   PackWrapperUp
-Key L           A   5   PackWrapperRight
+Key H           A   4S  PackWrapperLeft
+Key J           A   4S  PackWrapperDown
+Key K           A   4S  PackWrapperUp
+Key L           A   4S  PackWrapperRight
 
 # }}}2
 # Window Resizing {{{2
@@ -925,23 +915,14 @@ AddToFunc ResizeWrapperRight
 
 # }}}3
 
-Key J           A   4C  EnlargeWrapperDown
-Key K           A   4C  ResizeWrapperUp
-Key L           A   4C  EnlargeWrapperRight
-Key H           A   4C  ResizeWrapperLeft
-Key J           A   4M  ResizeWrapperDown
-Key K           A   4M  EnlargeWrapperUp
-Key L           A   4M  ResizeWrapperRight
-Key H           A   4M  EnlargeWrapperLeft
-
-Key Down  WTSF12468 C4  EnlargeWrapperDown
-Key Up    WTSF12468 C4  ResizeWrapperUp
-Key Right WTSF12468 C4  EnlargeWrapperRight
-Key Left  WTSF12468 C4  ResizeWrapperLeft
-Key Down  WTSF12468 M4  ResizeWrapperDown
-Key Up    WTSF12468 M4  EnlargeWrapperUp
-Key Right WTSF12468 M4  ResizeWrapperRight
-Key Left  WTSF12468 M4  EnlargeWrapperLeft
+Key J           A   4M  EnlargeWrapperDown
+Key K           A   4M  ResizeWrapperUp
+Key L           A   4M  EnlargeWrapperRight
+Key H           A   4M  ResizeWrapperLeft
+Key J           A   4C  ResizeWrapperDown
+Key K           A   4C  EnlargeWrapperUp
+Key L           A   4C  ResizeWrapperRight
+Key H           A   4C  EnlargeWrapperLeft
 
 # }}}2
 # Window Management {{{2
@@ -982,21 +963,27 @@ Silent Key Print A  C   Pick FuncCaptureWindow
 Silent Key Print A  SC  Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 Silent Key Print A  M   Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
 
-Key equal       A   5   FuncRepositionWindow
-Key equal       A   4   FuncRepositionWindow
-Key equal       A   4S  FuncToggleButtons
-Key minus       A   4   Iconify
-Key minus       A   4S  Maximize
-Key minus       A   5   Iconify
-Key minus       A   5S  Maximize
+Key Q            A  4   Close
+Key Q            A  4S  Destroy
 
-Key bracketleft A   4   Raise
-Key bracketright A  4   Lower
+Key equal        A  4   Raise
+Key equal        A  4M  Maximize
+Key equal        A  4C  Maximize 0 100
+Key equal        A  4S  Maximize 0 100
 
-Key 0           A   4   Menu MenuFvwmWindowOps Interior 0 0
+Key minus        A  4   Lower
+Key minus        A  4M  Iconify
+Key minus        A  4C  FuncRepositionWindow
+Key minus        A  4S  FuncRepositionWindow
 
-Key D           A   5   All (CurrentDesk, !Iconic) Iconify true
-Key D           A   5S  All (CurrentDesk, Iconic) Iconify false
+Key 0            A  4   Menu MenuFvwmWindowOps Interior 0 0
+Key 0            A  4M  Module FvwmIdent
+Key 0            A  4C  Pick FuncCaptureWindow
+Key 0            A  4S  Pick FuncCaptureWindow
+Key W            A  4   Menu MenuFvwmWindowOps Interior 0 0
+Key W            A  4M  Module FvwmIdent
+Key W            A  4C  Pick FuncCaptureWindow
+Key W            A  4S  Pick FuncCaptureWindow
 
 # }}}2
 # Multimedia {{{2
@@ -1005,62 +992,23 @@ DestroyFunc FuncCloseXmms
 AddToFunc FuncCloseXmms
 + I Exec exec tpope media quit
 
-#Key Q           A   5   FuncCloseXmms
-Key Z           A   5   Exec exec tpope media prev
-Key X           A   5   Exec exec tpope media play
-Key C           A   5   Exec exec tpope media toggle
-Key V           A   5   Exec exec tpope media stop
-Key B           A   5   Exec exec tpope media next
-#Key F           A   5   Exec exec xmms-shell -e jump
-#Key G           A   5   Exec exec xmms-shell -e repeat
-#Key S           A   5   Exec exec xmms-shell -e shuffle
-Key Z           A   4   Exec exec tpope media prev
-Key X           A   4   Exec exec tpope media play
-Key C           A   4   Exec exec tpope media toggle
-Key V           A   4   Exec exec tpope media stop
-Key B           A   4   Exec exec tpope media next
+Key bracketleft  A  4M  Exec exec tpope media prev
+Key bracketright A  4M  Exec exec tpope media next
+Key backslash    A  4M  Exec exec tpope media toggle
+Key bracketleft  A  4   Exec exec amixer set Master 5%-
+Key bracketright A  4   Exec exec amixer set Master 5%+
+Key backslash    A  4   Exec exec tpope media pause
 
 Key XF86AudioLowerVolume A A Exec exec amixer set Master 5%-
 Key XF86AudioRaiseVolume A A Exec exec amixer set Master 5%+
-Key Home        A   4   Exec exec aumix -w +5
-Key End         A   4   Exec exec aumix -w -5
-Key Home        A   5   Exec exec aumix -v +5
-Key End         A   5   Exec exec aumix -v -5
 
-Key Execute     A   A   Exec exec tpope media toggle
-Key Cancel      A   A   Exec exec tpope media stop
 Key XF86Standby   A A   Exec exec xscreensaver-command -activate
 Key XF86AudioStop A A   Exec exec media stop
 Key XF86AudioPlay A A   Exec exec media toggle
 Key XF86AudioPrev A A   Exec exec media prev
 Key XF86AudioNext A A   Exec exec media next
 Key XF86AudioMute A A   Exec exec media pause
-Key XF86WWW       A A   FuncFindOrLaunchWebBrowser
-Key XF86HomePage  A A   FuncFindOrLaunchWebBrowser
-Key XF86Mail      A A   FuncChatScreenSshXTerm
 
-# }}}2
-# Home Automation {{{2
-#Key 7           A   5   Exec exec tpope br -n 1
-#Key 8           A   5   Exec exec tpope br -f 1
-#Key U           A   5   Exec exec tpope br -n 2
-#Key I           A   5   Exec exec tpope br -f 2
-#Key J           A   5   Exec exec tpope br -n 3
-#Key K           A   5   Exec exec tpope br -f 3
-#Key M           A   5   Exec exec tpope br -n 5
-#Key Comma       A   5   Exec exec tpope br -f 5
-Key KP_Home     A   4   Exec exec tpope br -n 1
-Key KP_Left     A   4   Exec exec tpope br -n 2
-Key KP_End      A   4   Exec exec tpope br -n 3
-Key KP_Insert   A   4   Exec exec tpope br -n 4
-Key KP_Up       A   4   Exec exec tpope br -f 1
-Key KP_Begin    A   4   Exec exec tpope br -f 2
-Key KP_Down     A   4   Exec exec tpope br -f 3
-Key KP_Prior    A   4   Exec exec tpope br -n 4
-Key KP_Right    A   4   Exec exec tpope br -f 4
-Key KP_Delete   A   4   Exec exec tpope br -F
-Key KP_Add      A   4   Exec exec tpope br -d +1
-Key KP_Subtract A   4   Exec exec tpope br -d -1
 # }}}2
 # }}}1
 # Mouse Bindings {{{1
@@ -1076,8 +1024,6 @@ Mouse 2 R       S       StrokeFunc DrawMotion FeedBack StrokeWidth 1
 #Mouse 3 R       A       Menu MenuFvwmWindowOps Nop
 Mouse 3 R       A
 
-Mouse 4 R       A       GotoDesk -1 0 7
-Mouse 5 R       A       GotoDesk +1 0 7
 Mouse 4 A       5       Next (AcceptsFocus) FlipFocus
 Mouse 5 A       5       Prev (AcceptsFocus) Focus
 
