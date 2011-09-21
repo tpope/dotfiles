@@ -189,7 +189,7 @@ Style *         StippledTitle
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
 Style *         Icon norm/unknown.xpm, MiniIcon mini/unknown.xpm
-Style *         IconBox 0 -112 -0 -40, IconFill Right Bottom, IconBox -72 0 -0 -112, IconFill Bottom Right
+Style *         IconBox 0 -112 -0 -25, IconFill Right Left, IconBox -72 0 -0 -112, IconFill Bottom Left
 Style *         IconGrid 56 72, IconSize 48 48
 
 #Style *         ForeColor white, BackColor rgb:60/78/60
@@ -1173,6 +1173,7 @@ PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo + I ModuleSynchro
 + I Module FvwmAuto FvwmAutohide -menter FuncAutoEnter
 #+ I Module FvwmAuto 1 -passid -menterleave "Silent SelectiveRaiseLower FuncButtonsRestore" "Silent SelectiveRaiseLower Lower"
 + I Module FvwmBacker
++ I EwmhBaseStruts 0 0 0 25
 + I Module FvwmButtons FvwmButtonsBottom
 + I Module FvwmCommandS
 + I Module FvwmEvent
@@ -1213,7 +1214,7 @@ AddToFunc SessionRestartFunction
 
 DestroyFunc ExitFunction
 AddToFunc ExitFunction
-+ I Next (FvwmButtonsTop, CirculateHit) All (!FvwmButtonsTop) Move keep w-40p
++ I Next (FvwmButtonsTop, CirculateHit) All (!FvwmButtonsTop) Move keep w-25p
 
 # }}}1
 # Menus {{{1
@@ -1577,7 +1578,7 @@ AddToFunc FuncMaximize
 #+ I Current (Maximized, Maximizable) WindowStyle Borders
 + I UpdateStyles
 + I Maximize $*
-PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo '+ I Maximize 100 -40p'; fi"
+PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo '+ I Maximize 100 -25p'; fi"
 + I FuncRemaximize
 
 DestroyFunc FuncFullScreen
@@ -1595,8 +1596,8 @@ DestroyFunc FuncEnlarge
 AddToFunc FuncEnlarge
 + I State 5 false
 + I State 6 false
-+ I ResizeMove 100 -40p 0 0 warp
-+ I Any (FvwmButtonsTop, CirculateHit) WindowId $[w.id] Move 0 40p warp
++ I ResizeMove 100 -25p 0 0 warp
++ I Any (FvwmButtonsTop, CirculateHit) WindowId $[w.id] Move 0 25p warp
 + I FuncRemaximize
 
 DestroyFunc FuncResize
@@ -1706,7 +1707,7 @@ AddToFunc FuncMoveAllToDeskAndPage
 
 DestroyFunc FuncMenuFvwmRoot
 AddToFunc FuncMenuFvwmRoot
-+ I Menu MenuFvwmRoot Root 0 +100-100m-40p Nop
++ I Menu MenuFvwmRoot Root 0 +100-100m-25p Nop
 
 DestroyFunc FuncToggleButtons
 AddToFunc FuncToggleButtons
@@ -1720,27 +1721,27 @@ AddToFunc FuncButtonsRestore
 
 DestroyFunc FuncMoveButtonsToBottom
 AddToFunc FuncMoveButtonsToBottom
-+ I EwmhBaseStruts 0 0 0 40
++ I EwmhBaseStruts 0 0 0 25
 + I DestroyFunc FuncMenuFvwmRoot
-+ I AddToFunc FuncMenuFvwmRoot I Menu MenuFvwmRoot Root 0 100-100m-40p Nop
++ I AddToFunc FuncMenuFvwmRoot I Menu MenuFvwmRoot Root 0 100-100m-25p Nop
 + I EdgeCommand Top
 + I EdgeCommand Bottom All (FvwmButtons) FuncButtonsRestore
 + I KillModule FvwmButtons
-+ I All Move keep w-40p
++ I All Move keep w-25p
 + I Module FvwmButtons FvwmButtonsBottom
-+ I Style * IconBox 0 -112 -0 -40, IconFill Right Bottom, IconBox -112 0 -0 -112, IconFill Bottom Right
++ I Style * IconBox 0 -112 -0 -25, IconFill Left Bottom, IconBox -112 0 -0 -112, IconFill Bottom Left
 
 DestroyFunc FuncMoveButtonsToTop
 AddToFunc FuncMoveButtonsToTop
-+ I EwmhBaseStruts 0 0 40 0
++ I EwmhBaseStruts 0 0 25 0
 + I DestroyFunc FuncMenuFvwmRoot
-+ I AddToFunc FuncMenuFvwmRoot I Menu MenuFvwmRoot Root 0 +40p Nop
++ I AddToFunc FuncMenuFvwmRoot I Menu MenuFvwmRoot Root 0 +25p Nop
 + I EdgeCommand Top All (FvwmButtons) FuncButtonsRestore
 + I EdgeCommand Bottom
 + I KillModule FvwmButtons
-+ I All Move keep w+40p
++ I All Move keep w+25p
 + I Module FvwmButtons FvwmButtonsTop
-+ I Style * IconBox 0 -72 -0 -0, IconFill Right Bottom, IconBox -112 0 -0 -72, IconFill Bottom Right
++ I Style * IconBox 0 -72 -0 -0, IconFill Left Bottom, IconBox -112 0 -0 -72, IconFill Bottom Left
 
 DestroyFunc SelectiveRaiseLower
 AddToFunc SelectiveRaiseLower
@@ -1988,67 +1989,61 @@ Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) PipeRead 'for i in `seq 0 8`; do echo 
 SetEnv screen_width $[vp.width]
 # Dual head
 PipeRead 'if [ `expr $[vp.width] / $[vp.height]` -gt 2 ]; then echo SetEnv screen_width `expr $[vp.width] / 2`; fi'
-PipeRead 'echo SetEnv pager_width `expr 39 \\* $[vp.width] / $[vp.height] \\* 8 / 2`'
-PipeRead 'echo SetEnv right_width `expr $[pager_width] + 55`'
+PipeRead 'echo SetEnv pager_width `expr 25 \\* $[vp.width] / $[vp.height] \\* 8`'
+PipeRead 'echo SetEnv right_width `expr $[pager_width] + 218`'
 PipeRead 'echo SetEnv right_inner_width `expr $[right_width] - 1`'
-PipeRead 'echo SetEnv width `expr $[screen_width] / 2 - 73 - $[pager_width]`'
+PipeRead 'echo SetEnv iconman_width `expr $[screen_width] - 242 - $[pager_width]`'
 # FvwmButtonsBottom Config {{{3
-#+-----+-----~-----+-------+-------+-------+--+----------+
-#| O O |FvwmIconMan|  1st  |       |  8th  |/\|YYYY-MM-DD|
-#|  >  +-----~-----+ Pager |  ...  | Pager +--+          |
-#| \_/ |FvwmIconMan|       |       |       |Alert   hh:mm|
-#+-----+-----~-----+-------+-------+-------+-------------+
 DestroyModuleConfig FvwmButtonsBottom: *
-*FvwmButtonsBottom: ButtonGeometry 2x2+0-0
+*FvwmButtonsBottom: ButtonGeometry 1x1+0-0
 *FvwmButtonsBottom: Back Black
 *FvwmButtonsBottom: Fore Black
-*FvwmButtonsBottom: Rows 20
+*FvwmButtonsBottom: Rows 25
 *FvwmButtonsBottom: Font $[fvwm_smallfont]
 *FvwmButtonsBottom: Padding 0 0
-*FvwmButtonsBottom: (18x20, Frame 0, Padding 0 0, Container(Columns 36, Rows 40, Frame 0, Padding 0 0))
-*FvwmButtonsBottom: (36x1, Frame 0, Padding 0 0, Back Black)
-*FvwmButtonsBottom: (36x39, id menu, Frame 2, Padding 0 0, Back $[fvwm_mybg], Icon $[HOST].xpm, Action (Mouse 1) FuncMenuFvwmRoot, Action (Mouse 2) FuncWebBrowserClipboard, Action (Mouse 3) FuncScreenXTerm)
+*FvwmButtonsBottom: (24x25, Frame 0, Padding 0 0, Container(Columns 1, Rows 25, Frame 0, Padding 0 0))
+*FvwmButtonsBottom: (1x1, Frame 0, Padding 0 0, Back Black)
+*FvwmButtonsBottom: (1x24, id menu, Frame 2, Padding 0 0, Back $[fvwm_mybg], Icon mini.fvwm.xpm, Action (Mouse 1) FuncMenuFvwmRoot, Action (Mouse 2) FuncWebBrowserClipboard, Action (Mouse 3) FuncScreenXTerm)
 *FvwmButtonsBottom: (End)
-*FvwmButtonsBottom: ($[width]x20, Frame 0, Padding 0 1, Container(Columns 1, Rows 1, Frame 0, Padding 0 0))
-*FvwmButtonsBottom: (1x1, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmIconMan" "Module FvwmIconMan")
+*FvwmButtonsBottom: ($[iconman_width]x25, Frame 0, Padding 0 0, Container(Columns 1, Rows 25, Frame 0, Padding 0 0))
+*FvwmButtonsBottom: (1x1, Frame 0, Padding 0 0, Back Black)
+*FvwmButtonsBottom: (1x24, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmIconMan" "Module FvwmIconMan")
 *FvwmButtonsBottom: (End)
-*FvwmButtonsBottom: ($[right_width]x20, Frame 0, Padding 1 1, Container(Columns $[right_inner_width], Rows 19, Frame 0, Padding 0 0))
-*FvwmButtonsBottom: ($[pager_width]x19, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsBottom: (54x7, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
-*FvwmButtonsBottom: (54x12, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --no-shrink")
+*FvwmButtonsBottom: ($[right_width]x25, Frame 0, Padding 0 0, Container(Columns $[right_inner_width], Rows 25, Frame 0, Padding 0 0))
+*FvwmButtonsBottom: ($[right_inner_width]x1, Frame 0, Padding 0 0, Back Black)
+*FvwmButtonsBottom: ($[pager_width]x24, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
+*FvwmButtonsBottom: (108x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --icon-gravity SE --no-shrink")
+*FvwmButtonsBottom: (110x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
 *FvwmButtonsBottom: (End)
 # }}}3
 # FvwmButtonsTop Config {{{3
-#+-----+-----~-----+-------+-------+-------+-------------+
-#| O O |FvwmIconMan|  1st  |       |  8th  |Alert   hh:mm|
-#|  >  +-----~-----+ Pager |  ...  | Pager +--+          |
-#| \_/ |FvwmIconMan|       |       |       |\/|YYYY-MM-DD|
-#+-----+-----~-----+-------+-------+-------+--+----------+
 DestroyModuleConfig FvwmButtonsTop: *
-*FvwmButtonsTop: ButtonGeometry 2x2+0+0
+*FvwmButtonsTop: ButtonGeometry 1x1+0+0
 *FvwmButtonsTop: Back Black
 *FvwmButtonsTop: Fore Black
-*FvwmButtonsTop: Rows 20
+*FvwmButtonsTop: Rows 25
 *FvwmButtonsTop: Font $[fvwm_smallfont]
 *FvwmButtonsTop: Padding 0 0
-*FvwmButtonsTop: (18x20, Frame 0, Padding 0 0, Container(Columns 36, Rows 40, Frame 0, Padding 0 0))
-*FvwmButtonsTop: (36x39, Id menu, Frame 2, Padding 0 0, Back $[fvwm_mybg], Icon $[HOST].xpm, Action (Mouse 1) FuncMenuFvwmRoot, Action (Mouse 2) FuncWebBrowserClipboard, Action (Mouse 3) FuncScreenXTerm)
-*FvwmButtonsTop: (36x1, Frame 0, Padding 0 0, Back Black)
+*FvwmButtonsTop: (24x25, Frame 0, Padding 0 0, Container(Columns 1, Rows 25, Frame 0, Padding 0 0))
+*FvwmButtonsTop: (1x24, id menu, Frame 2, Padding 0 0, Back $[fvwm_mybg], Icon mini.fvwm.xpm, Action (Mouse 1) FuncMenuFvwmRoot, Action (Mouse 2) FuncWebBrowserClipboard, Action (Mouse 3) FuncScreenXTerm)
+*FvwmButtonsTop: (1x1, Frame 0, Padding 0 0, Back Black)
 *FvwmButtonsTop: (End)
-*FvwmButtonsTop: ($[width]x20, Frame 0, Padding 0 1, Container(Columns 1, Rows 1, Frame 0, Padding 0 0))
-*FvwmButtonsTop: (1x1, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmIconMan" "Module FvwmIconMan")
+*FvwmButtonsTop: ($[iconman_width]x25, Frame 0, Padding 0 0, Container(Columns 1, Rows 25, Frame 0, Padding 0 0))
+*FvwmButtonsTop: (1x24, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmIconMan" "Module FvwmIconMan")
+*FvwmButtonsTop: (1x1, Frame 0, Padding 0 0, Back Black)
 *FvwmButtonsTop: (End)
-*FvwmButtonsTop: ($[right_width]x20, Frame 0, Padding 1 1, Container(Columns $[right_inner_width], Rows 19, Frame 0, Padding 0 0, Back $[fvwm_mybg]))
-*FvwmButtonsTop: ($[pager_width]x19, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsTop: (54x7, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
-*FvwmButtonsTop: (54x12, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --no-shrink")
+*FvwmButtonsTop: ($[right_width]x25, Frame 0, Padding 0 0, Container(Columns $[right_inner_width], Rows 25, Frame 0, Padding 0 0))
+*FvwmButtonsTop: ($[pager_width]x24, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
+*FvwmButtonsTop: (108x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --icon-gravity SE --no-shrink")
+*FvwmButtonsTop: (110x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
+*FvwmButtonsTop: ($[right_inner_width]x1, Frame 0, Padding 0 0, Back Black)
 *FvwmButtonsTop: (End)
 # }}}3
 UnsetEnv screen_width
 UnsetEnv pager_width
 UnsetEnv right_width
 UnsetEnv right_inner_width
-UnsetEnv width
+UnsetEnv iconman_width
 # }}}2
 # FvwmIconMan Config {{{2
 DestroyModuleConfig FvwmIconMan: *
@@ -2080,8 +2075,8 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *TitleButton          flat $[fvwm_mybg] $[fvwm_mybg]
 *FvwmIconMan: *DontShow icon=Untitled resource=Untitled
 *FvwmIconMan: *DrawIcons always
-*FvwmIconMan: *ButtonGeometry  200x19
-*FvwmIconMan: *ManagerGeometry 3x2+3000+3000
+*FvwmIconMan: *ButtonGeometry  200x24
+*FvwmIconMan: *ManagerGeometry 4x1+3000+3000
 # }}}2
 # FvwmScript Config {{{2
 DestroyModuleConfig FvwmScript: *
@@ -2093,7 +2088,7 @@ DestroyModuleConfig FvwmScript: *
 DestroyModuleConfig FvwmPagerInline: *
 *FvwmPagerInline: Rows 1
 *FvwmPagerInline: Columns 8
-*FvwmPagerInline: Geometry 384x38-3000-3000
+*FvwmPagerInline: Geometry -3000-3000
 *FvwmPagerInline: Font none
 *FvwmPagerInline: SmallFont -schumacher-clean-medium-r-normal--6-*-*-*-c-*-iso646.1991-irv
 *FvwmPagerInline: MiniIcons
