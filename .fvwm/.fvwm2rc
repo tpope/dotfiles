@@ -70,14 +70,16 @@ CleanupColorsets
 #*FvwmTheme:
 SetEnv BACK       #C9C9C9
 SetEnv FORE       #777
-SetEnv FORESHAD   #999
 SetEnv HIBACK     #B3B3B3
 SetEnv HIFORE     #000
-SetEnv HIFORESHAD #FFF
+SetEnv DARK       #333
 
+Colorset 0 fg Black, fgsh White, bg $[BACK], IconAlpha 50
 Colorset 1 fg $[FORE], fgsh $[BACK], bg $[BACK], Transparent, IconAlpha 60
 Colorset 2 fg $[HIFORE], fgsh $[HIBACK], bg $[HIBACK], IconAlpha 100
-Colorset 3 fg Black, fgsh White, bg $[BACK], IconAlpha 50
+Colorset 3 fg $[DARK], fgsh $[BACK], bg $[BACK]
+Colorset 4 fg White, fgsh $[DARK], bg $[DARK]
+Colorset 5 fg $[FORE], fgsh $[BACK], bg $[BACK]
 PipeRead '\
 fvwm --version >/dev/null 2>&1 || ft="*FvwmTheme:"; \
 if xdpyinfo 2>&1|grep "depth of root window: *[23]" >/dev/null; then \
@@ -91,22 +93,16 @@ echo $ft Colorset 4$i fg black, bg \\#0`expr $i + 1``expr 8 - $i`; \
 done; \
 echo $ft Colorset 48 fg black, bg \\#077; \
 fi'
-SetEnv fvwm_mybg LightSteelBlue
+SetEnv fvwm_mybg #C9C9C9
 DefaultColors - $[fvwm_mybg]
 # }}}2
 # Menu Styles {{{2
-MenuStyle * Foreground black, Background SteelBlue, Greyed grey40
-MenuStyle * ActiveFore white, HilightBack navy
-MenuStyle * Animation, PopupOffset -4 100
-MenuStyle * MenuFace DGradient 256 LightSteelBlue SteelBlue
+MenuStyle * HilightBack
+MenuStyle * MenuColorset 3, ActiveColorset 4, GreyedColorset 5
+MenuStyle * Animation, PopupOffset -2 100
 MenuStyle * Font "$[fvwm_titlefont]"
 MenuStyle * Font "$[fvwm_menufont]"
-#CopyMenuStyle * Logins
-#CopyMenuStyle * Screens
-#MenuStyle Logins  Background rgb:ee/80/80, ActiveFore White, HilightBack DarkRed
-#MenuStyle Logins  MenuFace DGradient 256 rgb:ee/90/90 rgb:ee/70/70
-#MenuStyle Screens Background rgb:80/dd/80, ActiveFore White, HilightBack DarkGreen
-#MenuStyle Screens MenuFace DGradient 256 rgb:90/dd/90 rgb:70/dd/70
+MenuStyle * BorderWidth 1, TrianglesSolid, TrianglesUseFore
 
 # }}}2
 # Default Styles {{{2
@@ -366,6 +362,7 @@ UnsetEnv HIFORE
 UnsetEnv FORE
 UnsetEnv HIBACK
 UnsetEnv BACK
+UnsetEnv DARK
 # }}}1
 # Key Bindings {{{1
 # Keys are in /usr/include/X11/keysymdef.h
@@ -2012,7 +2009,7 @@ DestroyModuleConfig FvwmButtonsBottom: *
 *FvwmButtonsBottom: ($[right_width]x25, Frame 0, Padding 0 0, Container(Columns $[right_inner_width], Rows 25, Frame 0, Padding 0 0))
 *FvwmButtonsBottom: ($[right_inner_width]x1, Frame 0, Padding 0 0, Back Black)
 *FvwmButtonsBottom: ($[pager_width]x24, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsBottom: (108x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --icon-gravity SE --no-shrink")
+*FvwmButtonsBottom: (108x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 4x1-4-1 --icon-gravity SE --no-shrink --scrollbars horizontal")
 *FvwmButtonsBottom: (110x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
 *FvwmButtonsBottom: (End)
 # }}}3
@@ -2067,11 +2064,11 @@ DestroyModuleConfig FvwmIconMan: *
 *FvwmIconMan: *SortWeight   5 resource=@*
 *FvwmIconMan: *SortWeight   7 resource=ssh@*
 *FvwmIconMan: *SortWeight  50
-*FvwmIconMan: *PlainButton          up   black $[fvwm_mybg]
-*FvwmIconMan: *IconButton           up   DimGrey $[fvwm_mybg]
-*FvwmIconMan: *SelectButton         up   blue $[fvwm_mybg]
-*FvwmIconMan: *FocusButton          down black LightBlue2
-*FvwmIconMan: *FocusAndSelectButton down blue LightBlue2
+*FvwmIconMan: *PlainButton          up   #444444 $[bg.cs1]
+*FvwmIconMan: *IconButton           up   $[fg.cs1] $[bg.cs1]
+*FvwmIconMan: *SelectButton         up   Black $[bg.cs1]
+*FvwmIconMan: *FocusButton          down $[fg.cs2] $[bg.cs2]
+*FvwmIconMan: *FocusAndSelectButton down Black $[bg.cs2]
 *FvwmIconMan: *TitleButton          flat $[fvwm_mybg] $[fvwm_mybg]
 *FvwmIconMan: *DontShow icon=Untitled resource=Untitled
 *FvwmIconMan: *DrawIcons always
@@ -2150,8 +2147,8 @@ DestroyModuleConfig FvwmScroll: *
 
 DestroyModuleConfig FvwmFormDefault: *
 *FvwmFormDefault: Back #bbb
-*FvwmFormDefault: Colorset 3
-*FvwmFormDefault: ItemColorset 3
+*FvwmFormDefault: Colorset 0
+*FvwmFormDefault: ItemColorset 0
 *FvwmFormDefault: ButtonFont $[fvwm_labelfont]
 *FvwmFormDefault: Font       $[fvwm_labelfont]
 *FvwmFormDefault: InputFont  "xft:Mono:pixelsize=11"

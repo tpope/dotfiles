@@ -1,7 +1,7 @@
 # ~/.fvwm/FvwmScript-Date
 
 WindowSize 110 24
-ForeColor {Black}
+ForeColor {#333}
 
 WindowPosition -3000 -3000
 
