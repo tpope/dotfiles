@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -d "$1" ]; then
+  if [ -n "$LS_COLORS" ]; then
+    exec ls --color=force -lF "$1"
+  else
+    CLICOLOR_FORCE=1 exec ls -lF "$1"
+  fi
+fi
+
+exit 1
