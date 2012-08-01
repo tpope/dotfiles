@@ -33,6 +33,7 @@ TERM xterm-debian
 TERM rxvt
 TERM rxvt-unicode
 TERM screen
+TERM screen-256color
 TERM screen-bce
 TERM screen-w
 TERM screen.linux
