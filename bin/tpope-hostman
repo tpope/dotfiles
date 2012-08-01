@@ -1,8 +1,8 @@
 #!/bin/sh
-# -*- sh -*- vim:set ft=sh et sw=4 sts=4:
+# vi: set et sw=2:
 
-# This script handles everything to do with hostnames, particularly
-# colourizing them.
+# Handles everything to do with hostnames, particularly colorizing them in
+# shell prompts.
 
 hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
@@ -10,40 +10,40 @@ hosts="matthew todd lucas gideon roxy"
 menuhosts="matthew todd lucas gideon roxy"
 
 gethost() {
-    case "$1" in
-    [Gg]|gideon*)                 echo gideon ;;
-    [Ll]|ucas*)                   echo lucas ;;
-    [Mm]|matthew*)                echo matthew ;;
-    [Oo]|todd*)                   echo todd ;;
-    [Yy]|roxy*)                   echo roxy ;;
-    ?)                            echo localhost ;;
-    *) echo "$1" ;;
+  case "$1" in
+  [Gg]|gideon*)                 echo gideon ;;
+  [Ll]|ucas*)                   echo lucas ;;
+  [Mm]|matthew*)                echo matthew ;;
+  [Oo]|todd*)                   echo todd ;;
+  [Yy]|roxy*)                   echo roxy ;;
+  ?)                            echo localhost ;;
+  *) echo "$1" ;;
 esac
 }
 
 name() {
-    if [ -n "$COMPUTERNAME" ]; then
-        # Windows
-        echo "$COMPUTERNAME"
-    else
-        hostname
-    fi
+  if [ -n "$COMPUTERNAME" ]; then
+    # Windows
+    echo "$COMPUTERNAME"
+  else
+    hostname
+  fi
 }
 
 getinfo() {
-    `echo $1|tr A-Z.- a-z__` 2>/dev/null || unknown
-    case "$TERM" in screen*|xterm-*|rxvt-unicode) hterm="`echo $hterm|sed -e 's/01;3/00;9/'`" ;;
-    esac
+  `echo $1|tr A-Z.- a-z__` 2>/dev/null || unknown
+  case "$TERM" in screen*|xterm-*|rxvt-unicode) hterm="`echo $hterm|sed -e 's/01;3/00;9/'`" ;;
+  esac
 }
 
 insertletter() {
-    hltr=`echo $2|tr 'A-Z' 'a-z'`
-    if [ -n "$hltr" ]; then
-        case $1 in *$hltr*) hmenu=`echo "$1"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$1(&$hltr)" ;; esac
-        echo $hmenu
-    else
-        echo $1
-    fi
+  hltr=`echo $2|tr 'A-Z' 'a-z'`
+  if [ -n "$hltr" ]; then
+    case $1 in *$hltr*) hmenu=`echo "$1"|sed -e "s/$hltr/\&$hltr/"` ;; *) hmenu="$1(&$hltr)" ;; esac
+    echo $hmenu
+  else
+    echo $1
+  fi
 }
 
 matthew()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
@@ -60,7 +60,7 @@ navy()        { hterm="00;34";hscrn="   b";hlrgb="#7F7FFF";hdrgb="#000080";}
 purple()      { hterm="00;35";hscrn="   m";hlrgb="#D47FD4";hdrgb="#550055";}
 teal()        { hterm="00;36";hscrn="   c";hlrgb="#7FD4D4";hdrgb="#005555";}
 grey()        { hterm="01;30";hscrn="+b K";hlrgb="#BCBBBB";hdrgb="#3d3c3c";
-                test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
+        test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
 orange()      { hterm="01;31";hscrn="+b R";hlrgb="#FFA1A1";hdrgb="#802222";}
 lime()        { hterm="01;32";hscrn="+b G";hlrgb="#A2FFA1";hdrgb="#238022";}
 yellow()      { hterm="01;33";hscrn="+b Y";hlrgb="#FFFF7F";hdrgb="#808000";}
@@ -70,117 +70,117 @@ cyan()        { hterm="01;36";hscrn="+b C";hlrgb="#7FFFFF";hdrgb="#008080";}
 white()       { hterm="01;37";hscrn="+b W";hlrgb="#FFFFFF";hdrgb="#808080";}
 
 suffix() {
-    domains="`egrep '^search|^domain' /etc/resolv.conf 2>/dev/null`"
-    ifconfig="/sbin/ifconfig"
-    if $ifconfig -a 2>/dev/null|grep ':172\.' >/dev/null 2>&1; then
-        getinfo "$1"
-        case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
-    elif $ifconfig -a 2>/dev/null|grep ':192\.168\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-        getinfo "$1"
-        [ "$hdom" != "tpope.us" ] || suffix=".t"
-    elif $ifconfig -a 2>/dev/null|grep ':10\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-        suffix=".t"
-    elif [ ! -x $ifconfig -a -x "`which connect 2>/dev/null`" ]; then
-        suffix=".p"
-    else
-        getinfo "$1"
-        case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
-    fi
-    case "$1" in
-        [1-9]*) echo ;;
-        *) echo $suffix ;;
-    esac
+  domains="`egrep '^search|^domain' /etc/resolv.conf 2>/dev/null`"
+  ifconfig="/sbin/ifconfig"
+  if $ifconfig -a 2>/dev/null|grep ':172\.' >/dev/null 2>&1; then
+    getinfo "$1"
+    case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
+  elif $ifconfig -a 2>/dev/null|grep ':192\.168\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
+    getinfo "$1"
+    [ "$hdom" != "tpope.us" ] || suffix=".t"
+  elif $ifconfig -a 2>/dev/null|grep ':10\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
+    suffix=".t"
+  elif [ ! -x $ifconfig -a -x "`which connect 2>/dev/null`" ]; then
+    suffix=".p"
+  else
+    getinfo "$1"
+    case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
+  fi
+  case "$1" in
+    [1-9]*) echo ;;
+    *) echo $suffix ;;
+  esac
 }
 
 exec_nc() {
-    if [ -x "`which nc 2>/dev/null`" ]; then
-        if [ -x "$HOME/bin/nc" ]; then
-            exec "$HOME/bin/nc" "$1" "$2"
-        elif [ -f /etc/debian_version ]; then
-            # Debian versions benefit from -q, some others choke on it
-            exec nc -q 1 "$1" "$2"
-        else
-            # Hack around iTerm and nc stupidity
-            if [ "`uname`" = Darwin ]; then
-                #ls -l /dev/fd >&2
-                #echo "Closing stderr...">&2
-                exec 2>&-
-            fi
-            exec nc "$1" "$2"
-        fi
+  if [ -x "`which nc 2>/dev/null`" ]; then
+    if [ -x "$HOME/bin/nc" ]; then
+      exec "$HOME/bin/nc" "$1" "$2"
+    elif [ -f /etc/debian_version ]; then
+      # Debian versions benefit from -q, some others choke on it
+      exec nc -q 1 "$1" "$2"
+    else
+      # Hack around iTerm and nc stupidity
+      if [ "`uname`" = Darwin ]; then
+        #ls -l /dev/fd >&2
+        #echo "Closing stderr...">&2
+        exec 2>&-
+      fi
+      exec nc "$1" "$2"
     fi
+  fi
 }
 
 case "$hostinfo" in
 tpope) return ;;
 ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
 hostinfo|hostman|tpope-hostman)
-    : ${host:="`name`"}
+  : ${host:="`name`"}
+  case "$1" in
+  -h|--hostname)    echo `gethost ${2:-$host}`; exit 0 ;;
+  -c|--host-color)  getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
+  -l|--letter)      getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
+  -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
+  -r|--rgb)         getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
+  -S|--ssh)
+    shift
+    exec ssh "$@"
     case "$1" in
-    -h|--hostname)    echo `gethost ${2:-$host}`; exit 0 ;;
-    -c|--host-color)  getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
-    -l|--letter)      getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
-    -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
-    -r|--rgb)         getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
-    -S|--ssh)
-        shift
-        exec ssh "$@"
-        case "$1" in
-            *.*) host="$1";;
-            *) host=`gethost ${1:-$host}` ;;
-        esac
-        shift
-        exec ssh "$host`suffix $host`" "$@" ;;
-    -b|--batch-ssh)
-        case "$2" in
-            *.*|-*) host="$2" ;;
-            *) host=`gethost ${2:-$host}` ;;
-        esac
-        shift; shift
-        exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@" ;;
-    --tunnel)
-        host="`gethost $2`"
-        getinfo $host
-        case "`cat /etc/resolv.conf 2>/dev/null`" in
-            *$hdom*)
-            if [ -x "`which nc 2>/dev/null`" ]; then
-                exec_nc "$host" "$3"
-            fi
-            ;;
-        esac
-        if [ "$hdom" = tpope.net -a -x "`which nc 2>/dev/null`" ]; then
-            exec_nc "$host.$hdom" "$3"
-        fi
-        if [ "$hdom" = hshrckt.com ]; then
-            exec ssh -ex ci.hshrckt.com nc -q 1 "$host.local" "$3" 2>/dev/null
-        fi
-        exec ssh -ax trp nc -q 1 "$host" "$3" 2>/dev/null
-        ;;
-    -H)
-        rm -f "$HOME"/bin/[A-Z]
-        for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
-            ln -s hostinfo "$HOME/bin/$ltr"
-        done
-        exit 0
-        ;;
-    --fvwm-styles)
-        for host in $hosts; do getinfo `gethost ${2:-$host}`;
-            if [ "$host" != - ]; then
-                #echo "Style *@$host* ForeColor $hlrgb, HilightFore $hdrgb"
-                echo "Style *@$host* MiniIcon mini/terminal/right-$hcolor.xpm" #, Icon $host.xpm"
-                echo "Style @$host* MiniIcon mini/terminal/left-$hcolor.xpm"
-            fi
-        done
-        exit 0
-        ;;
-    --fvwm-menus)
-    cat<<EOF
+      *.*) host="$1";;
+      *) host=`gethost ${1:-$host}` ;;
+    esac
+    shift
+    exec ssh "$host`suffix $host`" "$@" ;;
+  -b|--batch-ssh)
+    case "$2" in
+      *.*|-*) host="$2" ;;
+      *) host=`gethost ${2:-$host}` ;;
+    esac
+    shift; shift
+    exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@" ;;
+  --tunnel)
+    host="`gethost $2`"
+    getinfo $host
+    case "`cat /etc/resolv.conf 2>/dev/null`" in
+      *$hdom*)
+      if [ -x "`which nc 2>/dev/null`" ]; then
+        exec_nc "$host" "$3"
+      fi
+      ;;
+    esac
+    if [ "$hdom" = tpope.net -a -x "`which nc 2>/dev/null`" ]; then
+      exec_nc "$host.$hdom" "$3"
+    fi
+    if [ "$hdom" = hshrckt.com ]; then
+      exec ssh -ex ci.hshrckt.com nc -q 1 "$host.local" "$3" 2>/dev/null
+    fi
+    exec ssh -ax trp nc -q 1 "$host" "$3" 2>/dev/null
+    ;;
+  -H)
+    rm -f "$HOME"/bin/[A-Z]
+    for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
+      ln -s hostinfo "$HOME/bin/$ltr"
+    done
+    exit 0
+    ;;
+  --fvwm-styles)
+    for host in $hosts; do getinfo `gethost ${2:-$host}`;
+      if [ "$host" != - ]; then
+        #echo "Style *@$host* ForeColor $hlrgb, HilightFore $hdrgb"
+        echo "Style *@$host* MiniIcon mini/terminal/right-$hcolor.xpm" #, Icon $host.xpm"
+        echo "Style @$host* MiniIcon mini/terminal/left-$hcolor.xpm"
+      fi
+    done
+    exit 0
+    ;;
+  --fvwm-menus)
+  cat<<EOF
 DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
 DestroyMenu MenuFvwmTerminals
-AddTomenu MenuFvwmScreens   MissingSubmenuFunction FuncMissingHostMenu
-AddTomenu MenuFvwmLogins    MissingSubmenuFunction FuncMissingHostMenu
-AddTomenu MenuFvwmTerminals MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmScreens   MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmLogins    MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmTerminals MissingSubmenuFunction FuncMissingHostMenu
 AddToMenu MenuFvwmScreens    "Screen" Title
 AddToMenu MenuFvwmLogins     "Login"  Title
 AddToMenu MenuFvwmTerminals  "Focus"  Title
@@ -193,85 +193,85 @@ AddToMenu MenuFvwmTerminals  "" Nop
 #ChangeMenuStyle Screens MenuFvwmScreens
 #ChangeMenuStyle Logins  MenuFvwmLogins
 EOF
-        for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
-            hltr=`echo $hltr|tr 'A-Z' 'a-z'`
-            if [ "$host" != - ]; then
-                hmenu="`insertletter $host $hltr`"
-                echo "AddToMenu MenuFvwmScreens    $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
-                echo "AddToMenu MenuFvwmLogins    $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm $host"
-                echo "AddToMenu MenuFvwmTerminals $hmenu%mini/terminal/right-$hcolor.xpm% FuncFindXTerm $host"
-            else
-                echo 'AddToMenu MenuFvwmScreens    "" Nop'
-                echo 'AddToMenu MenuFvwmLogins     "" Nop'
-                echo 'AddToMenu MenuFvwmTerminals  "" Nop'
-            fi
-        done
+    for host in ${menuhosts:-$hosts}; do getinfo `gethost $host`;
+      hltr=`echo $hltr|tr 'A-Z' 'a-z'`
+      if [ "$host" != - ]; then
+        hmenu="`insertletter $host $hltr`"
+        echo "AddToMenu MenuFvwmScreens    $hmenu%mini/terminal/left-$hcolor.xpm% FuncScreenSshXTerm $host"
+        echo "AddToMenu MenuFvwmLogins    $hmenu%mini/terminal/right-$hcolor.xpm% FuncSshXTerm $host"
+        echo "AddToMenu MenuFvwmTerminals $hmenu%mini/terminal/right-$hcolor.xpm% FuncFindXTerm $host"
+      else
+        echo 'AddToMenu MenuFvwmScreens    "" Nop'
+        echo 'AddToMenu MenuFvwmLogins     "" Nop'
+        echo 'AddToMenu MenuFvwmTerminals  "" Nop'
+      fi
+    done
 
-        if [ -x "`which avahi-browse 2>/dev/null`" ]; then
-            echo 'AddToMenu MenuFvwmScreens   "" Nop'
-            echo 'AddToMenu MenuFvwmLogins    "" Nop'
-            echo 'AddToMenu MenuFvwmTerminals "" Nop'
-            echo 'AddToMenu MenuFvwmScreens   "Discovered &. . ." Popup MenuDiscoveredHostsScreenSsh'
-            echo 'AddToMenu MenuFvwmLogins    "Discovered &. . ." Popup MenuDiscoveredHostsSsh'
-            echo 'AddToMenu MenuFvwmTerminals "Discovered &. . ." Popup MenuDiscoveredHostsFind'
-        fi
-
-        exit 0
-        ;;
-
-    --fvwm-keys)
-        for host in $hosts; do getinfo `gethost $host`;
-            [ "$host" != - ] &&
-            #echo "Key $hltr A 4   FuncFindXTerm $host" &&
-            echo "Key $hltr A 4S  FuncScreenSshXTerm $host" &&
-            echo "Key $hltr A 4C  FuncScreenSshXTerm $host" &&
-            echo "Key $hltr A CMS FuncSshXTerm $host" &&
-            echo "Key $hltr A 4M  FuncSshXTerm $host"
-        done
-        exit 0
-        ;;
-    -u|-w|--ruptime|--rwho)
-    PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
-    command="$1"; shift
-    [ "`uname -s`" != Linux ] || sep='\<'
-    [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
-    [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
-    if [ "$1" = "-p" ]; then
-        RUPTIME=cat
-        shift
-    elif [ -x "`which $command 2>/dev/null`" -a "`name`" != grex.cyberspace.org ]; then
-        RUPTIME="$command"
-    else
-        RUPTIME="finger $command$1@tpope.us"
-        [ -n "$1" ] && shift
+    if [ -x "`which avahi-browse 2>/dev/null`" ]; then
+      echo 'AddToMenu MenuFvwmScreens   "" Nop'
+      echo 'AddToMenu MenuFvwmLogins    "" Nop'
+      echo 'AddToMenu MenuFvwmTerminals "" Nop'
+      echo 'AddToMenu MenuFvwmScreens   "Discovered &. . ." Popup MenuDiscoveredHostsScreenSsh'
+      echo 'AddToMenu MenuFvwmLogins    "Discovered &. . ." Popup MenuDiscoveredHostsSsh'
+      echo 'AddToMenu MenuFvwmTerminals "Discovered &. . ." Popup MenuDiscoveredHostsFind'
     fi
-    AWK='{print $1" "$0}'
-    [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
-    [ -t 1 ] && TERMINAL=1
-    if [ "$TERMINAL" ]; then
-        $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
-            getinfo `gethost $host` 2>/dev/null || hterm="01;37"
-            echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
-        done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
-    else
-        $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
-    fi
+
     exit 0
-            ;;
-            -*) echo "Usage: [-chls] [hostname]" >&2; exit 1 ;;
-            *) echo `gethost ${1:-$host}`; exit 0 ;;
-        esac
-        exit 2
-        ;;
-    ?)  [ -n "$STY" ] && SCREEN="screen -ln"
-        exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
-    batch-ssh)
-        case "$2" in
-            *.*|-*) host="$2";;
-            *) host=`gethost ${2:-$host}` ;;
-        esac
-        shift; shift
-        exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
+    ;;
 
-    *) echo Warning: invalid command "$hostinfo" ;;
+  --fvwm-keys)
+    for host in $hosts; do getinfo `gethost $host`;
+      [ "$host" != - ] &&
+      #echo "Key $hltr A 4   FuncFindXTerm $host" &&
+      echo "Key $hltr A 4S  FuncScreenSshXTerm $host" &&
+      echo "Key $hltr A 4C  FuncScreenSshXTerm $host" &&
+      echo "Key $hltr A CMS FuncSshXTerm $host" &&
+      echo "Key $hltr A 4M  FuncSshXTerm $host"
+    done
+    exit 0
+    ;;
+  -u|-w|--ruptime|--rwho)
+  PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
+  command="$1"; shift
+  [ "`uname -s`" != Linux ] || sep='\<'
+  [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
+  [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
+  if [ "$1" = "-p" ]; then
+    RUPTIME=cat
+    shift
+  elif [ -x "`which $command 2>/dev/null`" -a "`name`" != grex.cyberspace.org ]; then
+    RUPTIME="$command"
+  else
+    RUPTIME="finger $command$1@tpope.us"
+    [ -n "$1" ] && shift
+  fi
+  AWK='{print $1" "$0}'
+  [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
+  [ -t 1 ] && TERMINAL=1
+  if [ "$TERMINAL" ]; then
+    $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
+      getinfo `gethost $host` 2>/dev/null || hterm="01;37"
+      echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
+    done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
+  else
+    $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
+  fi
+  exit 0
+      ;;
+      -*) echo "Usage: [-chls] [hostname]" >&2; exit 1 ;;
+      *) echo `gethost ${1:-$host}`; exit 0 ;;
+    esac
+    exit 2
+    ;;
+  ?)  [ -n "$STY" ] && SCREEN="screen -ln"
+    exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
+  batch-ssh)
+    case "$2" in
+      *.*|-*) host="$2";;
+      *) host=`gethost ${2:-$host}` ;;
+    esac
+    shift; shift
+    exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
+
+  *) echo Warning: invalid command "$hostinfo" ;;
 esac

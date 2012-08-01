@@ -1,5 +1,5 @@
 #!/bin/sh
-# vim:set ft=sh et sw=4 sts=4:
+# vi: set et sw=2:
 
 # This is a multipurpose script that is easier to copy around than 30-odd
 # single purpose ones.  If a function grows too big, it earns its own file,
@@ -14,32 +14,32 @@
 
 [ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
 case "$PATH" in
-    "$HOME/bin:"*) ;;
-    *) PATH="$HOME/bin:$PATH" ;;
+  "$HOME/bin:"*) ;;
+  *) PATH="$HOME/bin:$PATH" ;;
 esac
 
 if [ -f "$ENV" ]; then
-    . "$ENV"
+  . "$ENV"
 fi
 
 basename=`basename "$0"`
 if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
-    tpope="$basename " basename="$1"
-    shift
+  tpope="$basename " basename="$1"
+  shift
 fi
 
 if [ aliases = "$basename" ]; then
-    # Optimization: put this early since it is called for every shell
-    aliases="launch lt lv dm pg gp sb b e p t c dl sursync ruptime rwho status \
-    rclink rc start stop restart reload force-reload mount shutdown tomorrow \
-    vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix swap \
-    word ord wor or Word Ord Wor Or"
-    PATH=/usr/bin:/usr/sbin:/usr/local/bin
-    for app in apt-get aptitude emerge port diff cardctl rubber xdvi xpdf gv; do
-        [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
-    done
-    echo $aliases
-    exit 0
+  # Optimization: put this early since it is called for every shell
+  aliases="launch lt lv dm pg gp sb b e p t c dl sursync ruptime rwho status \
+  rclink rc start stop restart reload force-reload mount shutdown tomorrow \
+  vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix swap \
+  word ord wor or Word Ord Wor Or"
+  PATH=/usr/bin:/usr/sbin:/usr/local/bin
+  for app in apt-get aptitude emerge port diff cardctl rubber xdvi xpdf gv; do
+    [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
+  done
+  echo $aliases
+  exit 0
 fi
 
 rcd=/etc/init.d
@@ -57,744 +57,746 @@ inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
 wordtrans() { echo "$1"|sed -e 's/-/[-A-Za-z0-9]/g'; }
 
 root_init() {
-    if inpath cygstart; then
-        as_root() { "$@"; }
-    elif [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
-        if inpath sudo && sudo -l >/dev/null 2>&1; then
-            as_root() {
-                if [ "$1" = exec ]; then ex="exec"; shift; fi
-                $ex sudo "$@"
-            }
-        else
-            echo "Warning: sudo not installed or not configured" >&2
-            as_root() {
-                if [ "$1" = exec ]; then ex="exec"; shift; fi
-                $ex su -c "$*"
-            }
-        fi
+  if inpath cygstart; then
+    as_root() { "$@"; }
+  elif [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
+    if inpath sudo && sudo -l >/dev/null 2>&1; then
+      as_root() {
+        if [ "$1" = exec ]; then ex="exec"; shift; fi
+        $ex sudo "$@"
+      }
     else
-        as_root() { "$@" ; }
+      echo "Warning: sudo not installed or not configured" >&2
+      as_root() {
+        if [ "$1" = exec ]; then ex="exec"; shift; fi
+        $ex su -c "$*"
+      }
     fi
+  else
+    as_root() { "$@" ; }
+  fi
 }
 
 no_links() {
-    if [ -h "$HOME/bin/$basename" ]; then
-        echo "Error: this alias cannot be a symlink." >&2
-        echo "Remove $HOME/bin/$basename and try again." >&2
-        exit 1
-    fi
+  if [ -h "$HOME/bin/$basename" ]; then
+    echo "Error: this alias cannot be a symlink." >&2
+    echo "Remove $HOME/bin/$basename and try again." >&2
+    exit 1
+  fi
 }
 
 most_recent() {
-    prog="$1"
-    shift
-    file="`ls -1t "$@" 2>/dev/null|head -1`"
-    if [ -f "$file" ]; then
-        exec "$prog" "$file"
-    else
-        exec "$prog"
-    fi
+  prog="$1"
+  shift
+  file="`ls -1t "$@" 2>/dev/null|head -1`"
+  if [ -f "$file" ]; then
+    exec "$prog" "$file"
+  else
+    exec "$prog"
+  fi
 }
 
 do_media() {
-    exec "$HOME/bin/media" "$@"
+  exec "$HOME/bin/media" "$@"
 }
 
 try_libtrash() {
-    case "$LD_PRELOAD" in *libtrash*) ;; *)
-    if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
-       LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-       export LD_PRELOAD
-    elif [ -f /usr/lib/libtrash/libtrash.so.2.4 -a -f "$HOME/.libtrash" ]; then
-       LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so.2.4"
-       export LD_PRELOAD
+  case "$LD_PRELOAD" in *libtrash*) ;; *)
+  if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
+     LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
+     export LD_PRELOAD
+  elif [ -f /usr/lib/libtrash/libtrash.so.2.4 -a -f "$HOME/.libtrash" ]; then
+     LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so.2.4"
+     export LD_PRELOAD
    fi ;; esac
-    "$@"
+  "$@"
 }
 
 do_clean() {
-    if [ "$1" = -v ]; then
-        FIND()    { find "$@" ! -type d -print 2>/dev/null; }
-        FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
-        shift
+  if [ "$1" = -v ]; then
+    FIND()    { find "$@" ! -type d -print 2>/dev/null; }
+    FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
+    shift
+  else
+    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
+        xargs -0 rmdir >/dev/null 2>&1; }
+    if inpath wipe; then
+      FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+          xargs -0 wipe -fcsq >/dev/null 2>&1; }
+    elif inpath shred; then
+      FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+          xargs -0 shred -fun 4 >/dev/null 2>&1; }
     else
-        FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
-                xargs -0 rmdir >/dev/null 2>&1; }
-        if inpath wipe; then
-            FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-                    xargs -0 wipe -fcsq >/dev/null 2>&1; }
-        elif inpath shred; then
-            FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-                    xargs -0 shred -fun 4 >/dev/null 2>&1; }
-        else
-            FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
-                    xargs -0 rm >/dev/null 2>&1; }
-        fi
+      FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+          xargs -0 rm >/dev/null 2>&1; }
     fi
-    case "$1" in
-        1|2|3|4) unit=$1 ;;
-        5) unit=4 ;;
-        '') unit=2 ;;
-        *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
-    esac
-    unset LD_PRELOAD
-    PROTECT_TRASH=NO
-    export PROTECT_TRASH
-    FIND "$HOME" \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" -o -name screen-exchange -o -name "*.stackdump" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
-    FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
-    FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30`
-    [ $unit = 4 ] && unit=6
-    FIND "$HOME/.trash" "$HOME/.mutt_cache" -atime +`expr $unit \* 15`
-    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
-    FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
-    FINDDIR "$HOME/.trash" -atime +`expr $unit \* 1` -empty
-    if [ ! -d "$HOME/.trash" ]; then
-        mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
-    fi
-    rm -f "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/plutil.vim" "$HOME/.vim/ftplugin/pdf.vim" "$HOME/.vim/syntax/pdf.vim" "$HOME/.vim/indent/eruby.vim" "$HOME/.vim/syntax/simpsons.vim" "$HOME/.vim/syntax/"asm68* "$HOME/.vim/syntax/c89.vim" "$HOME/.vim/syntax/ti89call.vim" "$HOME/.vim/after/syntax/crontab.vim" "$HOME/.vim/autoload/bundle.vim" "$HOME/.vim/autoload/rtp.vim" "$HOME/.zsh/functions/prompt_simpson_setup" "$HOME/.vim/after/syntax/csh.vim" "$HOME/.vim/after/syntax/mail.vim" "$HOME/.vim/after/syntax/syncolor.vim" "$HOME/.vim/after/syntax/zsh.vim" "$HOME/.vim/templates/skel.pm" "$HOME/.vim/plugin/imagemagick.vim" "$HOME/.vim/plugin/allml.vim" "$HOME/.fvwm/FvwmScript-Alert" "$HOME/.fvwm/FvwmScript-Date" "$HOME/.fvwm/FvwmScript-Time" "$HOME/bin/hostinfo"
-    return 0
+  fi
+  case "$1" in
+    1|2|3|4) unit=$1 ;;
+    5) unit=4 ;;
+    '') unit=2 ;;
+    *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
+  esac
+  unset LD_PRELOAD
+  PROTECT_TRASH=NO
+  export PROTECT_TRASH
+  FIND "$HOME" \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" -o -name screen-exchange -o -name "*.stackdump" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
+  FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
+  FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30` -type f
+  [ $unit = 4 ] && unit=6
+  FIND "$HOME/.trash" "$HOME/.mutt_cache" -atime +`expr $unit \* 15`
+  FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
+  FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
+  FINDDIR "$HOME/.trash" -atime +`expr $unit \* 1` -empty
+  if [ ! -d "$HOME/.trash" ]; then
+    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
+  fi
+  rm -rf "$HOME/.vim/plugin/rails.txt" "$HOME/.vim/plugin/plutil.vim" "$HOME/.vim/ftplugin/pdf.vim" "$HOME/.vim/syntax/pdf.vim" "$HOME/.vim/indent/eruby.vim" "$HOME/.vim/syntax/simpsons.vim" "$HOME/.vim/syntax/"asm68* "$HOME/.vim/syntax/c89.vim" "$HOME/.vim/syntax/ti89call.vim" "$HOME/.vim/after/syntax/crontab.vim" "$HOME/.vim/autoload/bundle.vim" "$HOME/.vim/autoload/rtp.vim" "$HOME/.zsh/functions/prompt_simpson_setup" "$HOME/.vim/after/syntax/csh.vim" "$HOME/.vim/after/syntax/mail.vim" "$HOME/.vim/after/syntax/syncolor.vim" "$HOME/.vim/after/syntax/zsh.vim" "$HOME/.vim/templates/skel.pm" "$HOME/.vim/plugin/imagemagick.vim" "$HOME/.vim/plugin/allml.vim" "$HOME/.fvwm/FvwmScript-Alert" "$HOME/.fvwm/FvwmScript-Date" "$HOME/.fvwm/FvwmScript-Time" "$HOME/bin/hostinfo" "$HOME/.git_template/info/exclude" "$HOME/.fvwm/.fvwm-menu-headlines/extension.pl" "$HOME/.Eterm" "$HOME/.terminfo/E" "$HOME/.terminfo/x/78" "$HOME/.vim/after/syntax/dosbatch.vim" "$HOME/.zsh/functions/_git-trac"
+  return 0
 }
 
 display_manage() {
-    # Disables DPMS and xscreensaver for the duration of a programs execution
-    [ "$DISPLAY" ] || DISPLAY=:0
-    xset=xset
-    [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-    dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
-    case "$dpms" in
-        on|standby|suspend|off) ;;
-        *) dpms=on ;;
-    esac
-    #$xset dpms force on
-    while kill -0 $$ 2>/dev/null; do
-        xscreensaver-command -deactivate >/dev/null 2>&1
-        sleep 55
-    done &
-    "$@"
-    ret=$?
-    $xset dpms force $dpms
-    return $?
+  # Disables DPMS and xscreensaver for the duration of a programs execution
+  [ "$DISPLAY" ] || DISPLAY=:0
+  xset=xset
+  [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
+  dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
+  case "$dpms" in
+    on|standby|suspend|off) ;;
+    *) dpms=on ;;
+  esac
+  #$xset dpms force on
+  while kill -0 $$ 2>/dev/null; do
+    xscreensaver-command -deactivate >/dev/null 2>&1
+    sleep 55
+  done &
+  "$@"
+  ret=$?
+  $xset dpms force $dpms
+  return $?
 }
 
 status() {
-    if [ "$#" = 0 -a -f "$HOME/.status" ]; then
-        exec cat "$HOME/.status"
+  if [ "$#" = 0 -a -f "$HOME/.status" ]; then
+    exec cat "$HOME/.status"
+  fi
+  if [ "$hostname" = michael ]; then
+    if [ "$1" = away -o "$1" = activity ] && [ "$#" = 1 ]; then
+      exec cat "$HOME/.$1" 2>/dev/null
     fi
-    if [ "$hostname" = michael ]; then
-        if [ "$1" = away -o "$1" = activity ] && [ "$#" = 1 ]; then
-            exec cat "$HOME/.$1" 2>/dev/null
-        fi
-        case "$1" in
-            '') exit 1 ;;
-            away|activity|out|check) away-tpope "$@" ;;
-            rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
-            *) echo "Unknown status command $1" >&2 ;;
-        esac
-    elif [ -f "$HOME/.activity" -a "$1" = activity ]; then
-        exec cat "$HOME/.activity"
-    elif [ -f "$HOME/.away" -a "$1" = away ]; then
-        exec cat "$HOME/.away"
-    elif ping -c 1 tpope.us >/dev/null 2>&1; then
-        unset DISPLAY
-        if [ "$#" = 2 -a -z "$2" ]; then
-            exec tpope hostman -b tpope.us tpope status "$1" -c
-        else
-            exec tpope hostman -b tpope.us tpope status "$@"
-        fi
+    case "$1" in
+      '') exit 1 ;;
+      away|activity|out|check) away-tpope "$@" ;;
+      rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
+      *) echo "Unknown status command $1" >&2 ;;
+    esac
+  elif [ -f "$HOME/.activity" -a "$1" = activity ]; then
+    exec cat "$HOME/.activity"
+  elif [ -f "$HOME/.away" -a "$1" = away ]; then
+    exec cat "$HOME/.away"
+  elif ping -c 1 tpope.us >/dev/null 2>&1; then
+    unset DISPLAY
+    if [ "$#" = 2 -a -z "$2" ]; then
+      exec tpope hostman -b tpope.us tpope status "$1" -c
     else
-        exit 2
+      exec tpope hostman -b tpope.us tpope status "$@"
     fi
+  else
+    exit 2
+  fi
 }
 
 pager() {
-    if [ -t 1 ]; then
-        "$HOME/bin/tpope" sensible-pager "$@"
-    else
-        cat "$@"
-    fi
+  if [ -t 1 ]; then
+    "$HOME/bin/tpope" sensible-pager "$@"
+  else
+    cat "$@"
+  fi
 }
 
 case "$basename" in
 
-    status) status "$@" ;;
-    rehash|activity|away|out|check) status $basename "$@" ;;
+  status) status "$@" ;;
+  rehash|activity|away|out|check) status $basename "$@" ;;
 
-    br)
-        if [ "`hostname`" = michael ]; then
-            no_links
-            exec br "$@"
-        else
-            tpope hostman --batch-ssh michael br "$@"
-        fi ;;
+  br)
+    if [ "`hostname`" = michael ]; then
+      no_links
+      exec br "$@"
+    else
+      tpope hostman --batch-ssh michael br "$@"
+    fi ;;
 
-    char) case "$1" in
-        \') echo 39 ;;
-        \\) echo 92 ;;
-        ?) perl -e 'print ord('"'$1'"'), "\n"' ;;
-        [0-9]?*) perl -e 'print chr('"$1"'), "\n"' ;;
-        *) exit 1 ;;
+  char) case "$1" in
+    \') echo 39 ;;
+    \\) echo 92 ;;
+    ?) perl -e 'print ord('"'$1'"'), "\n"' ;;
+    [0-9]?*) perl -e 'print chr('"$1"'), "\n"' ;;
+    *) exit 1 ;;
+  esac ;;
+
+  chat|c)
+    if [ "$hostname" = roxy -a -z "$*" ]; then
+      "$HOME/.irssi/Chat-script" $hostname
+    elif [ -z "$*" ]; then
+      exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname
+    else
+      exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' "$@"
+    fi ;;
+
+  clean) do_clean "$@" ;;
+
+  cron)
+    [ ! -x "`which renice 2>/dev/null`" ] || renice 12 $$ >/dev/null 2>&1
+    if [ "$1" = --login ]; then
+      [ ! -x "`which nice 2>/dev/null`" ] || nice="nice"
+      ($nice find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || $nice find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
+      # The part after the || is for versions of find that don't support
+      # -maxdepth, such as busybox
+      exit 0
+    fi
+    sleep 1
+    tpope install --cron
+    find "$HOME" -maxdepth 1 -name .install-root -mtime +15 -exec tpope install --cron --root-only \;
+    cl=4
+    for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
+      [ "$i" -gt 90 ] && cl=3
+    done
+    do_clean $cl
+    touch "$HOME/. tpope"
+    exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope sync -W && touch "$HOME/.autodl"' \; 2>/dev/null
+  ;;
+
+  display-manage|dm) display_manage "$@" ;;
+  mpl) display_manage mplayer -fs -loop 0 "$@" ;;
+  mpa) DISPLAY=  mplayer -quiet -vo fb,aa "$@" ;;
+
+  launch)
+    exec >/dev/null 2>&1 </dev/null
+    if [ "$1" = "-dm" -o "$1" = "-md" ]; then
+      shift
+      pidof -x "$1" >/dev/null && exit 0
+      prefix="tpope display-manage"
+    fi
+    if [ "$1" = "-d" ]; then
+      shift
+      pidof -x "$1" >/dev/null && exit 0
+    fi
+    if [ "$1" = "-m" ]; then
+      shift
+      prefix="tpope display-manage"
+    fi
+    for arg in "$2" "$3" "$4"; do
+      case "$arg" in
+        /*) [ -e "$arg" ] && dontcd=1 ;;
+        -*) [ -e "$arg" ] && dontcd=1 ;;
+      esac
+    done
+    [ ! -x /usr/bin/setsid ] || setsid=/usr/bin/setsid
+    [ "$dontcd" ] || cd
+    $setsid $prefix "$@" &
+    exit 0
+  ;;
+
+  logview|lv)
+    cd /var/log
+    root=
+    for file in "$@"; do
+      [ -f "$file" -a ! -r "$file" ] && root=as_root
+    done
+    [ -z "$root" ] || root_init
+    $root exec less "-RFX#10" +G "$@"
+    ;;
+
+  pg)
+    if [ "$#" != 1 -o -e "$1" ]; then
+      exec "$HOME/bin/tpope" sensible-pager "$@"
+    else
+      echo "Warning: use gp instead." >&2
+      exec "$HOME/bin/tpope" gp "$@"
+    fi
+    ;;
+
+  ps-grep|gp)
+    LESS="-FRSX#10"
+    export LESS
+    (
+    arg="$1"; shift
+    cols="pid,user,ni,tt,stat,start,command"
+    if [ "`uname`" = Darwin ]; then
+      ps axwwo $cols|head -1
+      exec ps axwwo $cols |egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
+    elif [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
+      ps fo $cols|head -1
+      exec ps axfo $cols  |egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
+    else
+      /usr/bin/ps -f|head -1
+      exec /usr/bin/ps -ef|egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
+    fi
+    ) | pager
+    ;;
+
+  rclink|link)
+    if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
+        echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
+        exit 1
+    fi
+    root_init
+    sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
+      2>/dev/null |read run start stop trash
+    [ "$stop" ] || run=2345 start=20 stop=20
+    [ -z "$2" ] || run="$2"
+    [ -z "$3" ] || start="$3" stop="$3"
+    [ -z "$4" ] || stop="$4"
+    for i in 0 1 2 3 4 5 6; do
+      as_root rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
+      case $run in
+        [Xx])   ;;
+        *$i*) as_root ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
+        *)    as_root ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
+      esac
+    done
+    exit 0
+  ;;
+
+  runcontrol|rc) root_init
+    if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
+        echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
+        exit 1
+    fi
+    while [ "$#" -gt 0 ]; do
+      as_root "$rcd/$2" "$1"
+      shift 2
+    done
+    exit 0
+  ;;
+
+  sensible-browser|sb|b) exec "$HOME/bin/sensible-browser" "$@" ;;
+  sensible-pager|sp|p)
+    term=exec
+    if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" -a "$HOME/.rvm/README" != "$1" ]; then
+      term="x-terminal-emulator -title Pager -e"
+      if [ -z "$1" -o "x$1" = x- ]; then
+        tempfile=/tmp/sensible-pager.$$
+        cat > $tempfile
+        [ "x$1" = x- ] && shift
+      fi
+    fi
+    if inpath less; then
+      inpath lesspipe && LESSOPEN='|lesspipe %s'
+      export LESSOPEN
+      pager="less -RFX#10"
+    elif inpath more; then
+      pager="more"
+    elif inpath pg; then
+      pager="pg"
+    else
+      pager="cat"
+    fi
+    if [ ! "$tempfile" ]; then
+      $term $pager "$@"
+    else
+      $term $pager "$tempfile"
+      rm "$tempfile"
+    fi
+    ;;
+  sensible-tail|t)
+    if inpath less; then
+      inpath lesspipe && LESSOPEN='|lesspipe %s'
+      export LESSOPEN
+      less "-RFX#10" +F "$@"
+    else
+      exec tail -f "$@"
+    fi
+    ;;
+
+  sensible-editor|se)
+    if [ "$DISPLAY" -a ! -t 0 ]; then
+      inpath gvim && exec gvim -f "$@"
+      #exit
+      term="exec x-terminal-emulator -title Editor -e"
+    fi
+    if inpath gvim; then
+      $term vim "$@"
+    elif inpath vim; then
+      $term vim "$@"
+    elif inpath vi; then
+      $term vi "$@"
+    elif inpath nano; then
+      $term nano "$@"
+    else
+      echo 'No editor found!' >&2
+      exit 1
+    fi ;;
+
+  e)
+    gvime_ok() { inpath gvim &&
+      gvim --serverlist 2>/dev/null | grep '^E$' >/dev/null; }
+    gvim_ok() { inpath gvim &&
+      gvim --serverlist 2>/dev/null | grep '.' >/dev/null; }
+    case "$DISPLAY" in
+      :*)
+      if gvime_ok; then
+        [ -n "$*" ] || exit 0
+        case "`vim --version 2>/dev/null|head -1`" in
+          "VIM - Vi IMproved "[7891]*)
+          exec gvim --servername E --remote-tab "$@" ;;
+          *)
+          exec gvim --servername E --remote "$@" ;;
+        esac
+      elif gvim_ok; then
+        [ -n "$*" ] || exit 0
+        case "`vim --version 2>/dev/null|head -1`" in
+          "VIM - Vi IMproved "[7891]*)
+          exec gvim --remote-tab "$@" ;;
+          *)
+          exec gvim --remote "$@" ;;
+        esac
+      elif inpath gvim && [ -z "$*" ]; then
+        exec gvim --servername e
+      fi ;;
+    esac
+    if [ -n "$STY" ]; then
+      exec tpope screen -ln -fn -t Editor sensible-editor "$@"
+    else
+      exec sensible-editor "$@"
+    fi
+  ;;
+
+  swap)
+    set -e
+    mv "$2" "$1.$$"
+    mv "$1" "$2"
+    mv "$1.$$" "$1"
+    ;;
+
+  x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+
+  start|stop|restart|reload|force-reload) root_init
+    for daemon in "$@"; do
+      as_root "$rcd/$daemon" "$basename"
+    done
+    [ -z "$*" -a "$basename" = stop ] && do_media stop && exit 0
+    [ "$*" ]
+    exit
+  ;;
+
+  hostinfo) exec "$HOME/bin/tpope-hostman" "$@" ;;
+  hostman)  exec "$HOME/bin/tpope-hostman" "$@" ;;
+  ruptime)  exec "$HOME/bin/tpope-hostman" -u "$@" ;;
+  rwho)     exec "$HOME/bin/tpope-hostman" -w "$@" ;;
+  ssh)      exec "$HOME/bin/tpope-hostman" --ssh "$@" ;;
+
+  libtrash|lt) try_libtrash "$@" ;;
+
+  install|installer) installer "$@" ;;
+
+  soffice)
+    if [ ! -d "$HOME/.openoffice" ]; then
+      echo "Sorry, OpenOffice.org not installed." >&2
+      exit 1
+    fi
+    ver=`ls "$HOME/.openoffice"|tail -1`
+    exec "$HOME/.openoffice/$ver/soffice" "$@"
+    ;;
+
+  media) do_media "$@"; exit ;;
+
+  [Qq]uit|Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Tt]oggle|[Nn]ext|[Pp]rev|[Ff]fwd|[Rr]ew) do_media "$basename" "$@"; exit ;;
+
+  screen|s)
+  if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
+    TERM=rxvt-unicode
+  fi
+  exec screen "$@"
+  ;;
+
+  sursync|suscp)
+  for arg in "$@"; do
+    case "$arg" in
+      [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
+    esac
+  done
+  args=-P
+  [ "$basename" = suscp ] && args=-P
+  sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
+  ret="$?"
+  if [ "$ret" = 0 ]; then
+    nice find "$HOME" -maxdepth 1 -name .install-root -mtime +1 -exec tpope install --quiet --root-only \; &
+  fi
+  exit "$ret"
+  ;;
+
+  sync)
+    if [ "$#" = 0 ]; then
+      exec "$HOME/bin/sync-tpope" -W
+    else
+      exec "$HOME/bin/sync-tpope" "$@"
+    fi
+    ;;
+
+  dl)
+    if [ "$HOME/dl" != `pwd` ]; then
+      mkdir -p "$HOME/dl"
+      prefix="~/dl/"
+    fi
+    if [ -n "$2" ]; then
+      out="$2"
+    else
+      out="`echo "$1"|sed -e 's/?.*//'`"
+      out="`basename "$out"`"
+    fi
+    if [ -e "$1" ]; then
+      cp -a "$1" "$prefix$out"
+    elif [ -x "`which wget`" ]; then
+      wget -nv -O "$prefix$out" "$1" || exit "$?"
+    elif [ -x "`which curl`" ]; then
+      curl -s "$1" > "$prefix$out" || exit "$?"
+    elif [ -x "`which lynx`" ]; then
+      lynx -source "$1" > "$prefix$out" || exit "$?"
+    else
+      exit 1
+    fi
+    echo "$prefix$out"
+    ;;
+
+  temperature) webget="curl -m8 -s"
+    [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
+    temp="`$webget http://weather.noaa.gov/weather/current/${1:-KJAX}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
+    case "$temp" in
+      ?????*) echo "$temp" ;;
+      ????)  echo " $temp" ;;
+      ???)  echo "  $temp" ;;
+      ??)  echo "   $temp" ;;
+      *) echo " --$temp.-" ;;
+    esac
+    ;;
+
+  tomorrow) today --date=tomorrow "$@" ;;
+
+  url)
+    if [ "$*" = "-" ]; then
+      url="`cat`"
+    else
+      url="$*"
+    fi
+    if [ ! -e "$url" ]; then
+    case url in
+      /*|./*) ;;
+      *://*|*.*.*/*) url="`echo $url|tr -d ' \t\n\r\f'`" ;;
+      *) url="http://www.google.com/search?q=`echo $url|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;;
+    esac
+    fi
+  exec "$HOME/bin/sensible-browser" "$url" ;;
+
+  vnc)
+  if [ -f "$HOME/.vnc/$1" ]; then
+    exec xvncviewer -passwd "$HOME/.vnc/$1" "$@"
+  else
+    exec xvncviewer "$@"
+  fi
+  exit 1
+  ;;
+
+  word) w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w\$" "$@" |pager ;;
+  ord)  w="`wordtrans "$1"`"; shift; $words | egrep -i "$w\$"  "$@" |pager ;;
+  wor)  w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w"   "$@" |pager ;;
+  or)   w="`wordtrans "$1"`"; shift; $words | egrep -i "$w"    "$@" |pager ;;
+  Word) w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w\$" "$@" |pager ;;
+  Ord)  w="`wordtrans "$1"`"; shift; $Words | egrep    "$w\$"  "$@" |pager ;;
+  Wor)  w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w"   "$@" |pager ;;
+  Or)   w="`wordtrans "$1"`"; shift; $Words | egrep    "$w"    "$@" |pager ;;
+
+  xauth-get) exec tpope hostman --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
+  xssc|xscc)
+    case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
+    export DISPLAY
+    exec xscreensaver-command "$@" ;;
+
+  lock)
+    case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
+    export DISPLAY
+    xset=xset
+    [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
+    xscreensaver-command -version >/dev/null||exit 1
+    if xscreensaver-command -time 2>/dev/null|egrep 'non-blanked|no saver status|locked' >/dev/null; then
+      :
+    else
+      xscreensaver-command -lock
+      xset dpms force off
+    fi
+    ;;
+
+  unlock)
+    case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
+    export DISPLAY
+    xset=xset
+    [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
+    xscreensaver-command -version >/dev/null 2>/dev/null ||exit 1
+    if xscreensaver-command -time 2>/dev/null|egrep 'locked' >/dev/null; then
+      dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
+      [ "$dpms" = on ] && $xset dpms force standby
+      echo 'BAD NEWS!'
+      echo 'WOULD HAVE KILLED XSCREENSAVER' >&2
+      #skill xscreensaver
+      #xscreensaver -no-splash >/dev/null 2>&1 &
+      #xscreensaver-command -activate >/dev/null 2>&1 &
+      #xscreensaver-command -throttle >/dev/null 2>&1 &
+      #[ "$dpms" = on ] && sleep 2 && $xset dpms force $dpms
+    fi
+    exit 0
+    ;;
+
+  mount|cdrecord|shutdown) no_links
+    case "$1" in
+      '') exec "$basename" "$@" ;;
+      *) root_init; as_root exec "$basename" "$@" ;;
+    esac ;;
+  emerge|port) no_links
+    case "$1" in
+      search|show|help|server) exec "$basename" "$@" ;;
+      *) root_init; as_root exec "$basename" "$@" ;;
+    esac ;;
+  apt-get|aptitude) no_links
+    case "$1" in
+      source|show|changelog|download) exec "$basename" "$@" ;;
+      install|upgrade|dist-upgrade) root_init; as_root "$basename" "$@"
+        ret="$?"
+        [ "$ret" != 0 ] || tpope install --quiet &
+        exit $ret
+        ;;
+      *) root_init; as_root exec "$basename" "$@" ;;
+    esac ;;
+  cardctl) no_links
+    case "$1" in
+      status|config|ident|info|'') exec "$basename" "$@" ;;
+      *) root_init; as_root exec "$basename" "$@" ;;
     esac ;;
 
-    chat|c)
-        if [ "$hostname" = roxy -a -z "$*" ]; then
-            "$HOME/.irssi/Chat-script" $hostname
-        elif [ -z "$*" ]; then
-            exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname
-        else
-            exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' "$@"
-        fi ;;
+  diff)
+    PATH="`echo $PATH|sed -e "s,\\($HOME/bin\\):\\(.*\\),\\2:\\1,"`"
+    if [ -t 1 ]; then
+      if inpath git; then
+        [ "x-uN" = "x$1" ] && shift
+        exec git diff --no-index "$@"
+      else
+        exec diff -uprN "$@" | pager
+      fi
+    else
+      exec diff "$@"
+    fi ;;
 
-    clean) do_clean "$@" ;;
+  aumix) no_links
+    if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
+  feh) no_links
+    try_libtrash feh -Z "$@" ;;
 
-    cron)
-        [ ! -x "`which renice 2>/dev/null`" ] || renice 12 $$ >/dev/null 2>&1
-        if [ "$1" = --login ]; then
-            [ ! -x "`which nice 2>/dev/null`" ] || nice="nice"
-            ($nice find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || $nice find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
-            # The part after the || is for versions of find that don't support
-            # -maxdepth, such as busybox
-            exit 0
-        fi
-        sleep 1
-        installer --cron
-        find "$HOME" -maxdepth 1 -name .install-root -mtime +15 -exec installer --cron --root-only \;
-        cl=4
-        for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
-            [ "$i" -gt 90 ] && cl=3
-        done
-        do_clean $cl
-        touch "$HOME/. tpope"
-        exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'sync-tpope -W && touch "$HOME/.autodl"' \; 2>/dev/null
+  git-publish)
+    USAGE="<dir>"
+    SUBDIRECTORY_OK=1
+    . git-sh-setup
+    [ -n "$1" ] || usage
+    umask 002
+    trap 'rm -rf /tmp/git-publish.$$' EXIT
+    mkdir -m 02700 /tmp/git-publish.$$
+    dir=/tmp/git-publish.$$/repo.git
+    GIT_DIR="$dir" git init --quiet --shared=group
+    GIT_DIR="$dir" git config --remove-section receive
+    chmod +x "$dir/hooks/post-update"
+    touch "$dir/git-daemon-export-ok"
+    #git clone --bare "$GIT_DIR" $dir
+    #GIT_CONFIG=$dir/config git-config --add core.sharedrepository group
+    #find $dir -type d -exec chmod g+ws {} \;
+    #chmod +x $dir/hooks/post-update
+    #touch $dir/git-daemon-export-ok
+    cp "$GIT_DIR/description" "$dir/description"
+    scp -pqr "$dir" "$1" || exit 1
+    git remote add origin "$1" &&
+    git config branch.master.remote origin &&
+    git config branch.master.merge "refs/heads/master" &&
+    git push origin "master:refs/heads/master"
     ;;
 
-    display-manage|dm) display_manage "$@" ;;
-    mpl) display_manage mplayer -fs -loop 0 "$@" ;;
-    mpa) DISPLAY=  mplayer -quiet -vo fb,aa "$@" ;;
-
-    launch)
-        exec >/dev/null 2>&1 </dev/null
-        if [ "$1" = "-dm" -o "$1" = "-md" ]; then
-            shift
-            pidof -x "$1" >/dev/null && exit 0
-            prefix="tpope display-manage"
-        fi
-        if [ "$1" = "-d" ]; then
-            shift
-            pidof -x "$1" >/dev/null && exit 0
-        fi
-        if [ "$1" = "-m" ]; then
-            shift
-            prefix="tpope display-manage"
-        fi
-        for arg in "$2" "$3" "$4"; do
-            case "$arg" in
-                /*) [ -e "$arg" ] && dontcd=1 ;;
-                -*) [ -e "$arg" ] && dontcd=1 ;;
-            esac
-        done
-        [ ! -x /usr/bin/setsid ] || setsid=/usr/bin/setsid
-        [ "$dontcd" ] || cd
-        $setsid $prefix "$@" &
-        exit 0
+  rds)
+    width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
+    height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
+    exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
     ;;
-
-    logview|lv)
-        cd /var/log
-        root=
-        for file in "$@"; do
-            [ -f "$file" -a ! -r "$file" ] && root=as_root
-        done
-        [ -z "$root" ] || root_init
-        $root exec less "-RFX#10" +G "$@"
-        ;;
-
-    pg)
-        if [ "$#" != 1 -o -e "$1" ]; then
-            exec "$HOME/bin/tpope" sensible-pager "$@"
-        else
-            echo "Warning: use gp instead." >&2
-            exec "$HOME/bin/tpope" gp "$@"
-        fi
-        ;;
-
-    ps-grep|gp)
-        LESS="-FRSX#10"
-        export LESS
-        (
-        arg="$1"; shift
-        cols="pid,user,ni,tt,stat,start,command"
-        if [ "`uname`" = Darwin ]; then
-            ps axwwo $cols|head -1
-            exec ps axwwo $cols |egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
-        elif [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
-            ps fo $cols|head -1
-            exec ps axfo $cols  |egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
-        else
-            /usr/bin/ps -f|head -1
-            exec /usr/bin/ps -ef|egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
-        fi
-        ) | pager
-        ;;
-
-    rclink|link)
-        if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
-                echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
-                exit 1
-        fi
-        root_init
-        sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
-            2>/dev/null |read run start stop trash
-        [ "$stop" ] || run=2345 start=20 stop=20
-        [ -z "$2" ] || run="$2"
-        [ -z "$3" ] || start="$3" stop="$3"
-        [ -z "$4" ] || stop="$4"
-        for i in 0 1 2 3 4 5 6; do
-            as_root rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
-            case $run in
-                [Xx])   ;;
-                *$i*) as_root ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
-                *)    as_root ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
-            esac
-        done
-        exit 0
+  rubydemo)
+    exec ruby - "$*" <<-EOF
+    print ARGV.join(' ') + ' #=> '
+    begin
+      p(eval(ARGV.join(' '),binding,'(demo)'))
+    rescue Exception => e
+      puts "#<#{e.class}: #{e.message[/.*/]}>"
+    end
+EOF
     ;;
-
-    runcontrol|rc) root_init
-        if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
-                echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
-                exit 1
-        fi
-        while [ "$#" -gt 0 ]; do
-            as_root "$rcd/$2" "$1"
-            shift 2
-        done
-        exit 0
-    ;;
-
-    sensible-browser|sb|b) exec "$HOME/bin/sensible-browser" "$@" ;;
-    sensible-pager|sp|p)
-        term=exec
-        if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" ]; then
-            term="x-terminal-emulator -title Pager -e"
-            if [ -z "$1" -o "x$1" = x- ]; then
-                tempfile=/tmp/sensible-pager.$$
-                cat > $tempfile
-                [ "x$1" = x- ] && shift
-            fi
-        fi
-        if inpath less; then
-            inpath lesspipe && LESSOPEN='|lesspipe %s'
-            export LESSOPEN
-            pager="less -RFX#10"
-        elif inpath more; then
-            pager="more"
-        elif inpath pg; then
-            pager="pg"
-        else
-            pager="cat"
-        fi
-        if [ ! "$tempfile" ]; then
-            $term $pager "$@"
-        else
-            $term $pager "$tempfile"
-            rm "$tempfile"
-        fi
-        ;;
-    sensible-tail|t)
-        if inpath less; then
-            inpath lesspipe && LESSOPEN='|lesspipe %s'
-            export LESSOPEN
-            less "-RFX#10" +F "$@"
-        else
-            exec tail -f "$@"
-        fi
-        ;;
-
-    sensible-editor|se)
-        if [ "$DISPLAY" -a ! -t 0 ]; then
-            inpath gvim && exec gvim -f "$@"
-            #exit
-            term="exec x-terminal-emulator -title Editor -e"
-        fi
-        if inpath gvim; then
-            $term vim "$@"
-        elif inpath vim; then
-            $term vim "$@"
-        elif inpath vi; then
-            $term vi "$@"
-        elif inpath nano; then
-            $term nano "$@"
-        else
-            echo 'No editor found!' >&2
-            exit 1
-        fi ;;
-
-    e)
-        gvime_ok() { inpath gvim &&
-            gvim --serverlist 2>/dev/null | grep '^E$' >/dev/null; }
-        gvim_ok() { inpath gvim &&
-            gvim --serverlist 2>/dev/null | grep '.' >/dev/null; }
-        case "$DISPLAY" in
-            :*)
-            if gvime_ok; then
-                [ -n "$*" ] || exit 0
-                case "`vim --version 2>/dev/null|head -1`" in
-                    "VIM - Vi IMproved "[7891]*)
-                    exec gvim --servername E --remote-tab "$@" ;;
-                    *)
-                    exec gvim --servername E --remote "$@" ;;
-                esac
-            elif gvim_ok; then
-                [ -n "$*" ] || exit 0
-                case "`vim --version 2>/dev/null|head -1`" in
-                    "VIM - Vi IMproved "[7891]*)
-                    exec gvim --remote-tab "$@" ;;
-                    *)
-                    exec gvim --remote "$@" ;;
-                esac
-            elif inpath gvim && [ -z "$*" ]; then
-                exec gvim --servername e
-            fi ;;
-        esac
-        if [ -n "$STY" ]; then
-            exec tpope screen -ln -fn -t Editor sensible-editor "$@"
-        else
-            exec sensible-editor "$@"
-        fi
-    ;;
-
-    swap)
-        set -e
-        mv "$2" "$1.$$"
-        mv "$1" "$2"
-        mv "$1.$$" "$1"
-        ;;
-
-    x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
-
-    start|stop|restart|reload|force-reload) root_init
-        for daemon in "$@"; do
-            as_root "$rcd/$daemon" "$basename"
-        done
-        [ -z "$*" -a "$basename" = stop ] && do_media stop && exit 0
-        [ "$*" ]
-        exit
-    ;;
-
-    hostinfo) exec "$HOME/bin/tpope-hostman" "$@" ;;
-    hostman)  exec "$HOME/bin/tpope-hostman" "$@" ;;
-    ruptime)  exec "$HOME/bin/tpope-hostman" -u "$@" ;;
-    rwho)     exec "$HOME/bin/tpope-hostman" -w "$@" ;;
-    ssh)      exec "$HOME/bin/tpope-hostman" --ssh "$@" ;;
-
-    libtrash|lt) try_libtrash "$@" ;;
-
-    install|installer) installer "$@" ;;
-
-    soffice)
-        if [ ! -d "$HOME/.openoffice" ]; then
-            echo "Sorry, OpenOffice.org not installed." >&2
-            exit 1
-        fi
-        ver=`ls "$HOME/.openoffice"|tail -1`
-        exec "$HOME/.openoffice/$ver/soffice" "$@"
-        ;;
-
-    media) do_media "$@"; exit ;;
-
-    [Qq]uit|Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Tt]oggle|[Nn]ext|[Pp]rev|[Ff]fwd|[Rr]ew) do_media "$basename" "$@"; exit ;;
-
-    screen|s)
-    if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
-        TERM=rxvt-unicode
+  rsync) no_links
+    exec rsync -CP --filter='dir-merge,- .gitignore' --include='*.so' --include='*.exe' "$@" ;;
+  rubber) no_links
+    if [ -n "$*" ]; then
+      exec rubber "$@"
+    elif [ '*.tex' != "`echo *.tex`" ]; then
+      exec rubber *.tex
+    else
+      exec rubber
+    fi ;;
+  see) no_links;
+    if inpath see; then
+      see=see
+    elif inpath cygstart; then
+      see=cygstart
+    elif [ "`uname`" = Darwin ] && inpath open; then
+      see=open
+    else
+      see=less
     fi
-    exec screen "$@"
-    ;;
+    if [ -f "$*" ]; then
+      exec $see "$*"
+    else
+      exec $see "$@"
+    fi ;;
+  xdvi) no_links
+    [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
+  xpdf) no_links
+    [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/dl/*.pdf;;
+  gv) no_links
+    [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
+  rm) no_links
+    if [ -d /usr/lib/libtrash -a -f "$HOME/.libtrash" ]; then
+      try_libtrash rm "$@"
+    elif [ "`uname`" = Darwin ] && inpath rmm; then
+      exec rmm "$@"
+    else
+      exec rm "$@"
+    fi ;;
 
-    sursync|suscp)
-    for arg in "$@"; do
-        case "$arg" in
-            [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
-        esac
-    done
-    args=-P
-    [ "$basename" = suscp ] && args=-P
-    sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
+  ri) no_links; exec ri -f bs "$@" ;;
+
+  trayer) no_links; exec trayer --distance 40 --alpha 50 --widthtype request --align left "$@" ;;
+
+  whois)
+    [ -d /private ] || args=-H
+    if [ "$1" != "-H" -a -t 1 ]; then
+      exec /usr/bin/whois $args "$@" | pager
+    else
+      exec /usr/bin/whois "$@"
+    fi ;;
+
+  xrandr)
+    case "$DISPLAY" in
+      ""|localhost:*) DISPLAY=:0; export DISPLAY ;;
+    esac
+    /usr/bin/xrandr "$@"
     ret="$?"
-    if [ "$ret" = 0 ]; then
-        nice find "$HOME" -maxdepth 1 -name .install-root -mtime +1 -exec installer --quiet --root-only \; &
+    if [ "$ret" = 0 -a "$#" != 0 -a "x$*" != "x-q" ]; then
+      xrdb -load "$HOME/.Xresources"
+      FvwmCommand Restart >/dev/null 2>&1
     fi
     exit "$ret"
     ;;
 
-    sync-tpope|sync) if [ "$#" = 0 ]; then
-                        exec "$HOME/bin/sync-tpope" -W
-                    else
-                        exec "$HOME/bin/sync-tpope" "$@"
-                    fi ;;
-
-    dl)
-        if [ "$HOME/dl" != `pwd` ]; then
-            mkdir -p "$HOME/dl"
-            prefix="~/dl/"
-        fi
-        if [ -n "$2" ]; then
-            out="$2"
-        else
-            out="`echo "$1"|sed -e 's/?.*//'`"
-            out="`basename "$out"`"
-        fi
-        if [ -e "$1" ]; then
-            cp -a "$1" "$prefix$out"
-        elif [ -x "`which wget`" ]; then
-            wget -nv -O "$prefix$out" "$1" || exit "$?"
-        elif [ -x "`which curl`" ]; then
-            curl -s "$1" > "$prefix$out" || exit "$?"
-        elif [ -x "`which lynx`" ]; then
-            lynx -source "$1" > "$prefix$out" || exit "$?"
-        else
-            exit 1
-        fi
-        echo "$prefix$out"
-        ;;
-
-    temperature) webget="curl -m8 -s"
-        [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
-        temp="`$webget http://weather.noaa.gov/weather/current/${1:-KJAX}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
-        case "$temp" in
-            ?????*) echo "$temp" ;;
-            ????)  echo " $temp" ;;
-            ???)  echo "  $temp" ;;
-            ??)  echo "   $temp" ;;
-            *) echo " --$temp.-" ;;
-        esac
-        ;;
-
-    tomorrow) today --date=tomorrow "$@" ;;
-
-    url)
-        if [ "$*" = "-" ]; then
-            url="`cat`"
-        else
-            url="$*"
-        fi
-        if [ ! -e "$url" ]; then
-        case url in
-            /*|./*) ;;
-            *://*|*.*.*/*) url="`echo $url|tr -d ' \t\n\r\f'`" ;;
-            *) url="http://www.google.com/search?q=`echo $url|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;;
-        esac
-        fi
-    exec "$HOME/bin/sensible-browser" "$url" ;;
-
-    vnc)
-    if [ -f "$HOME/.vnc/$1" ]; then
-        exec xvncviewer -passwd "$HOME/.vnc/$1" "$@"
-    else
-        exec xvncviewer "$@"
-    fi
-    exit 1
-    ;;
-
-    word) w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w\$" "$@" |pager ;;
-    ord)  w="`wordtrans "$1"`"; shift; $words | egrep -i "$w\$"  "$@" |pager ;;
-    wor)  w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w"   "$@" |pager ;;
-    or)   w="`wordtrans "$1"`"; shift; $words | egrep -i "$w"    "$@" |pager ;;
-    Word) w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w\$" "$@" |pager ;;
-    Ord)  w="`wordtrans "$1"`"; shift; $Words | egrep    "$w\$"  "$@" |pager ;;
-    Wor)  w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w"   "$@" |pager ;;
-    Or)   w="`wordtrans "$1"`"; shift; $Words | egrep    "$w"    "$@" |pager ;;
-
-    xauth-get) exec tpope hostman --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
-    xssc|xscc)
-        case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
-        export DISPLAY
-        exec xscreensaver-command "$@" ;;
-
-    lock)
-        case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
-        export DISPLAY
-        xset=xset
-        [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-        xscreensaver-command -version >/dev/null||exit 1
-        if xscreensaver-command -time 2>/dev/null|egrep 'non-blanked|no saver status|locked' >/dev/null; then
-            :
-        else
-            xscreensaver-command -lock
-            xset dpms force off
-        fi
-        ;;
-
-    unlock)
-        case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
-        export DISPLAY
-        xset=xset
-        [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-        xscreensaver-command -version >/dev/null 2>/dev/null ||exit 1
-        if xscreensaver-command -time 2>/dev/null|egrep 'locked' >/dev/null; then
-            dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
-            [ "$dpms" = on ] && $xset dpms force standby
-            echo 'BAD NEWS!'
-            echo 'WOULD HAVE KILLED XSCREENSAVER' >&2
-            #skill xscreensaver
-            #xscreensaver -no-splash >/dev/null 2>&1 &
-            #xscreensaver-command -activate >/dev/null 2>&1 &
-            #xscreensaver-command -throttle >/dev/null 2>&1 &
-            #[ "$dpms" = on ] && sleep 2 && $xset dpms force $dpms
-        fi
-        exit 0
-        ;;
-
-    mount|cdrecord|shutdown) no_links
-        case "$1" in
-            '') exec "$basename" "$@" ;;
-            *) root_init; as_root exec "$basename" "$@" ;;
-        esac ;;
-    emerge|port) no_links
-        case "$1" in
-            search|show|help|server) exec "$basename" "$@" ;;
-            *) root_init; as_root exec "$basename" "$@" ;;
-        esac ;;
-    apt-get|aptitude) no_links
-        case "$1" in
-            source|show|changelog|download) exec "$basename" "$@" ;;
-            install|upgrade|dist-upgrade) root_init; as_root "$basename" "$@"
-                ret="$?"
-                [ "$ret" != 0 ] || installer --quiet &
-                exit $ret
-                ;;
-            *) root_init; as_root exec "$basename" "$@" ;;
-        esac ;;
-    cardctl) no_links
-        case "$1" in
-            status|config|ident|info|'') exec "$basename" "$@" ;;
-            *) root_init; as_root exec "$basename" "$@" ;;
-        esac ;;
-
-    diff)
-        PATH="`echo $PATH|sed -e "s,\\($HOME/bin\\):\\(.*\\),\\2:\\1,"`"
-        if [ -t 1 ]; then
-            if inpath git; then
-                [ "x-uN" = "x$1" ] && shift
-                exec git diff --no-index "$@"
-            else
-                exec diff -uprN "$@" | pager
-            fi
-        else
-            exec diff "$@"
-        fi ;;
-
-    aumix) no_links
-        if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
-    feh) no_links
-        try_libtrash feh -Z "$@" ;;
-
-    git-publish)
-        USAGE="<dir>"
-        SUBDIRECTORY_OK=1
-        . git-sh-setup
-        [ -n "$1" ] || usage
-        umask 002
-        trap 'rm -rf /tmp/git-publish.$$' EXIT
-        mkdir -m 02700 /tmp/git-publish.$$
-        dir=/tmp/git-publish.$$/repo.git
-        GIT_DIR="$dir" git init --quiet --shared=group
-        GIT_DIR="$dir" git config --remove-section receive
-        chmod +x "$dir/hooks/post-update"
-        touch "$dir/git-daemon-export-ok"
-        #git clone --bare "$GIT_DIR" $dir
-        #GIT_CONFIG=$dir/config git-config --add core.sharedrepository group
-        #find $dir -type d -exec chmod g+ws {} \;
-        #chmod +x $dir/hooks/post-update
-        #touch $dir/git-daemon-export-ok
-        cp "$GIT_DIR/description" "$dir/description"
-        scp -pqr "$dir" "$1" || exit 1
-        git remote add origin "$1" &&
-        git config branch.master.remote origin &&
-        git config branch.master.merge "refs/heads/master" &&
-        git push origin "master:refs/heads/master"
-        ;;
-
-    rds)
-        width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
-        height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
-        exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
-        ;;
-    rubydemo)
-        exec ruby - "$*" <<-EOF
-        print ARGV.join(' ') + ' #=> '
-        begin
-            p(eval(ARGV.join(' '),binding,'(demo)'))
-        rescue Exception => e
-            puts "#<#{e.class}: #{e.message[/.*/]}>"
-        end
-EOF
-        ;;
-    rsync) no_links
-        exec rsync -CP --filter='dir-merge,- .gitignore' --include='*.so' --include='*.exe' "$@" ;;
-    rubber) no_links
-        if [ -n "$*" ]; then
-            exec rubber "$@"
-        elif [ '*.tex' != "`echo *.tex`" ]; then
-            exec rubber *.tex
-        else
-            exec rubber
-        fi ;;
-    see) no_links;
-        if inpath see; then
-            see=see
-        elif inpath cygstart; then
-            see=cygstart
-        elif [ "`uname`" = Darwin ] && inpath open; then
-            see=open
-        else
-            see=less
-        fi
-        if [ -f "$*" ]; then
-            exec $see "$*"
-        else
-            exec $see "$@"
-        fi ;;
-    xdvi) no_links
-        [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
-    xpdf) no_links
-        [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/dl/*.pdf;;
-    gv) no_links
-        [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
-    rm) no_links
-        if [ -d /usr/lib/libtrash -a -f "$HOME/.libtrash" ]; then
-            try_libtrash rm "$@"
-        elif [ "`uname`" = Darwin ] && inpath rmm; then
-            exec rmm "$@"
-        else
-            exec rm "$@"
-        fi ;;
-
-    ri) no_links; exec ri -f bs "$@" ;;
-
-    trayer) no_links; exec trayer --distance 40 --alpha 50 --widthtype request --align left "$@" ;;
-
-    whois)
-        #no_links
-        if [ "$1" != "-H" -a -t 1 ]; then
-            exec whois -H "$@" | pager
-        else
-            exec /usr/bin/whois "$@"
-        fi ;;
-
-    xrandr)
-        case "$DISPLAY" in
-            ""|localhost:*) DISPLAY=:0; export DISPLAY ;;
-        esac
-        /usr/bin/xrandr "$@"
-        ret="$?"
-        if [ "$ret" = 0 -a "$#" != 0 -a "x$*" != "x-q" ]; then
-            xrdb -load "$HOME/.Xresources"
-            FvwmCommand Restart >/dev/null 2>&1
-        fi
-        exit "$ret"
-        ;;
-
-    '') echo "Usage: `basename "$0"` <command> [options]" ;;
-    *) echo "$basename: unknown command." >&2 ;;
+  '') echo "Usage: `basename "$0"` <command> [options]" ;;
+  *) echo "$basename: unknown command." >&2 ;;
 esac
