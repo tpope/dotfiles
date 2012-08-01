@@ -11,3 +11,5 @@ set keymap emacs-ctlx
 v: vi-editing-mode
 Control-v: "\C-xv\e"
 Escape: "\C-xv\e"
+set keymap emacs
+Control-w: unix-filename-rubout
