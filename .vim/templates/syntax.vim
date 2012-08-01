@@ -18,4 +18,4 @@ hi def link @BASENAME@String            String
 
 let b:current_syntax = "@BASENAME@"
 
-" vim:set sts=2 sw=2:
+" vim:set et sw=2:

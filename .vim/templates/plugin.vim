@@ -6,4 +6,4 @@ if exists("g:loaded_@BASENAME@") || v:version < 700 || &cp
 endif
 let g:loaded_@BASENAME@ = 1
 
-" vim:set sw=2 sts=2:
+" vim:set et sw=2:

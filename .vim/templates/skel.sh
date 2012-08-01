@@ -1,3 +1,3 @@
 #!/bin/sh
-# -*- sh -*- vim:set ft=sh ai et sw=4 sts=4:
+# -*- sh -*- vim:set et sw=2:
 

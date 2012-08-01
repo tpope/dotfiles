@@ -1,12 +1,9 @@
-# vim:set ft=make ai noet sw=8 sts=8:
 # Makefile for creating distribution
 # Type 'make dist' for create tar-gzipped archive. 
 
 #
 # Author: Lubomir Host 'rajo' <host8@kepler.fmph.uniba.sk
 #
-
-# $Id$
 
 PACKAGE = test
 VERSION = 1.0

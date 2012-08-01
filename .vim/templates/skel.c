@@ -1,5 +1,4 @@
-/* -*- Mode: c; c-basic-offset: 4 -*- vi:set sw=4: vim:set sts=4: */
-/* $Id$ */
+/* -*- Mode: c; c-basic-offset: 4 -*- vi:set sw=4: */
 
 #include <stdio.h>
 #include "@FILE@.h"
