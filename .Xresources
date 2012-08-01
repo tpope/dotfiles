@@ -240,9 +240,11 @@ URxvt*keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
 URxvt*keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
 URxvt*keysym.C-9:  command:\033]720;12\007
 URxvt*keysym.C-0:  command:\033]721;12\007
+URxvt*keysym.XF86Back: \033[d
+URxvt*keysym.XF86Forward: \033[c
 URxvt.keysym.C-comma:  perl:dabbrev-expand:\\\\w
 URxvt.keysym.C-period: perl:dabbrev-expand:\\\\w./-
-URxvt.keysym.C-equal:  perl:matcher
+URxvt.keysym.C-1:      perl:matcher
 URxvt.keysym.C-grave:  perl:matcher:list
 #if WIDTH > 1800
 URxvt.font: FIXED-normal--20-*-*-*-c-*-UTFENC
