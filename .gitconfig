@@ -48,3 +48,5 @@
 	browser = dillo
 [browser "dillo"]
 	path = sensible-browser
+[include]
+	path = .gitconfig.local
