@@ -1,5 +1,6 @@
 # ~/.screenrc
 
+term screen-256color
 startup_message off
 shell -$SHELL
 hardstatus on
