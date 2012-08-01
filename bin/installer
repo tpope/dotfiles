@@ -282,9 +282,6 @@ if [ -d "$HOME/.kde/share" -a ! -h "$HOME/.kde/share/icons" ]; then
     ln -s ../../.pixmaps "$HOME/.kde/share/icons"
     links=1
 fi
-if [ ! -h "$HOME/.bash_logout" ]; then
-    ln -sf .zlogout "$HOME/.bash_logout"
-fi
 if [ ! -f "$HOME/bin/sdplay" ]; then
     if inpath rplay && pidof rplayd >/dev/null 2>&1; then
 	ln -sf "`which rplay`" "$HOME/bin/sdplay"

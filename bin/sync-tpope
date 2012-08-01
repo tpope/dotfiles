@@ -6,10 +6,10 @@
 
 FILES="\
   .zshenv .zshrc .zlogin .zlogout .zsh/functions/* .shrc .cshrc .login .logout \
-  .profile .bashrc .bash_profile .inputrc .screenrc .tmux.conf .dir_colors \
+  .profile .bashrc .bash_profile .bash_logout .inputrc .dir_colors \
   .terminfo/? .vimrc .vim/[acdimpst]* .lessfilter .muttrc .urlview .mailcap \
   .gnupg/gpg.conf .ssh/config .ssh/authorized_keys .ssh/authorized_keys2 \
-  .cvsignore .gitconfig .git_template \
+  .screenrc .tmux.conf .cvsignore .gitconfig .git_template \
   .xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
   .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-* \
   bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/tpope-hostman \
