@@ -2,6 +2,5 @@ syntax: glob
 *~
 .*.sw?
 .sw?
-.*.lock
 *.local
 tags
