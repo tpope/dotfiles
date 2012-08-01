@@ -1,7 +1,5 @@
 " ztemplate.vim - Templates
 " Maintainer:   Tim Pope <vimNOSPAM@tpope.info>
-" URL:          http://tpope.us/cgi-bin/cvsweb/~checkout~/tpope/.vim/plugin/ztemplate.vim
-" $Id$
 "
 " Loads a template based on filename/filetype.  Loosely inspired by
 " templatefile.vim, and aims for backwards compatibility with it in certain

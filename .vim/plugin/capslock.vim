@@ -1,7 +1,6 @@
 " capslock.vim - Software Caps Lock
 " Maintainer:   Tim Pope
 " GetLatestVimScripts: 1725 1 :AutoInstall: capslock.vim
-" $Id$
 
 " This plugin enables a software caps lock.  This is advantageous over a
 " regular caps lock in that normal mode commands, other buffers, and other
