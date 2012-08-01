@@ -5,6 +5,7 @@ export ENV="$HOME/.shrc"
 . "$ENV"
 unset interactive
 [ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
+[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(rbenv init -|grep -v export.PATH)"
 
 if [ "$PS1" ]; then
 # If running interactively, then:

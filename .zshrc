@@ -9,6 +9,7 @@ interactive=1
 unset interactive
 
 [ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
+[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(rbenv init -|grep -v export.PATH)"
 
 # }}}1
 # Prompt {{{1
