@@ -135,12 +135,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
   PS1="$LOGNAME@$hostname `basename $execbin`$promptchar "
 
-  #case `basename "$execbin"` in
-  #*ksh*)
-     #PS1="`whoami`@$hostname:"'`pwd|sed -e "s,^$HOME,~,"`'"$promptchar "
-    #;;
-  #esac
-
   if [ "`basename "$execbin"`" != sh ]; then
 
     [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1

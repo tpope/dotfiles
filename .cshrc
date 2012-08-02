@@ -63,7 +63,7 @@ else
   set usercolor = "01;33"
   set usercode = "+b Y"
   set promptchar = "%"
-  if ( `id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'` == `whoami` ) umask 002
+  if ( `id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'` == `id -un` ) umask 002
 endif
 
 if ( -x /usr/bin/tty || -x /usr/local/bin/tty ) then
@@ -129,8 +129,7 @@ else
   alias chdir 'chdir \!* && setprompt'
   alias pushd 'pushd \!* && setprompt'
   alias popd  'popd  \!* && setprompt'
-  #alias setprompt 'set prompt = "[${usercolor}m`whoami`[00m@[${hostcolor}m`hostname`[00m:[01;34m`pwd|sed -e "s,^$HOME,~,"`[00m$promptchar "'
-  alias setprompt 'set prompt = "'`whoami`@`hostname|sed -e "s/[.].*//"`':`pwd|sed -e "s,^$HOME,~,"`'"$promptchar"' "'
+  alias setprompt 'set prompt = "'`id -un`@`hostname|sed -e "s/[.].*//"`':`pwd|sed -e "s,^$HOME,~,"`'"$promptchar"' "'
   setprompt
   set history = 100
   set filec

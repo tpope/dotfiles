@@ -50,7 +50,7 @@ Words="cat /usr/share/dict/words"
 [ -f "$HOME/misc/scrabble" ] && words="cat $HOME/misc/scrabble"
 
 hostname="`hostname|sed -e 's/[.].*//'`"
-[ "`whoami`" != root -a "`id -u`" -ne 0 ] && sudo="sudo -H"
+[ "`id -u`" -ne 0 ] && sudo="sudo -H"
 
 inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
 
@@ -59,7 +59,7 @@ wordtrans() { echo "$1"|sed -e 's/-/[-A-Za-z0-9]/g'; }
 root_init() {
   if inpath cygstart; then
     as_root() { "$@"; }
-  elif [ "`whoami`" != root -a "`id -u`" -ne 0 ]; then
+  elif [ "`id -u`" -ne 0 ]; then
     if inpath sudo && sudo -l >/dev/null 2>&1; then
       as_root() {
         if [ "$1" = exec ]; then ex="exec"; shift; fi
