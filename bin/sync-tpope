@@ -16,8 +16,7 @@ FILES="\
   bin/sync-tpope bin/media bin/installer .ruby/lib/tpope.rb .irbrc .pryrc \
   "
 LOCAL_FILES="\
-  .gnupg/pubring.gpg .netscape/userContent.css \
-  .pork/porkrc .pork/scract.pl .kde/share/apps/konsole .qt"
+  .netrc .gnupg/pubring.gpg .netscape/userContent.css"
 
 RSYNC_RSH="ssh -ax"
 [ -t 0 ] || RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20"
