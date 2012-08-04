@@ -247,6 +247,8 @@ zstyle :compinstall filename "$HOME/.zshrc"
 autoload -Uz compinit
 compinit -u
 # End of lines added by compinstall
+
+compdef '_arguments "-dump[dump to stdout]" "-T[force console]" "-G[force gui]" :url:_webbrowser' b sb sensible-browser
 compdef 'local expl; _description files expl "picture file"; _files "$expl[@]" -g "*.(#i)(png|gif|jpeg|jpg|tiff|tif|pbm|pgm|ppm|xbm|xpm|ras(|t)|tga|rle|rgb|bmp|pcx|fits|pm)(-.)"' feh
 
 # }}}1

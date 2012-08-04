@@ -1,7 +1,0 @@
-#compdef b sb sensible-browser
-
-_arguments \
-    '-dump[dump to stdout]' \
-    '-T[force console]' \
-    '-G[force gui]' \
-    ':url:_webbrowser'
