@@ -1,5 +1,5 @@
 #!/bin/sh
-# vi: set et sw=2:
+# vim:set et sw=2:
 
 # Analyzes what terminal emulators are installed and picks my favorite from the
 # bunch.

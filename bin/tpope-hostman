@@ -1,5 +1,5 @@
 #!/bin/sh
-# vi: set et sw=2:
+# vim:set et sw=2:
 
 # Handles everything to do with hostnames, particularly colorizing them in
 # shell prompts.

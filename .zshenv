@@ -1,5 +1,5 @@
 # ~/.zshenv
-# vi:set et sw=2:
+# vim:set et sw=2:
 
 typeset -U path
 for dir in /bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$HOME/bin"; do

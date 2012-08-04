@@ -1,5 +1,5 @@
 #!/bin/sh
-# vi: set et sw=2:
+# vim:set et sw=2:
 
 # This is a multipurpose script that is easier to copy around than 30-odd
 # single purpose ones.  If a function grows too big, it earns its own file,

@@ -1,5 +1,5 @@
 # ~/.zshrc
-# vi:set et sw=2:
+# vim:set et sw=2:
 
 # Environment {{{1
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-# vi: set et sw=2:
+# vim:set et sw=2:
 
 # Does various tasks involved with moving in (such as setting up a crontab and
 # changing my login shell).

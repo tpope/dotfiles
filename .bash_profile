@@ -1,5 +1,5 @@
 # ~/.bash_profile
-# vi:set et sw=2:
+# vim:set et sw=2:
 
 . "$HOME/.bashrc"
 test -f "$HOME/.profile.local" && . "$HOME/.profile.local"

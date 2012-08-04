@@ -1,5 +1,5 @@
 #!/bin/sh
-# vi: set et sw=2:
+# vim:set et sw=2:
 
 # Provides a standard interface for sending commands to various media players.
 

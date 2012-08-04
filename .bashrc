@@ -1,5 +1,5 @@
 # ~/.bashrc
-# vi: set et sw=2:
+# vim:set et sw=2:
 
 [ "$PS1" ] && interactive=1
 export ENV="$HOME/.shrc"

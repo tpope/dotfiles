@@ -1,5 +1,5 @@
 # ~/.zlogin
-# vi:set et sw=2:
+# vim:set et sw=2:
 
 test ! -f "$HOME/.profile.local" || . "$HOME/.profile.local"
 
