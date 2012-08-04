@@ -12,7 +12,7 @@ $LOAD_PATH.uniq!
   end
 end
 
-Pry.start and exit if defined?(Pry)
+(Pry.start; exit) if defined?(Pry)
 
 IRB.conf[:AUTO_INDENT] = true
 IRB.conf[:LOAD_MODULES] |= %w(irb/completion stringio enumerator ostruct)
