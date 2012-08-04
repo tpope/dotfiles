@@ -22,7 +22,6 @@ setenv RUBYLIB  "$HOME/.ruby/lib:$HOME/.ruby"
 setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
 setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
 if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
-setenv CVS_RSH 'ssh'
 
 unset dir
 
@@ -48,8 +47,6 @@ else
   setenv LESSOPEN '|"$HOME/.lessfilter" %s'
 endif
 if ( $HOST == '') set HOST = `tpope hostman`
-setenv CVSROOT ':ext:michael:/home/tpope/.cvs'
-if ( $HOST == michael ) setenv CVSROOT "$HOME/.cvs"
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
