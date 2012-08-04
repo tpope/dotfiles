@@ -30,7 +30,7 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lv dm pg gp sb b e p t c dl sursync ruptime rwho \
+  aliases="launch lv dm pg gp b e p t c dl sursync ruptime rwho \
   rclink rc start stop restart reload force-reload mount shutdown \
   vnc xssc mpl mpa ri whois xrandr rds rsync aumix swap diff \
   word ord wor or Word Ord Wor Or"
@@ -320,7 +320,7 @@ case "$basename" in
     exit 0
   ;;
 
-  sensible-browser|sb|b) exec "$HOME/bin/sensible-browser" "$@" ;;
+  sensible-browser|b) exec "$HOME/bin/sensible-browser" "$@" ;;
   sensible-pager|sp|p)
     term=exec
     if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" -a "$HOME/.rvm/README" != "$1" ]; then
