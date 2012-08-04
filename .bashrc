@@ -52,22 +52,18 @@ fi
 
 PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$dircolor'm\]\w\[\e[00m\]\$ '
 
-export HISTIGNORE="%*"
-bind '"\C-z": "\C-a\%- \n"'
-trap 'stty susp ^Z' DEBUG
-
 [ "$OLDTERM" ] && TERM=$OLDTERM
 case $TERM in
   screen*|vt220*)
   if [ "$STY" ]; then
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}"'\033\\"; stty susp undef'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}"'\033\\"'
   else
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${hostname}"'\033\\"; stty susp undef'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${hostname}"'\033\\"'
   fi
   ;;
   xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
   # If this is an xterm set the title to user@host:dir [tty]
-  PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${LOGNAME}@${hostname}"':`echo ${PWD}|sed -e "s,$HOME,~,"`'"${ttyslash}"'\007"; stty susp undef'
+  PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${LOGNAME}@${hostname}"':`echo ${PWD}|sed -e "s,$HOME,~,"`'"${ttyslash}"'\007"'
   ;;
   linux*) ;;
   *)
