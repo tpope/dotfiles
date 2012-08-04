@@ -30,12 +30,12 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lt lv dm pg gp sb b e p t c dl sursync ruptime rwho status \
-  rclink rc start stop restart reload force-reload mount shutdown tomorrow \
-  vnc xssc mpl mpa ri whois xrandr char rds feh rsync aumix swap \
+  aliases="launch lv dm pg gp sb b e p t c dl sursync ruptime rwho \
+  rclink rc start stop restart reload force-reload mount shutdown \
+  vnc xssc mpl mpa ri whois xrandr rds rsync aumix swap diff \
   word ord wor or Word Ord Wor Or"
   PATH=/usr/bin:/usr/sbin:/usr/local/bin
-  for app in apt-get aptitude emerge port diff cardctl rubber xdvi xpdf gv; do
+  for app in apt-get aptitude emerge port rubber xdvi xpdf gv; do
     [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
   done
   echo $aliases
@@ -139,7 +139,7 @@ do_clean() {
   if [ ! -d "$HOME/.trash" ]; then
     mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
   fi
-  rm -rf "$HOME/.fvwm/FvwmScript-Alert" "$HOME/.fvwm/FvwmScript-Date" "$HOME/.fvwm/FvwmScript-Time" "$HOME/bin/hostinfo" "$HOME/.git_template/info/exclude" "$HOME/.fvwm/.fvwm-menu-headlines/extension.pl" "$HOME/.Eterm" "$HOME/.terminfo/E" "$HOME/.terminfo/x/78" "$HOME/.vim/after/syntax/dosbatch.vim" "$HOME/.zsh/functions/_git-trac" "$HOME/.zsh/functions/_editor" "$HOME/.ssh/authorized_keys2" "$HOME/.zsh/functions/_sb"
+  tpope config prune
   return 0
 }
 
@@ -164,36 +164,6 @@ display_manage() {
   return $?
 }
 
-status() {
-  if [ "$#" = 0 -a -f "$HOME/.status" ]; then
-    exec cat "$HOME/.status"
-  fi
-  if [ "$hostname" = michael ]; then
-    if [ "$1" = away -o "$1" = activity ] && [ "$#" = 1 ]; then
-      exec cat "$HOME/.$1" 2>/dev/null
-    fi
-    case "$1" in
-      '') exit 1 ;;
-      away|activity|out|check) away-tpope "$@" ;;
-      rehash) skill -HUP away-tpope 2>/dev/null || away-tpope -d ;;
-      *) echo "Unknown status command $1" >&2 ;;
-    esac
-  elif [ -f "$HOME/.activity" -a "$1" = activity ]; then
-    exec cat "$HOME/.activity"
-  elif [ -f "$HOME/.away" -a "$1" = away ]; then
-    exec cat "$HOME/.away"
-  elif ping -c 1 tpope.us >/dev/null 2>&1; then
-    unset DISPLAY
-    if [ "$#" = 2 -a -z "$2" ]; then
-      exec tpope hostman -b tpope.us tpope status "$1" -c
-    else
-      exec tpope hostman -b tpope.us tpope status "$@"
-    fi
-  else
-    exit 2
-  fi
-}
-
 pager() {
   if [ -t 1 ]; then
     "$HOME/bin/tpope" sensible-pager "$@"
@@ -204,9 +174,6 @@ pager() {
 
 case "$basename" in
 
-  status) status "$@" ;;
-  rehash|activity|away|out|check) status $basename "$@" ;;
-
   br)
     if [ "`hostname`" = michael ]; then
       no_links
@@ -214,14 +181,6 @@ case "$basename" in
     else
       tpope hostman --batch-ssh michael br "$@"
     fi ;;
-
-  char) case "$1" in
-    \') echo 39 ;;
-    \\) echo 92 ;;
-    ?) perl -e 'print ord('"'$1'"'), "\n"' ;;
-    [0-9]?*) perl -e 'print chr('"$1"'), "\n"' ;;
-    *) exit 1 ;;
-  esac ;;
 
   chat|c)
     if [ "$hostname" = roxy -a -z "$*" ]; then
@@ -233,6 +192,8 @@ case "$basename" in
     fi ;;
 
   clean) do_clean "$@" ;;
+
+  config) exec "$HOME/bin/tpope-config" "$@" ;;
 
   cron)
     [ ! -x "`which renice 2>/dev/null`" ] || renice 12 $$ >/dev/null 2>&1
@@ -252,7 +213,7 @@ case "$basename" in
     done
     do_clean $cl
     touch "$HOME/. tpope"
-    exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope sync -W && touch "$HOME/.autodl"' \; 2>/dev/null
+    exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope config pull && touch "$HOME/.autodl"' \; 2>/dev/null
   ;;
 
   display-manage|dm) display_manage "$@" ;;
@@ -469,7 +430,6 @@ case "$basename" in
     exit
   ;;
 
-  hostinfo) exec "$HOME/bin/tpope-hostman" "$@" ;;
   hostman)  exec "$HOME/bin/tpope-hostman" "$@" ;;
   ruptime)  exec "$HOME/bin/tpope-hostman" -u "$@" ;;
   rwho)     exec "$HOME/bin/tpope-hostman" -w "$@" ;;
@@ -477,18 +437,7 @@ case "$basename" in
 
   install|installer) installer "$@" ;;
 
-  soffice)
-    if [ ! -d "$HOME/.openoffice" ]; then
-      echo "Sorry, OpenOffice.org not installed." >&2
-      exit 1
-    fi
-    ver=`ls "$HOME/.openoffice"|tail -1`
-    exec "$HOME/.openoffice/$ver/soffice" "$@"
-    ;;
-
   media) do_media "$@"; exit ;;
-
-  [Qq]uit|Stop|[Pp]lay|[Pp]ause|[Rr]esume|[Tt]oggle|[Nn]ext|[Pp]rev|[Ff]fwd|[Rr]ew) do_media "$basename" "$@"; exit ;;
 
   screen|s)
   if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
@@ -515,9 +464,10 @@ case "$basename" in
 
   sync)
     if [ "$#" = 0 ]; then
-      exec "$HOME/bin/sync-tpope" -W
+      exec "$HOME/bin/tpope-config" pull
     else
-      exec "$HOME/bin/sync-tpope" "$@"
+      echo "Use tpope config sync instead." >&2
+      exit 1
     fi
     ;;
 
@@ -545,20 +495,6 @@ case "$basename" in
     fi
     echo "$prefix$out"
     ;;
-
-  temperature) webget="curl -m8 -s"
-    [ ! -x "`which wget 2>/dev/null`" ] || webget="wget -t1 -T8 -qO -"
-    temp="`$webget http://weather.noaa.gov/weather/current/${1:-KJAX}.html 2>/dev/null| grep -A 2 ' Temperature ' | tail -1 | awk '{print $3}'`"
-    case "$temp" in
-      ?????*) echo "$temp" ;;
-      ????)  echo " $temp" ;;
-      ???)  echo "  $temp" ;;
-      ??)  echo "   $temp" ;;
-      *) echo " --$temp.-" ;;
-    esac
-    ;;
-
-  tomorrow) today --date=tomorrow "$@" ;;
 
   url)
     if [ "$*" = "-" ]; then
@@ -594,6 +530,7 @@ case "$basename" in
   Or)   w="`wordtrans "$1"`"; shift; $Words | egrep    "$w"    "$@" |pager ;;
 
   xauth-get) exec tpope hostman --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
+
   xssc|xscc)
     case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
     export DISPLAY
@@ -633,7 +570,7 @@ case "$basename" in
     exit 0
     ;;
 
-  mount|cdrecord|shutdown) no_links
+  mount|shutdown) no_links
     case "$1" in
       '') exec "$basename" "$@" ;;
       *) root_init; as_root exec "$basename" "$@" ;;
@@ -653,11 +590,6 @@ case "$basename" in
         ;;
       *) root_init; as_root exec "$basename" "$@" ;;
     esac ;;
-  cardctl) no_links
-    case "$1" in
-      status|config|ident|info|'') exec "$basename" "$@" ;;
-      *) root_init; as_root exec "$basename" "$@" ;;
-    esac ;;
 
   diff)
     PATH="`echo $PATH|sed -e "s,\\($HOME/bin\\):\\(.*\\),\\2:\\1,"`"
@@ -674,40 +606,13 @@ case "$basename" in
 
   aumix) no_links
     if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
-  feh) no_links
-    feh -Z "$@" ;;
-
-  git-publish)
-    USAGE="<dir>"
-    SUBDIRECTORY_OK=1
-    . git-sh-setup
-    [ -n "$1" ] || usage
-    umask 002
-    trap 'rm -rf /tmp/git-publish.$$' EXIT
-    mkdir -m 02700 /tmp/git-publish.$$
-    dir=/tmp/git-publish.$$/repo.git
-    GIT_DIR="$dir" git init --quiet --shared=group
-    GIT_DIR="$dir" git config --remove-section receive
-    chmod +x "$dir/hooks/post-update"
-    touch "$dir/git-daemon-export-ok"
-    #git clone --bare "$GIT_DIR" $dir
-    #GIT_CONFIG=$dir/config git-config --add core.sharedrepository group
-    #find $dir -type d -exec chmod g+ws {} \;
-    #chmod +x $dir/hooks/post-update
-    #touch $dir/git-daemon-export-ok
-    cp "$GIT_DIR/description" "$dir/description"
-    scp -pqr "$dir" "$1" || exit 1
-    git remote add origin "$1" &&
-    git config branch.master.remote origin &&
-    git config branch.master.merge "refs/heads/master" &&
-    git push origin "master:refs/heads/master"
-    ;;
 
   rds)
     width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
     height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
     exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
     ;;
+
   rubydemo)
     exec ruby - "$*" <<-EOF
     print ARGV.join(' ') + ' #=> '
@@ -718,8 +623,10 @@ case "$basename" in
     end
 EOF
     ;;
+
   rsync) no_links
     exec rsync -CP --filter='dir-merge,- .gitignore' --include='*.so' --include='*.exe' "$@" ;;
+
   rubber) no_links
     if [ -n "$*" ]; then
       exec rubber "$@"
@@ -728,6 +635,7 @@ EOF
     else
       exec rubber
     fi ;;
+
   see) no_links;
     if inpath see; then
       see=see
@@ -743,6 +651,7 @@ EOF
     else
       exec $see "$@"
     fi ;;
+
   xdvi) no_links
     [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
   xpdf) no_links
@@ -751,8 +660,6 @@ EOF
     [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
 
   ri) no_links; exec ri -f bs "$@" ;;
-
-  trayer) no_links; exec trayer --distance 40 --alpha 50 --widthtype request --align left "$@" ;;
 
   whois)
     [ -d /private ] || args=-H
@@ -776,5 +683,6 @@ EOF
     ;;
 
   '') echo "Usage: `basename "$0"` <command> [options]" ;;
-  *) echo "$basename: unknown command." >&2 ;;
+
+  *) echo "`basename "$0"` $command: unknown command." >&2; exit 1 ;;
 esac
