@@ -151,7 +151,7 @@ do_clean() {
   if [ ! -d "$HOME/.trash" ]; then
     mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
   fi
-  rm -rf "$HOME/.fvwm/FvwmScript-Alert" "$HOME/.fvwm/FvwmScript-Date" "$HOME/.fvwm/FvwmScript-Time" "$HOME/bin/hostinfo" "$HOME/.git_template/info/exclude" "$HOME/.fvwm/.fvwm-menu-headlines/extension.pl" "$HOME/.Eterm" "$HOME/.terminfo/E" "$HOME/.terminfo/x/78" "$HOME/.vim/after/syntax/dosbatch.vim" "$HOME/.zsh/functions/_git-trac" "$HOME/.zsh/functions/_editor"
+  rm -rf "$HOME/.fvwm/FvwmScript-Alert" "$HOME/.fvwm/FvwmScript-Date" "$HOME/.fvwm/FvwmScript-Time" "$HOME/bin/hostinfo" "$HOME/.git_template/info/exclude" "$HOME/.fvwm/.fvwm-menu-headlines/extension.pl" "$HOME/.Eterm" "$HOME/.terminfo/E" "$HOME/.terminfo/x/78" "$HOME/.vim/after/syntax/dosbatch.vim" "$HOME/.zsh/functions/_git-trac" "$HOME/.zsh/functions/_editor" "$HOME/.ssh/authorized_keys2"
   return 0
 }
 
