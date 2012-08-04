@@ -228,6 +228,7 @@ if [ ! -d "$HOME/.trash" ]; then
   chmod 0700 "$HOME/.trash"
   directories=1
 fi
+
 if [ ! -e "$HOME/dl" ]; then
   if [ -d "$HOME/Downloads" ]; then
     ln -s Downloads "$HOME/dl"
@@ -239,6 +240,7 @@ if [ ! -e "$HOME/dl" ]; then
   fi
 fi
 [ -z "$directories" ] || echo "Creating directories."
+
 for dir in .mozilla/firefox; do
   [ -d "$HOME/$dir" ] || continue
   if [ -f "$HOME/$dir/profiles.ini" ]; then
@@ -257,18 +259,8 @@ for dir in .mozilla/firefox; do
       ln -s ../../../../.netscape/userContent.css "$subdir/chrome/userContent.css"
       links=1
     fi
-    for file in localstore.rdf ctxextensions.rdf bookmarks.html; do
-      if [ -f "$HOME/.netscape/$file" -a ! -s "$subdir/$file" ]; then
-        cp "$HOME/.netscape/$file" "$subdir/$file"
-      fi
-    done
   done
 done
-if [ -d "$HOME/.kde/share" -a ! -h "$HOME/.kde/share/icons" ]; then
-  rm -rf "$HOME/.kde/share/icons" # A bad idea?
-  ln -s ../../.pixmaps "$HOME/.kde/share/icons"
-  links=1
-fi
 for bin in sensible-editor sensible-pager; do
   if [ -f "$HOME/bin/$bin.lnk" -a ! -h "$HOME/bin/$bin.lnk" ]; then
     rm -f "$HOME/bin/$bin.lnk"
@@ -278,17 +270,6 @@ for bin in sensible-editor sensible-pager; do
     links=1
   fi
 done
-if [ -f "$HOME/.pixmaps/unknown.xpm" -a ! -f "$HOME/.pixmaps/.localhost.xpm" ]; then
-  ln -sf unknown.xpm "$HOME/.pixmaps/.localhost.xpm"
-  links=1
-fi
-if [ -f "$HOME/.pixmaps/$hostname.xpm" ]; then
-  unknown="`find "$HOME/.pixmaps" -maxdepth 1 -name .localhost.xpm -lname unknown.xpm -print 2>/dev/null`"
-  if [ "$unknown" ]; then
-    ln -sf "$hostname.xpm" "$HOME/.pixmaps/.localhost.xpm"
-    links=1
-  fi
-fi
 [ -z "$links" ] || echo "Creating symlinks."
 
 if inpath crontab && [ ! -f "$HOME/.sandbox" ]; then
@@ -316,7 +297,6 @@ if [ "$cron" = 0 -o "$cron" = n ]; then
     shell=/bin/sh
     env=ENV
   fi
-  [ -n "$PERL5LIB" ]  || PERL5LIB="$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
   [ -n "$RUBYLIB" ]   || RUBYLIB="$HOME/.ruby/lib:$HOME/ruby/lib:$HOME/.ruby"
   [ ! -f "$HOME/.ruby/lib/tpope.rb" ] || rubyopt="
 RUBYOPT=rtpope"
@@ -327,7 +307,6 @@ CRON=1
 SHELL=$shell
 $env=$HOME/.shrc
 PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
-PERL5LIB=$PERL5LIB
 RUBYLIB=$RUBYLIB$rubyopt
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
@@ -342,16 +321,9 @@ EOF
 fi
 rm /tmp/crontab.original.$$
 fi
-if [ ! -f "$HOME/.ssh/id_rsa" ]; then
-  ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N "" >/dev/null 2>&1 &&
-  cat "$HOME/.ssh/id_rsa.pub" >> "$HOME/.ssh/authorized_keys2" &&
-  echo "Generating ssh key."
-fi
 zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
 if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null && [ ! -f "$HOME/.sandbox" ]; then
-  if grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
-    :
-  else
+  if ! grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
     echo "Changing login shell."
     chsh -s "$zsh"
   fi
