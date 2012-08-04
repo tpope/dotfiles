@@ -100,18 +100,6 @@ do_media() {
   exec "$HOME/bin/media" "$@"
 }
 
-try_libtrash() {
-  case "$LD_PRELOAD" in *libtrash*) ;; *)
-  if [ -f /usr/lib/libtrash/libtrash.so -a -f "$HOME/.libtrash" ]; then
-     LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so"
-     export LD_PRELOAD
-  elif [ -f /usr/lib/libtrash/libtrash.so.2.4 -a -f "$HOME/.libtrash" ]; then
-     LD_PRELOAD="$LD_PRELOAD${LD_PRELOAD:+:}/usr/lib/libtrash/libtrash.so.2.4"
-     export LD_PRELOAD
-   fi ;; esac
-  "$@"
-}
-
 do_clean() {
   if [ "$1" = -v ]; then
     FIND()    { find "$@" ! -type d -print 2>/dev/null; }
@@ -487,8 +475,6 @@ case "$basename" in
   rwho)     exec "$HOME/bin/tpope-hostman" -w "$@" ;;
   ssh)      exec "$HOME/bin/tpope-hostman" --ssh "$@" ;;
 
-  libtrash|lt) try_libtrash "$@" ;;
-
   install|installer) installer "$@" ;;
 
   soffice)
@@ -689,7 +675,7 @@ case "$basename" in
   aumix) no_links
     if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
   feh) no_links
-    try_libtrash feh -Z "$@" ;;
+    feh -Z "$@" ;;
 
   git-publish)
     USAGE="<dir>"
@@ -763,14 +749,6 @@ EOF
     [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/dl/*.pdf;;
   gv) no_links
     [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
-  rm) no_links
-    if [ -d /usr/lib/libtrash -a -f "$HOME/.libtrash" ]; then
-      try_libtrash rm "$@"
-    elif [ "`uname`" = Darwin ] && inpath rmm; then
-      exec rmm "$@"
-    else
-      exec rm "$@"
-    fi ;;
 
   ri) no_links; exec ri -f bs "$@" ;;
 

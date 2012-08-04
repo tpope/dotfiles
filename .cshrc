@@ -167,7 +167,6 @@ endif
 
 alias mv 'mv -i'
 alias cp 'cp -i'
-alias rm "$HOME/bin/tpope rm"
 
 alias j 'jobs'
 

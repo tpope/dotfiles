@@ -1255,7 +1255,7 @@ if [ -x "`which $2 2>/dev/null`" ]; then \
 # Programs {{{2
 DestroyMenu MenuFvwmPrograms
 AddToMenu MenuFvwmPrograms "Programs" Title
-Test (x rox-filer) + "&ROX-Filer%/usr/share/rox-filer/.DirIcon%" Exec exec tpope libtrash rox-filer
+Test (x rox-filer) + "&ROX-Filer%/usr/share/rox-filer/.DirIcon%" Exec exec rox-filer
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Writer%hicolor/32x32/apps/ooo_writer.xpm%" oowriter
 FuncAddIfExists MenuFvwmPrograms "OpenOffice &Calc%hicolor/32x32/apps/ooo_calc.xpm%" oocalc
 FuncAddIfExists MenuFvwmPrograms "&Google Earth%/usr/local/google-earth/googleearth.xpm%" googleearth

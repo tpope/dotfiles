@@ -144,7 +144,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     alias mv='mv -i'
     alias cp='cp -i'
-    alias rm="$HOME/bin/tpope rm"
 
     alias j='jobs'
 

@@ -35,11 +35,6 @@ if [ "x$1" = "x--root-only" -a -n "$2" ]; then
       esac
     done
     [ -z "$didgroup" ] || echo "Added to groups."
-    if [ -d /root/Trash -a ! -f /root/.libtrash ]; then
-      ln -s "$HOME/.libtrash" /root/.libtrash
-      rm -rf /root/Trash
-      didroot=1
-    fi
     [ -z "$didroot" ] || echo "Did root related tasks."
     [ ! -f "$HOME/.install-root" ] || touch "$HOME/.install-root"
     exit 0
@@ -209,17 +204,6 @@ EOF
   for link in application audio image message model multipart text_html video; do
     ln -s text "$HOME/.rox_choices/MIME-types/$link"
   done
-  hidden=1
-fi
-if [ -f /usr/lib/libtrash/libtrash.so -a ! -f "$HOME/.libtrash" ]; then
-  cat > "$HOME/.libtrash" <<EOF
-# ~/.libtrash
-TRASH_CAN = .trash
-IGNORE_EXTENSIONS = o;log;aux;bbl;blg;ent;toc;swp;swo;viminfo
-IGNORE_HIDDEN = NO
-GLOBAL_PROTECTION = NO
-LIBTRASH_CONFIG_FILE_UNREMOVABLE = NO
-EOF
   hidden=1
 fi
 [ -z "$hidden" ] || echo "Creating hidden files."
