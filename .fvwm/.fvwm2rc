@@ -29,7 +29,7 @@ DesktopName 5 Sixth
 DesktopName 6 Seventh
 DesktopName 7 Eighth
 
-PipeRead "echo SetEnv HOST `hostname|sed -e 's/[.].*//'`"
+PipeRead "echo SetEnv HOST `tpope hostman`"
 PipeRead "echo SetEnv sudo `if [ -x /usr/bin/gksudo ]; then echo gksudo; else echo sudo; fi`"
 
 SetEnv SMALLFONT "-misc-fixed-medium-r-normal--8-80-75-75-c-50-iso8859-1"

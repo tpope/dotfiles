@@ -20,11 +20,9 @@ export HISTCONTROL=ignoredups
 export HISTFILE=
 
 if [ -x "$HOME/bin/tpope" ]; then
-  hostname=`"$HOME/bin/tpope" hostman`
   hostcolor=`"$HOME/bin/tpope" hostman -c`
   hostcode=`"$HOME/bin/tpope" hostman -s`
 else
-  hostname=`hostname`
   hostcolor="01;37"
   hostcode="+b W"
 fi
@@ -56,14 +54,14 @@ PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$di
 case $TERM in
   screen*|vt220*)
   if [ "$STY" ]; then
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}"'\033\\"'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${HOSTNAME}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${HOSTNAME}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}"'\033\\"'
   else
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${hostname}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${hostname}"'\033\\"'
+    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${HOSTNAME}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${HOSTNAME}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${HOSTNAME}"'\033\\"'
   fi
   ;;
   xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
   # If this is an xterm set the title to user@host:dir [tty]
-  PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${hostname}"'\007\033]2;'"${LOGNAME}@${hostname}"':`echo ${PWD}|sed -e "s,$HOME,~,"`'"${ttyslash}"'\007"'
+  PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${HOSTNAME}"'\007\033]2;'"${LOGNAME}@${HOSTNAME}"':`echo ${PWD}|sed -e "s,$HOME,~,"`'"${ttyslash}"'\007"'
   ;;
   linux*) ;;
   *)
@@ -81,4 +79,4 @@ alias sudo='sudo '
 
 [ ! -f /etc/bash_completion ] || . /etc/bash_completion
 
-unset hostname hostcolor hostcode usercolor usercode dircolor ttyslash ttydash
+unset hostcolor hostcode usercolor usercode dircolor ttyslash ttydash

@@ -9,7 +9,7 @@ case "$PATH" in
   "$HOME/bin:"*) ;;
   *) PATH="$HOME/bin:$PATH" ;;
 esac
-hostname="`hostname|sed -e 's/[.].*//'`"
+hostname="`(hostname 2>/dev/null || cat /proc/sys/kernel/hostname)|sed -e 's/\..*//'`"
 inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
 
 if [ "x$1" = "x--cron" -o "x$1" = "x--quiet" ]; then

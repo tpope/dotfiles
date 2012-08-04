@@ -66,7 +66,7 @@ if [ -z "$PERL5LIB" ]; then
   export PERL5LIB
 fi
 
-hostname=`hostname|sed -e 's/[.].*//'`
+hostname="`(hostname 2>/dev/null || cat /proc/sys/kernel/hostname)|sed -e 's/\..*//'`"
 RSYNC_RSH='ssh -axqoBatchmode=yes'
 CVS_RSH='ssh'
 CVSROOT=':ext:cvs.tpope.net:/home/tpope/.cvs'

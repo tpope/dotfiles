@@ -164,7 +164,7 @@ boxen=(matthew todd lucas gideon)
 if [ -d "$HOME/friends" ]; then
   local host
   for host in $boxen; do
-    [ "${host%.tpope.us}" != `hostname` ] && family=($family $host)
+    [ "${host%.tpope.us}" != "$HOST" ] && family=($family $host)
     [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
     : ~${host%.tpope.us}
   done

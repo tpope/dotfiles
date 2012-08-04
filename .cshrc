@@ -47,9 +47,9 @@ if ( -x /usr/bin/lesspipe ) then
 else
   setenv LESSOPEN '|"$HOME/.lessfilter" %s'
 endif
-set hostname = `hostname|sed -e 's/[.].*//'`
+if ( $HOST == '') set HOST = `tpope hostman`
 setenv CVSROOT ':ext:michael:/home/tpope/.cvs'
-if ( $hostname == michael ) setenv CVSROOT "$HOME/.cvs"
+if ( $HOST == michael ) setenv CVSROOT "$HOME/.cvs"
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
@@ -94,11 +94,11 @@ if ( $?tcsh ) then
   case screen*:
   case vt220*:
     if ( $?STY ) then
-    alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${hostname}"'\"'
+    alias precmd 'echo -n "]1;'"${ttydash}${HOST}"']2;'"{$usercode}${USER}{-}@{$hostcode}${HOST}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${HOST}"'\"'
     else
-    alias precmd 'echo -n "]1;'"${ttydash}${hostname}"']2;'"{$usercode}${USER}{-}@{$hostcode}${hostname}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}"'\"'
+    alias precmd 'echo -n "]1;'"${ttydash}${HOST}"']2;'"{$usercode}${USER}{-}@{$hostcode}${HOST}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}"'\"'
     endif
-    #echo -n "k${ttydash}${hostname}\" # "
+    #echo -n "k${ttydash}${HOST}\" # "
     set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
     breaksw
 
@@ -110,7 +110,7 @@ if ( $?tcsh ) then
   case dtterm*:
   case ansi*:
   case cygwin*:
-    alias precmd 'echo -n "]1;'"i${ttydash}${hostname}"']2;'"${USER}@${hostname}"':`echo $cwd|sed -e s,^$HOME,~,`'"${ttyslash}"'"'
+    alias precmd 'echo -n "]1;'"i${ttydash}${HOST}"']2;'"${USER}@${HOST}"':`echo $cwd|sed -e s,^$HOME,~,`'"${ttyslash}"'"'
     #alias jobcmd 'echo -n "]2\;\!#"'
     set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
     breaksw
@@ -129,16 +129,16 @@ else
   alias chdir 'chdir \!* && setprompt'
   alias pushd 'pushd \!* && setprompt'
   alias popd  'popd  \!* && setprompt'
-  alias setprompt 'set prompt = "'`id -un`@`hostname|sed -e "s/[.].*//"`':`pwd|sed -e "s,^$HOME,~,"`'"$promptchar"' "'
+  alias setprompt 'set prompt = "'`id -un`@$HOST':`pwd|sed -e "s,^$HOME,~,"`'"$promptchar"' "'
   setprompt
   set history = 100
   set filec
   if ( $TERM =~ screen* || $TERM =~ vt220* ) then
-      echo -n "k${ttydash}${hostname}\" # "
+      echo -n "k${ttydash}${HOST}\" # "
   endif
 endif
 
-unset hostcolor hostletter hostname hostcode usercolor usercode promptchar oldterm ttydash ttyslash
+unset hostcolor hostletter hostcode usercolor usercode promptchar oldterm ttydash ttyslash
 # }}}1
 # Aliases {{{1
 if ( -x /usr/bin/dircolors && $?tcsh ) then

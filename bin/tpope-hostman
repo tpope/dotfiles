@@ -25,6 +25,8 @@ name() {
   if [ -n "$COMPUTERNAME" ]; then
     # Windows
     echo "$COMPUTERNAME"
+  elif [ -r /proc/sys/kernel/hostname ]; then
+    cat /proc/sys/kernel/hostname
   else
     hostname
   fi
