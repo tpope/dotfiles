@@ -305,8 +305,8 @@ bindkey -M emacs "\ea" change-first-word
 bindkey -M emacs "^XD" describe-key-briefly
 
 fg-widget() {
-  stty icanon echo pendin -inlcr < /dev/tty
-  stty discard '^O' dsusp '^Y' lnext '^V' quit '^\' susp '^Z' < /dev/tty
+  stty icanon echo -inlcr < /dev/tty
+  stty lnext '^V' quit '^\' susp '^Z' < /dev/tty
   zle reset-prompt
   if jobs %- >/dev/null 2>&1; then
     fg %-
