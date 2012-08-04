@@ -2,6 +2,7 @@
 
 ENV['HOME'] ||= ENV['USERPROFILE'] || File.dirname(__FILE__)
 
+Pry.editor = ENV['VISUAL']
 Pry.config.history.file = if defined?(Bundler)
                             Bundler.tmp.parent.join('history.rb')
                           else
