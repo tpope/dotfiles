@@ -36,7 +36,7 @@ if ( "$prompt" == "" ) exit
 # }}}1
 # Environment {{{1
 umask 022
-stty -ixon
+if ( -x /bin/stty ) stty -ixon
 
 setenv VISUAL "$HOME/bin/sensible-editor"
 setenv PAGER "$HOME/bin/sensible-pager"

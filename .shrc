@@ -103,7 +103,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
   LESS="FRX#10"
 
   umask 022
-  stty -ixon
+  [ ! -x /bin/stty ] || stty -ixon
 
   #oldterm="$TERM"
   #[ "$OLDTERM" ] && oldterm="$OLDTERM"
