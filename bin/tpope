@@ -174,14 +174,6 @@ pager() {
 
 case "$basename" in
 
-  br)
-    if [ "`hostname`" = michael ]; then
-      no_links
-      exec br "$@"
-    else
-      tpope hostman --batch-ssh michael br "$@"
-    fi ;;
-
   chat|c)
     if [ "$hostname" = roxy -a -z "$*" ]; then
       "$HOME/.irssi/Chat-script" $hostname
