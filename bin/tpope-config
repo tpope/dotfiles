@@ -1,0 +1,112 @@
+#!/bin/sh
+# vim:set et sw=2:
+
+base_files="\
+.shrc .profile .bashrc .bash_profile .bash_logout \
+.cshrc .login .logout \
+.zshenv .zshrc .zlogin .zlogout .zsh/functions/_tpope .zsh/functions/_daemons \
+.inputrc .dir_colors \
+.screenrc .tmux.conf .terminfo/s/screen-256color \
+.terminfo/x/xterm-256color .terminfo/r/rxvt-unicode \
+.vim/after .vim/autoload .vim/colors .vim/plugin .vim/syntax .vim/templates \
+.vimrc .lessfilter .muttrc .urlview .mailcap .curlrc \
+.gnupg/gpg.conf .ssh/config .ssh/authorized_keys \
+.cvsignore .gitconfig .git_template \
+.xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
+.pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-DateTime \
+bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/tpope-hostman \
+bin/tpope-config bin/media bin/installer \
+.ruby/lib/tpope.rb .irbrc .pryrc"
+
+extra_files="\
+.netrc .gnupg/pubring.gpg .netscape/userContent.css"
+
+default_host=tpo.pe
+
+RSYNC_RSH="ssh -ax"
+[ -t 0 ] || RSYNC_RSH="ssh -axqoBatchMode=yes -oStrictHostKeyChecking=no -oSetupTimeOut=20"
+export RSYNC_RSH
+
+files="$base_files"
+
+if [ x--extra = "x$1" ]; then
+  files="$base_files $extra_files"
+  shift
+fi
+
+command="$1"
+shift
+
+if [ x--extra = "x$1" ]; then
+  files="$base_files $extra_files"
+  shift
+fi
+
+case "$command" in
+  tar) exec tar "$@" -C "$HOME" $files ;;
+
+  pull)
+  if [ "$#" = 0 ]; then
+    if [ -x "`which curl 2>/dev/null`" ]; then
+      webcat="curl -m8 -s -S"
+    elif [ -x "`which wget 2>/dev/null`" ]; then
+      webcat="wget -t1 -T8 -qO -"
+    elif [ -x "`which lynx 2>/dev/null`" ]; then
+      webcat="lynx -source"
+    else
+      webcat="ssh $default_host curl -m8 -s -S"
+    fi
+    $webcat http://c.tpo.pe/tgz | tar xzpf - -C "$HOME"
+    exec tpope config prune
+  fi
+
+  for host in "$@"; do
+    $RSYNC_RSH "$host" tar cf - $files | tar xpf - -C "$HOME"
+  done
+  ;;
+
+  push)
+  tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xpf -
+  ;;
+
+  sync)
+  rsync="rsync -urlptRC --exclude='.*.sw?' --exclude='*.local'"
+
+  for host in "${@-$default_host}"; do
+    $rsync "$host:$files" "$HOME" 2>/dev/null
+  done
+  for host in "${@-$default_host}"; do
+    (cd; $rsync $files "$host:")
+  done
+  exec tpope config prune
+  ;;
+
+  clone)
+  set -e
+  git clone git://github.com/tpope/tpope.git "$@"
+  cd "${1-tpope}"
+  git config --replace-all remote.origin.url git@github.com:tpope/tpope.git
+  git config alias.import '!find . -name .git -prune -o -type f -print0 | xargs -0 rm && tpope config tar cf - | tar xpf -'
+  git import
+  ;;
+
+  prune)
+  cd
+  [ ! -L .bash_logout ] || rm .bash_logout
+  rm -rf \
+  .fvwm/FvwmScript-Alert .fvwm/FvwmScript-Date .fvwm/FvwmScript-Time \
+  bin/hostinfo \
+  .git_template/info/exclude \
+  .fvwm/.fvwm-menu-headlines/extension.pl \
+  .Eterm .terminfo/E \
+  .terminfo/x/78 \
+  .vim/after/syntax/dosbatch.vim \
+  .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
+  .ssh/authorized_keys2 \
+  bin/sync-tpope
+  ;;
+
+  '') echo "Usage: `basename "$0"` <command> [options]" ;;
+
+  *) echo "`basename "$0"` $command: unknown command." >&2; exit 1 ;;
+esac

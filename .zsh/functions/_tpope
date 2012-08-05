@@ -1,4 +1,4 @@
-#compdef tpope launch x-terminal-emulator logview lv xauth-get sursync sync-tpope
+#compdef tpope launch x-terminal-emulator logview lv xauth-get sursync
 
 local tmp
 
@@ -11,7 +11,6 @@ case $service in
       shift words
       (( CURRENT-- ))
       curcontext="${curcontext%:*:*}:tpope-${words[1]}:"
-      [[ $words[1] = sync ]] && words[1]=sync-tpope
       [[ $words[1] = link ]] && words[1]=rclink
       [[ $words[1] = sursync ]] && words[1]=rsync
       [[ $words[1] = tomorrow ]] && words[1]=today
@@ -30,20 +29,4 @@ case $service in
     _normal ;;
   xauth-get)
     _hosts ;;
-  sync-tpope)
-    _arguments \
-      '(-a -z -j -c -d)-g[following should get GUI files]' \
-      '(-a -z -j -c -d)-G[following should not get GUI files]' \
-      '(-a -z -j -c -d)-t[following hosts are trusted]' \
-      '(-a -z -j -c -d)-T[following hosts are not trusted]' \
-      '(-a -z -j -c -d)-s[add simpson hosts]' \
-      '(* -a -z -j -c -d)-a[archive to tar]:archive file: _tar_archive x' \
-      '(* -a -z -j -c -d)-z[archive to tar.gz]:archive file:_tar_archive xz' \
-      '(* -a -z -j -c -d)-j[archive to tar.bz2]:archive file:_tar_archive xj' \
-      '(-a -z -j -c -d)-A[pipe over ssh]' \
-      '(-a -z -j -c -d)-Z[pipe gzipped over ssh]' \
-      '-c[commit files to cvs]:*:files:_files -W ~' \
-      '-d[diff files in cvs]:*:files:_files -W ~' \
-      '*:host:_hosts'
-    ;;
 esac
