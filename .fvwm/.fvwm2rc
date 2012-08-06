@@ -953,8 +953,8 @@ Silent Key F11  A   CM  StickAcrossDesks
 Silent Key SunF36 A CM  StickAcrossDesks
 Silent Key F12  A   M   WindowShade
 Silent Key SunF37 A M   WindowShade
-Silent Key F12  A   SM  Delete
-Silent Key SunF37 A SM  Delete
+Silent Key F12  A   SM  FuncSignal QUIT
+Silent Key SunF37 A SM  FuncSignal QUIT
 
 Silent Key Print A  C   Pick FuncCaptureWindow
 Silent Key Print A  SC  Exec exec import -window root $[HOME]/root-`date +%Y-%m-%d_%H-%M-%S`.png
@@ -962,6 +962,7 @@ Silent Key Print A  M   Exec exec import -window root $[HOME]/root-`date +%Y-%m-
 
 Key Q            A  4   Close
 Key Q            A  4S  Destroy
+Key Q            A  4C  FuncSignal QUIT
 
 Key equal        A  4   Raise
 Key equal        A  4M  Maximize
@@ -1487,15 +1488,27 @@ AddToMenu MenuFvwmWindowOps
 + "Re&fresh	S-M-F7%menu/refresh.xpm%"               RefreshWindow
 + "R&eposition	S-M-F8%menu/display.xpm%"               FuncRepositionWindow
 + "Identif&y	S-M-F9%menu/window-identify.xpm%"       Module FvwmIdent
-#+ "Scroll&Bar	C-M-F11%mini.move2.xpm%"                Module FvwmScroll 90p 95p
 + "Ca&pture	C-Print%mini.camera.xpm%"               Pick FuncCaptureWindow
 + ""                                                    Nop
 + "&Take To Desk	 S-C-Del%mini.book4.xpm%"       Popup MenuTakeToDesktop
 + "Mo&ve To Desk	S-M-Del%mini.book3.xpm%"        Popup MenuMoveToDesktop
 + ""                                                    Nop
-+ "&Delete	S-M-F12%menu/window-delete.xpm%"        Delete
 + "&Close	   M-F4%menu/window-close.xpm%"         Close
++ "Kill	S-M-F12%menu/quit.xpm%"                         FuncSignal QUIT
 + "Destroy	S-M-F4%menu/window-destroy.xpm%"        Destroy
+
+DestroyFunc FuncSignal
+AddToFunc FuncSignal
++ I PipeRead 'echo Exec echo s/\\"$// >/tmp/foo'
++ I PipeRead " \
+host=\"`xprop -id $[w.id] WM_CLIENT_MACHINE|sed -e 's/\"$//' -e 's/.*\"//'`\"; \
+pid=\"`xprop -id $[w.id] _NET_WM_PID|sed -e 's/.* = //'`\"; \
+if [ \"\$host\" = \"\$HOST\" ]; then \
+  echo Exec kill -$0 \$pid; \
+else \
+  echo Exec tpope hostman -S \"\$host\" -ax kill -$0 \$pid; \
+fi
+"
 
 # }}}2
 # }}}1
