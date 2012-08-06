@@ -13,7 +13,6 @@ SnapAttraction 3 Screen
 OpaqueMoveSize -1
 XorPixmap resize.rainbow.xpm
 ClickTime 650
-EwmhBaseStruts 0 0 0 40
 EdgeCommand Bottom All (FvwmButtons) FuncButtonsRestore
 ColormapFocus FollowsMouse
 #SetAnimation 10 -.01 0 .01 .03 .08 .18 .3 .45 .6 .75 .85 .90 .94 .97 .99 1.0
@@ -187,6 +186,7 @@ Style *         IconFont   "$[fvwm_iconfont]"
 Style *         Icon norm/unknown.xpm, MiniIcon mini/unknown.xpm
 Style *         IconBox 0 -112 -0 -25, IconFill Right Left, IconBox -72 0 -0 -112, IconFill Bottom Left
 Style *         IconGrid 56 72, IconSize 48 48
+Test (EnvIsSet GNOME_DESKTOP_SESSION_ID) Style * IconBox 0 -112 -0 -0, IconFill Left Bottom, IconBox -112 0 -0 -112, IconFill Bottom Left
 
 #Style *         ForeColor white, BackColor rgb:60/78/60
 #Style *         HilightFore white, HilightBack rgb:00/80/00
@@ -321,6 +321,7 @@ Style *MPlayer* StartsAnyWhere
 # }}}2
 # Common Program Styles {{{2
 
+Style Gnome-panel GrabFocusOff, NeverFocus
 Style Googleearth-bin GrabFocusOff
 Style trayer    GrabFocusOff
 Style *lock     NoTitle, NoHandles, Sticky, WindowListSkip, ClickToFocus, Icon norm/lock.xpm, MiniIcon mini/lock.xpm
@@ -849,7 +850,7 @@ AddToFunc EnlargeWindowUp
 + I PipeRead "echo FuncNextEdgeUp $1 0"
 + I PipeRead "echo WindowId $0 ResizeMove frame keep `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc EnlargeWrapperUp
 AddToFunc EnlargeWrapperUp
 + I NoWindow EnlargeWindowUp $[w.id] $[w.y] $[w.height]
@@ -860,7 +861,7 @@ AddToFunc ResizeWindowDown
 + I PipeRead "echo FuncNextEdgeDown $1 `expr $1 + $2 / 2`"
 + I PipeRead "echo WindowId $0 ResizeMove frame keep `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc ResizeWrapperDown
 AddToFunc ResizeWrapperDown
 + I NoWindow ResizeWindowDown $[w.id] $[w.y] $[w.height]
@@ -871,7 +872,7 @@ AddToFunc EnlargeWindowRight
 + I PipeRead "echo FuncNextEdgeRight `expr $1 + $2` $[vp.width]"
 + I PipeRead "echo WindowId $0 Resize frame `expr $[edge_w] - $1`p keep"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc EnlargeWrapperRight
 AddToFunc EnlargeWrapperRight
 + I NoWindow EnlargeWindowRight $[w.id] $[w.x] $[w.width]
@@ -882,7 +883,7 @@ AddToFunc ResizeWindowLeft
 + I PipeRead "echo FuncNextEdgeLeft `expr $1 + $2` `expr $1 + $2 / 2`"
 + I PipeRead "echo WindowId $0 Resize frame `expr $[edge_w] - $1`p keep"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc ResizeWrapperLeft
 AddToFunc ResizeWrapperLeft
 + I NoWindow ResizeWindowLeft $[w.id] $[w.x] $[w.width]
@@ -893,7 +894,7 @@ AddToFunc EnlargeWindowLeft
 + I PipeRead "echo FuncNextEdgeLeft $1 0"
 + I PipeRead "echo WindowId $0 ResizeMove frame `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p keep"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc EnlargeWrapperLeft
 AddToFunc EnlargeWrapperLeft
 + I NoWindow EnlargeWindowLeft $[w.id] $[w.x] $[w.width]
@@ -905,7 +906,7 @@ AddToFunc ResizeWindowRight
 + I PipeRead "echo WindowId $0 ResizeMove frame `expr $1 + $2 - $[edge_w]`p keep $[edge_w]p keep"
 + I Echo $[edge_w]
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc ResizeWrapperRight
 AddToFunc ResizeWrapperRight
 + I NoWindow ResizeWindowRight $[w.id] $[w.x] $[w.width]
@@ -1171,8 +1172,8 @@ PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo + I ModuleSynchro
 + I Module FvwmAuto FvwmAutohide -menter FuncAutoEnter
 #+ I Module FvwmAuto 1 -passid -menterleave "Silent SelectiveRaiseLower FuncButtonsRestore" "Silent SelectiveRaiseLower Lower"
 + I Module FvwmBacker
-+ I EwmhBaseStruts 0 0 0 25
-+ I Module FvwmButtons FvwmButtonsBottom
+Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) + I EwmhBaseStruts 0 0 0 25
+Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) + I Module FvwmButtons FvwmButtonsBottom
 + I Module FvwmCommandS
 + I Module FvwmEvent
 + I Module FvwmForm
@@ -1416,14 +1417,15 @@ AddToFunc FuncConfigureIconBox
 # }}}2
 
 DestroyMenu MenuFvwmQuitVerify
-AddToMenu MenuFvwmQuitVerify "Really Quit Fvwm?" Title
-+ "No, &Restart%menu/restart.xpm%"          Restart
+AddToMenu MenuFvwmQuitVerify
+Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) + "No, &Restart%menu/restart.xpm%" Restart
+Test (EnvIsSet GNOME_DESKTOP_SESSION_ID) + "No, &Restart%menu/restart.xpm%" Restart fvwm2
 + "Yes, Really &Quit%menu/choice-yes.xpm%"  FuncSmartQuit
 + ""                     Nop
 + "&Halt%menu/lock.xpm%"                    Popup MenuHalt
 + "R&eboot%menu/restart.xpm%"               Popup MenuReboot
 + ""                     Nop
-+ "Start &TWM%mini.twm.xpm%"        Restart twm
++ "Start &Gnome%mini.gnome.xpm%"    Restart gnome-session
 + "Start &KDE%mini.kde.xpm%"        Restart startkde
 + "&Just an XTerm%mini.xterm.xpm%"  Restart xterm -name '"X Console"' -T '"X Console"'
 
@@ -1717,7 +1719,8 @@ AddToFunc FuncMoveAllToDeskAndPage
 
 DestroyFunc FuncMenuFvwmRoot
 AddToFunc FuncMenuFvwmRoot
-+ I Menu MenuFvwmRoot Root 0 +100-100m-25p Nop
+Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) + I Menu MenuFvwmRoot Root 0 +100-100m-25p Nop
+Test (EnvIsSet GNOME_DESKTOP_SESSION_ID) + I Menu MenuFvwmRoot Root 0 +25p Nop
 
 DestroyFunc FuncToggleButtons
 AddToFunc FuncToggleButtons
