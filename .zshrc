@@ -160,7 +160,7 @@ periodic() { rehash }
 # }}}1
 # Named directories {{{1
 
-boxen=(matthew todd lucas gideon)
+boxen=(matthew todd lucas gideon ken kyle)
 if [ -d "$HOME/friends" ]; then
   local host
   for host in $boxen; do

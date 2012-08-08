@@ -6,8 +6,8 @@
 
 hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="matthew todd lucas gideon roxy"
-menuhosts="matthew todd lucas gideon roxy"
+hosts="matthew todd lucas gideon roxy ken kyle"
+menuhosts="matthew todd lucas gideon roxy ken kyle"
 
 gethost() {
   case "$1" in
@@ -15,6 +15,8 @@ gethost() {
   [Ll]|ucas*)                   echo lucas ;;
   [Mm]|matthew*)                echo matthew ;;
   [Oo]|todd*)                   echo todd ;;
+  [Nn]|ken*)                    echo ken ;;
+  [Ee]|kyle*)                   echo kyle ;;
   [Yy]|roxy*)                   echo roxy ;;
   ?)                            echo localhost ;;
   *) echo "$1" ;;
@@ -52,6 +54,8 @@ matthew()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
 todd()        { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
 lucas()       { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
 gideon()      { hcolor=teal;   $hcolor;hltr=G;hdom=tpope.us;}
+ken()         { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
+kyle()        { hcolor=orange; $hcolor;hltr=E;hdom=tpope.us;}
 roxy()        { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
 
@@ -153,10 +157,7 @@ hostinfo|hostman|tpope-hostman)
     if [ "$hdom" = tpope.net -a -x "`which nc 2>/dev/null`" ]; then
       exec_nc "$host.$hdom" "$3"
     fi
-    if [ "$hdom" = hshrckt.com ]; then
-      exec ssh -ex ci.hshrckt.com nc -q 1 "$host.local" "$3" 2>/dev/null
-    fi
-    exec ssh -ax trp nc -q 1 "$host" "$3" 2>/dev/null
+    exec ssh -ax home nc "$host" "$3" 2>/dev/null
     ;;
   -H)
     rm -f "$HOME"/bin/[A-Z]
