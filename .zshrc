@@ -250,6 +250,8 @@ compinit -u
 
 compdef '_arguments "-dump[dump to stdout]" "-T[force console]" "-G[force gui]" :url:_webbrowser' b sensible-browser
 compdef 'local expl; _description files expl "picture file"; _files "$expl[@]" -g "*.(#i)(png|gif|jpeg|jpg|tiff|tif|pbm|pgm|ppm|xbm|xpm|ras(|t)|tga|rle|rgb|bmp|pcx|fits|pm)(-.)"' feh
+compdef '_arguments "1:command:(start stop force-stop restart reload force-reload status)" "2:service:_services"' runcontrol rc
+compdef '_services' start stop restart reload force-reload rclink
 
 # }}}1
 # Mime {{{1

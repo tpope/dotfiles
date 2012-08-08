@@ -4,7 +4,7 @@
 base_files="\
 .shrc .profile .bashrc .bash_profile .bash_logout \
 .cshrc .login .logout \
-.zshenv .zshrc .zlogin .zlogout .zsh/functions/_tpope .zsh/functions/_daemons \
+.zshenv .zshrc .zlogin .zlogout .zsh/functions/_tpope \
 .inputrc .dir_colors \
 .screenrc .tmux.conf .terminfo/s/screen-256color \
 .terminfo/x/xterm-256color .terminfo/r/rxvt-unicode \
@@ -102,6 +102,7 @@ case "$command" in
   .terminfo/x/78 \
   .vim/after/syntax/dosbatch.vim \
   .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
+  .zsh/functions/_daemons \
   .ssh/authorized_keys2 \
   bin/sync-tpope
   ;;
