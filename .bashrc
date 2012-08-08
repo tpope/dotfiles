@@ -11,7 +11,7 @@ unset interactive
 if [ "$PS1" ]; then
 # If running interactively, then:
 
-shopt -s extglob
+shopt -s extglob 2>/dev/null
 set -o noclobber
 
 # don't put duplicate lines in the history
