@@ -266,7 +266,7 @@ Style emacs     UseStyle Editor
 # }}}2
 # Host Specific Styles {{{2
 
-PipeRead "$HOME/bin/tpope hostman --fvwm-styles"
+PipeRead "$HOME/bin/tpope hostman fvwm-styles"
 PipeRead "echo 'Style *localhost UseStyle' \\*@`hostname|sed -e 's/[.].*//'`\\*"
 PipeRead "echo 'Style @localhost UseStyle' @`hostname|sed -e 's/[.].*//'`\\*"
 
@@ -1378,7 +1378,7 @@ Test (x cdcd) + "&Disc Tracks%menu/disk-cd.xpm%" Popup MenuCDTracks
 # }}}2
 # Remote Logins and Screens {{{2
 
-PipeRead "$HOME/bin/tpope hostman --fvwm-menus"
+PipeRead "$HOME/bin/tpope hostman fvwm-menus"
 
 # }}}2
 # Fvwm Menus {{{2
@@ -1508,7 +1508,7 @@ pid=\"`xprop -id $[w.id] _NET_WM_PID|sed -e 's/.* = //'`\"; \
 if [ \"\$host\" = \"\$HOST\" ]; then \
   echo Exec kill -$0 \$pid; \
 else \
-  echo Exec tpope hostman -S \"\$host\" -ax kill -$0 \$pid; \
+  echo Exec tpope hostman ssh \"\$host\" -ax kill -$0 \$pid; \
 fi
 "
 
@@ -1854,7 +1854,7 @@ AddToFunc FuncScreenXTerm
 
 DestroyFunc FuncSshXTerm
 AddToFunc FuncSshXTerm
-+ I Exec exec x-terminal-emulator -ut -name ssh@$0 -T ssh@$0 -e tpope hostman -S $0 -tX
++ I Exec exec x-terminal-emulator -ut -name ssh@$0 -T ssh@$0 -e tpope hostman ssh $0 -tX
 
 DestroyFunc FuncFindXTerm
 AddToFunc FuncFindXTerm
@@ -1863,7 +1863,7 @@ AddToFunc FuncFindXTerm
 DestroyFunc FuncScreenSshXTerm
 AddToFunc FuncScreenSshXTerm
 + I FuncFindResource @$0
-+ I None (@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -name @$0 -T @$0 -e tpope hostman -S $0 -t screen -dRR $[HOST]
++ I None (@$0, AcceptsFocus) Exec exec x-terminal-emulator -ut -name @$0 -T @$0 -e tpope hostman ssh $0 -t screen -dRR $[HOST]
 
 # }}}2
 # Menu Functions {{{2
@@ -2185,7 +2185,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 *FvwmForm-Run: Input        Host           22      ""
 *FvwmForm-Run: Line         expand
 *FvwmForm-Run: Button       quit    "Run"           ^M
-*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?tpope hostman -S $(Host) -t) screen -dRR $[HOST] ;; ???://*|????://*|?????://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
+*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?tpope hostman ssh $(Host) -t) screen -dRR $[HOST] ;; ???://*|????://*|?????://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
 # Before saving the data, remove any previously saved data:
 *FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
 *FvwmForm-Run: Command !(                                      /bin/echo \
@@ -2194,7 +2194,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 ) > ${FVWM_USERDIR}/.FvwmForm-Run
 *FvwmForm-Run: Command !(                                      /bin/echo \
   "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
- Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?tpope hostman -S $(Host) -t) screen -dRR $[HOST] ';; ???://*|????://*|?????://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
+ Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?tpope hostman ssh $(Host) -t) screen -dRR $[HOST] ';; ???://*|????://*|?????://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
 ) > ${FVWM_USERDIR}/.FvwmForm-RunLast
 
 *FvwmForm-Run: Button       quit    "In Terminal"           ^J

@@ -174,13 +174,13 @@ pager() {
 case "$basename" in
 
   chat|c)
-    hostname="`"$HOME/bin/tpope" hostman`"
+    hostname="`tpope hostman`"
     if [ "$hostname" = roxy -a -z "$*" ]; then
       "$HOME/.irssi/Chat-script" $hostname
     elif [ -z "$*" ]; then
-      exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' $hostname
+      exec tpope hostman ssh tpope.net -t '$HOME/.irssi/Chat-script' $hostname
     else
-      exec tpope hostman -S tpope.net -t '$HOME/.irssi/Chat-script' "$@"
+      exec tpope hostman ssh tpope.net -t '$HOME/.irssi/Chat-script' "$@"
     fi ;;
 
   clean) do_clean "$@" ;;
@@ -423,9 +423,9 @@ case "$basename" in
   ;;
 
   hostman)  exec "$HOME/bin/tpope-hostman" "$@" ;;
-  ruptime)  exec "$HOME/bin/tpope-hostman" -u "$@" ;;
-  rwho)     exec "$HOME/bin/tpope-hostman" -w "$@" ;;
-  ssh)      exec "$HOME/bin/tpope-hostman" --ssh "$@" ;;
+  ruptime)  exec "$HOME/bin/tpope-hostman" ruptime "$@" ;;
+  rwho)     exec "$HOME/bin/tpope-hostman" rwho "$@" ;;
+  ssh)      exec "$HOME/bin/tpope-hostman" ssh "$@" ;;
 
   install|installer) installer "$@" ;;
 
@@ -521,7 +521,7 @@ case "$basename" in
   Wor)  w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w"   "$@" |pager ;;
   Or)   w="`wordtrans "$1"`"; shift; $Words | egrep    "$w"    "$@" |pager ;;
 
-  xauth-get) exec tpope hostman --batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
+  xauth-get) exec tpope hostman batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
 
   xssc|xscc)
     case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac

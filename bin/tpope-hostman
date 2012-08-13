@@ -4,7 +4,6 @@
 # Handles everything to do with hostnames, particularly colorizing them in
 # shell prompts.
 
-hostinfo=`basename "$0"`
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
 hosts="matthew todd lucas gideon roxy ken kyle"
 menuhosts="matthew todd lucas gideon roxy ken kyle"
@@ -117,18 +116,21 @@ exec_nc() {
   fi
 }
 
-case "$hostinfo" in
-tpope) return ;;
-ruptime|rwho) exec "$HOME/bin/hostinfo" --"$hostinfo" "$@" ;;
-hostinfo|hostman|tpope-hostman)
-  : ${host:="`name`"}
-  case "$1" in
-  -h|--hostname)    echo `gethost ${2:-$host}`; exit 0 ;;
-  -c|--host-color)  getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
-  -l|--letter)      getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
-  -s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
-  -r|--rgb)         getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
-  -S|--ssh)
+case `basename "$0"` in
+  ?)
+    [ -n "$STY" ] && SCREEN="screen -ln"
+    exec $SCREEN ssh `gethost $hostinfo` "$@"
+    ;;
+esac
+
+host="`name`"
+case "$1" in
+  name|-h|--hostname)     echo `gethost ${2:-$host}`; exit 0 ;;
+  ansi|-c|--host-color)   getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
+  letter|-l|--letter)     getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
+  rgb|-r|--rgb)           getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
+  screen-code|-s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
+  ssh|-S|--ssh)
     shift
     exec ssh "$@"
     case "$1" in
@@ -137,14 +139,14 @@ hostinfo|hostman|tpope-hostman)
     esac
     shift
     exec ssh "$host`suffix $host`" "$@" ;;
-  -b|--batch-ssh)
+  batch-ssh|-b|--batch-ssh)
     case "$2" in
       *.*|-*) host="$2" ;;
       *) host=`gethost ${2:-$host}` ;;
     esac
     shift; shift
     exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@" ;;
-  --tunnel)
+  tunnel|--tunnel)
     host="`gethost $2`"
     getinfo $host
     case "`cat /etc/resolv.conf 2>/dev/null`" in
@@ -159,14 +161,14 @@ hostinfo|hostman|tpope-hostman)
     fi
     exec ssh -ax home nc "$host" "$3" 2>/dev/null
     ;;
-  -H)
+  link|-H)
     rm -f "$HOME"/bin/[A-Z]
     for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
-      ln -s hostinfo "$HOME/bin/$ltr"
+      ln -s tpope-hostman "$HOME/bin/$ltr"
     done
     exit 0
     ;;
-  --fvwm-styles)
+  fvwm-styles|--fvwm-styles)
     for host in $hosts; do getinfo `gethost ${2:-$host}`;
       if [ "$host" != - ]; then
         #echo "Style *@$host* ForeColor $hlrgb, HilightFore $hdrgb"
@@ -176,7 +178,7 @@ hostinfo|hostman|tpope-hostman)
     done
     exit 0
     ;;
-  --fvwm-menus)
+  fvwm-menus|--fvwm-menus)
   cat<<EOF
 DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
@@ -222,7 +224,7 @@ EOF
     exit 0
     ;;
 
-  --fvwm-keys)
+  fvwm-keys|--fvwm-keys)
     for host in $hosts; do getinfo `gethost $host`;
       [ "$host" != - ] &&
       #echo "Key $hltr A 4   FuncFindXTerm $host" &&
@@ -233,7 +235,7 @@ EOF
     done
     exit 0
     ;;
-  -u|-w|--ruptime|--rwho)
+  ruptime|rwho|-u|-w|--ruptime|--rwho)
   PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
   command="$1"; shift
   [ "`uname -s`" != Linux ] || sep='\<'
@@ -260,21 +262,11 @@ EOF
     $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
   fi
   exit 0
-      ;;
-      -*) echo "Usage: [-chls] [hostname]" >&2; exit 1 ;;
-      *) echo `gethost ${1:-$host}`; exit 0 ;;
-    esac
-    exit 2
-    ;;
-  ?)  [ -n "$STY" ] && SCREEN="screen -ln"
-    exec $SCREEN ssh `gethost $hostinfo` "$@" ;;
-  batch-ssh)
-    case "$2" in
-      *.*|-*) host="$2";;
-      *) host=`gethost ${2:-$host}` ;;
-    esac
-    shift; shift
-    exec ssh -axqoBatchmode=yes "$host`suffix $host`" "$@" ;;
-
+  ;;
+  -*) echo "Usage: `basename "$0"` <command> [hostname]" >&2; exit 1 ;;
+  *) echo Deprecated >&2; gethost ${1:-$host}; exit 1 ;;
+  esac
+  exit 2
+  ;;
   *) echo Warning: invalid command "$hostinfo" ;;
 esac
