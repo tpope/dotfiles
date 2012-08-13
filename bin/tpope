@@ -676,5 +676,5 @@ EOF
 
   '') echo "Usage: `basename "$0"` <command> [options]" ;;
 
-  *) echo "`basename "$0"` $command: unknown command." >&2; exit 1 ;;
+  *) echo "`basename "$0"` $basename: unknown command." >&2; exit 1 ;;
 esac
