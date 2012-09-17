@@ -19,7 +19,7 @@ case ":$PATH" in
   *) PATH=".git/safe/../../bin:$PATH" ;;
 esac
 
-for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc; do
+for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc; do
   if [ -d "$dir" ]; then
     case "$PATH" in
       *:"$dir":*|*:"$dir"|"$dir":*|"$dir") ;;
