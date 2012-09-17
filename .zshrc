@@ -136,17 +136,16 @@ periodic() { rehash }
 # }}}1
 # Named directories {{{1
 
-boxen=(matthew todd lucas gideon ken kyle)
-if [ -d "$HOME/friends" ]; then
-  local host
-  for host in $boxen; do
-    [ "${host%.tpope.us}" != "$HOST" ] && family=($family $host)
-    [ -d "$HOME/friends" ] && typeset ${host%.tpope.us}=$HOME/friends/${host%.tpope.us}
-    : ~${host%.tpope.us}
-  done
-fi
+boxen=(`tpope hostman boxen`)
+local host
+for host in $boxen; do
+  [ "$host" != "$HOST" ] && family=($family $host)
+  if [ -L "$HOME/homes/$host" ]; then
+    typeset $host="$HOME/homes/$host"
+    : ~$host
+  fi
+done
 
-friends=($boxen roxy)
 unset host
 
 if [ -n "$USERPROFILE" ] && which cygpath >/dev/null; then
@@ -197,7 +196,7 @@ zstyle ':completion::complete:*:(all-|)files' ignored-patterns '*\~'
 zstyle ':completion::complete:*' ignore-parents parent pwd
 zstyle ':completion::complete:rm::(all-|)files' ignored-patterns
 # zstyle ':completion:*' group-name ''
-zstyle ':completion:*' hosts localhost $friends tpope.dyndns.org
+zstyle ':completion:*' hosts localhost $boxen tpope.dyndns.org
 zstyle ':completion:*' urls http://tpo.pe/ http://www.google.com/ https://github.com/
 zstyle ':completion:*' insert-unambiguous true
 # NO NO NO!!! This makes things SLOW

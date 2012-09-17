@@ -6,7 +6,7 @@
 
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
 hosts="matthew todd lucas gideon roxy ken kyle"
-menuhosts="matthew todd lucas gideon roxy ken kyle"
+menuhosts="$hosts"
 
 gethost() {
   case "$1" in
@@ -182,6 +182,9 @@ case "$1" in
       ln -s tpope-hostman "$HOME/bin/$ltr"
     done
     exit 0
+    ;;
+  boxen)
+    echo $hosts
     ;;
   fvwm-styles|--fvwm-styles)
     for host in $hosts; do getinfo `gethost ${2:-$host}`;
