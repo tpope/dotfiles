@@ -260,7 +260,7 @@ bindkey -M emacs '^X^[' vi-cmd-mode
 bindkey -M emacs ' ' magic-space
 bindkey -M viins ' ' magic-space
 
-bindkey -M isearch '^J' accept-search
+bindkey -M isearch '^J' accept-search 2>/dev/null
 
 # [[ -z "$terminfo[kdch1]" ]] || bindkey -M emacs "$terminfo[kdch1]" delete-char
 # [[ -z "$terminfo[khome]" ]] || bindkey -M emacs "$terminfo[khome]" beginning-of-line
