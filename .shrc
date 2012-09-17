@@ -102,20 +102,18 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
   umask 022
   [ ! -x /bin/stty ] || stty -ixon
 
-  #oldterm="$TERM"
-  #[ "$OLDTERM" ] && oldterm="$OLDTERM"
   if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-    tty=`tty|sed -e 's,^/dev/,,' -e 's,/,-,g'`
+    tty=`tty|sed -e 's,^/dev/,,'`
   fi
   case "$TERM" in
-    screen*|vt220*)
+    screen*)
     [ "$STY" ] || h="$hostname"
-    echo -n "k$tty@$h\\"
-    echo -n "]1;$tty@$hostname"
+    printf '\e]1;%s@%s\a' "$tty" "$hostname"
+    printf '\ek%s@%s\e\\' "$tty" "$h"
     unset h
     ;;
     xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
-    echo -n "]1;$tty@$hostname"
+    printf '\e]1;%s@%s\a' "$tty" "$hostname"
     ;;
   esac
   unset tty

@@ -14,8 +14,6 @@ unset interactive
 # }}}1
 # Prompt {{{1
 
-e=`echo -ne "\e"`
-
 _git_prompt_info() {
   case "$PWD" in
     /net/*|/Volumes/*) return ;;
@@ -28,109 +26,87 @@ _git_prompt_info() {
       return
   fi
   case "$TERM" in
-    screen*) branchcolor=$'\e[38;5;31m'   ;;
-    *)       branchcolor="$fg_bold[blue]" ;;
+    *-256color)             branchcolor=$'\e[38;5;31m'   ;;
+    *-88color|rxvt-unicode) branchcolor=$'\e[38;5;22m'   ;;
+    *)                      branchcolor="$fg_bold[blue]" ;;
   esac
-  case "$ref" in ????????????????????*) ref="${ref[1,17]}..." ;; esac
-  echo "(%{$branchcolor%}${ref}%{$reset_color%})"
+  print -Pn '(%%{$branchcolor%%}%20>..>$ref%<<%%{\e[00m%%})'
 }
 
 autoload -Uz colors && colors
 
 if [ -x "$HOME/bin/tpope" ]; then
-  hostcolor=`$HOME/bin/tpope hostman -c`
+  hostcolor=$'\e['`$HOME/bin/tpope hostman ansi`m
 else
-  hostcolor="01;37"
+  hostcolor=$'\e[01;37m'
 fi
 
 local usercolor="$fg_bold[yellow]"
 local dircolor="$fg_bold[blue]"
+# Use echotc Co?
 case "$TERM" in
-  screen*)
+  *-256color)
     usercolor=$'\e[38;5;184m'
     dircolor=$'\e[38;5;27m'
     ;;
-  xterm*|rxvt-unicode)
-    usercolor=$'\e[93m'
-    dircolor=$'\e[94m'
+  *-88color|rxvt-unicode)
+    usercolor=$'\e[38;5;56m'
+    dircolor=$'\e[38;5;23m'
     ;;
 esac
 [ $UID = '0' ] && usercolor="$fg_bold[white]"
 reset_color=$'\e[00m'
 
-PROMPT="%{$usercolor%}%n%{${e}[00m%}@%{${e}[${hostcolor}m%}%m%{${e}[00m%}:%{$dircolor%}%30<...<%~%<<%{${e}[00m%}%{${e}[00m%}\$(_git_prompt_info)%# "
-RPS1="%(?..(%{${e}[01;35m%}%?%{${e}[00m%}%)%<<)"
+PROMPT="%{$usercolor%}%n%{$reset_color%}@%{${hostcolor}%}%m%{$reset_color%}:%{$dircolor%}%30<...<%~%<<%{$reset_color%}\$(_git_prompt_info)%# "
+RPS1="%(?..(%{"$'\e[01;35m'"%}%?%{$reset_color%}%)%<<)"
 setopt promptsubst
 
-case ${OLDTERM:-$TERM} in
-  screen*|vt220*)
-    if [ -x "$HOME/bin/tpope" ]; then
-      hostcode=`$HOME/bin/tpope hostman -s`
-    else
-      hostcode="+b W"
-    fi
-    usercode="+b Y"
-    [ $UID = '0' ] && usercode="+b W"
+_set_title() {
+  print -Pn '\e]1;%l@%m*\a'
+  print -Pn '\e]2;%n@%m:%~'
+  if [ -n "$1" ]; then
+    print -Pnr ' (%24>..>$1%>>)'|tr '\0-\037' '?'
+  fi
+  print -Pn " [%l]\a"
+}
 
-    screenhs="\005{$usercode}%n\005{-}@\005{$hostcode}%m\005{-}:\005{+b B}%~\005{-}"
-    precmd  () {
-      local tty="`print -P "%l@"|sed -e s,/,-,g`"
-      # print -Pn "\e]1;\a\e]1;$tty%m\a"
-      print -Pn "\e]2;$screenhs [%l]\a"
+case $TERM in
+  screen*)
+    precmd() {
+      _set_title "$@"
       if [ "$STY" ]; then
-        print -Pn "\e]1;\a\e]1;@%m\a"
-        # $tty
-        print -Pn "\ek@\e\\"
+        # print -Pn "\e]1;\a\e]1;@%m\a"
+        print -Pn '\ek@\e\\'
       else
-        print -Pn "\ek@%m\e\\"
+        print -Pn '\ek@%m\e\\'
       fi
     }
-    preexec () {
-      local tty="`print -P "%l@"|sed -e s,/,-,g`"
-      local cmd="$1"
-      case "$cmd" in
-        ???????????*) cmd="${cmd%% *}" ;;
-      esac
-      case "$cmd" in
-        ???????????*) cmd="${cmd%%/*}" ;;
-      esac
-      cmd=$(echo -n "$cmd"|tr '\0-\037%$' '.')
-      # print -Pn "\e]1;\a\e]1;$tty%m*\a"
-      print -Pn "\e]2;$screenhs"
-      print -Pnr " (%24>..>$cmd"
-      print -Pn ") [%l]\a"
+    preexec() {
+      _set_title "$@"
+      print -n "\ek"
+      print -Pnr '%10>..>$1' | tr '\0-\037' '?'
       if [ "$STY" ]; then
-        print -Pn "\ek$cmd@\e\\"
+        print -Pn '@\e\\'
       else
-        print -Pn "\ek$cmd@%m\e\\"
+        print -Pn '@%m\e\\'
       fi
     }
-    ;;
+  ;;
 
   xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
-    precmd  () {
-      local tty="`print -P "%l@"|sed -e s,/,-,g`"
-      print -Pn "\e]1;$tty%m\a"
-      print -Pn "\e]2;%n@%m:%~ [%l]\a"
-    }
-    preexec () {
-      local tty="`print -P "%l@"|sed -e s,/,-,g`"
-      print -Pn "\e]1;$tty%m*\a"
-      print -Pn "\e]2;%n@%m:%~"
-      print -Pnr " (%24>..>$1"|tr '\0-\037' '.'
-      print -Pn ") [%l]\a"
-    } ;;
+    precmd () { _set_title "$@" }
+    preexec() { _set_title "$@" }
+    ;;
 
   linux) ;;
 
   *)
-    PS1="$hostletter%# "
+    PS1="%n@%m:%~%# "
     RPS1="%(?..(%?%)%<<)"
     ;;
 esac
 
-unset hostcolor hostletter hostcode dircolor usercolor usercode
-unset e
+unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color
 
 # Options {{{1
 

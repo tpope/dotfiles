@@ -64,39 +64,30 @@ else
 endif
 
 if ( -x /usr/bin/tty || -x /usr/local/bin/tty ) then
-  set ttyslash=" [`tty|sed -e s,^/dev/,, -e s/^tty//`]"
-  set ttydash="`tty|sed -e s,^/dev/,, -e s/^tty// -e s,/,-,g`@"
+  set ttybracket=" [`tty|sed -e s,^/dev/,,`]"
+  set ttyat="`tty|sed -e s,^/dev/,,`@"
 else
-  set ttydash=""
-  set ttyslash=""
+  set ttyat=""
+  set ttybracket=""
 endif
 
 if ( $?tcsh ) then
   if ( -x "$HOME/bin/tpope" ) then
-    set hostcolor = `$HOME/bin/tpope hostman -c`
-    set hostletter = `$HOME/bin/tpope hostman -l`
-    set hostcode = `$HOME/bin/tpope hostman -s`
+    set hostcolor = `$HOME/bin/tpope hostman ansi`
   else
     set hostcolor = `00;33`
-    set hostletter = ``
-    set hostcode = `y`
   endif
-  if ( ! $?TERM ) setenv TERM vt220
-  #set oldterm = "$TERM"
-  #if ( $?OLDTERM ) then
-    #set oldterm = "$OLDTERM"
-  #endif
+
+  set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
+
   switch ($TERM)
 
   case screen*:
-  case vt220*:
     if ( $?STY ) then
-    alias precmd 'echo -n "]1;'"${ttydash}${HOST}"']2;'"{$usercode}${USER}{-}@{$hostcode}${HOST}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}${HOST}"'\"'
+      alias precmd 'printf "\e]1;'"i${ttyat}${HOST}"'\a\e]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\ek'"${ttyat}"'\e\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
     else
-    alias precmd 'echo -n "]1;'"${ttydash}${HOST}"']2;'"{$usercode}${USER}{-}@{$hostcode}${HOST}{-}:{+b B}"'`echo $cwd|sed -e s,^$HOME,~,`'"{-}{k}${ttyslash}{-}"'k'"${ttydash}"'\"'
+      alias precmd 'printf "\e]1;'"i${ttyat}${HOST}"'\a\e]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\ek'"${ttyat}${HOST}"'\e\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
     endif
-    #echo -n "k${ttydash}${HOST}\" # "
-    set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
     breaksw
 
   case xterm*:
@@ -107,17 +98,14 @@ if ( $?tcsh ) then
   case dtterm*:
   case ansi*:
   case cygwin*:
-    alias precmd 'echo -n "]1;'"i${ttydash}${HOST}"']2;'"${USER}@${HOST}"':`echo $cwd|sed -e s,^$HOME,~,`'"${ttyslash}"'"'
-    #alias jobcmd 'echo -n "]2\;\!#"'
-    set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
+    alias precmd 'printf "\e]1;'"${ttyat}${HOST}"'\a\e]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a" "`echo $cwd|sed -e s,^$HOME,~,`"'
     breaksw
 
   case linux*:
-    set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
     breaksw
 
   default:
-    set prompt = "$hostletter%# "
+    set prompt = "%n@%m:%~%# "
     breaksw
 
   endsw
@@ -131,11 +119,11 @@ else
   set history = 100
   set filec
   if ( $TERM =~ screen* || $TERM =~ vt220* ) then
-      echo -n "k${ttydash}${HOST}\" # "
+      printf "\ek%s\e\\" "$ttyat$HOST"
   endif
 endif
 
-unset hostcolor hostletter hostcode usercolor usercode promptchar oldterm ttydash ttyslash
+unset hostcolor usercolor usercode promptchar oldterm ttyat ttybracket
 # }}}1
 # Aliases {{{1
 if ( -x /usr/bin/dircolors && $?tcsh ) then

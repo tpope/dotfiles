@@ -20,63 +20,57 @@ export HISTCONTROL=ignoredups
 export HISTFILE=
 
 if [ -x "$HOME/bin/tpope" ]; then
-  hostcolor=`"$HOME/bin/tpope" hostman -c`
-  hostcode=`"$HOME/bin/tpope" hostman -s`
+  hostcolor=`"$HOME/bin/tpope" hostman ansi`
 else
   hostcolor="01;37"
-  hostcode="+b W"
 fi
 
 [ "$UID" ] || UID=`id -u`
-usercolor="01;33" && usercode="+b Y"
+usercolor='01;33'
 dircolor='01;34'
 case "$TERM" in
-  screen*)
+  *-256color)
   usercolor='38;5;184'
   dircolor='38;5;27'
   ;;
-  xterm*|rxvt-unicode)
+  *-88color|rxvt-unicode)
+  usercolor='38;5;56'
+  dircolor='38;5;23'
+  ;;
+  xterm*)
   usercolor='93'
   dircolor='94'
   ;;
 esac
-[ $UID = '0' ] && usercolor="01;37" && usercode="+b W"
-
+[ $UID = '0' ] && usercolor="01;37"
 
 if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-  ttyslash=" [`tty|sed -e s,^/dev/,, -e s/^tty//`]"
-  ttydash="`tty|sed -e s,^/dev/,, -e s/^tty// -e s,/,-,g`@"
+  ttybracket=" [`tty|sed -e s,^/dev/,,`]"
+  ttyat="`tty|sed -e s,^/dev/,,`@"
 fi
 
 PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$dircolor'm\]\w\[\e[00m\]\$ '
 
-[ "$OLDTERM" ] && TERM=$OLDTERM
-case $TERM in
-  screen*|vt220*)
-  if [ "$STY" ]; then
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${HOSTNAME}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${HOSTNAME}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}"'\033\\"'
-  else
-    PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${HOSTNAME}"'\007\033]2;\005{'"$usercode}${LOGNAME/\\\\/\\0134}\005{-}@\005{$hostcode}${HOSTNAME}\005{-}:\005{+b B}"'`echo ${PWD}|sed -e "s,$HOME,~,"`'"\005{-}\005{k}${ttyslash}\005{-}"'\007\033k'"${ttydash}${HOSTNAME}"'\033\\"'
-  fi
-  ;;
-  xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
-  # If this is an xterm set the title to user@host:dir [tty]
-  PROMPT_COMMAND='echo -ne "\033]1;'"${ttydash}${HOSTNAME}"'\007\033]2;'"${LOGNAME}@${HOSTNAME}"':`echo ${PWD}|sed -e "s,$HOME,~,"`'"${ttyslash}"'\007"'
+case "$TERM" in
+  screen*|xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
+    PS1='\[\e]1;'$ttyat'\h\007\e]2;\u@\h:\w'$ttybracket'\007\]'"$PS1"
   ;;
   linux*) ;;
   *)
-  if [ -x "$HOME/bin/tpope" ]; then
-    hostletter=`"$HOME/bin/tpope" hostman -l`
-  fi
-  PS1=$hostletter'\$ '
-  unset hostletter
+  PS1='\u@\h:\w\$ '
   ;;
 esac
 
-fi
+case $TERM in
+  screen*)
+    PS1="$PS1"'\[\ek'"$ttyat`[ -n "$STY" ] || echo '\h'`"'\e\\\]'
+    ;;
+esac
 
 alias sudo='sudo '
 
 [ ! -f /etc/bash_completion ] || . /etc/bash_completion
 
-unset hostcolor hostcode usercolor usercode dircolor ttyslash ttydash
+unset hostcolor usercolor dircolor ttybracket ttyat
+
+fi
