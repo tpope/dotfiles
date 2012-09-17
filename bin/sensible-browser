@@ -64,6 +64,7 @@ elif [ "$DISPLAY" -a -z "$terminal" ]; then
   fi
   case "$gui$url" in
     file:*|/*) ;;
+    :spotify:*) exec spotify "$url" ;;
     *:*|www*|'')
     for browser in firefox mozilla-firebird mozilla netscape; do
       if [ -x "`which $browser 2>/dev/null`" ] && \
