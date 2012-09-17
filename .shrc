@@ -134,8 +134,8 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
 
-    alias ls='ls -F'
-    alias ll='ls -lF'
+    alias ls='ls -hF'
+    alias ll='ls -lhF'
 
     alias mv='mv -i'
     alias cp='cp -i'
@@ -149,10 +149,10 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     if [ -x "`which dircolors 2>/dev/null`" ]; then
       eval `dircolors -b "$HOME/.dir_colors"`
-      alias ls="ls -F --color=auto"
+      alias ls="ls -hF --color=auto"
     elif [ -x "`which gdircolors 2>/dev/null`" ]; then
       eval `gdircolors -b "$HOME/.dir_colors"`
-      alias ls="gls -F --color=auto"
+      alias ls="gls -hF --color=auto"
     else
       CLICOLOR=1
       LSCOLORS=ExGxFxdxCxfxexCaCdEaEd

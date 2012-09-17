@@ -128,14 +128,14 @@ unset hostcolor usercolor usercode promptchar oldterm ttyat ttybracket
 # Aliases {{{1
 if ( -x /usr/bin/dircolors && $?tcsh ) then
   eval `/usr/bin/dircolors -c $HOME/.dir_colors`
-  alias ls 'ls -F --color=auto'
+  alias ls 'ls -hF --color=auto'
 else if ( -x /usr/local/bin/dircolors && $?tcsh ) then
   eval `/usr/local/bin/dircolors -c $HOME/.dir_colors`
-  alias ls 'ls -F --color=auto'
+  alias ls 'ls -hF --color=auto'
 else if ( -x /usr/bin/dircolors || -x /usr/local/bin/dircolors ) then
-  alias ls 'ls -F --color=auto'
+  alias ls 'ls -hF --color=auto'
 else
-  alias ls 'ls -F'
+  alias ls 'ls -hF'
   setenv CLICOLOR ''
   setenv LSCOLORS ExGxFxdxCxfxexCaCdEaEd
 endif
