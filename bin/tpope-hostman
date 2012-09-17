@@ -132,20 +132,35 @@ case "$1" in
   screen-code|-s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
   ssh|-S|--ssh)
     shift
-    exec ssh "$@"
     case "$1" in
       *.*) host="$1";;
       *) host=`gethost ${1:-$host}` ;;
     esac
     shift
-    exec ssh "$host`suffix $host`" "$@" ;;
+    exec ssh "$host`suffix $host`" "$@"
+    ;;
   batch-ssh|-b|--batch-ssh)
-    case "$2" in
-      *.*|-*) host="$2" ;;
-      *) host=`gethost ${2:-$host}` ;;
+    shift
+    case "$1" in
+      *.*|-*) host="$1" ;;
+      *) host=`gethost ${1:-$host}` ;;
     esac
-    shift; shift
-    exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@" ;;
+    shift
+    exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@"
+    ;;
+  screen-ssh)
+    shift
+    args=""
+    case "$1" in
+      -*[Rr]*) resume="$1 $host"; shift ;;
+    esac
+    case "$1" in
+      *.*) host="$1" ;;
+      *) host=`gethost $1` ;;
+    esac
+    shift
+    exec ssh -t "$host`suffix $host`" screen $resume "$@"
+    ;;
   tunnel|--tunnel)
     host="`gethost $2`"
     getinfo $host
