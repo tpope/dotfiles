@@ -5,6 +5,7 @@
 export ENV="$HOME/.shrc"
 . "$ENV"
 unset interactive
+
 [ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
 [ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(rbenv init -|grep -v export.PATH)"
 
@@ -14,10 +15,7 @@ if [ "$PS1" ]; then
 shopt -s extglob 2>/dev/null
 set -o noclobber
 
-# don't put duplicate lines in the history
-export HISTCONTROL=ignoredups
-# In fact, let's not use a history file at all
-export HISTFILE=
+export HISTCONTROL=ignoredups HISTFILE=
 
 if [ -x "$HOME/bin/tpope" ]; then
   hostcolor=`"$HOME/bin/tpope" hostman ansi`
