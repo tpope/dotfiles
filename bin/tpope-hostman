@@ -54,7 +54,7 @@ todd()        { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
 lucas()       { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
 gideon()      { hcolor=teal;   $hcolor;hltr=G;hdom=tpope.us;}
 ken()         { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
-kyle()        { hcolor=orange; $hcolor;hltr=E;hdom=tpope.us;}
+kyle()        { hcolor=cyan;   $hcolor;hltr=E;hdom=tpope.us;}
 roxy()        { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
 
