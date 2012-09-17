@@ -48,9 +48,9 @@ case "$command" in
   pull)
   if [ "$#" = 0 ]; then
     if [ -x "`which curl 2>/dev/null`" ]; then
-      webcat="curl -m8 -s -S"
+      webcat="curl -m8 -L -s -S"
     elif [ -x "`which wget 2>/dev/null`" ]; then
-      webcat="wget -t1 -T8 -qO -"
+      webcat="wget -t1 -T8 -nv -O -"
     elif [ -x "`which lynx 2>/dev/null`" ]; then
       webcat="lynx -source"
     else
