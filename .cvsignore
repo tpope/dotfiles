@@ -2,5 +2,7 @@ syntax: glob
 *~
 .*.sw?
 .sw?
-*.local
 tags
+.DS_Store
+.AppleDouble
+*.local
