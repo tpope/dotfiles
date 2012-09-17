@@ -1,4 +1,4 @@
-$:.unshift(*%w(~/src/ruby/lib ~/.ruby ~/.ruby/lib).map {|d| File.expand_path d})
+$:.unshift(*%w(~/src/ruby/lib ~/.ruby/lib).map {|d| File.expand_path d})
 $:.unshift('.') if $:.delete('.')
 
 Gem.path.grep(/@global$/).each do |gemset|

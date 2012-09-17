@@ -27,12 +27,6 @@ esac
 done
 PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
 
-for dir in "$HOME/.ruby/lib" "$HOME/ruby/lib" "$HOME/.ruby"; do
-  case ":$RUBYLIB:" in
-    *:"$dir":*) ;;
-  *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB:$dir"
-esac
-done
-RUBYLIB="`echo "$RUBYLIB"|sed -e s/^://`"
+RUBYLIB="$HOME/src/ruby/lib:$HOME/.ruby/lib"
 
 export ENV="$HOME/.shrc" CLASSPATH PERL5LIB PERL5OPT RUBYLIB

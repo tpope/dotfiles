@@ -43,17 +43,8 @@ if [ -z "$CLASSPATH" ]; then
   export CLASSPATH
 fi
 
-if [ -z "$RUBYLIB" ]; then
-  for dir in "$HOME/.ruby/lib" "$HOME/.ruby"; do
-    case ":$RUBYLIB:" in
-      *:"$dir":*) ;;
-      *) [ ! -d "$dir" ] || RUBYLIB="$RUBYLIB:$dir"
-    esac
-  done
-  RUBYLIB="`echo "$RUBYLIB"|sed -e s/^://`"
-  export RUBYLIB
-fi
-export PATH RUBYLIB
+RUBYLIB="$HOME/src/ruby/lib:$HOME/.ruby/lib"
+export RUBYLIB
 
 if [ -z "$PERL5LIB" ]; then
   for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
