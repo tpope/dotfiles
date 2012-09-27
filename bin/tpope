@@ -172,7 +172,7 @@ case "$basename" in
 
   chat|c)
     hostname="`tpope hostman`"
-    if [ "$hostname" = roxy -a -z "$*" ]; then
+    if [ -x "$HOME/.irssi/Chat-script" -a -z "$*" ]; then
       "$HOME/.irssi/Chat-script" $hostname
     elif [ -z "$*" ]; then
       exec tpope hostman ssh tpope.net -t '$HOME/.irssi/Chat-script' $hostname
