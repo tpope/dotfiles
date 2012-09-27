@@ -9,7 +9,7 @@ text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
 text/richtext; richtext -t; description="Rich Text"; copiousoutput
 text/x-vcalendar; korganizer '%s'; description="vCalendar File"; test=test -n "$DISPLAY"
 audio/x-amzxml; "$HOME/Music/clamz.sh" '%s'; description="Amazon MP3 Download"
-text/*; sensible-pager '%s'; edit=vim '%s'; needsterminal; test=test -t 0
+text/*; less '%s'; edit=vim '%s'; needsterminal; test=test -t 0
 text/*; gvim -Rf '%s'; edit=gvim -f '%s'; test=test -n "$DISPLAY" -a ! -t 0
 video/*; mplayer -quiet -vo fb,fa '%s'; description="Video"; needsterminal; test=test -z "$DISPLAY" -a -t 0
 video/*; mplayer '%s'; description="Video"; needsterminal; test=test -t 0

@@ -395,9 +395,9 @@ case "$basename" in
       fi ;;
     esac
     if [ -n "$STY" ]; then
-      exec tpope screen -ln -fn -t Editor sensible-editor "$@"
+      exec tpope screen -ln -fn -t Editor tpope sensible-editor "$@"
     else
-      exec sensible-editor "$@"
+      exec tpope sensible-editor "$@"
     fi
   ;;
 

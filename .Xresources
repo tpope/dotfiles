@@ -291,9 +291,6 @@ XConsole*verbose: true
 XConsole*saveLines: 128
 XConsole*geometry: 364x225-90-40
 XConsole*font: 5x7
-!## XFM {{{1
-Xfm*defaultEditor: sensible-editor
-Xfm*defaultViewer: sensible-pager
 !## XOSVIEW {{{1
 xosview*background: #666
 xosview*interrupts: false

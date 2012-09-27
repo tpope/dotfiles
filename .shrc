@@ -80,9 +80,13 @@ RSYNC_RSH='ssh -ax'
 if [ "$interactive" -o "$_" = "interactive" ] || \
   echo $0|\grep '^[^.]*sh[0-9.-]*$' >/dev/null; then
 
-  VISUAL="$HOME/bin/sensible-editor"
+  if [ -x "`which vim 2>/dev/null`" ]; then
+    VISUAL=vim
+  elif [ -x "`which vi 2>/dev/null`" ]; then
+    VISUAL=vi
+  fi
   BROWSER="$HOME/bin/sensible-browser"
-  PAGER="$HOME/bin/sensible-pager"
+  [ ! -x "`which less 2>/dev/null`" ] || PAGER=less
   if [ -x /usr/bin/lesspipe ]; then
     LESSOPEN='|lesspipe %s'
   else

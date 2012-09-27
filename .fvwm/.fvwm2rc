@@ -395,7 +395,7 @@ Key I           A   4   FuncFindBookmark I FuncFindMediaProgram
 Key O           A   4   FuncFindBookmark O FuncFindOffice
 Key P           A   4   FuncFindBookmark P FuncFindDesktop
 Key semicolon   A   4   FuncFindEditor
-Key semicolon   A   4M  Exec exec sensible-editor
+Key semicolon   A   4M  Exec exec tpope sensible-editor
 Key period      A   4   FuncFindTerminal
 Key comma       A   4   FuncFindGameEtc
 

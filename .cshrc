@@ -37,9 +37,13 @@ if ( "$prompt" == "" ) exit
 umask 022
 if ( -x /bin/stty ) stty -ixon
 
-setenv VISUAL "$HOME/bin/sensible-editor"
-setenv PAGER "$HOME/bin/sensible-pager"
+if ( -x /usr/local/bin/vim || -x /usr/bin/vim ) then
+  setenv VISUAL vim
+else if ( -x /usr/bin/vi || -x /bin/vi ) then
+  setenv VISUAL vi
+endif
 setenv BROWSER "$HOME/bin/sensible-browser"
+if ( -x /usr/local/bin/less || -x /usr/bin/less || -x /bin/less ) setenv PAGER less
 setenv LESS 'RFX#10'
 if ( -x /usr/bin/lesspipe ) then
   setenv LESSOPEN '|lesspipe %s'
