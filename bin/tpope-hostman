@@ -5,18 +5,18 @@
 # shell prompts.
 
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="matthew todd lucas gideon roxy ken kyle"
+hosts="brandon drogo lyanna rhaegar varys balon renly"
 menuhosts="$hosts"
 
 gethost() {
   case "$1" in
-  [Gg]|gideon*)                 echo gideon ;;
-  [Ll]|ucas*)                   echo lucas ;;
-  [Mm]|matthew*)                echo matthew ;;
-  [Oo]|todd*)                   echo todd ;;
-  [Nn]|ken*)                    echo ken ;;
-  [Ee]|kyle*)                   echo kyle ;;
-  [Yy]|roxy*)                   echo roxy ;;
+  [Gg]|gideon*|rhaegar*)        echo rhaegar ;;
+  [Ll]|ucas*|lyanna*)           echo lyanna ;;
+  [Mm]|matthew*|brandon*)       echo brandon ;;
+  [Oo]|todd*|drogo*)            echo drogo ;;
+  [Nn]|ken*|balon*)             echo balon ;;
+  [Ee]|kyle*|renly*)            echo renly ;;
+  [Yy]|roxy*|varys*)            echo varys ;;
   ?)                            echo localhost ;;
   *) echo "$1" ;;
 esac
@@ -49,13 +49,13 @@ insertletter() {
   fi
 }
 
-matthew()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
-todd()        { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
-lucas()       { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
-gideon()      { hcolor=teal;   $hcolor;hltr=G;hdom=tpope.us;}
-ken()         { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
-kyle()        { hcolor=cyan;   $hcolor;hltr=E;hdom=tpope.us;}
-roxy()        { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
+brandon()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
+drogo()       { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
+lyanna()      { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
+rhaegar()     { hcolor=navy;   $hcolor;hltr=G;hdom=tpope.us;}
+balon()       { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
+renly()       { hcolor=cyan;   $hcolor;hltr=E;hdom=tpope.us;}
+varys()       { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
 
 red()         { hterm="00;31";hscrn="   r";hlrgb="#D47F7F";hdrgb="#550000";}
