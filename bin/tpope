@@ -101,20 +101,20 @@ do_media() {
 
 do_clean() {
   if [ "$1" = -v ]; then
-    FIND()    { find "$@" ! -type d -print 2>/dev/null; }
-    FINDDIR() { find "$@" -mindepth 1 -type d -print 2>/dev/null; }
+    destroy()    { find "$@" ! -type d -print 2>/dev/null; }
+    empty_dirs() { find "$@" -mindepth 1 -type d -empty -print; }
     shift
   else
-    FINDDIR() { find "$@" -mindepth 1 -type d -print0 2>/dev/null | \
+    empty_dirs() { find "$@" -mindepth 1 -type d -empty -print0 2>/dev/null | \
         xargs -0 rmdir >/dev/null 2>&1; }
     if inpath wipe; then
-      FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
           xargs -0 wipe -fcsq >/dev/null 2>&1; }
     elif inpath shred; then
-      FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
           xargs -0 shred -fun 4 >/dev/null 2>&1; }
     else
-      FIND()    { find "$@" ! -type d -print0 2>/dev/null | \
+      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
           xargs -0 rm >/dev/null 2>&1; }
     fi
   fi
@@ -124,20 +124,17 @@ do_clean() {
     '') unit=2 ;;
     *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
   esac
-  unset LD_PRELOAD
-  PROTECT_TRASH=NO
-  export PROTECT_TRASH
-  FIND "$HOME" \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .viminfo -o -name .zcompdump -o -name texput.log -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" -o -name screen-exchange -o -name "*.stackdump" \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
-  FIND "$HOME" -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name "*.aux" -o -name "*.blg" -o -name ".*.bak" \) \( -mtime +`expr $unit \* 15` \)
-  FIND "/tmp" "/var/tmp" "$HOME/tmp" -user "$LOGNAME" -mtime +`expr $unit \* 15 + 30` -type f
+  cd
+  destroy . \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/tv shows" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .zcompdump -o -name texput.log -o -name screen-exchange \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
+  destroy . -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" \) \( -mtime +`expr $unit \* 15` \)
+  destroy /tmp /var/tmp tmp -user "$LOGNAME" -atime +`expr $unit \* 15 + 30` -type f
   [ $unit = 4 ] && unit=6
-  FIND "$HOME/.trash" "$HOME/.mutt_cache" -atime +`expr $unit \* 15`
-  FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
-  FIND "$HOME/.trash" -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
-  FINDDIR "$HOME/.trash" -atime +`expr $unit \* 1` -empty
-  if [ ! -d "$HOME/.trash" ]; then
-    mkdir "$HOME/.trash" && chmod 0700 "$HOME/.trash"
-  fi
+  destroy .trash .local/share/Trash/files .mutt_cache -atime +`expr $unit \* 15`
+  destroy .trash .local/share/Trash/files -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
+  destroy .trash .local/share/Trash/files -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
+  empty_dirs .trash .local/share/Trash/files
+  trash-empty  `expr $unit \* 15 + 1` 2>/dev/null
+  autotrash -d `expr $unit \* 15 + 1` 2>/dev/null
   tpope config prune
   return 0
 }
