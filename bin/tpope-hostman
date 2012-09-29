@@ -5,7 +5,7 @@
 # shell prompts.
 
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="brandon drogo lyanna rhaegar varys balon renly"
+hosts="brandon drogo lyanna rhaegar varys balon renly tywin"
 menuhosts="$hosts"
 
 gethost() {
@@ -16,6 +16,7 @@ gethost() {
   [Oo]|todd*|drogo*)            echo drogo ;;
   [Nn]|ken*|balon*)             echo balon ;;
   [Ee]|kyle*|renly*)            echo renly ;;
+  [Tt]|tywin*)                  echo tywin ;;
   [Yy]|roxy*|varys*)            echo varys ;;
   ?)                            echo localhost ;;
   *) echo "$1" ;;
@@ -55,6 +56,7 @@ lyanna()      { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
 rhaegar()     { hcolor=navy;   $hcolor;hltr=G;hdom=tpope.us;}
 balon()       { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
 renly()       { hcolor=cyan;   $hcolor;hltr=E;hdom=tpope.us;}
+tywin()       { hcolor=magenta;$hcolor;hltr=T;hdom=tpope.us;}
 varys()       { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
 
