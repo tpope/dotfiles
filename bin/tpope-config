@@ -56,21 +56,21 @@ case "$command" in
     else
       webcat="ssh $default_host curl -m8 -s -S"
     fi
-    $webcat http://c.tpo.pe/tgz | tar xzpf - -C "$HOME"
+    $webcat http://c.tpo.pe/tgz | tar xzf - -C "$HOME"
     exec tpope config prune
   fi
 
   for host in "$@"; do
-    $RSYNC_RSH "$host" tar cf - $files | tar xpf - -C "$HOME"
+    $RSYNC_RSH "$host" tar cf - $files | tar xf - -C "$HOME"
   done
   ;;
 
   push)
-  tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xpf -
+  tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xf -
   ;;
 
   sync)
-  rsync="rsync -urlptRC --exclude='.*.sw?' --exclude='*.local'"
+  rsync="rsync -urltRC --exclude='.*.sw?' --exclude='*.local'"
 
   for host in "${@-$default_host}"; do
     $rsync "$host:$files" "$HOME" 2>/dev/null
@@ -86,7 +86,7 @@ case "$command" in
   git clone git://github.com/tpope/tpope.git "$@"
   cd "${1-tpope}"
   git config --replace-all remote.origin.url git@github.com:tpope/tpope.git
-  git config alias.import '!find . -name .git -prune -o -type f -print0 | xargs -0 rm && tpope config tar cf - | tar xpf -'
+  git config alias.import '!find . -name .git -prune -o -type f -print0 | xargs -0 rm && tpope config tar cf - | tar xf -'
   git import
   ;;
 
