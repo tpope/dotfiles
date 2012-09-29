@@ -2001,9 +2001,9 @@ SetEnv screen_width $[vp.width]
 # Dual head
 PipeRead 'if [ `expr $[vp.width] / $[vp.height]` -gt 2 ]; then echo SetEnv screen_width `expr $[vp.width] / 2`; fi'
 PipeRead 'echo SetEnv pager_width `expr 25 \\* $[vp.width] / $[vp.height] \\* 8`'
-PipeRead 'echo SetEnv right_width `expr $[pager_width] + 182`'
+PipeRead 'echo SetEnv right_width `expr $[pager_width] + 194`'
 PipeRead 'echo SetEnv right_inner_width `expr $[right_width] - 1`'
-PipeRead 'echo SetEnv iconman_width `expr $[screen_width] - 206 - $[pager_width]`'
+PipeRead 'echo SetEnv iconman_width `expr $[screen_width] - 218 - $[pager_width]`'
 # FvwmButtonsBottom Config {{{3
 DestroyModuleConfig FvwmButtonsBottom: *
 *FvwmButtonsBottom: ButtonGeometry 1x1+0-0
@@ -2023,7 +2023,7 @@ DestroyModuleConfig FvwmButtonsBottom: *
 *FvwmButtonsBottom: ($[right_width]x25, Frame 0, Padding 0 0, Container(Columns $[right_inner_width], Rows 25, Frame 0, Padding 0 0))
 *FvwmButtonsBottom: ($[right_inner_width]x1, Frame 0, Padding 0 0, Back Black)
 *FvwmButtonsBottom: ($[pager_width]x24, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsBottom: (72x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 2x1-4-1 --icon-gravity SE --no-shrink --scrollbars horizontal")
+*FvwmButtonsBottom: (84x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 3x1-4-1 --max-geometry 3x1 --icon-gravity SE --no-shrink --scrollbars horizontal --kludges force_icons_size")
 *FvwmButtonsBottom: (110x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
 *FvwmButtonsBottom: (End)
 # }}}3
@@ -2045,7 +2045,7 @@ DestroyModuleConfig FvwmButtonsTop: *
 *FvwmButtonsTop: (End)
 *FvwmButtonsTop: ($[right_width]x25, Frame 0, Padding 0 0, Container(Columns $[right_inner_width], Rows 25, Frame 0, Padding 0 0))
 *FvwmButtonsTop: ($[pager_width]x24, Frame 0, Padding 0 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmPagerInline" "Module FvwmPager FvwmPagerInline 0 7")
-*FvwmButtonsTop: (72x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 2x1-4-1 --icon-gravity SE --no-shrink --scrollbars horizontal")
+*FvwmButtonsTop: (84x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, Respawn) "stalonetray" "Exec exec stalonetray -bg '$[fvwm_mybg]' --geometry 3x1-4-1 --max-geometry 3x1 --icon-gravity SE --no-shrink --scrollbars horizontal --kludges force_icons_size")
 *FvwmButtonsTop: (110x24, Padding 0 0, Frame 0, Back $[fvwm_mybg], Swallow(UseOld, NoHints, NoClose, Respawn) "FvwmScript-DateTime" "Module FvwmScript FvwmScript-DateTime")
 *FvwmButtonsTop: ($[right_inner_width]x1, Frame 0, Padding 0 0, Back Black)
 *FvwmButtonsTop: (End)
