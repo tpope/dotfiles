@@ -30,7 +30,7 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lv dm pg gp b e p t c dl sursync ruptime rwho \
+  aliases="launch lv dm pg gp b e p t c rm dl sursync ruptime rwho \
   rclink rc start stop restart reload force-reload mount shutdown \
   vnc xssc mpl mpa ri whois xrandr rds rsync aumix swap diff \
   word ord wor or Word Ord Wor Or"
@@ -649,6 +649,61 @@ EOF
     [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
 
   ri) no_links; exec ri -f bs "$@" ;;
+
+  rm)
+    if inpath trash-put; then
+      trash=trash-put
+    elif inpath rmtrash; then
+      trash=rmtrash
+    else
+      exec rm "$@"
+    fi
+    trash() {
+      if [ -L "$1" ]; then
+        rm -- "$1"
+      elif [ -d "$1" -a -z "$recurse" ]; then
+        echo "tpope rm: cannot remove \`$1': Is a directory"
+      elif [ ! -e "$1" -a -z "$force" ]; then
+        echo "tpope rm: cannot remove \`$1': No such file or directory"
+      else
+        case "$1" in
+          /*) absolute="$1" ;;
+          *)  absolute="`pwd`/$1" ;;
+        esac
+        case "$file" in
+          "$HOME"/*) $trash -- "$1" ;;
+          *) rm $force $recurse -- "$1" ;;
+        esac
+      fi
+    }
+    for arg in "$@"; do
+      case "$arg" in
+        --) break ;;
+        -*)
+          case "$arg" in
+            -*[\ -eg-qs-~]*)
+              echo "tpope rm: invalid option $arg" >&2
+              exit 1
+              ;;
+          esac
+          case "$arg" in -*f*) force=-f ;; esac
+          case "$arg" in -*r*) recurse=-r ;; esac
+          ;;
+        *)
+      esac
+    done
+    for arg in "$@"; do
+      case "$arg" in
+        --) everything=1 ;;
+        -*)
+          if [ -n "$everything" ]; then
+            trash "$arg"
+          fi
+          ;;
+        *) trash "$arg" ;;
+      esac
+    done
+    ;;
 
   whois)
     [ -d /private ] || args=-H
