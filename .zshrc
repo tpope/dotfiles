@@ -28,6 +28,7 @@ _git_prompt_info() {
   case "$TERM" in
     *-256color)             branchcolor=$'\e[38;5;31m'   ;;
     *-88color|rxvt-unicode) branchcolor=$'\e[38;5;22m'   ;;
+    xterm*)                 branchcolor=$'\e[00;94m'     ;;
     *)                      branchcolor="$fg_bold[blue]" ;;
   esac
   print -Pn '(%%{$branchcolor%%}%20>..>$ref%<<%%{\e[00m%%})'
@@ -72,6 +73,7 @@ _set_title() {
 
 case $TERM in
   screen*)
+    PROMPT="${PROMPT//01;3/00;9}"
     precmd() {
       _set_title "$@"
       if [ "$STY" ]; then
@@ -94,11 +96,12 @@ case $TERM in
   ;;
 
   xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
+    PROMPT="${PROMPT//01;3/00;9}"
     precmd () { _set_title "$@" }
     preexec() { _set_title "$@" }
     ;;
 
-  linux) ;;
+  linux*|vt220*) ;;
 
   *)
     PS1="%n@%m:%~%# "

@@ -58,11 +58,9 @@ set noclobber
 # Prompt {{{1
 if ( `id|sed -e 's/^uid=\([0-9]*\).*$/\1/'` == 0 ) then
   set usercolor = "01;37"
-  set usercode = "+b W"
   set promptchar = "#"
 else
   set usercolor = "01;33"
-  set usercode = "+b Y"
   set promptchar = "%"
   if ( `id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'` == `id -un` ) umask 002
 endif
@@ -106,6 +104,7 @@ if ( $?tcsh ) then
     breaksw
 
   case linux*:
+  case vt220*:
     breaksw
 
   default:
@@ -127,7 +126,7 @@ else
   endif
 endif
 
-unset hostcolor usercolor usercode promptchar oldterm ttyat ttybracket
+unset hostcolor usercolor promptchar oldterm ttyat ttybracket
 # }}}1
 # Aliases {{{1
 if ( -x /usr/bin/dircolors && $?tcsh ) then

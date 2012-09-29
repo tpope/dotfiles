@@ -35,10 +35,6 @@ case "$TERM" in
   usercolor='38;5;56'
   dircolor='38;5;23'
   ;;
-  xterm*)
-  usercolor='93'
-  dircolor='94'
-  ;;
 esac
 [ $UID = '0' ] && usercolor="01;37"
 
@@ -51,9 +47,9 @@ PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$di
 
 case "$TERM" in
   screen*|xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
-    PS1='\[\e]1;'$ttyat'\h\007\e]2;\u@\h:\w'$ttybracket'\007\]'"$PS1"
+    PS1='\[\e]1;'$ttyat'\h\007\e]2;\u@\h:\w'$ttybracket'\007\]'"${PS1//01;3/00;9}"
   ;;
-  linux*) ;;
+  linux*|vt220*) ;;
   *)
   PS1='\u@\h:\w\$ '
   ;;
