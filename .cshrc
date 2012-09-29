@@ -156,10 +156,7 @@ else if ( -x /usr/ucb/finger && -f "$HOME/.hushlogin" ) then
     echo "You have new mail."
 endif
 
-alias mv 'mv -i'
-alias cp 'cp -i'
-
-alias j 'jobs'
+eval `grep '^    alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
 
 if ( -x /usr/bin/vim || -x /usr/local/bin/vim || -x /opt/sfw/bin/vim ) then
   alias vi 'vim'
@@ -167,11 +164,6 @@ endif
 
 if ( -x /usr/bin/gvim || -x /usr/local/bin/gvim || -x /opt/sfw/bin/gvim ) then
   alias vi 'vim' # -X
-endif
-
-if ( `uname` == Linux ) then
-  alias less 'less -R'
-  alias zless 'zless -R'
 endif
 
 foreach cmd ( `tpope aliases` )

@@ -166,12 +166,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
       # alias egrep='egrep --color=auto --exclude="*~" --exclude=tags'
     fi
 
-    if [ -f /etc/debian_version -a "`uname`" = Linux ]; then
-      alias less='less -R'
-      alias zless='zless -R'
-      #PAGER='less -R'
-    fi
-
     unalias gp >/dev/null 2>&1
     for cmd in `tpope aliases`; do
       if [ -n "$ZSH_VERSION" -a -x "`which $cmd 2>/dev/null`" ]; then
