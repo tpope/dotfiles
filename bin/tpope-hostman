@@ -30,7 +30,7 @@ name() {
   elif [ -r /proc/sys/kernel/hostname ]; then
     cat /proc/sys/kernel/hostname
   else
-    hostname
+    hostname | sed -e 's/\..*//'
   fi
 }
 

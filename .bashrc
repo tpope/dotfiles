@@ -15,7 +15,8 @@ if [ "$PS1" ]; then
 shopt -s extglob 2>/dev/null
 set -o noclobber
 
-export HISTCONTROL=ignoredups HISTFILE=
+export HISTCONTROL=ignoredups
+unset HISTFILE
 
 if [ -x "$HOME/bin/tpope" ]; then
   hostcolor=`"$HOME/bin/tpope" hostman ansi`

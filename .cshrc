@@ -50,7 +50,7 @@ if ( -x /usr/bin/lesspipe ) then
 else
   setenv LESSOPEN '|"$HOME/.lessfilter" %s'
 endif
-if ( $HOST == '') set HOST = `tpope hostman`
+if ( ! $?HOST ) set HOST = `tpope hostman name`
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
@@ -121,7 +121,7 @@ else
   setprompt
   set history = 100
   set filec
-  if ( $TERM =~ screen* || $TERM =~ vt220* ) then
+  if ( $TERM =~ screen* ) then
       printf "\ek%s\e\\" "$ttyat$HOST"
   endif
 endif

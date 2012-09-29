@@ -53,7 +53,7 @@ if [ -z "$PERL5LIB" ]; then
       *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB:$dir"
     esac
   done
-  PERL5LIB="`echo "$PERL5LIB"|sed -e s/^://`"
+  PERL5LIB="`echo "$PERL5LIB"|sed -e 's/^://'`"
   export PERL5LIB
 fi
 
