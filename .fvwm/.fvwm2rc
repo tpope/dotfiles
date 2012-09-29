@@ -303,7 +303,6 @@ Style MPlayer   UseStyle Media, NoPPosition, FixedPPosition, MaxWindowSize, NoIc
 Style xmms      UseStyle Media, Icon norm/music.xpm, MiniIcon mini/music.xpm
 Style Xawtv     UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
 Style tvtime    UseStyle Media, Icon norm/video.xpm, MiniIcon mini/video.xpm
-Style aumix     UseStyle Media, MiniIcon aumix.mini.xpm
 Style Inkscape  UseStyle Media
 Style Amarok    UseStyle Media
 
@@ -994,12 +993,12 @@ AddToFunc FuncCloseXmms
 Key bracketleft  A  4M  Exec exec tpope media prev
 Key bracketright A  4M  Exec exec tpope media next
 Key backslash    A  4M  Exec exec tpope media toggle
-Key bracketleft  A  4   Exec exec amixer set Master 5%-
-Key bracketright A  4   Exec exec amixer set Master 5%+
+Key bracketleft  A  4   Exec for sink in `pactl list short sinks|cut -f 1`; do pactl -- set-sink-volume $sink -5%; done || exec amixer set Master 5%-
+Key bracketright A  4   Exec for sink in `pactl list short sinks|cut -f 1`; do pactl -- set-sink-volume $sink +5%; done || exec amixer set Master 5%+
 Key backslash    A  4   Exec exec tpope media pause
 
-Key XF86AudioLowerVolume A A Exec exec amixer set Master 5%-
-Key XF86AudioRaiseVolume A A Exec exec amixer set Master 5%+
+Key XF86AudioLowerVolume A A Exec for sink in `pactl list short sinks|cut -f 1`; do pactl -- set-sink-volume $sink -5%; done || exec amixer set Master 5%-
+Key XF86AudioRaiseVolume A A Exec for sink in `pactl list short sinks|cut -f 1`; do pactl -- set-sink-volume $sink +5%; done || exec amixer set Master 5%+
 
 Key XF86Standby   A A   Exec exec xscreensaver-command -activate
 Key XF86AudioStop A A   Exec exec media stop
@@ -1346,7 +1345,6 @@ FuncAddIfExists MenuFvwmNetwork "&Netscape%mini.netscape.xpm%" netscape
 DestroyMenu MenuFvwmMultimedia
 AddToMenu MenuFvwmMultimedia "Multimedia" Title
 + MissingSubmenuFunction FuncMenuMusic
-+ "&Aumix%aumix.mini.xpm%"      Exec exec aumix
 FuncAddIfExists MenuFvwmMultimedia "Pa&vucontrol%menu/monitoring.xpm%" pavucontrol
 + "&Gimp%menu/gimp.xpm%"        FuncExec Gimp "exec gimp"
 FuncAddIfExists MenuFvwmMultimedia "In&kscape%mini.inkscape.png%" inkscape
