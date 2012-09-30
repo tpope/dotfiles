@@ -43,71 +43,74 @@ if [ x--extra = "x$1" ]; then
 fi
 
 case "$command" in
-  tar) exec tar "$@" -C "$HOME" $files ;;
+  tar)
+    exec tar "$@" -C "$HOME" $files ;;
 
   pull)
-  if [ "$#" = 0 ]; then
-    if [ -x "`which curl 2>/dev/null`" ]; then
-      webcat="curl -m8 -L -s -S"
-    elif [ -x "`which wget 2>/dev/null`" ]; then
-      webcat="wget -t1 -T8 -nv -O -"
-    elif [ -x "`which lynx 2>/dev/null`" ]; then
-      webcat="lynx -source"
-    else
-      webcat="ssh $default_host curl -m8 -s -S"
+    if [ "$#" = 0 ]; then
+      if [ -x "`which curl 2>/dev/null`" ]; then
+        webcat="curl -m8 -L -s -S"
+      elif [ -x "`which wget 2>/dev/null`" ]; then
+        webcat="wget -t1 -T8 -nv -O -"
+      elif [ -x "`which lynx 2>/dev/null`" ]; then
+        webcat="lynx -source"
+      else
+        webcat="ssh $default_host curl -m8 -s -S"
+      fi
+      $webcat http://c.tpo.pe/tgz | tar xzf - -C "$HOME"
+      exec tpope config prune
     fi
-    $webcat http://c.tpo.pe/tgz | tar xzf - -C "$HOME"
-    exec tpope config prune
-  fi
 
-  for host in "$@"; do
-    $RSYNC_RSH "$host" tar cf - $files | tar xf - -C "$HOME"
-  done
-  ;;
+    for host in "$@"; do
+      $RSYNC_RSH "$host" tar cf - $files | tar xf - -C "$HOME"
+    done
+    ;;
 
   push)
-  tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xf -
-  ;;
+    tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xf -
+    ;;
 
   sync)
-  rsync="rsync -urltRC --exclude='.*.sw?' --exclude='*.local'"
+    rsync="rsync -urltRC --exclude='.*.sw?' --exclude='*.local'"
 
-  for host in "${@-$default_host}"; do
-    $rsync "$host:$files" "$HOME" 2>/dev/null
-  done
-  for host in "${@-$default_host}"; do
-    (cd; $rsync $files "$host:")
-  done
-  exec tpope config prune
-  ;;
+    for host in "${@-$default_host}"; do
+      $rsync "$host:$files" "$HOME" 2>/dev/null
+    done
+    for host in "${@-$default_host}"; do
+      (cd; $rsync $files "$host:")
+    done
+    exec tpope config prune
+    ;;
 
   clone)
-  set -e
-  git clone git://github.com/tpope/tpope.git "$@"
-  cd "${1-tpope}"
-  git config --replace-all remote.origin.url git@github.com:tpope/tpope.git
-  git config alias.import '!find . -name .git -prune -o -type f -print0 | xargs -0 rm && tpope config tar cf - | tar xf -'
-  git import
-  ;;
+    set -e
+    git clone git://github.com/tpope/tpope.git "$@"
+    cd "${1-tpope}"
+    git config --replace-all remote.origin.url git@github.com:tpope/tpope.git
+    git config alias.import '!find . -name .git -prune -o -type f -print0 | xargs -0 rm && tpope config tar cf - | tar xf -'
+    git import
+    ;;
 
   prune)
-  cd
-  [ ! -L .bash_logout ] || rm .bash_logout
-  rm -rf \
-  .fvwm/FvwmScript-Alert .fvwm/FvwmScript-Date .fvwm/FvwmScript-Time \
-  bin/hostinfo \
-  .git_template/info/exclude \
-  .fvwm/.fvwm-menu-headlines/extension.pl \
-  .Eterm .terminfo/E \
-  .terminfo/x/78 \
-  .vim/after/syntax/dosbatch.vim \
-  .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
-  .zsh/functions/_daemons \
-  .ssh/authorized_keys2 \
-  bin/sync-tpope
-  ;;
+    cd
+    [ ! -L .bash_logout ] || rm .bash_logout
+    rm -rf \
+      .fvwm/FvwmScript-Alert .fvwm/FvwmScript-Date .fvwm/FvwmScript-Time \
+      bin/hostinfo \
+      .git_template/info/exclude \
+      .fvwm/.fvwm-menu-headlines/extension.pl \
+      .Eterm .terminfo/E \
+      .terminfo/x/78 \
+      .vim/after/syntax/dosbatch.vim \
+      .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
+      .zsh/functions/_daemons \
+      .ssh/authorized_keys2 \
+      bin/sync-tpope
+    ;;
 
-  '') echo "Usage: `basename "$0"` <command> [options]" ;;
+  '')
+    echo "Usage: `basename "$0"` <command> [options]" ;;
 
-  *) echo "`basename "$0"` $command: unknown command." >&2; exit 1 ;;
+  *)
+    echo "`basename "$0"` $command: unknown command." >&2; exit 1 ;;
 esac
