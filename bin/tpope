@@ -5,8 +5,8 @@
 # single purpose ones.  If a function grows too big, it earns its own file,
 # and this script is modified to call that file instead.
 
-# Of particular interest here is the start/restart/etc functions, which call
-# the appropriate script in /etc/init.d, the install function, which does
+# Of particular interest here is the service function, which calls the
+# appropriate script in /etc/init.d, the install function, which does
 # various tasks involved with moving in (such as setting up a crontab and
 # changing my login shell), and the cron function, which calls my installer
 # script, cleans up temp files, and optionally downloads my latest set of
@@ -30,30 +30,16 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lv dm pg gp b e p t c rm dl sursync ruptime rwho \
-  rclink rc start stop restart reload force-reload mount shutdown \
-  vnc xssc mpl mpa ri whois xrandr rds rsync aumix swap diff \
-  word ord wor or Word Ord Wor Or"
+  aliases="launch lv pg gp e rm dl sursync vnc whois xrandr rds swap diff"
   PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin
-  for app in apt-get aptitude emerge opkg port rubber xdvi xpdf gv; do
+  for app in apt-get aptitude emerge opkg yum xdvi xpdf gv; do
     [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
   done
   echo $aliases
   exit 0
 fi
 
-rcd=/etc/init.d
-[ -d "$rcd" ] || rcd=/etc/rc.d
-
-words="cat /usr/share/dict/words"
-Words="cat /usr/share/dict/words"
-[ -f "$HOME/misc/scrabble" ] && words="cat $HOME/misc/scrabble"
-
-[ "`id -u`" -ne 0 ] && sudo="sudo -H"
-
 inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
-
-wordtrans() { echo "$1"|sed -e 's/-/[-A-Za-z0-9]/g'; }
 
 root_init() {
   if inpath cygstart; then
@@ -76,14 +62,6 @@ root_init() {
   fi
 }
 
-no_links() {
-  if [ -h "$HOME/bin/$basename" ]; then
-    echo "Error: this alias cannot be a symlink." >&2
-    echo "Remove $HOME/bin/$basename and try again." >&2
-    exit 1
-  fi
-}
-
 most_recent() {
   prog="$1"
   shift
@@ -93,10 +71,6 @@ most_recent() {
   else
     exec "$prog"
   fi
-}
-
-do_media() {
-  exec "$HOME/bin/media" "$@"
 }
 
 do_clean() {
@@ -139,27 +113,6 @@ do_clean() {
   return 0
 }
 
-display_manage() {
-  # Disables DPMS and xscreensaver for the duration of a programs execution
-  [ "$DISPLAY" ] || DISPLAY=:0
-  xset=xset
-  [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-  dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
-  case "$dpms" in
-    on|standby|suspend|off) ;;
-    *) dpms=on ;;
-  esac
-  #$xset dpms force on
-  while kill -0 $$ 2>/dev/null; do
-    xscreensaver-command -deactivate >/dev/null 2>&1
-    sleep 55
-  done &
-  "$@"
-  ret=$?
-  $xset dpms force $dpms
-  return $?
-}
-
 pager() {
   if [ -t 1 ]; then
     "$HOME/bin/tpope" sensible-pager "$@"
@@ -170,7 +123,7 @@ pager() {
 
 case "$basename" in
 
-  chat|c)
+  chat)
     hostname="`tpope hostman`"
     if [ -x "$HOME/.irssi/Chat-script" -a -z "$*" ]; then
       "$HOME/.irssi/Chat-script" $hostname
@@ -204,24 +157,11 @@ case "$basename" in
     exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope config pull && touch "$HOME/.autodl"' \; 2>/dev/null
   ;;
 
-  display-manage|dm) display_manage "$@" ;;
-  mpl) display_manage mplayer -fs -loop 0 "$@" ;;
-  mpa) DISPLAY=  mplayer -quiet -vo fb,aa "$@" ;;
-
-  launch)
+  launch) # precommand
     exec >/dev/null 2>&1 </dev/null
-    if [ "$1" = "-dm" -o "$1" = "-md" ]; then
-      shift
-      pidof -x "$1" >/dev/null && exit 0
-      prefix="tpope display-manage"
-    fi
     if [ "$1" = "-d" ]; then
       shift
       pidof -x "$1" >/dev/null && exit 0
-    fi
-    if [ "$1" = "-m" ]; then
-      shift
-      prefix="tpope display-manage"
     fi
     for arg in "$2" "$3" "$4"; do
       case "$arg" in
@@ -254,7 +194,7 @@ case "$basename" in
     fi
     ;;
 
-  ps-grep|gp)
+  ps-grep|gp) # grep
     LESS="-FRSX#10"
     export LESS
     (
@@ -273,7 +213,7 @@ case "$basename" in
     ) | pager
     ;;
 
-  rclink|link)
+  rclink) # services
     if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
         echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
         exit 1
@@ -296,20 +236,23 @@ case "$basename" in
     exit 0
   ;;
 
-  runcontrol|rc) root_init
+  runcontrol|service) # services
+    root_init
     if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
         echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
         exit 1
     fi
     while [ "$#" -gt 0 ]; do
-      as_root "$rcd/$2" "$1"
+      as_root "/etc/init.d/$2" "$1"
       shift 2
     done
     exit 0
   ;;
 
-  sensible-browser|b) exec "$HOME/bin/sensible-browser" "$@" ;;
-  sensible-pager|sp|p)
+  page) # precommand
+    exec "$@" | pager ;;
+
+  sensible-pager|pager)
     term=exec
     if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" -a "$HOME/.rvm/README" != "$1" ]; then
       term="x-terminal-emulator -title Pager -e"
@@ -337,7 +280,8 @@ case "$basename" in
       rm "$tempfile"
     fi
     ;;
-  sensible-tail|t)
+
+  tail)
     if inpath less; then
       inpath lesspipe && LESSOPEN='|lesspipe %s'
       export LESSOPEN
@@ -347,7 +291,7 @@ case "$basename" in
     fi
     ;;
 
-  sensible-editor|se)
+  sensible-editor)
     if [ "$DISPLAY" -a ! -t 0 ]; then
       inpath gvim && exec gvim -f "$@"
       #exit
@@ -407,34 +351,23 @@ case "$basename" in
     mv "$1.$$" "$1"
     ;;
 
-  x-terminal-emulator|xterm) exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+  x-terminal-emulator|xterm) # xterm
+    exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
-  start|stop|restart|reload|force-reload) root_init
-    for daemon in "$@"; do
-      as_root "$rcd/$daemon" "$basename"
-    done
-    [ -z "$*" -a "$basename" = stop ] && do_media stop && exit 0
-    [ "$*" ]
-    exit
-  ;;
+  hostman) exec "$HOME/bin/tpope-hostman" "$@" ;;
 
-  hostman)  exec "$HOME/bin/tpope-hostman" "$@" ;;
-  ruptime)  exec "$HOME/bin/tpope-hostman" ruptime "$@" ;;
-  rwho)     exec "$HOME/bin/tpope-hostman" rwho "$@" ;;
-  ssh)      exec "$HOME/bin/tpope-hostman" ssh "$@" ;;
+  install|installer) exec "$HOME/bin/installer" "$@" ;;
 
-  install|installer) installer "$@" ;;
+  media) exec "$HOME/bin/media" "$@" ;;
 
-  media) do_media "$@"; exit ;;
-
-  screen|s)
+  screen)
   if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
     TERM=rxvt-unicode
   fi
   exec screen "$@"
   ;;
 
-  sursync|suscp)
+  sursync|suscp) # rsync
   for arg in "$@"; do
     case "$arg" in
       [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
@@ -442,12 +375,7 @@ case "$basename" in
   done
   args=-P
   [ "$basename" = suscp ] && args=-P
-  sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
-  ret="$?"
-  if [ "$ret" = 0 ]; then
-    nice find "$HOME" -maxdepth 1 -name .install-root -mtime +1 -exec tpope install --quiet --root-only \; &
-  fi
-  exit "$ret"
+  sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axtF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
   ;;
 
   sync)
@@ -459,7 +387,7 @@ case "$basename" in
     fi
     ;;
 
-  dl)
+  dl) # urls
     if [ "$HOME/dl" != `pwd` ]; then
       mkdir -p "$HOME/dl"
       prefix="~/dl/"
@@ -472,19 +400,20 @@ case "$basename" in
     fi
     if [ -e "$1" ]; then
       cp -a "$1" "$prefix$out"
-    elif [ -x "`which wget`" ]; then
+    elif inpath wget; then
       wget -nv -O "$prefix$out" "$1" || exit "$?"
-    elif [ -x "`which curl`" ]; then
-      curl -s "$1" > "$prefix$out" || exit "$?"
-    elif [ -x "`which lynx`" ]; then
+    elif inpath curl; then
+      curl -L -s -S "$1" > "$prefix$out" || exit "$?"
+    elif inpath lynx; then
       lynx -source "$1" > "$prefix$out" || exit "$?"
     else
+      echo "Can't find any download tools." >&2
       exit 1
     fi
     echo "$prefix$out"
     ;;
 
-  url)
+  url) # urls
     if [ "$*" = "-" ]; then
       url="`cat`"
     else
@@ -508,69 +437,15 @@ case "$basename" in
   exit 1
   ;;
 
-  word) w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w\$" "$@" |pager ;;
-  ord)  w="`wordtrans "$1"`"; shift; $words | egrep -i "$w\$"  "$@" |pager ;;
-  wor)  w="`wordtrans "$1"`"; shift; $words | egrep -i "^$w"   "$@" |pager ;;
-  or)   w="`wordtrans "$1"`"; shift; $words | egrep -i "$w"    "$@" |pager ;;
-  Word) w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w\$" "$@" |pager ;;
-  Ord)  w="`wordtrans "$1"`"; shift; $Words | egrep    "$w\$"  "$@" |pager ;;
-  Wor)  w="`wordtrans "$1"`"; shift; $Words | egrep    "^$w"   "$@" |pager ;;
-  Or)   w="`wordtrans "$1"`"; shift; $Words | egrep    "$w"    "$@" |pager ;;
-
-  xauth-get) exec tpope hostman batch-ssh "$1" xauth extract - "$1:0"|xauth merge - ;;
-
-  xssc|xscc)
-    case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
-    export DISPLAY
-    exec xscreensaver-command "$@" ;;
-
-  lock)
-    case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
-    export DISPLAY
-    xset=xset
-    [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-    xscreensaver-command -version >/dev/null||exit 1
-    if xscreensaver-command -time 2>/dev/null|egrep 'non-blanked|no saver status|locked' >/dev/null; then
-      :
-    else
-      xscreensaver-command -lock
-      xset dpms force off
-    fi
-    ;;
-
-  unlock)
-    case "$DISPLAY" in localhost:*|'') DISPLAY=:0 ;; esac
-    export DISPLAY
-    xset=xset
-    [ -z "`which xset 2>/dev/null`" ] && xset=/usr/bin/X11/xset
-    xscreensaver-command -version >/dev/null 2>/dev/null ||exit 1
-    if xscreensaver-command -time 2>/dev/null|egrep 'locked' >/dev/null; then
-      dpms="`$xset q 2>/dev/null|grep 'Monitor is'|sed -e 's/^ *Monitor is.* \([A-Za-z]*\)$/\1/'|tr 'A-Z' 'a-z'`"
-      [ "$dpms" = on ] && $xset dpms force standby
-      echo 'BAD NEWS!'
-      echo 'WOULD HAVE KILLED XSCREENSAVER' >&2
-      #skill xscreensaver
-      #xscreensaver -no-splash >/dev/null 2>&1 &
-      #xscreensaver-command -activate >/dev/null 2>&1 &
-      #xscreensaver-command -throttle >/dev/null 2>&1 &
-      #[ "$dpms" = on ] && sleep 2 && $xset dpms force $dpms
-    fi
-    exit 0
-    ;;
-
-  mount|shutdown|opkg) no_links
+  opkg)
     case "$1" in
       '') exec "$basename" "$@" ;;
       *) root_init; as_root exec "$basename" "$@" ;;
     esac ;;
-  emerge|port) no_links
+  apt-get|aptitude|emerge|yum)
     case "$1" in
-      search|show|help|server) exec "$basename" "$@" ;;
-      *) root_init; as_root exec "$basename" "$@" ;;
-    esac ;;
-  apt-get|aptitude) no_links
-    case "$1" in
-      source|show|changelog|download) exec "$basename" "$@" ;;
+      changelog|download|help|search|server|show|source)
+        exec "$basename" "$@" ;;
       install|upgrade|dist-upgrade) root_init; as_root "$basename" "$@"
         ret="$?"
         [ "$ret" != 0 ] || tpope install --quiet &
@@ -592,9 +467,6 @@ case "$basename" in
       exec diff "$@"
     fi ;;
 
-  aumix) no_links
-    if [ "$#" = 0 ]; then exec aumix -C; else exec aumix "$@"; fi ;;
-
   rds)
     width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
     height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
@@ -612,19 +484,7 @@ case "$basename" in
 EOF
     ;;
 
-  rsync) no_links
-    exec rsync -CP --filter='dir-merge,- .gitignore' --include='*.so' --include='*.exe' "$@" ;;
-
-  rubber) no_links
-    if [ -n "$*" ]; then
-      exec rubber "$@"
-    elif [ '*.tex' != "`echo *.tex`" ]; then
-      exec rubber *.tex
-    else
-      exec rubber
-    fi ;;
-
-  see) no_links;
+  see)
     if inpath see; then
       see=see
     elif inpath cygstart; then
@@ -640,14 +500,12 @@ EOF
       exec $see "$@"
     fi ;;
 
-  xdvi) no_links
+  xdvi)
     [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
-  xpdf) no_links
+  xpdf)
     [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/dl/*.pdf;;
-  gv) no_links
+  gv)
     [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
-
-  ri) no_links; exec ri -f bs "$@" ;;
 
   rm)
     if inpath trash-put; then

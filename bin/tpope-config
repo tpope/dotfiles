@@ -4,7 +4,7 @@
 base_files="\
 .shrc .profile .bashrc .bash_profile .bash_logout \
 .cshrc .login .logout \
-.zshenv .zshrc .zlogin .zlogout .zsh/functions/_tpope \
+.zshenv .zshrc .zlogin .zlogout \
 .inputrc .dir_colors \
 .screenrc .tmux.conf .terminfo/s/screen-256color \
 .terminfo/x/xterm-256color .terminfo/r/rxvt-unicode \
@@ -46,7 +46,7 @@ case "$command" in
   tar)
     exec tar "$@" -C "$HOME" $files ;;
 
-  pull)
+  pull) # hosts
     if [ "$#" = 0 ]; then
       if [ -x "`which curl 2>/dev/null`" ]; then
         webcat="curl -m8 -L -s -S"
@@ -67,11 +67,11 @@ case "$command" in
     exec tpope config prune
     ;;
 
-  push)
+  push) # hosts
     tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xf -
     ;;
 
-  sync)
+  sync) # hosts
     rsync="rsync -urltRC --exclude='.*.sw?' --exclude='*.local'"
 
     [ $# -gt 0 ] || set $default_host
@@ -84,7 +84,7 @@ case "$command" in
     exec tpope config prune
     ;;
 
-  clone)
+  clone) # directories
     set -e
     git clone git://github.com/tpope/tpope.git "$@"
     cd "${1-tpope}"
@@ -93,7 +93,7 @@ case "$command" in
     git import
     ;;
 
-  prune)
+  prune) # nothing
     cd
     [ ! -L .bash_logout ] || rm .bash_logout
     rm -rf \
@@ -107,6 +107,7 @@ case "$command" in
       .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
       .zsh/functions/_daemons \
       .ssh/authorized_keys2 \
+      .zsh/functions/_tpope \
       bin/sync-tpope
     ;;
 

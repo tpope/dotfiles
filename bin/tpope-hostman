@@ -127,17 +127,18 @@ esac
 
 host="`name`"
 case "$1" in
-  name|-h|--hostname)
+  name|-h|--hostname) # hosts
     echo `gethost ${2:-$host}`; exit 0 ;;
-  ansi|-c|--host-color)
+  ansi|-c|--host-color) # hosts
     getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
-  letter|-l|--letter)
+  letter|-l|--letter) # hosts
     getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
-  rgb|-r|--rgb)
+  rgb|-r|--rgb) # hosts
     getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
-  screen-code|-s|--screen-code)
+  screen-code|-s|--screen-code) # hosts
     getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
-  ssh|-S|--ssh)
+
+  ssh|-S|--ssh) # ssh
     shift
     case "$1" in
       *.*) host="$1";;
@@ -147,7 +148,7 @@ case "$1" in
     exec ssh "$host`suffix $host`" "$@"
     ;;
 
-  batch-ssh|-b|--batch-ssh)
+  batch-ssh|-b|--batch-ssh) # ssh
     shift
     case "$1" in
       *.*|-*) host="$1" ;;
@@ -157,7 +158,7 @@ case "$1" in
     exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@"
     ;;
 
-  screen-ssh)
+  screen-ssh) # hosts
     shift
     args=""
     case "$1" in
@@ -171,7 +172,7 @@ case "$1" in
     exec ssh -t "$host`suffix $host`" screen $resume "$@"
     ;;
 
-  tunnel|--tunnel)
+  tunnel|--tunnel) # hosts
     host="`gethost $2`"
     getinfo $host
     case "`cat /etc/resolv.conf 2>/dev/null`" in
@@ -187,7 +188,7 @@ case "$1" in
     exec ssh -ax home nc "$host" "$3" 2>/dev/null
     ;;
 
-  link|-H)
+  link|-H) # nothing
     rm -f "$HOME"/bin/[A-Z]
     for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
       ln -s tpope-hostman "$HOME/bin/$ltr"
@@ -195,11 +196,11 @@ case "$1" in
     exit 0
     ;;
 
-  boxen)
+  boxen) # nothing
     echo $hosts
     ;;
 
-  fvwm-styles|--fvwm-styles)
+  fvwm-styles|--fvwm-styles) # nothing
     for host in $hosts; do getinfo `gethost ${2:-$host}`;
       if [ "$host" != - ]; then
         #echo "Style *@$host* ForeColor $hlrgb, HilightFore $hdrgb"
@@ -210,7 +211,7 @@ case "$1" in
     exit 0
     ;;
 
-  fvwm-menus|--fvwm-menus)
+  fvwm-menus|--fvwm-menus) # nothing
     cat<<EOF
 DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
@@ -256,7 +257,7 @@ EOF
     exit 0
     ;;
 
-  fvwm-keys|--fvwm-keys)
+  fvwm-keys|--fvwm-keys) # nothing
     for host in $hosts; do getinfo `gethost $host`;
       [ "$host" != - ] &&
       #echo "Key $hltr A 4   FuncFindXTerm $host" &&

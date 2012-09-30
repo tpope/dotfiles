@@ -136,11 +136,24 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     alias ls='ls -hF'
     alias ll='ls -lhF'
-
-    alias mv='mv -i'
     alias cp='cp -i'
+    alias mv='mv -i'
+    alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
 
     alias j='jobs'
+
+    alias ri='ri -f bs'
+
+    alias b='sensible-browser'
+    alias mpl='mplayer -fs -loop 0'
+
+    alias wordgrep='cat /usr/share/dict/words|tpope page egrep -i'
+
+    alias start='"$HOME/bin/tpope" service start'
+    alias stop='"$HOME/bin/tpope" service stop'
+    alias restart='"$HOME/bin/tpope" service restart'
+    alias reload='"$HOME/bin/tpope" service reload'
+    alias force-reload='"$HOME/bin/tpope" service force-reload'
 
     [ -n "$cygwin" -o -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
       alias vi='vim'
@@ -166,17 +179,11 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     if ! grep --color 2>&1 | grep un >/dev/null; then
       GREP_OPTIONS='--color=auto --exclude=*~ --exclude=tags'
       export GREP_OPTIONS
-      # alias grep='grep --color=auto --exclude="*~" --exclude=tags'
-      # alias egrep='egrep --color=auto --exclude="*~" --exclude=tags'
     fi
 
     unalias gp >/dev/null 2>&1
     for cmd in `tpope aliases`; do
-      if [ -n "$ZSH_VERSION" -a -x "`which $cmd 2>/dev/null`" ]; then
-        eval "${cmd}() { tpope $cmd \"\$@\"; }"
-      else
-        alias $cmd="$HOME/bin/tpope $cmd"
-      fi
+      alias $cmd="\"\$HOME/bin/tpope\" $cmd"
     done
 
     set -o emacs -o noclobber >/dev/null 2>&1

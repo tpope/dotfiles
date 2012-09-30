@@ -66,6 +66,36 @@ alias sudo='sudo '
 
 [ ! -f /etc/bash_completion ] || . /etc/bash_completion
 
+_tpope() {
+  while [ -x "$HOME/bin/${COMP_WORDS[0]}-${COMP_WORDS[1]}" ]; do
+    COMP_WORDS=("${COMP_WORDS[0]}-${COMP_WORDS[1]}" "${COMP_WORDS[@]:2}")
+    COMP_CWORD=$((COMP_CWORD-1))
+  done
+  local cmd=${COMP_WORDS[0]} sub=${COMP_WORDS[1]} cur=${COMP_WORDS[COMP_CWORD]}
+  if [[ $COMP_CWORD == 1 ]]; then
+    COMPREPLY=($(compgen -W "$(grep '^  [a-z-]*[|)]' "$HOME/bin/$cmd" | sed -e 's/).*//' | tr '|' ' ')" "$cur"))
+  else
+    local selector=$(egrep "^  ([a-z-]*[|])*$sub([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/bin/$cmd" | sed -e 's/.*# *//')
+    case "$selector" in
+      hosts|ssh)
+        COMPREPLY=($(compgen -W "localhost $(tpope hostman boxen)" "$cur")) ;;
+      services)
+        _services ;;
+      directories)
+        COMPREPLY=($(compgen -d "$cur")) ;;
+      precommand)
+        COMPREPLY=($(compgen -c "$cur")) ;;
+      nothing)
+        COMPREPLY=() ;;
+      *)
+        COMPREPLY=($(compgen -f "$cur")) ;;
+    esac
+  fi
+}
+
+complete -F _tpope tpope
+complete -F _services start stop restart reload force-reload
+
 unset hostcolor usercolor dircolor ttybracket ttyat
 
 fi

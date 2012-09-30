@@ -226,10 +226,36 @@ autoload -Uz compinit
 compinit -u
 # End of lines added by compinstall
 
-compdef '_arguments "-dump[dump to stdout]" "-T[force console]" "-G[force gui]" :url:_webbrowser' b sensible-browser
-compdef 'local expl; _description files expl "picture file"; _files "$expl[@]" -g "*.(#i)(png|gif|jpeg|jpg|tiff|tif|pbm|pgm|ppm|xbm|xpm|ras(|t)|tga|rle|rgb|bmp|pcx|fits|pm)(-.)"' feh
-compdef '_arguments "1:command:(start stop force-stop restart reload force-reload status)" "2:service:_services"' runcontrol rc
-compdef '_services' start stop restart reload force-reload rclink
+compdef '_files -W /var/log -g "*~*.(gz|old|*[0-9])(-.)"' lv logview
+compdef '_arguments "-dump[dump to stdout]" "-T[force console]" "-G[force gui]" :url:_webbrowser' sensible-browser
+compdef '_arguments "*:picture file:_files -g \*.\(\#i\)\(png\|gif\|jpeg\|jpg\|tiff\|tif\|pbm\|pgm\|ppm\|xbm\|xpm\|ras\(\|t\)\|tga\|rle\|rgb\|bmp\|pcx\|fits\|pm\)\(-.\)"' feh
+compdef _tpope tpope
+
+_tpope() {
+  local cmd=$(basename $words[1])
+  if [[ $CURRENT = 2 ]]; then
+    local tmp
+    tmp=($(grep '^  [a-z-]*[|)]' "$HOME/bin/$cmd" | sed -e 's/).*//' | tr '|' ' '))
+    _describe -t commands "${words[1]} command" tmp --
+  else
+
+    shift words
+    (( CURRENT-- ))
+    curcontext="${curcontext%:*:*}:$cmd-${words[1]}:"
+
+    local selector=$(egrep "^  ([a-z-]*[|])*${words[1]}([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/bin/$cmd" | sed -e 's/.*# *//')
+
+    if [[ -f "$HOME/bin/$cmd-${words[1]}" ]]; then
+      words[1]="$cmd-${words[1]}"
+      _tpope
+    elif (( $+functions[_${selector-$words[1]}] )); then
+      service=${selector-$words[1]}
+      _call_function ret _$service && return $ret
+    else
+      _normal
+    fi
+  fi
+}
 
 # }}}1
 # Mime {{{1
