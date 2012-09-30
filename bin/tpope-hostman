@@ -127,11 +127,16 @@ esac
 
 host="`name`"
 case "$1" in
-  name|-h|--hostname)     echo `gethost ${2:-$host}`; exit 0 ;;
-  ansi|-c|--host-color)   getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
-  letter|-l|--letter)     getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
-  rgb|-r|--rgb)           getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
-  screen-code|-s|--screen-code) getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
+  name|-h|--hostname)
+    echo `gethost ${2:-$host}`; exit 0 ;;
+  ansi|-c|--host-color)
+    getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
+  letter|-l|--letter)
+    getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
+  rgb|-r|--rgb)
+    getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
+  screen-code|-s|--screen-code)
+    getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
   ssh|-S|--ssh)
     shift
     case "$1" in
@@ -141,6 +146,7 @@ case "$1" in
     shift
     exec ssh "$host`suffix $host`" "$@"
     ;;
+
   batch-ssh|-b|--batch-ssh)
     shift
     case "$1" in
@@ -150,6 +156,7 @@ case "$1" in
     shift
     exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@"
     ;;
+
   screen-ssh)
     shift
     args=""
@@ -163,6 +170,7 @@ case "$1" in
     shift
     exec ssh -t "$host`suffix $host`" screen $resume "$@"
     ;;
+
   tunnel|--tunnel)
     host="`gethost $2`"
     getinfo $host
@@ -178,6 +186,7 @@ case "$1" in
     fi
     exec ssh -ax home nc "$host" "$3" 2>/dev/null
     ;;
+
   link|-H)
     rm -f "$HOME"/bin/[A-Z]
     for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
@@ -185,9 +194,11 @@ case "$1" in
     done
     exit 0
     ;;
+
   boxen)
     echo $hosts
     ;;
+
   fvwm-styles|--fvwm-styles)
     for host in $hosts; do getinfo `gethost ${2:-$host}`;
       if [ "$host" != - ]; then
@@ -198,8 +209,9 @@ case "$1" in
     done
     exit 0
     ;;
+
   fvwm-menus|--fvwm-menus)
-  cat<<EOF
+    cat<<EOF
 DestroyMenu MenuFvwmScreens
 DestroyMenu MenuFvwmLogins
 DestroyMenu MenuFvwmTerminals
@@ -255,38 +267,42 @@ EOF
     done
     exit 0
     ;;
+
   ruptime|rwho|-u|-w|--ruptime|--rwho)
-  PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
-  command="$1"; shift
-  [ "`uname -s`" != Linux ] || sep='\<'
-  [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
-  [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
-  if [ "$1" = "-p" ]; then
-    RUPTIME=cat
-    shift
-  elif [ -x "`which $command 2>/dev/null`" -a "`name`" != grex.cyberspace.org ]; then
-    RUPTIME="$command"
-  else
-    RUPTIME="finger $command$1@tpope.us"
-    [ -n "$1" ] && shift
-  fi
-  AWK='{print $1" "$0}'
-  [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
-  [ -t 1 ] && TERMINAL=1
-  if [ "$TERMINAL" ]; then
-    $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
-      getinfo `gethost $host` 2>/dev/null || hterm="01;37"
-      echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
-    done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
-  else
-    $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
-  fi
-  exit 0
-  ;;
-  -*) echo "Usage: `basename "$0"` <command> [hostname]" >&2; exit 1 ;;
-  *) echo Deprecated >&2; gethost ${1:-$host}; exit 1 ;;
-  esac
-  exit 2
-  ;;
-  *) echo Warning: invalid command "$hostinfo" ;;
+    PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
+    command="$1"; shift
+    [ "`uname -s`" != Linux ] || sep='\<'
+    [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
+    [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
+    if [ "$1" = "-p" ]; then
+      RUPTIME=cat
+      shift
+    elif [ -x "`which $command 2>/dev/null`" -a "`name`" != grex.cyberspace.org ]; then
+      RUPTIME="$command"
+    else
+      RUPTIME="finger $command$1@tpope.us"
+      [ -n "$1" ] && shift
+    fi
+    AWK='{print $1" "$0}'
+    [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
+    [ -t 1 ] && TERMINAL=1
+    if [ "$TERMINAL" ]; then
+      $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
+        getinfo `gethost $host` 2>/dev/null || hterm="01;37"
+        echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
+      done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
+    else
+      $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
+    fi
+    exit 0
+    ;;
+    -*) echo "Usage: `basename "$0"` <command> [hostname]" >&2; exit 1 ;;
+    *) echo Deprecated >&2; gethost ${1:-$host}; exit 1 ;;
+    esac
+    exit 2
+    ;;
+
+  *)
+    echo Warning: invalid command "$hostinfo" ;;
+
 esac
