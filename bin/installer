@@ -211,8 +211,8 @@ if inpath crontab && [ ! -f "$HOME/.sandbox" ]; then
   cron="$?"
 crontab -l 2>&1 >/dev/null | grep "no crontab" >/dev/null && cron=n
 if [ "$cron" = 0 ]; then
-  if grep '\<tpope\>.*\<cron\>' /tmp/crontab.original.$$ >/dev/null; then
-    sed -ne '/\<tpope\>.*\<cron\>/,$p' /tmp/crontab.original.$$ | \
+  if grep 'tpope cron' /tmp/crontab.original.$$ >/dev/null; then
+    sed -ne '/tpope cron/,$p' /tmp/crontab.original.$$ | \
     sed -ne '2,$p' > /tmp/crontab.custom.$$
     cronmsg="Updating skeleton crontab."
   else
@@ -255,6 +255,7 @@ EOF
 fi
 rm /tmp/crontab.original.$$
 fi
+
 zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
 if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null && [ ! -f "$HOME/.sandbox" ]; then
   if ! grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
