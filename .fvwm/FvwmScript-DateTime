@@ -9,7 +9,7 @@ Init
  Begin
   Set $date =(GetOutput {exec date '+ %a %m/%d %H:%M'} 1 -1)
   ChangeTitle 1 $date
-  ChangeFont  1 "-adobe-helvetica-medium-r-*--14-*-*-*-p-*-iso8859-1"
+  ChangeFont  1 "7x14"
  End
 
 PeriodicTasks

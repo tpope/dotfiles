@@ -1,21 +1,18 @@
 # ~/.fvwm/.fvwm2rc
-# vim:set et sw=4 sts=4:
+# vim:set et sw=4:
 
 # Basic Settings {{{1
 
-ImagePath ${HOME}/.pixmaps:${HOME}/.wm-icons:${HOME}/.fvwm/icons:/usr/local/share/icons:/usr/share/icons:/usr/include/X11/pixmaps:/usr/local/share/pixmaps:/usr/share/pixmaps:/usr/include/X11/bitmaps:/usr/X11R6/include/bitmaps:/usr/X11R6/include/X11/pixmaps:/usr/share/icons/wm-icons:/usr/share/icons/fvwm:/usr/share/fvwm/images:/usr/share/icons/default.kde/16x16/apps
+ImagePath ${HOME}/.pixmaps:${HOME}/.wm-icons:${HOME}/.fvwm/icons:/usr/local/share/icons:/usr/share/icons:/usr/include/X11/pixmaps:/usr/local/share/pixmaps:/usr/share/pixmaps/fvwm:/usr/share/pixmaps:/usr/include/X11/bitmaps:/usr/X11R6/include/bitmaps:/usr/X11R6/include/X11/pixmaps:/usr/share/icons/wm-icons:/usr/share/icons/fvwm:/usr/share/fvwm/images:/usr/share/icons/default.kde/16x16/apps
 
 EdgeResistance 2000 16
 EdgeScroll 0 0
 EdgeThickness 1
-SnapAttraction 3 Screen
-#MoveThreshold 2
+SnapAttraction 2
 OpaqueMoveSize -1
 XorPixmap resize.rainbow.xpm
 ClickTime 650
 EdgeCommand Bottom All (FvwmButtons) FuncButtonsRestore
-ColormapFocus FollowsMouse
-#SetAnimation 10 -.01 0 .01 .03 .08 .18 .3 .45 .6 .75 .85 .90 .94 .97 .99 1.0
 SetAnimation 5 .01 .03 .08 .18 .3 .45 .6 .75 .85 .90 .94 .97 .99 1.0
 
 DesktopSize 1x1
@@ -177,9 +174,9 @@ AddToDecor Flat
 + ButtonStyle All ToggledInactive -- flat
 # }}}3
 
-#Style *         UseDecor Mwm, MwmBorder
 Style *         UseDecor Flat, MwmBorder
 Style *         StippledTitle
+Style *         ResizeOpaque
 
 Style *         Font       "$[fvwm_titlefont]"
 Style *         IconFont   "$[fvwm_iconfont]"
@@ -188,8 +185,6 @@ Style *         IconBox 0 -112 -0 -25, IconFill Right Left, IconBox -72 0 -0 -11
 Style *         IconGrid 56 72, IconSize 48 48
 Test (EnvIsSet GNOME_DESKTOP_SESSION_ID) Style * IconBox 0 -112 -0 -0, IconFill Left Bottom, IconBox -112 0 -0 -112, IconFill Bottom Left
 
-#Style *         ForeColor white, BackColor rgb:60/78/60
-#Style *         HilightFore white, HilightBack rgb:00/80/00
 Style *         HilightFore $[HIFORE], ForeColor $[FORE]
 Style *         HilightBack $[HIBACK], BackColor $[BACK]
 Style *         Colorset 1, HilightColorset 2
@@ -209,7 +204,7 @@ Style *         NoButton 8
 # }}}2
 # Terminal Emulator Styles {{{2
 
-Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm
+Style Terminal  Icon term.xpm, MiniIcon mini.term2.xpm, EWMHDonateMiniIcon
 #Style Terminal  HilightBack rgb:30/40/50, BackColor rgb:52/55/58
 Style XTerm*    UseStyle Terminal
 Style UXTerm*   UseStyle Terminal
@@ -425,7 +420,7 @@ AddToFunc FuncFindEditor
 
 DestroyFunc FuncFindMediaProgram
 AddToFunc FuncFindMediaProgram
-+ I FuncFindResource "Gimp|Inkscape|feh|MPlayer|xmms|Amarok|Xawtv|tvtime|aumix"
++ I FuncFindResource "Gimp|Inkscape|feh|MPlayer|xmms|Amarok|Xawtv|tvtime|aumix|Pavucontrol|nuvolaplayer|Spotify"
 
 # }}}2
 # Applications {{{2
@@ -827,7 +822,7 @@ AddToFunc EnlargeWindowDown
 + I PipeRead "echo FuncNextEdgeDown `expr $1 + $2` $[vp.height]"
 + I PipeRead "echo WindowId $0 Resize frame keep `expr $[edge_w] - $1`p"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc EnlargeWrapperDown
 AddToFunc EnlargeWrapperDown
 + I NoWindow EnlargeWindowDown $[w.id] $[w.y] $[w.height]
@@ -838,7 +833,7 @@ AddToFunc ResizeWindowUp
 + I PipeRead "echo FuncNextEdgeUp `expr $1 + $2` `expr $1 + $2 / 2`"
 + I PipeRead "echo WindowId $0 Resize frame keep `expr $[edge_w] - $1`p"
 + I UnsetEnv edge_w
-#+ I WindowId $0 FuncFocusWindow
++ I WindowId $0 Focus
 DestroyFunc ResizeWrapperUp
 AddToFunc ResizeWrapperUp
 + I NoWindow ResizeWindowUp $[w.id] $[w.y] $[w.height]
@@ -1047,27 +1042,29 @@ Mouse 2 8       A       StickAcrossDesks
 Mouse 3 8       A       StickAcrossPages
 
 #   for other parts of the window/borders/icons:
-Mouse 1 F       A       FuncResizeOrRaiseOrShade
+Mouse 1 <       A       FuncResizeOrRaiseOr Close
+Mouse 1 ^       A       FuncResizeOrRaiseOr PlaceAgain
+Mouse 1 >       A       FuncResizeOrRaiseOr Maximize
+Mouse 1 v       A       FuncResizeOrRaiseOr Iconify
 Mouse 1 TS      A       FuncMoveOrRaise
 Mouse 1 TSIFW   4       FuncMoveOrRaise
 Mouse (x0rfbserver) 1 W A FuncMoveOrRaise
 Mouse (xosview)     1 W A FuncMoveOrRaise
-Mouse 2 TSIFW   4       FuncResizeOrRaiseOrShade
+Mouse 2 TSIFW   4       FuncResizeOrRaiseOr PlaceAgain
 Mouse (x0rfbserver) 2 W A Menu MenuFvwmWindowOps Close
 Mouse (xosview)     3 W A Menu MenuFvwmWindowOps Close
 Mouse 3 TSIFW   4       Menu MenuFvwmWindowOps Close
 Mouse 1 I       A       FuncMoveOrIconify
 Mouse 2 I       A       PlaceAgain Icon
-#Mouse 2 TSIF    A       StrokeFunc DrawMotion
-#Mouse 2 TSIF    S       StrokeFunc EchoSequence DrawMotion
-Mouse 2 TS      A       FuncResizeOrRaiseOrShade
+Mouse 2 TS      A       FuncResizeOrRaiseOr PlaceAgain
 Mouse 3 TSIF    A       Menu MenuFvwmWindowOps RaiseLower
 Mouse 4 TSIFW   4       FuncTakeToDesk -1 0 7
-Mouse 5 TSFIW   4       FuncTakeToDesk +1 0 7
-Mouse 4 T       N       FuncTakeToDesk -1 0 7
-Mouse 5 T       N       FuncTakeToDesk +1 0 7
-Mouse 4 T       N       Lower
-Mouse 5 T       N       Raise
+Mouse 5 TSIFW   4       FuncTakeToDesk +1 0 7
+Mouse 4 TSIF    N       Lower
+Mouse 5 TSIF    N       Raise
+
+Mouse 3 TSIF    A       StrokeFunc DrawMotion
+Mouse 3 TSIF    S       StrokeFunc EchoSequence DrawMotion FeedBack
 
 # Strokes {{{2
 
@@ -1128,37 +1125,30 @@ Stroke 35753    0 TSIF  N WindowShade
 Stroke 321474123 0 TSIF N WindowShade
 Stroke 369878963 0 TSIF N WindowShade
 
+Stroke 852 0 - N EnlargeWrapperUp
+Stroke 258 0 - N ResizeWrapperDown
+Stroke 258 0 _ N EnlargeWrapperDown
+Stroke 852 0 _ N ResizeWrapperUp
+Stroke 654 0 [ N EnlargeWrapperLeft
+Stroke 456 0 [ N ResizeWrapperRight
+Stroke 456 0 ] N EnlargeWrapperRight
+Stroke 654 0 ] N ResizeWrapperLeft
+
+Stroke 0 0 TSIFW A Menu MenuFvwmWindowOps RaiseLower
+
 Stroke 21478962 2 R     A Restart
 Stroke 21478963 2 R     A Restart
 Stroke 214789632 2 R    A Restart
 Stroke 321478963 2 R    A Restart
 Stroke 3214789632 2 R   A Restart
 Stroke 0        0 R     N Menu MenuFvwmRoot Nop
-Stroke 0        0 TSF   N FuncResizeOrRaiseOrShade
+Stroke 0        2 TSF   N Menu MenuFvwmWindowOps RaiseLower
 Stroke 0        0 I     N Menu MenuFvwmWindowOps Iconify
 #Stroke 0        1 R     A Menu MenuFvwmRoot Nop
 Stroke 0        2 R     A WindowList ShowPage SelectOnRelease
 #Stroke 0        3 R     A Menu MenuFvwmWindowOps Nop
 
 # }}}2
-# Pages {{{2
-
-DestroyFunc FuncTakeToPage
-AddToFunc FuncTakeToPage
-+ I Raise
-+ I MoveToPage $*
-+ I GoToPage $*
-
-Stroke 25852    0 TSIF  A MoveToPage 0p +1p
-Stroke 258      0 TSIF  A FuncTakeToPage 0p +1p
-Stroke 85258    0 TSIF  A MoveToPage 0p -1p
-Stroke 852      0 TSIF  A FuncTakeToPage 0p -1p
-Stroke 45654    0 TSIF  A MoveToPage +1p 0p
-Stroke 456      0 TSIF  A FuncTakeToPage +1p 0p
-Stroke 65456    0 TSIF  A MoveToPage -1p 0p
-Stroke 654      0 TSIF  A FuncTakeToPage -1p 0p
-
-# }}]2
 # }}}1
 # Initialization Functions {{{1
 
@@ -1174,7 +1164,6 @@ PipeRead "if fvwm --version >/dev/null 2>&1; then :; else echo + I ModuleSynchro
 Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) + I EwmhBaseStruts 0 0 0 25
 Test (!EnvIsSet GNOME_DESKTOP_SESSION_ID) + I Module FvwmButtons FvwmButtonsBottom
 + I Module FvwmCommandS
-+ I Module FvwmEvent
 + I Module FvwmForm
 + I Module FvwmProxy
 + I UnsetEnv fvwm_titlefont
@@ -1194,6 +1183,8 @@ PipeRead 'if test -x /usr/dt/bin/dtaction; then echo + I AddToFunc FuncSmartQuit
 
 DestroyFunc RestartFunction
 AddToFunc RestartFunction
++ I Exec exec xrdb -load $[HOME]/.Xresources
++ I Exec if [ -f $[HOME]/.xmodmap ]; then sleep 1; setxkbmap us; xmodmap $[HOME]/.xmodmap; fi
 + I DestroyFunc FuncSmartQuit
 PipeRead 'if test -x /usr/dt/bin/dtaction; then echo + I AddToFunc FuncSmartQuit I Exec exec /usr/dt/bin/dtaction ExitSession; else echo  + I AddToFunc FuncSmartQuit I Quit; fi'
 
@@ -1217,10 +1208,10 @@ AddToFunc ExitFunction
 # }}}1
 # Menus {{{1
 DestroyMenu MenuFvwmRoot
-AddToMenu MenuFvwmRoot@side.fvwm2.xpm@^black^
+AddToMenu MenuFvwmRoot
 + "&Terminal%mini/terminal/left-plain.xpm%" FuncScreenXTerm
 + "Web &Browser%menu/www.xpm%"           FuncWebBrowser http://www.google.com/
-+ "Ch&at%menu/chat.xpm%"                 FuncChatScreenSshXTerm
++ "&Chat%menu/chat.xpm%"                 FuncChatScreenSshXTerm
 + ""              Nop
 + "Pr&ograms%menu/programs.xpm%"         Popup MenuFvwmPrograms item 100-4p c
 Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames item 100-4p c
@@ -1229,14 +1220,14 @@ Test (f $[HOME]/games) + "&Games%menu/game.xpm%" Popup MenuFvwmGames item 100-4p
 + "&Multimedia%menu/multimedia.xpm%"     Popup MenuFvwmMultimedia item 100-4p c
 + ""              Nop
 + "S&ystem%menu/system.xpm%"         Popup MenuFvwmSystem item 100-4p c
-+ "&Configuration%menu/configuration.xpm%" Popup MenuFvwmConfig item 100-4p c
++ "Con&figuration%menu/configuration.xpm%" Popup MenuFvwmConfig item 100-4p c
 + "&Window Ops%menu/windows.xpm%"     Popup MenuFvwmWindowOps item 100-4p c
 #+ "W&indow List%menu/windows.xpm%"     WindowList
 + ""              Nop
 + "Remote Lo&gins%mini/terminal/right-black.xpm%"  Popup MenuFvwmLogins item 100-4p c
 + "Remote &Screens%mini/terminal/left-black.xpm%" Popup MenuFvwmScreens item 100-4p c
 + ""              Nop
-PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%mini.debian.xpm%\\" Popup /Debian item 100-4p c'
+PipeRead 'test -e /etc/X11/fvwm/menudefs.hook && echo + \\"\\&Debian%gnome/16x16/places/debian-swirl.png%\\" Popup /Debian item 100-4p c'
 PipeRead 'test -e /usr/share/gnome/apps && echo + \\"GNOM\\&E%menu/gnome.xpm%\\" Popup Gnome-sys item 100-4p c'
 PipeRead 'test -e /usr/share/applnk -a -x /usr/bin/kstart -o -e "$KDEDIR" && echo + \\"KD\\&E%menu/kde.xpm%\\" Popup Kde-sys item 100-4p c'
 + ""              Nop
@@ -1324,21 +1315,19 @@ DestroyMenu MenuFvwuNetwork
 AddToMenu MenuFvwmNetwork "Network" Title
 #+ "&Chat%menu/chat.xpm%"        FuncChatScreenSshXTerm
 + "M&utt%mutt.mini.xpm%"        Exec exec x-terminal-emulator -name mutt@localhost -T mutt -e mutt
-#Test (x /usr/bin/gaim) + "&Gaim%mini.gaim.xpm%" FuncExec gaim "exec gaim"
-PipeRead 'if [ -x "`which gaim 2>/dev/null`" ]; then \
-echo "+ \\"&Gaim%mini.gaim.xpm%\\" FuncExec gaim \\"exec gaim\\""; \
+FuncAddIfExists MenuFvwmNetwork "Sk&ype%pidgin/protocols/16/skype.png%" skype
+PipeRead 'if [ -x "`which pidgin 2>/dev/null`" ]; then \
+echo "+ \\"P&idgin%hicolor/16x16/apps/pidgin.png%\\" FuncExec pidgin \\"exec pidgin\\""; \
 elif [ -x "`which tik 2>/dev/null`" ]; then \
-echo "+ \\"TIK%menu/chat.xpm%\\" Exec exec tik"; fi'
-FuncAddIfExists MenuFvwmNetwork "&Blog%blogtk16x16.xpm%" BloGTK
+echo "+ \\"T&IK%menu/chat.xpm%\\" Exec exec tik"; fi'
+FuncAddIfExists MenuFvwmNetwork "Transmission%hicolor/16x16/apps/transmission.png%" transmission
 + ""                            Nop
 + "&Headlines%menu/news.xpm%"   Popup MenuHeadlines
-FuncAddIfExists MenuFvwmNetwork "&Firefox%mozilla.mini.xpm%" firefox
-FuncAddIfExists MenuFvwmNetwork "&Firebird%mozilla.mini.xpm%" mozilla-firebird
+FuncAddIfExists MenuFvwmNetwork "Google &Chrome%hicolor/16x16/apps/google-chrome.png%" google-chrome
+FuncAddIfExists MenuFvwmNetwork "&Firefox%hicolor/16x16/apps/iceweasel.png%" firefox
 FuncAddIfExists MenuFvwmNetwork "&Opera%mini.opera.xpm%" opera
-FuncAddIfExists MenuFvwmNetwork "&Konqueror%mini.kde.xpm%" konqueror
+FuncAddIfExists MenuFvwmNetwork "&Konqueror%hicolor/16x16/apps/konqueror.png%" konqueror
 FuncAddIfExists MenuFvwmNetwork "&Dillo%menu/www.xpm%" dillo
-Test (!x /usr/bin/firefox) Test (!x /usr/bin/mozilla-firebird) FuncAddIfExists MenuFvwmNetwork "M&ozilla%mozilla.mini.xpm%" mozilla
-Test (x /usr/bin/firefox) Test (x /usr/lib/mozilla/run-mozilla.sh) FuncAddIfExists MenuFvwmNetwork "M&ozilla%mozilla.mini.xpm%" mozilla
 FuncAddIfExists MenuFvwmNetwork "&Netscape%mini.netscape.xpm%" netscape
 # }}}2
 # Multimedia {{{2
@@ -1364,6 +1353,8 @@ PipeRead 'if [ -x "`which gmplayer 2>/dev/null`" ]; then \
 echo "+ \\"MPlay&er%menu/video.xpm%\\" Exec exec gmplayer"; \
 elif [ -x "`which xine 2>/dev/null`" ]; then \
 echo "+ \\"Xin&e%menu/video.xpm%\\" Exec exec xine"; fi'
+
+FuncAddIfExists MenuFvwmMultimedia "Nuv&ola Player%hicolor/22x22/apps/nuvolaplayer.png%" nuvolaplayer
 
 + ""                            Nop
 Test (x $[HOME]/.fvwm/fvwm-menu-music) + "Mus&ic%menu/folder.xpm%" Popup $[HOME]/Music
@@ -1394,9 +1385,6 @@ AddToMenu MenuFvwmConfig "Configuration" Title
 + "Buttons at &Top%menu/window-raise.xpm%"    Schedule 10 Next (FvwmButtonsBottom, CirculateHit) FuncMoveButtonsToTop
 + "Buttons at &Bottom%menu/window-lower.xpm%" Schedule 10 Next (FvwmButtonsTop, CirculateHit) FuncMoveButtonsToBottom
 + "" Nop
-#+ "Colorma&p Follows Mouse%mini.mouse.xpm%"   ColormapFocus FollowsMouse
-#+ "C&olormap Follows Focus%mini.windows.xpm%" ColormapFocus FollowsFocus
-#+ "" Nop
 + "&All Paging OFF%mini.rball.xpm%"           EdgeScroll 0 0
 + "F&ull Paging%mini.gball.xpm%"              EdgeScroll 100 100
 + "Full Paging && &Edge Wrap%mini.bball.xpm%" EdgeScroll 100000 100000
@@ -1542,12 +1530,14 @@ AddToFunc FuncMoveOrIconify
 + M FuncMove
 + D Iconify
 # }}}3
-# FuncResizeOrRaiseOrShade {{{3
-DestroyFunc FuncResizeOrRaiseOrShade
-AddToFunc FuncResizeOrRaiseOrShade
+# FuncResizeOrRaiseOr {{{3
+
+DestroyFunc FuncResizeOrRaiseOr
+AddToFunc FuncResizeOrRaiseOr
 + I Raise
 + M FuncResize
-+ D WindowShade $[func.context]
++ D $0 $[func.context]
+
 # }}}3
 # FuncUnshadeAndIconify {{{3
 DestroyFunc FuncUnshadeAndIconify
@@ -1650,8 +1640,8 @@ AddToFunc EWMHActivateWindowFunc
 + I FuncDeiconifyAndRearrange
 + I FlipFocus
 + I Raise
-+ I WarpToWindow 50 50
-#+ I FuncWarpToTitle
+# + I WarpToWindow 50 50
+# + I FuncWarpToTitle
 # }}}3
 # Focus Functions {{{3
 DestroyFunc FuncFocusWindow
@@ -1788,7 +1778,7 @@ AddToFunc FuncFindWebBrowser
 
 DestroyFunc FuncFindOrLaunchWebBrowser
 AddToFunc FuncFindOrLaunchWebBrowser
-+ I None ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|Google-chrome|konqueror|dillo", AcceptsFocus) Exec exec sensible-browser $*
++ I None ("WWW-Browser|Gecko|gecko|Galeon|Navigator|Firefox-bin|Google-chrome|Chromium-browser|konqueror|dillo", AcceptsFocus) Exec exec sensible-browser $*
 + I FuncFindWebBrowser
 
 DestroyFunc FuncSmartWebBrowser
@@ -1837,7 +1827,7 @@ AddToFunc FuncChatScreenXTerm
 + I Next (chat@localhost|Chat@localhost, AcceptsFocus) Iconify off
 + I Next (chat@localhost|Chat@localhost, AcceptsFocus) Focus
 + I Next (chat@localhost|Chat@localhost, AcceptsFocus) FuncWarpToTitle
-+ I None (chat@localhost|Chat@localhost) Exec exec x-terminal-emulator -ut -name Chat@localhost -T Chat@localhost -e tpope screen -c "$HOME/.irssi/screenrc" -dRR irc
++ I None (chat@localhost|Chat@localhost) Exec exec x-terminal-emulator -ut -name Chat@localhost -T Chat@localhost -e screen -c "$HOME/.irssi/screenrc" -dRR irc
 
 # }}}2
 # XTerm Functions {{{2
@@ -1848,7 +1838,7 @@ AddToFunc FuncXTerm
 DestroyFunc FuncScreenXTerm
 AddToFunc FuncScreenXTerm
 + I FuncFindResource @localhost
-+ I None (@localhost, AcceptsFocus) Exec exec x-terminal-emulator -name @localhost -T @localhost -e tpope screen -dRR $[HOST]
++ I None (@localhost, AcceptsFocus) Exec exec x-terminal-emulator -name @localhost -T @localhost -e screen -dRR $[HOST]
 
 DestroyFunc FuncSshXTerm
 AddToFunc FuncSshXTerm
@@ -1899,11 +1889,11 @@ DestroyFunc FuncMenuDiscoverHosts
 AddToFunc FuncMenuDiscoverHosts
 + I DestroyMenu "MenuDiscoverHosts$0"
 + I AddToMenu   "MenuDiscoverHosts$0"
-+ I PipeRead 'avahi-browse -t _ssh._tcp|awk \'{print "+ "$$$$4" Func$0XTerm "$$$$4}\''
++ I PipeRead 'avahi-browse -t _ssh._tcp|grep IPv4|awk \'{print "+ "$$$$4" Func$0XTerm "$$$$4}\''
 
 DestroyFunc FuncMissingHostMenu
 AddToFunc FuncMissingHostMenu
-+ I PipeRead 'avahi-browse -t _ssh._tcp|awk \'{print "AddToMenu MenuDiscoveredHostsSsh "$$$$4" FuncSshXTerm "$$$$4"\\nAddToMenu MenuDiscoveredHostsScreenSsh "$$$$4" FuncScreenSshXTerm "$$$$4"\\nAddToMenu MenuDiscoveredHostsFind "$$$$4" FuncFindXTerm "$$$$4}\''
++ I PipeRead 'avahi-browse -t _ssh._tcp|grep IPv4|awk \'{print "AddToMenu MenuDiscoveredHostsSsh "$$$$4" FuncSshXTerm "$$$$4"\\nAddToMenu MenuDiscoveredHostsScreenSsh "$$$$4" FuncScreenSshXTerm "$$$$4"\\nAddToMenu MenuDiscoveredHostsFind "$$$$4" FuncFindXTerm "$$$$4}\''
 + I Schedule 600000 DestroyMenu MenuDiscoveredHostsSsh
 + I Schedule 600000 DestroyMenu MenuDiscoveredHostsScreenSsh
 + I Schedule 600000 DestroyMenu MenuDiscoveredHostsFind
@@ -2216,7 +2206,6 @@ DestroyModuleConfig  FvwmForm-Run: *
 # }}}2
 # }}}1
 # Other Config Files {{{1
-
 
 Read /etc/X11/fvwm/menudefs.hook Quiet
 Read menudefs.hook Quiet
