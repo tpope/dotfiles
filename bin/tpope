@@ -195,7 +195,6 @@ case "$basename" in
     fi
     sleep 1
     tpope install --cron
-    find "$HOME" -maxdepth 1 -name .install-root -mtime +15 -exec tpope install --cron --root-only \;
     cl=4
     for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
       [ "$i" -gt 90 ] && cl=3

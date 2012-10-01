@@ -16,59 +16,9 @@ if [ "x$1" = "x--cron" -o "x$1" = "x--quiet" ]; then
   quiet=1; exec >/dev/null; shift
 fi
 
-if [ ! -f "$HOME/. tpope" ]; then
-  case "`id`" in
-    'uid=1000(tpope)'*) touch "$HOME/.install-root" ;;
-    *) touch "$HOME/.autodl" ;;
-  esac
-fi
-
-if [ "x$1" = "x--root-only" -a -n "$2" ]; then
-    u="$2"
-    PATH="/usr/local/sbin:/usr/sbin:/sbin:$PATH"
-    for group in adm src dip dialout floppy cdrom video audio disk camera plugdev lpadmin; do
-      line="`getent group $group 2>/dev/null || grep ^$group: /etc/group`"
-      case "$line" in
-        '') ;;
-        *"$u"*) ;;
-        *) adduser "$u" $group >/dev/null 2>&1 && didgroup=1 ;;
-      esac
-    done
-    [ -z "$didgroup" ] || echo "Added to groups."
-    [ -z "$didroot" ] || echo "Did root related tasks."
-    [ ! -f "$HOME/.install-root" ] || touch "$HOME/.install-root"
-    exit 0
-fi
-
-if [ "$1" = "--root" -o "$1" = "--root-only" ] && [ -n "$LOGNAME" ]; then
-  # ugh, how complicated
-  if [ -n "$quiet" -o ! -t 0 ]; then
-    if inpath sudo && sudo -l >/dev/null 2>&1; then
-      sudo -p '' -S "$HOME/bin/installer" --root-only $LOGNAME </dev/null 2>/dev/null
-    fi
-  elif inpath sudo; then
-    if sudo -l >/dev/null 2>&1; then
-      sudo "$HOME/bin/installer" --root-only $LOGNAME
-    else
-      if [ -f /etc/sudoers ]; then
-        su -c "echo $LOGNAME 'ALL=(ALL)' ALL >> /etc/sudoers"
-        echo "Adding to sudoers."
-        if sudo -l >/dev/null 2>&1; then
-          sudo "$HOME/bin/installer" --root-only $LOGNAME
-        else
-          su -c "$HOME/bin/installer --root-only $LOGNAME"
-        fi
-      else
-        su -c "$HOME/bin/installer --root-only $LOGNAME"
-      fi
-    fi
-  else
-    su -c "$HOME/bin/installer --root-only $LOGNAME"
-  fi
-fi
-
 if [ "x$1" = "x--root-only" ]; then
-  exit
+  echo '--root-only has been removed' >&2
+  exit 1
 fi
 
 if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
