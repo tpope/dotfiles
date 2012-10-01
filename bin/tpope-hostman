@@ -5,17 +5,17 @@
 # shell prompts.
 
 PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="brandon drogo lyanna rhaegar varys balon renly tywin"
+hosts="renly balon brandon drogo lyanna rhaegar varys tywin"
 menuhosts="$hosts"
 
 gethost() {
   case "$1" in
+  [Rr]|renly*)                  echo renly ;;
+  [Nn]|balon*)                  echo balon ;;
   [Gg]|gideon*|rhaegar*)        echo rhaegar ;;
   [Ll]|ucas*|lyanna*)           echo lyanna ;;
   [Mm]|matthew*|brandon*)       echo brandon ;;
   [Oo]|todd*|drogo*)            echo drogo ;;
-  [Nn]|ken*|balon*)             echo balon ;;
-  [Ee]|kyle*|renly*)            echo renly ;;
   [Tt]|tywin*)                  echo tywin ;;
   [Yy]|roxy*|varys*)            echo varys ;;
   ?)                            echo localhost ;;
@@ -50,12 +50,12 @@ insertletter() {
   fi
 }
 
+renly()       { hcolor=cyan;   $hcolor;hltr=R;hdom=tpope.us;}
+balon()       { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
 brandon()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
 drogo()       { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
 lyanna()      { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
 rhaegar()     { hcolor=navy;   $hcolor;hltr=G;hdom=tpope.us;}
-balon()       { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
-renly()       { hcolor=cyan;   $hcolor;hltr=E;hdom=tpope.us;}
 tywin()       { hcolor=magenta;$hcolor;hltr=T;hdom=tpope.us;}
 varys()       { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
 unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
