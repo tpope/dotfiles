@@ -170,7 +170,4 @@ mediaaction() {
   return 1
 }
 
-basename=`basename "$0"`
-[ "$basename" = media ] && prefix='media ' basename="$1" && shift
-
-mediaaction "$basename" "$@"
+mediaaction "$@"

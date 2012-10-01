@@ -15,7 +15,7 @@ base_files="\
 .xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
 .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-DateTime \
 bin/x-terminal-emulator bin/sensible-browser bin/tpope bin/tpope-hostman \
-bin/tpope-config bin/media bin/installer \
+bin/tpope-config bin/tpope-media bin/installer \
 .ruby/lib/tpope.rb .irbrc .pryrc"
 
 extra_files="\
@@ -108,6 +108,7 @@ case "$command" in
       .zsh/functions/_daemons \
       .ssh/authorized_keys2 \
       .zsh/functions/_tpope \
+      bin/media \
       bin/sync-tpope
     ;;
 

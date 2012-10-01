@@ -358,7 +358,8 @@ case "$basename" in
 
   install|installer) exec "$HOME/bin/installer" "$@" ;;
 
-  media) exec "$HOME/bin/media" "$@" ;;
+  media)
+    exec "$HOME/bin/tpope-media" "$@" ;;
 
   screen)
   if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
