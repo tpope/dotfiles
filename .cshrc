@@ -144,7 +144,9 @@ else
   setenv LSCOLORS ExGxFxdxCxfxexCaCdEaEd
 endif
 
-grep --color |& grep unknown >/dev/null || alias grep 'grep --color=auto --exclude="*~"'
+if ( { ! grep --color |& grep un >/dev/null } ) then
+  setenv GREP_OPTIONS '--color=auto --exclude=*~ --exclude=tags'
+endif
 
 if ( -x /usr/bin/finger && -f "$HOME/.hushlogin" ) then
   /usr/bin/finger $USER | grep '^New mail' >&/dev/null && \

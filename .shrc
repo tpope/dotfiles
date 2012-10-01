@@ -160,7 +160,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     esac
 
     if ! grep --color 2>&1 | grep un >/dev/null; then
-      GREP_OPTIONS='--color=auto --exclude="*~" --exclude=tags'
+      GREP_OPTIONS='--color=auto --exclude=*~ --exclude=tags'
       export GREP_OPTIONS
       # alias grep='grep --color=auto --exclude="*~" --exclude=tags'
       # alias egrep='egrep --color=auto --exclude="*~" --exclude=tags'
