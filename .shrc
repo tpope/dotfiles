@@ -44,7 +44,8 @@ if [ -z "$CLASSPATH" ]; then
 fi
 
 RUBYLIB="$HOME/src/ruby/lib:$HOME/.ruby/lib"
-export RUBYLIB
+RUBYOPT=-rtpope
+export RUBYLIB RUBYOPT
 
 if [ -z "$PERL5LIB" ]; then
   for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
