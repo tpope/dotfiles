@@ -144,9 +144,7 @@ else
   setenv LSCOLORS ExGxFxdxCxfxDxxbadacad
 endif
 
-if ( { ! grep --color |& grep un >/dev/null } ) then
-  setenv GREP_OPTIONS '--color=auto --exclude=*~ --exclude=tags'
-endif
+grep --color |& grep un >/dev/null || setenv GREP_OPTIONS '--color=auto --exclude=*~ --exclude=tags'
 
 if ( ! $?MAIL && -f "/var/mail/$USER" ) setenv MAIL "/var/mail/$USER"
 
