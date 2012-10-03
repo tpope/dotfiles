@@ -196,7 +196,7 @@ case "$1" in
     exit 0
     ;;
 
-  boxen) # nothing
+  list|boxen) # nothing
     echo $hosts
     ;;
 

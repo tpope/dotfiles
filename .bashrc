@@ -78,7 +78,7 @@ _tpope() {
     local selector=$(egrep "^  ([a-z-]*[|])*$sub([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/bin/$cmd" | sed -e 's/.*# *//')
     case "$selector" in
       hosts|ssh)
-        COMPREPLY=($(compgen -W "localhost $(tpope hostman boxen)" "$cur")) ;;
+        COMPREPLY=($(compgen -W "localhost $(tpope hostman list)" "$cur")) ;;
       services)
         _services ;;
       directories)

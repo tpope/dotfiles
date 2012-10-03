@@ -139,7 +139,7 @@ periodic() { rehash }
 # }}}1
 # Named directories {{{1
 
-boxen=(`tpope hostman boxen`)
+boxen=(`tpope hostman list`)
 local host
 for host in $boxen; do
   [ "$host" != "$HOST" ] && family=($family $host)
