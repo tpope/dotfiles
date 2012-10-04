@@ -154,10 +154,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     alias reload='"$HOME/bin/tpope" service reload'
     alias force-reload='"$HOME/bin/tpope" service force-reload'
 
-    [ -n "$cygwin" -o -x /usr/bin/vim -o -x /usr/local/bin/vim -o -x /opt/sfw/bin/vim ] && \
-      alias vi='vim'
-    #[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
-      #alias vi='vim' # -X
+    [ "$VISUAL" != vim ] || alias vi='vim'
 
     if [ -x /usr/bin/dircolors -o -x /usr/local/bin/dircolors ]; then
       eval `dircolors -b "$HOME/.dir_colors"`

@@ -145,13 +145,7 @@ if ( ! $?MAIL && -f "/var/mail/$USER" ) setenv MAIL "/var/mail/$USER"
 
 eval `grep '^    alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
 
-if ( -x /usr/bin/vim || -x /usr/local/bin/vim || -x /opt/sfw/bin/vim ) then
-  alias vi 'vim'
-endif
-
-if ( -x /usr/bin/gvim || -x /usr/local/bin/gvim || -x /opt/sfw/bin/gvim ) then
-  alias vi 'vim' # -X
-endif
+if ( $?VISUAL && "$VISUAL" == vim ) alias vi vim
 
 foreach cmd ( `tpope aliases` )
   alias $cmd "tpope $cmd"
