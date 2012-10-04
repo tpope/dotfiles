@@ -76,10 +76,10 @@ if [ -t 1 ]; then
 
 RSYNC_RSH='ssh -ax'
 
-[ "$TERM" = linux ] && TMOUT=43200
-
 if [ "$interactive" -o "$_" = "interactive" ] || \
   echo $0|\grep '^[^.]*sh[0-9.-]*$' >/dev/null; then
+
+  [ "$TERM" != linux ] || TMOUT=43200
 
   if [ -x "`which vim 2>/dev/null`" ]; then
     VISUAL=vim
