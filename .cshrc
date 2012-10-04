@@ -148,13 +148,7 @@ if ( { ! grep --color |& grep un >/dev/null } ) then
   setenv GREP_OPTIONS '--color=auto --exclude=*~ --exclude=tags'
 endif
 
-if ( -x /usr/bin/finger && -f "$HOME/.hushlogin" ) then
-  /usr/bin/finger $USER | grep '^New mail' >&/dev/null && \
-    echo "You have new mail."
-else if ( -x /usr/ucb/finger && -f "$HOME/.hushlogin" ) then
-  /usr/ucb/finger $USER | grep '^New mail' >&/dev/null && \
-    echo "You have new mail."
-endif
+if ( ! $?MAIL && -f "/var/mail/$USER" ) setenv MAIL "/var/mail/$USER"
 
 eval `grep '^    alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
 

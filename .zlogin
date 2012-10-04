@@ -9,4 +9,9 @@ if [ ! -f "$HOME/. tpope" ]; then
 elif [ -x /usr/games/fortune ] && [ "$SHLVL" -le 1 -a \( -z "$SSH_TTY" -o "$TERMCAP" \) ]; then
   /usr/games/fortune
 fi
+
+if [ -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
+  find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
+fi
+
 [ ! -x "`which tpope 2>/dev/null`" ] || tpope cron --login

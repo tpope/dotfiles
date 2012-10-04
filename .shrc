@@ -95,6 +95,10 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
   fi
   LESS="FRX#10"
 
+  [ -n "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+  [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+  [ -z "$MAIL" ] || export MAIL
+
   umask 022
   [ ! -x /bin/stty ] || stty -ixon
 
@@ -174,22 +178,6 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
         alias $cmd="$HOME/bin/tpope $cmd"
       fi
     done
-
-    [ -n "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
-    [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
-    [ -z "$MAIL" ] || export MAIL
-    if [ -z "$cygwin" -a -x "`which finger 2>/dev/null`" -a -f "$HOME/.hushlogin" ]; then
-      if finger $LOGNAME 2>/dev/null|grep "^New mail" >/dev/null 2>/dev/null; then
-        echo "You have new mail."
-      fi
-    elif [ "$LS_COLORS" -a -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
-      mtime=-1 atime=-1
-      mtime=`ls -l --time-style=+%s "$MAIL"|awk '{print $6}'`
-      atime=`ls -ul --time-style=+%s "$MAIL"|awk '{print $6}'`
-      if [ "`expr $mtime - $atime`" -gt 0 ]; then
-        echo "You have new mail."
-      fi
-    fi
 
     set -o emacs -o noclobber >/dev/null 2>&1
 
