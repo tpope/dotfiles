@@ -37,27 +37,11 @@ set mail-subdirectory Mail
 EOF
   hidden=1
 fi
-if inpath mplayer && [ ! -d "$HOME/.mplayer" ]; then
-  mkdir "$HOME/.mplayer"
-  mkfifo "$HOME/.mplayer/mplayer"
-  cat > "$HOME/.mplayer/config" <<EOF
-# ~/.mplayer/config
-vo=xv,x11,fb,aa
-alang=en
-slang=en
-framedrop=yes
-input=file=$HOME/.mplayer/mplayer
-EOF
-  hidden=1
-fi
 if inpath dcop && [ ! -f "$HOME/.kde/share/config/kdeglobals" ]; then
   mkdir -p "$HOME/.kde/share/config"
   cat > "$HOME/.kde/share/config/kdeglobals" <<EOF
 [General]
 TerminalApplication=\$HOME/bin/x-terminal-emulator
-
-[Paths]
-Trash=\$HOME/.trash/
 EOF
   hidden=1
 fi
@@ -86,7 +70,6 @@ if inpath elinks && [ ! -d "$HOME/.elinks" ]; then
   cat > "$HOME/.elinks/elinks.conf" <<EOF
 # ~/.elinks/elinks.conf
 set terminal.xterm.colors = 1
-set terminal.Eterm.colors = 1
 set terminal.screen.colors = 1
 set terminal.screen.block_cursor = 1
 set terminal.screen.underline = 1
@@ -102,66 +85,12 @@ elif inpath links && [ ! -d "$HOME/.links" -a ! -d "$HOME/.elinks" ]; then
   cat > "$HOME/.links/links.cfg" <<EOF
 # ~/.links/links.cfg
 terminal "xterm" 0 0 1 us-ascii
-terminal "Eterm" 0 0 1 us-ascii
 terminal "screen" 0 0 1 us-ascii
 download_dir "~/dl"
 EOF
   hidden=1
 fi
-if inpath konqueror && [ ! -f "$HOME/.kde/share/config/konquerorrc" ]; then
-  mkdir -p "$HOME/.kde/share/config"
-  cat > "$HOME/.kde/share/config/konquerorrc" <<EOF
-[FMSettings]
-AlwaysNewWin=false
-AlwaysTabbedMode=true
-HomeURL=http://www.google.com/
-KonquerorTabforExternalURL=true
-MMBOpensTab=true
-NewTabsInFront=false
-OpenAfterCurrentPage=true
-PopupsWithinTabs=true
-TabCloseActivatePrevious=true
-
-[KonqMainWindow Toolbar bookmarkToolBar]
-IconSize=16
-IconText=IconTextRight
-EOF
-  hidden=1
-fi
-if inpath dillo && [ ! -d "$HOME/.dillo" ]; then
-  mkdir "$HOME/.dillo"
-  cat > "$HOME/.dillo/dillorc" <<EOF
-# ~/.dillo/dillorc
-start_page="http://www.google.com/"
-home="http://www.google.com/"
-contrast_visited_color=NO
-enterpress_forces_submit=YES
-show_extra_warnings=YES
-geometry=790x532
-EOF
-  echo "DEFAULT ACCEPT" > "$HOME/.dillo/cookiesrc"
-  hidden=1
-fi
-if inpath rox-filer && [ ! -d "$HOME/.rox_choices" ]; then
-  mkdir "$HOME/.rox_choices"
-  mkdir "$HOME/.rox_choices/MIME-types"
-  cat > "$HOME/.rox_choices/MIME-types/text" <<EOF
-#!/bin/sh
-# Installed by tpope install
-exec see "\$@"
-EOF
-  chmod a+x "$HOME/.rox_choices/MIME-types/text"
-  for link in application audio image message model multipart text_html video; do
-    ln -s text "$HOME/.rox_choices/MIME-types/$link"
-  done
-  hidden=1
-fi
 [ -z "$hidden" ] || echo "Creating hidden files."
-if [ ! -d "$HOME/.trash" ]; then
-  mkdir "$HOME/.trash"
-  chmod 0700 "$HOME/.trash"
-  directories=1
-fi
 
 if [ ! -e "$HOME/dl" ]; then
   if [ -d "$HOME/Downloads" ]; then
