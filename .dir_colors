@@ -1,16 +1,12 @@
 # ~/.dir_colors
 
-# Configuration file for dircolors, a utility to help you set the
-# LS_COLORS environment variable used by GNU ls with the --color option.
-
 # The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
 # slackware version of dircolors) are recognized but ignored.
 
 # Below, there should be one TERM entry for each termtype that is colorizable
-TERM linux
-TERM linux-c
-TERM mach-color
-TERM console
+TERM Eterm
+TERM ansi
+TERM color-xterm
 TERM con132x25
 TERM con132x30
 TERM con132x43
@@ -23,23 +19,40 @@ TERM con80x50
 TERM con80x60
 TERM cygwin
 TERM dtterm
+TERM eterm-color
+TERM gnome
+TERM gnome-256color
+TERM jfbterm
+TERM konsole
+TERM kterm
+TERM linux
+TERM linux-c
+TERM mach-color
 TERM mlterm
 TERM putty
-TERM xterm
-TERM xterm-color
-TERM xterm-16color
-TERM xterm-256color
-TERM xterm-debian
 TERM rxvt
+TERM rxvt-256color
+TERM rxvt-cygwin
+TERM rxvt-cygwin-native
 TERM rxvt-unicode
+TERM rxvt-unicode-256color
+TERM rxvt-unicode256
 TERM screen
 TERM screen-256color
+TERM screen-256color-bce
 TERM screen-bce
 TERM screen-w
+TERM screen.Eterm
+TERM screen.rxvt
 TERM screen.linux
+TERM terminator
 #TERM vt100
-TERM Eterm
-TERM Eterm-xterm
+TERM xterm
+TERM xterm-16color
+TERM xterm-256color
+TERM xterm-88color
+TERM xterm-color
+TERM xterm-debian
 
 # Below are the color init strings for the basic file types. A color init
 # string consists of one or more of the following numeric codes:
@@ -49,63 +62,78 @@ TERM Eterm-xterm
 # 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
 # Background color codes:
 # 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
-NORMAL 00	# global default, although everything should be something.
-FILE 00		# normal file
-DIR 01;34	# directory
-#LINK target
-LINK 01;36	# symbolic link.  (If you set this to 'target' instead of a
-		# numerical value, the color is as for the file pointed to.)
-FIFO 33		# pipe
-SOCK 01;35	# socket
-#DOOR 01;44	# door
-BLK 00;35	# block device driver
-CHR 00;34	# character device driver
-ORPHAN 00;41	# symlink to nonexistent file
-MISSING 00;45	# said nonexistent file
+#NORMAL 00 # no color code at all
+#FILE 00 # regular file: use no color at all
+RESET 0 # reset to "normal" color
+DIR 01;34 # directory
+LINK 01;36 # symbolic link. (If you set this to 'target' instead of a
+ # numerical value, the color is as for the file pointed to.)
+# MULTIHARDLINK 00 # regular file with more than one link
+FIFO 33 # pipe
+SOCK 01;35 # socket
+# DOOR 01;44 # door
+BLK 00;35 # block device driver
+CHR 01;33 # character device driver
+ORPHAN 00;41 # symlink to nonexistent file
+MISSING 00;45 # said nonexistent file
 
+SETUID 37;41 # file that is setuid (u+s)
+SETGID 30;43 # file that is setgid (g+s)
+CAPABILITY 30;41 # file with capability
+STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
+OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
+STICKY 37;44 # dir with the sticky bit set (+t) and not other-writable
 # This is for files with execute permission:
 EXEC 01;32
 
 # List any file extensions like '.gz' or '.tar' that you would like ls
 # to colorize below. Put the extension, a space, and the color init string.
 # (and any comments you want to add after a '#')
-
-# executables (dark green)
+# If you use DOS-style suffixes, you may want to uncomment the following:
 .cmd 00;32
 .exe 00;32
-.EXE 00;32
 .com 00;32
-.COM 00;32
 .btm 00;32
 .bat 00;32
-.BAT 00;32
-.cmd 00;32
-.CMD 00;32
-.class 00;32
-.sh 00;32
+# Or if you want to colorize scripts even if they do not have the
+# executable bit actually set.
+#.sh 01;32
+#.csh 01;32
 
 # archives or compressed (bright red)
+.tar 01;31
+.tgz 01;31
 .arj 01;31
 .taz 01;31
 .lzh 01;31
+.lzma 01;31
+.tlz 01;31
+.txz 01;31
 .zip 01;31
 .ZIP 01;31
-.tar 01;31
-.z   01;31
-.Z   01;31
-.gz  01;31
-.tgz 01;31
+.z 01;31
+.Z 01;31
+.dz 01;31
+.gz 01;31
+.lz 01;31
+.xz 01;31
 .bz2 01;31
+.bz 01;31
 .tbz 01;31
 .tbz2 01;31
+.tz 01;31
 .deb 01;31
 .rpm 01;31
-.ipk 01;31
-.prc 01;31
-.PRC 01;31
 .jar 01;31
-.cab 01;31
-.CAB 01;31
+.war 01;31
+.ear 01;31
+.sar 01;31
+.rar 01;31
+.ace 01;31
+.zoo 01;31
+.cpio 01;31
+.7z 01;31
+.rz 01;31
 
 # backup and temporary files
 *~ 01;30
@@ -116,7 +144,6 @@ EXEC 01;32
 .BAK 01;30
 .back 01;30
 .dpkg-old 01;30
-.org 01;30
 .swp 01;30
 .swo 01;30
 .aux 01;30
@@ -132,21 +159,15 @@ EXEC 01;32
 .o 00;33
 .a 00;33
 .dll 00;33
-
-# text and document files
-.pdf 01;33
-.dvi 01;33
-.ps 01;33
-.eps 01;33
+.rbc 00;33
+.pyc 00;33
+.class 00;33
 
 # patches
 .diff 00;31
 .patch 00;31
 
 # misc.
-*akefile 01;37
-*akefile.in 01;37
-*akefile.am 01;37
 .dpkg-dist 01;37
 *core 01;37
 .lnk 01;36

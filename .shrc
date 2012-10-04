@@ -155,7 +155,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
       alias ls="gls -hF --color=auto"
     else
       CLICOLOR=1
-      LSCOLORS=ExGxFxdxCxfxexCaCdEaEd
+      LSCOLORS=ExGxFxdxCxfxDxxbadacad
       export CLICOLOR LSCOLORS
     fi
 

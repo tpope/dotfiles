@@ -140,8 +140,8 @@ else if ( -x /usr/bin/dircolors || -x /usr/local/bin/dircolors ) then
   alias ls 'ls -hF --color=auto'
 else
   alias ls 'ls -hF'
-  setenv CLICOLOR ''
-  setenv LSCOLORS ExGxFxdxCxfxexCaCdEaEd
+  setenv CLICOLOR 1
+  setenv LSCOLORS ExGxFxdxCxfxDxxbadacad
 endif
 
 if ( { ! grep --color |& grep un >/dev/null } ) then
