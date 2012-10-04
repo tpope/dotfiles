@@ -74,10 +74,11 @@ case "$command" in
   sync)
     rsync="rsync -urltRC --exclude='.*.sw?' --exclude='*.local'"
 
-    for host in "${@-$default_host}"; do
+    [ $# -gt 0 ] || set $default_host
+    for host in "$@"; do
       $rsync "$host:$files" "$HOME" 2>/dev/null
     done
-    for host in "${@-$default_host}"; do
+    for host in "$@"; do
       (cd; $rsync $files "$host:")
     done
     exec tpope config prune
