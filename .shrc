@@ -134,8 +134,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
 
-    alias ls='ls -hF'
-    alias ll='ls -lhF'
+    alias ll='ls -l'
     alias cp='cp -i'
     alias mv='mv -i'
     alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
@@ -160,16 +159,14 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     #[ -x /usr/bin/gvim -o -x /usr/local/bin/gvim -o -x /opt/sfw/bin/gvim ] && \
       #alias vi='vim' # -X
 
-    if [ -x "`which dircolors 2>/dev/null`" ]; then
+    if [ -x /usr/bin/dircolors -o -x /usr/local/bin/dircolors ]; then
       eval `dircolors -b "$HOME/.dir_colors"`
       alias ls="ls -hF --color=auto"
-    elif [ -x "`which gdircolors 2>/dev/null`" ]; then
-      eval `gdircolors -b "$HOME/.dir_colors"`
-      alias ls="gls -hF --color=auto"
     else
       CLICOLOR=1
       LSCOLORS=ExGxFxdxCxfxDxxbadacad
       export CLICOLOR LSCOLORS
+      alias ls='ls -hF'
     fi
 
     [ -z "$LS_COLORS" ] || case "$TERM" in xterm*|screen*)
