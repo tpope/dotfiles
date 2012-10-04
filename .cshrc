@@ -87,9 +87,9 @@ if ( $?tcsh ) then
 
   case screen*:
     if ( $?STY ) then
-      alias precmd 'printf "\e]1;'"i${ttyat}${HOST}"'\a\e]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\ek'"${ttyat}"'\e\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
+      alias precmd 'printf "\033]1;'"i${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\033k'"${ttyat}"'\033\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
     else
-      alias precmd 'printf "\e]1;'"i${ttyat}${HOST}"'\a\e]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\ek'"${ttyat}${HOST}"'\e\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
+      alias precmd 'printf "\033]1;'"i${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\033k'"${ttyat}${HOST}"'\033\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
     endif
     breaksw
 
@@ -101,7 +101,7 @@ if ( $?tcsh ) then
   case dtterm*:
   case ansi*:
   case cygwin*:
-    alias precmd 'printf "\e]1;'"${ttyat}${HOST}"'\a\e]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a" "`echo $cwd|sed -e s,^$HOME,~,`"'
+    alias precmd 'printf "\033]1;'"${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a" "`echo $cwd|sed -e s,^$HOME,~,`"'
     breaksw
 
   case linux*:
@@ -123,7 +123,7 @@ else
   set history = 100
   set filec
   if ( $TERM =~ screen* ) then
-      printf "\ek%s\e\\" "$ttyat$HOST"
+      printf "\033k%s\033\\" "$ttyat$HOST"
   endif
 endif
 

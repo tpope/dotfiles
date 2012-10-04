@@ -108,12 +108,12 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
   case "$TERM" in
     screen*)
     [ "$STY" ] || h="$hostname"
-    printf '\e]1;%s@%s\a' "$tty" "$hostname"
-    printf '\ek%s@%s\e\\' "$tty" "$h"
+    printf '\033]1;%s@%s\a' "$tty" "$hostname"
+    printf '\033k%s@%s\033\\' "$tty" "$h"
     unset h
     ;;
     xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
-    printf '\e]1;%s@%s\a' "$tty" "$hostname"
+    printf '\033]1;%s@%s\a' "$tty" "$hostname"
     ;;
   esac
   unset tty
