@@ -62,8 +62,9 @@ case "$command" in
     fi
 
     for host in "$@"; do
-      $RSYNC_RSH "$host" tar cf - $files | tar xf - -C "$HOME"
+      $RSYNC_RSH "$host" '$HOME/bin/tpope' config tar cf - | tar xf - -C "$HOME"
     done
+    exec tpope config prune
     ;;
 
   push)
