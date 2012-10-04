@@ -124,7 +124,7 @@ pager() {
 case "$basename" in
 
   chat)
-    hostname="`tpope hostman`"
+    hostname="`tpope host name`"
     if [ -x "$HOME/.irssi/Chat-script" -a -z "$*" ]; then
       "$HOME/.irssi/Chat-script" $hostname
     elif [ -z "$*" ]; then
@@ -358,7 +358,7 @@ case "$basename" in
   x-terminal-emulator|xterm) # xterm
     exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
-  hostman) exec "$HOME/bin/tpope-hostman" "$@" ;;
+  host|hostman) exec "$HOME/bin/tpope-hostman" "$@" ;;
 
   install|installer) exec "$HOME/bin/installer" "$@" ;;
 
