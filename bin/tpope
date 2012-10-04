@@ -6,11 +6,10 @@
 # and this script is modified to call that file instead.
 
 # Of particular interest here is the service function, which calls the
-# appropriate script in /etc/init.d, the install function, which does
-# various tasks involved with moving in (such as setting up a crontab and
-# changing my login shell), and the cron function, which calls my installer
-# script, cleans up temp files, and optionally downloads my latest set of
-# configuration files.
+# appropriate script in /etc/init.d, the setup function, which does various
+# tasks involved with moving in (such as setting up a crontab and changing my
+# login shell), and the cron function, which calls my setup script, cleans up
+# temp files, and optionally downloads my latest set of configuration files.
 
 [ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
 case "$PATH" in
@@ -360,7 +359,14 @@ case "$basename" in
 
   host|hostman) exec "$HOME/bin/tpope-hostman" "$@" ;;
 
-  install|installer) exec "$HOME/bin/installer" "$@" ;;
+  setup|install)
+    if [ -x "$HOME/bin/tpope-setup" ]; then
+      exec "$HOME/bin/tpope-setup" "$@"
+    elif [ -x "$HOME/bin/installer" ]; then
+      exec "$HOME/bin/installer" "$@"
+    else
+      exec "$HOME/bin/tpope-config" pull
+    fi ;;
 
   media)
     exec "$HOME/bin/tpope-media" "$@" ;;

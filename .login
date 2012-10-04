@@ -3,8 +3,8 @@
 if ( -f "$HOME/.login.local" ) source "$HOME/.login.local"
 
 if ( ! -f "$HOME/. tpope" ) then
-    echo 'Performing an initial "tpope install"'
-    "$HOME/bin/tpope" install
+    echo 'Performing an initial "tpope setup"'
+    tpope setup
 else if ( ! $?SHLVL && ( ! $?SSH_TTY || $?TERMCAP ) ) then
     if ( -x /usr/games/fortune ) /usr/games/fortune
 endif
