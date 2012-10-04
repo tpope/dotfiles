@@ -1,5 +1,4 @@
 # ~/.zlogin
-# vim:set et sw=2:
 
 test ! -f "$HOME/.profile.local" || . "$HOME/.profile.local"
 
@@ -14,4 +13,4 @@ if [ -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
   find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
 fi
 
-[ ! -x "`which tpope 2>/dev/null`" ] || tpope cron --login
+tpope cron --login
