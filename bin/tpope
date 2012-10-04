@@ -243,7 +243,11 @@ case "$basename" in
         exit 1
     fi
     while [ "$#" -gt 0 ]; do
-      as_root "/etc/init.d/$2" "$1"
+      if [ -x /usr/sbin/service ]; then
+        as_root /usr/sbin/service "$2" "$1"
+      else
+        as_root "/etc/init.d/$2" "$1"
+      fi
       shift 2
     done
     exit 0
