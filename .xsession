@@ -9,6 +9,7 @@ unset STY
 xsetroot -solid '#000420'
 xset r rate 600 30
 xset b 40 440 60
+xset dpms 600
 
 if [ -f "$HOME/.xmodmap" ]; then
   xmodmap "$HOME/.xmodmap"
@@ -29,10 +30,6 @@ tpope cron --login
 
 if [ -x /usr/bin/ssh-agent -a -z "$SSH_AUTH_SOCK" ]; then
   sshagent="/usr/bin/ssh-agent --"
-fi
-
-if [ -x "`which xscreensaver 2>/dev/null`" ]; then
-  nice -n 2 xscreensaver -no-splash >/dev/null 2>/dev/null &
 fi
 
 [ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
