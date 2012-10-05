@@ -10,7 +10,11 @@ else if ( ! $?SHLVL && ( ! $?SSH_TTY || $?TERMCAP ) ) then
 endif
 
 if ( $?MAIL && -f "$HOME/.hushlogin" && -f "$MAIL" ) then
-  find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
+  if ( -x /usr/bin/finger ) then
+    finger $USER | grep '^New mail' >&/dev/null && echo "You have new mail."
+  else
+    find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
+  endif
 endif
 
 tpope cron --login

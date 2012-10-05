@@ -10,7 +10,11 @@ elif [ -x /usr/games/fortune ] && [ "$SHLVL" -le 1 -a \( -z "$SSH_TTY" -o "$TERM
 fi
 
 if [ -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
-  find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
+  if [ -x /usr/bin/finger ]; then
+    finger $LOGNAME | grep '^New mail' >/dev/null 2>&1 && echo "You have new mail."
+  else
+    find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
+  fi
 fi
 
 tpope cron --login
