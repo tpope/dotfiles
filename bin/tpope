@@ -357,7 +357,8 @@ case "$basename" in
   x-terminal-emulator|xterm) # xterm
     exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
-  host|hostman) exec "$HOME/bin/tpope-hostman" "$@" ;;
+  host|hostman)
+    exec "$HOME/bin/tpope-host" "$@" ;;
 
   setup|install)
     if [ -x "$HOME/bin/tpope-setup" ]; then

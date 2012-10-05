@@ -191,7 +191,7 @@ case "$1" in
   link|-H) # nothing
     rm -f "$HOME"/bin/[A-Z]
     for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
-      ln -s tpope-hostman "$HOME/bin/$ltr"
+      ln -s tpope-host "$HOME/bin/$ltr"
     done
     exit 0
     ;;
