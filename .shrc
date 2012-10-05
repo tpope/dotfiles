@@ -141,6 +141,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     alias j='jobs'
 
+    alias gst='git status'
     alias ri='ri -f bs'
 
     alias b='sensible-browser'
