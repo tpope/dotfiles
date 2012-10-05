@@ -9,10 +9,10 @@ elif [ -x /usr/games/fortune ] && [ "$SHLVL" -le 1 -a \( -z "$SSH_TTY" -o "$TERM
   /usr/games/fortune
 fi
 
-if [ -f "$HOME/.hushlogin" -a -f "$MAIL" ]; then
+if [ -f "$HOME/.hushlogin" ]; then
   if [ -x /usr/bin/finger ]; then
     finger $LOGNAME | grep '^New mail' >/dev/null 2>&1 && echo "You have new mail."
-  else
+  elif [ -f "$MAIL" ]; then
     find "$MAIL" -newerma "$MAIL" -exec echo 'You have new mail.' \;
   fi
 fi
