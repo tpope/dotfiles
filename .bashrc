@@ -18,8 +18,8 @@ set -o noclobber
 export HISTCONTROL=ignoredups
 unset HISTFILE
 
-if [ -x "$HOME/bin/tpope" ]; then
-  hostcolor=`"$HOME/bin/tpope" hostman ansi`
+if [ -x "$HOME/bin/tpope-host" ]; then
+  hostcolor=`tpope-host ansi`
 else
   hostcolor="01;37"
 fi
@@ -78,7 +78,7 @@ _tpope() {
     local selector=$(egrep "^  ([a-z-]*[|])*$sub([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/bin/$cmd" | sed -e 's/.*# *//')
     case "$selector" in
       hosts|ssh)
-        COMPREPLY=($(compgen -W "localhost $(tpope hostman list)" "$cur")) ;;
+        COMPREPLY=($(compgen -W "localhost $(tpope-host list)" "$cur")) ;;
       services)
         _services ;;
       directories)

@@ -51,7 +51,7 @@ if ( -x /usr/bin/lesspipe ) then
 else
   setenv LESSOPEN '|"$HOME/.lessfilter" %s'
 endif
-if ( ! $?HOST ) set HOST = `tpope hostman name`
+if ( ! $?HOST ) set HOST = `tpope-host name`
 setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
@@ -75,8 +75,8 @@ else
 endif
 
 if ( $?tcsh ) then
-  if ( -x "$HOME/bin/tpope" ) then
-    set hostcolor = `$HOME/bin/tpope hostman ansi`
+  if ( -x "$HOME/bin/tpope-host" ) then
+    set hostcolor = `tpope-host ansi`
   else
     set hostcolor = `00;33`
   endif

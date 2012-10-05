@@ -36,8 +36,8 @@ _git_prompt_info() {
 
 autoload -Uz colors && colors
 
-if [ -x "$HOME/bin/tpope" ]; then
-  hostcolor=$'\e['`$HOME/bin/tpope hostman ansi`m
+if [ -x "$HOME/bin/tpope-host" ]; then
+  hostcolor=$'\e['`tpope-host ansi`m
 else
   hostcolor=$'\e[01;37m'
 fi
@@ -139,9 +139,9 @@ periodic() { rehash }
 # }}}1
 # Named directories {{{1
 
-boxen=(`tpope hostman list`)
+hosts=(`tpope-host list`)
 local host
-for host in $boxen; do
+for host in $hosts; do
   [ "$host" != "$HOST" ] && family=($family $host)
   if [ -L "$HOME/homes/$host" ]; then
     typeset $host="$HOME/homes/$host"
@@ -199,7 +199,7 @@ zstyle ':completion::complete:*:(all-|)files' ignored-patterns '*\~'
 zstyle ':completion::complete:*' ignore-parents parent pwd
 zstyle ':completion::complete:rm::(all-|)files' ignored-patterns
 # zstyle ':completion:*' group-name ''
-zstyle ':completion:*' hosts localhost $boxen tpope.dyndns.org
+zstyle ':completion:*' hosts localhost $hosts
 zstyle ':completion:*' urls http://tpo.pe/ http://www.google.com/ https://github.com/
 zstyle ':completion:*' insert-unambiguous true
 # NO NO NO!!! This makes things SLOW
