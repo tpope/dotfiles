@@ -45,6 +45,8 @@ TerminalApplication=\$HOME/bin/x-terminal-emulator
 EOF
   hidden=1
 fi
+[ -z "$hidden" ] || echo "Creating hidden files."
+
 if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
   globalcfg="`lynx -dump lynxcfg: 2>/dev/null|sed -ne '/^References/,$p'|grep 'file://localhost/'|tail -1|sed -e 's,.*file://localhost,,'`"
   [ -n "$globalcfg" ] || \
@@ -63,7 +65,7 @@ EXTERNAL:file:sensible-browser %s:TRUE
 SAVE_SPACE:~/dl
 STARTFILE:http://www.google.com/
 EOF
-  hidden=1
+  web=1
 fi
 if inpath elinks && [ ! -d "$HOME/.elinks" ]; then
   mkdir "$HOME/.elinks"
@@ -79,7 +81,7 @@ set document.colors.vlink = "fuchsia"
 set document.download.directory = "~/dl"
 set document.plain.display_links = 1
 EOF
-  hidden=1
+  web=1
 elif inpath links && [ ! -d "$HOME/.links" -a ! -d "$HOME/.elinks" ]; then
   mkdir "$HOME/.links"
   cat > "$HOME/.links/links.cfg" <<EOF
@@ -88,23 +90,10 @@ terminal "xterm" 0 0 1 us-ascii
 terminal "screen" 0 0 1 us-ascii
 download_dir "~/dl"
 EOF
-  hidden=1
+  web=1
 fi
-[ -z "$hidden" ] || echo "Creating hidden files."
 
-if [ ! -e "$HOME/dl" ]; then
-  if [ -d "$HOME/Downloads" ]; then
-    ln -s Downloads "$HOME/dl"
-    directories=1
-  elif [ -d "$HOME/.mozilla" -o -f "$HOME/.lynx.cfg" ]; then
-    mkdir "$HOME/dl"
-    chmod 0755 "$HOME/dl"
-    directories=1
-  fi
-fi
-[ -z "$directories" ] || echo "Creating directories."
-
-for dir in .mozilla/firefox; do
+for dir in .mozilla/firefox 'Library/Application Support/Firefox'; do
   [ -d "$HOME/$dir" ] || continue
   if [ -f "$HOME/$dir/profiles.ini" ]; then
     subdirs="`cat "$HOME/$dir/profiles.ini"|grep '^Path='|sed -e 's/^Path=//'`"
@@ -115,25 +104,28 @@ for dir in .mozilla/firefox; do
     subdir="$HOME/$dir/$subdir"
     [ -d "$subdir" ] || continue
     if [ ! -L "$subdir/user.js" ]; then
-      ln -s ../../../.netscape/user.js "$subdir/user.js"
-      links=1
+      ln -s "$HOME/.netscape/user.js" "$subdir/user.js"
+      web=1
     fi
     if [ -d "$subdir/chrome" -a ! -e "$subdir/chrome/userContent.css" -a ! -L "$subdir/chrome/userContent.css" ]; then
-      ln -s ../../../../.netscape/userContent.css "$subdir/chrome/userContent.css"
-      links=1
+      ln -s "$HOME/.netscape/userContent.css" "$subdir/chrome/userContent.css"
+      web=1
     fi
   done
 done
-for bin in sensible-editor sensible-pager; do
-  if [ -f "$HOME/bin/$bin.lnk" -a ! -h "$HOME/bin/$bin.lnk" ]; then
-    rm -f "$HOME/bin/$bin.lnk"
+
+if [ ! -e "$HOME/dl" ]; then
+  if [ -d "$HOME/Downloads" ]; then
+    ln -s Downloads "$HOME/dl"
+    web=1
+  elif [ -d "$HOME/.mozilla" -o -f "$HOME/.lynx.cfg" -o -n "$web" ]; then
+    mkdir "$HOME/dl"
+    chmod 0755 "$HOME/dl"
+    web=1
   fi
-  if [ ! -f "$HOME/bin/$bin" ]; then
-    ln -s tpope "$HOME/bin/$bin"
-    links=1
-  fi
-done
-[ -z "$links" ] || echo "Creating symlinks."
+fi
+
+[ -z "$web" ] || echo "Initializing browser configuration."
 
 if inpath crontab && [ ! -f "$HOME/.sandbox" ]; then
   crontab -l >/tmp/crontab.original.$$ 2>/dev/null
