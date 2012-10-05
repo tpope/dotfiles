@@ -37,14 +37,6 @@ set mail-subdirectory Mail
 EOF
   hidden=1
 fi
-if inpath dcop && [ ! -f "$HOME/.kde/share/config/kdeglobals" ]; then
-  mkdir -p "$HOME/.kde/share/config"
-  cat > "$HOME/.kde/share/config/kdeglobals" <<EOF
-[General]
-TerminalApplication=\$HOME/bin/x-terminal-emulator
-EOF
-  hidden=1
-fi
 [ -z "$hidden" ] || echo "Creating hidden files."
 
 if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
