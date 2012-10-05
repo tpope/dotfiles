@@ -1,3 +1,5 @@
+[advice]
+	statusHints = false
 [alias]
 	one = show -s --pretty='format:%h (%s)'
 	recursive-update = "!sh -c 'find \"${@-.}\" -type d -name .git -exec dirname {} \\; -exec git --git-dir={} remote update \\;' recursive-update"
