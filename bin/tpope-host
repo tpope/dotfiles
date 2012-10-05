@@ -107,12 +107,6 @@ exec_nc() {
       # Debian versions benefit from -q, some others choke on it
       exec nc -q 1 "$1" "$2"
     else
-      # Hack around iTerm and nc stupidity
-      if [ "`uname`" = Darwin ]; then
-        #ls -l /dev/fd >&2
-        #echo "Closing stderr...">&2
-        exec 2>&-
-      fi
       exec nc "$1" "$2"
     fi
   fi
