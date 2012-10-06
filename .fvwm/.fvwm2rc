@@ -259,13 +259,6 @@ Style nedit     UseStyle Editor
 Style emacs     UseStyle Editor
 
 # }}}2
-# Host Specific Styles {{{2
-
-PipeRead "$HOME/bin/tpope host fvwm-styles"
-PipeRead "echo 'Style *localhost UseStyle' \\*@`hostname|sed -e 's/[.].*//'`\\*"
-PipeRead "echo 'Style @localhost UseStyle' @`hostname|sed -e 's/[.].*//'`\\*"
-
-# }}}2
 # Web Browser Styles {{{2
 
 Style www-browser  MiniIcon mini/www.xpm, GrabFocusOff, SkipMapping, Title
@@ -1367,7 +1360,46 @@ Test (x cdcd) + "&Disc Tracks%menu/disk-cd.xpm%" Popup MenuCDTracks
 # }}}2
 # Remote Logins and Screens {{{2
 
-PipeRead "$HOME/bin/tpope host fvwm-menus"
+DestroyMenu MenuFvwmScreens
+DestroyMenu MenuFvwmLogins
+DestroyMenu MenuFvwmTerminals
+AddToMenu MenuFvwmScreens   MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmLogins    MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmTerminals MissingSubmenuFunction FuncMissingHostMenu
+AddToMenu MenuFvwmScreens    "Screen" Title
+AddToMenu MenuFvwmLogins     "Login"  Title
+AddToMenu MenuFvwmTerminals  "Focus"  Title
+AddToMenu MenuFvwmScreens   "& localhost%mini/terminal/left-plain.xpm%"    FuncScreenXTerm
+AddToMenu MenuFvwmLogins    "& localhost%mini/terminal/right-plain.xpm%"   FuncXTerm
+AddToMenu MenuFvwmTerminals "& localhost%mini/terminal/right-plain.xpm%"   FuncFindResource "*@localhost|localhost"
+AddToMenu MenuFvwmScreens    "" Nop
+AddToMenu MenuFvwmLogins     "" Nop
+AddToMenu MenuFvwmTerminals  "" Nop
+
+PipeRead 'for host in `tpope-host list`; do \
+    letter=`tpope-host letter $$host|tr A-Z a-z`; \
+    color=`tpope-host color $$host`; \
+    echo "Style *@$$host* MiniIcon mini/terminal/right-$$color.xpm"; \
+    echo "Style  @$$host* MiniIcon mini/terminal/left-$$color.xpm"; \
+    label=$$host; \
+    if [ -n "$$letter" ]; then \
+        label=`echo $$host | sed -e "s/$$letter/\\&$$letter/"`; \
+        case $$label in *"&"*) ;; *) label="$label(&$letter)" ;; esac; \
+    fi; \
+    echo "AddToMenu MenuFvwmScreens    $$label%mini/terminal/left-$$color.xpm% FuncScreenSshXTerm $host"; \
+    echo "AddToMenu MenuFvwmLogins    $$label%mini/terminal/right-$$color.xpm% FuncSshXTerm $host"; \
+    echo "AddToMenu MenuFvwmTerminals $$label%mini/terminal/right-$$color.xpm% FuncFindXTerm $$host"; \
+done'
+
+PipeRead "echo 'Style *@localhost UseStyle' \\*@$$HOST\\*"
+PipeRead "echo 'Style @localhost UseStyle' @$$HOST\\*"
+
+Test (x avahi-browse) AddToMenu MenuFvwmScreens   "" Nop
+Test (x avahi-browse) AddToMenu MenuFvwmLogins    "" Nop
+Test (x avahi-browse) AddToMenu MenuFvwmTerminals "" Nop
+Test (x avahi-browse) AddToMenu MenuFvwmScreens   "Discovered &. . ." Popup MenuDiscoveredHostsScreenSsh
+Test (x avahi-browse) AddToMenu MenuFvwmLogins    "Discovered &. . ." Popup MenuDiscoveredHostsSsh
+Test (x avahi-browse) AddToMenu MenuFvwmTerminals "Discovered &. . ." Popup MenuDiscoveredHostsFind
 
 # }}}2
 # Fvwm Menus {{{2
