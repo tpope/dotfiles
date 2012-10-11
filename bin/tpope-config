@@ -108,6 +108,7 @@ case "$command" in
       .zsh/functions/_daemons \
       .ssh/authorized_keys2 \
       .zsh/functions/_tpope \
+      .vim/plugin/flatfoot.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
