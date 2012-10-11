@@ -2205,7 +2205,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 *FvwmForm-Run: Input        Host           22      ""
 *FvwmForm-Run: Line         expand
 *FvwmForm-Run: Button       quit    "Run"           ^M
-*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?tpope host ssh $(Host) -t) screen -dRR $[HOST] ;; ???://*|????://*|?????://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
+*FvwmForm-Run: Command      Exec case "$(Program)" in '') exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost) -e $(Host?tpope host ssh $(Host) -t) screen -dRR $[HOST] ;; ???://*|????://*|?????://*|www.*) exec $(Host?ssh -X $(Host)) sensible-browser $(Program) ;; *) exec $(Host?ssh -X $(Host)) $(Program) ;; esac
 # Before saving the data, remove any previously saved data:
 *FvwmForm-Run: Command DestroyModuleConfig FvwmForm-RunDefault: *
 *FvwmForm-Run: Command !(                                      /bin/echo \
@@ -2214,7 +2214,7 @@ DestroyModuleConfig  FvwmForm-Run: *
 ) > ${FVWM_USERDIR}/.FvwmForm-Run
 *FvwmForm-Run: Command !(                                      /bin/echo \
   "# This file last created by FvwmForm-Run on: `/bin/date`."; /bin/echo \
- Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost tpope) -e $(Host?tpope host ssh $(Host) -t) screen -dRR $[HOST] ';; ???://*|????://*|?????://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
+ Exec case '"$(Program)"' in "'')" exec x-terminal-emulator $(Host?-ut -name @$(Host) -T @$(Host))$(Host!-name @localhost -T @localhost) -e $(Host?tpope host ssh $(Host) -t) screen -dRR $[HOST] ';; ???://*|????://*|?????://*|www.*)' exec $(Host?ssh -X $(Host)) sensible-browser '$(Program)' ';; *)' exec $(Host?ssh -X $(Host)) '$(Program)' ';;' esac \
 ) > ${FVWM_USERDIR}/.FvwmForm-RunLast
 
 *FvwmForm-Run: Button       quit    "In Terminal"           ^J
