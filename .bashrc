@@ -58,7 +58,7 @@ esac
 
 case $TERM in
   screen*)
-    PS1="$PS1"'\[\ek'"$ttyat`[ -n "$STY" ] || echo '\h'`"'\e\\\]'
+    PS1="$PS1"'\[\ek'"$ttyat`[ "$STY" -o "$TMUX" ] || echo '\h'`"'\e\\\]'
     ;;
 esac
 

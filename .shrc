@@ -107,7 +107,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
   fi
   case "$TERM" in
     screen*)
-    [ "$STY" ] || h="$hostname"
+    [ "$STY" -o "$TMUX" ] || h="$hostname"
     printf '\033]1;%s@%s\a' "$tty" "$hostname"
     printf '\033k%s@%s\033\\' "$tty" "$h"
     unset h

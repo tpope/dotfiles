@@ -86,7 +86,7 @@ if ( $?tcsh ) then
   switch ($TERM)
 
   case screen*:
-    if ( $?STY ) then
+    if ( $?STY || $?TMUX ) then
       alias precmd 'printf "\033]1;'"i${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\033k'"${ttyat}"'\033\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
     else
       alias precmd 'printf "\033]1;'"i${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\033k'"${ttyat}${HOST}"'\033\\" "`echo $cwd|sed -e s,^$HOME,~,`"'

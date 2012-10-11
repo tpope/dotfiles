@@ -76,7 +76,7 @@ case $TERM in
     PROMPT="${PROMPT//01;3/00;9}"
     precmd() {
       _set_title "$@"
-      if [ "$STY" ]; then
+      if [ "$STY" -o "$TMUX" ]; then
         # print -Pn "\e]1;\a\e]1;@%m\a"
         print -Pn '\ek@\e\\'
       else
@@ -87,7 +87,7 @@ case $TERM in
       _set_title "$@"
       print -n "\ek"
       print -Pnr '%10>..>$1' | tr '\0-\037' '?'
-      if [ "$STY" ]; then
+      if [ "$STY" -o "$TMUX" ]; then
         print -Pn '@\e\\'
       else
         print -Pn '@%m\e\\'

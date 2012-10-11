@@ -4,7 +4,7 @@
 PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
 [ -n "$ENV" ] || ENV="$HOME/.shrc"
 . "$ENV"
-unset STY
+unset STY TMUX
 
 xsetroot -solid '#000420'
 xset r rate 600 30
