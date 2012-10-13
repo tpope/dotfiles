@@ -5,6 +5,7 @@
 #endif
 
 *customization: -color
+*international: true
 !## NETSCAPE {{{1
 Gecko*drawingArea.translations:  #replace    \
 	<Btn6Down>: xfeDoCommand(back)\n\
@@ -333,6 +334,9 @@ XDvi.mainTranslations: #override \
 	<Btn3Down>: magnifier(*3)\n
 !Technically  for xfig
 Fig.inches: true
+! }}}1
+!## XMESSAGE {{{1
+Xmessage.defaultButton: okay
 ! }}}1
 !## XSCREENSAVER {{{1
 XScreenSaver.dpmsEnabled: true
