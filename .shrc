@@ -149,11 +149,11 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     alias wordgrep='cat /usr/share/dict/words|tpope page egrep -i'
 
-    alias start='"$HOME/bin/tpope" service start'
-    alias stop='"$HOME/bin/tpope" service stop'
-    alias restart='"$HOME/bin/tpope" service restart'
-    alias reload='"$HOME/bin/tpope" service reload'
-    alias force-reload='"$HOME/bin/tpope" service force-reload'
+    alias start='"$HOME"/bin/tpope service start'
+    alias stop='"$HOME"/bin/tpope service stop'
+    alias restart='"$HOME"/bin/tpope service restart'
+    alias reload='"$HOME"/bin/tpope service reload'
+    alias force-reload='"$HOME"/bin/tpope service force-reload'
 
     [ "$VISUAL" != vim ] || alias vi='vim'
 
@@ -178,7 +178,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
     unalias gp >/dev/null 2>&1
     for cmd in `tpope aliases`; do
-      alias $cmd="\"\$HOME/bin/tpope\" $cmd"
+      alias $cmd="\"\$HOME\"/bin/tpope $cmd"
     done
 
     set -o emacs -o noclobber >/dev/null 2>&1
