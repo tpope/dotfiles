@@ -5,53 +5,6 @@
 #endif
 
 *international: true
-!## NETSCAPE {{{1
-Gecko*drawingArea.translations:  #replace    \
-	<Btn6Down>: xfeDoCommand(back)\n\
-	<Btn7Down>: xfeDoCommand(forward)\n
-
-Gecko*globalNonTextTranslations: #override\n\
-	<Btn6Down>: xfeDoCommand(back)\n\
-	<Btn7Down>: xfeDoCommand(forward)\n
-
-Netscape*drawingArea.translations:  #replace    \
-	<Btn1Down>:           ArmLink()   \n\
-	<Btn2Down>:           ArmLink()   \n\
-	~Shift<Btn1Up>:       ActivateLink()  \n\
-	~Shift<Btn2Up>:       ActivateLink(new-window)DisarmLink()    \n\
-	Shift<Btn1Up>:        ActivateLink(save-only)DisarmLink()    \n\
-	Shift<Btn2Up>:        ActivateLink(save-only)DisarmLink()    \n\
-	<Btn1Motion>:             DisarmLinkIfMoved()  \n\
-	<Btn2Motion>:             DisarmLinkIfMoved()  \n\
-	<Btn3Motion>:             DisarmLinkIfMoved()  \n\
-	<Motion>:             DescribeLink()  \n\
-	<Btn3Down>:           xfeDoPopup()    \n\
-	<Btn3Up>:             ActivatePopup() \n\
-	Ctrl<Btn4Down>: PageUp()\n\
-	Ctrl<Btn5Down>: PageDown()\n\
-	Shift<Btn4Down>: LineUp()\n\
-	Shift<Btn5Down>: LineDown()\n\
-	None<Btn4Down>: LineUp()LineUp()LineUp()LineUp()LineUp()LineUp()\n\
-	None<Btn5Down>: LineDown()LineDown()LineDown()LineDown()LineDown()LineDown()\n\
-	Alt<Btn4Down>: xfeDoCommand(forward)\n\
-	Alt<Btn5Down>: xfeDoCommand(back)\n\
-	<Btn6Down>: xfeDoCommand(back)\n\
-	<Btn7Down>: xfeDoCommand(forward)\n
-	
-
-Netscape*globalNonTextTranslations: #override\n\
-	Shift<Btn4Down>: LineUp()\n\
-	Shift<Btn5Down>: LineDown()\n\
-	None<Btn4Down>:LineUp()LineUp()LineUp()LineUp()LineUp()LineUp()\n\
-	None<Btn5Down>:LineDown()LineDown()LineDown()LineDown()LineDown()LineDown()\n\
-	Alt<Btn4Down>: xfeDoCommand(forward)\n\
-	Alt<Btn5Down>: xfeDoCommand(back)\n\
-	<Btn6Down>: xfeDoCommand(back)\n\
-	<Btn7Down>: xfeDoCommand(forward)\n
-
-Netscape*documentFonts.sizeIncrement: 20
-Netscape*documentFonts.xResolution*iso-8859-1: 100
-Netscape*documentFonts.yResolution*iso-8859-1: 100
 
 !## TERMINAL COLORS {{{1
 *customization: -color
