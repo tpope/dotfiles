@@ -44,7 +44,7 @@ fi
 
 case "$command" in
   tar)
-    exec tar "$@" -C "$HOME" $files ;;
+    exec tar "$@" -C "$HOME" -X "$HOME/.cvsignore" $files ;;
 
   pull) # hosts
     if [ "$#" = 0 ]; then
@@ -72,7 +72,7 @@ case "$command" in
     ;;
 
   sync) # hosts
-    rsync="rsync -urltRC --exclude='.*.sw?' --exclude='*.local'"
+    rsync="rsync -urltRC"
 
     [ $# -gt 0 ] || set $default_host
     for host in "$@"; do
