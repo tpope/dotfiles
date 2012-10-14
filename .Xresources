@@ -4,7 +4,6 @@
 #define HOME /home/tpope
 #endif
 
-*customization: -color
 *international: true
 !## NETSCAPE {{{1
 Gecko*drawingArea.translations:  #replace    \
@@ -54,6 +53,26 @@ Netscape*documentFonts.sizeIncrement: 20
 Netscape*documentFonts.xResolution*iso-8859-1: 100
 Netscape*documentFonts.yResolution*iso-8859-1: 100
 
+!## TERMINAL COLORS {{{1
+*customization: -color
+*color0:  #000000
+*color1:  #aa0000
+*color2:  #00aa00
+*color3:  #aa5522
+*color4:  #0000aa
+*color5:  #aa00aa
+*color6:  #00aaaa
+*color7:  #aaaaaa
+*color8:  #555555
+*color9:  #ff4444
+*color10: #44ff44
+*color11: #ffff00
+*color12: #4444ff
+*color13: #ff00ff
+*color14: #00ffff
+*color15: #ffffff
+*colorBD: #ffffff
+! }}}1
 !## XTERM {{{1
 XTerm.background:        #000000
 XTerm.VT100.background:  #000000
@@ -66,7 +85,6 @@ XTerm*allowBoldFonts: false
 XTerm*scrollBar:   false
 !XTerm*backarrowKey: false
 XTerm*colorBDMode: true
-XTerm*colorBD:     #ffffff
 XTerm*cursorColor: #c0c090
 XTerm*visualBell: true
 XTerm*eightBitInput: false
@@ -83,22 +101,6 @@ XTerm.VT100.translations: #override \
 	<Key>XF86Forward: string(0x1b) string("[1;2C") \n\
 	<Key>leftanglebracket: string(0x1b) string("[1;2D") \n\
 	<Key>rightanglebracket: string(0x1b) string("[1;2C")
-XTerm*color0:  #000000
-XTerm*color1:  #aa0000
-XTerm*color2:  #00aa00
-XTerm*color3:  #aa5522
-XTerm*color4:  #0000aa
-XTerm*color5:  #aa00aa
-XTerm*color6:  #00aaaa
-XTerm*color7:  #aaaaaa
-XTerm*color8:  #555555
-XTerm*color9:  #ff4444
-XTerm*color10: #44ff44
-XTerm*color11: #ffff00
-XTerm*color12: #4444ff
-XTerm*color13: #ff00ff
-XTerm*color14: #00ffff
-XTerm*color15: #ffffff
 
 #define FIXED -misc-fixed-medium-r
 #define ISOENC iso8859-1
@@ -170,24 +172,6 @@ XTerm*utf8Fonts.font6:  -*-clean-medium-r-normal--12-*-*-*-c-*-UTFENC
 XTerm.fontMenu.font6.Label:   VGA
 XTerm*faceSize: 10
 
-!## XTERM-WHITE {{{1
-XTerm-white*VT100*color0: #ffffff
-XTerm-white*VT100*color1: #ff4444
-XTerm-white*VT100*color2: #44ff44
-XTerm-white*VT100*color3: #ffff00
-XTerm-white*VT100*color4: #4444ff
-XTerm-white*VT100*color5: #ff00ff
-XTerm-white*VT100*color6: #00ffff
-XTerm-white*VT100*color7: #555555
-XTerm-white*VT100*color8: #aaaaaa
-XTerm-white*VT100*color9: #aa0000
-XTerm-white*VT100*color10: #00aa00
-XTerm-white*VT100*color11: #aa5522
-XTerm-white*VT100*color12: #0000aa
-XTerm-white*VT100*color13: #aa00aa
-XTerm-white*VT100*color14: #00aaaa
-XTerm-white*VT100*color15: #000000
-
 !## RXVT {{{1
 #define UNIVGA -bolkhov-vga-medium-r-normal--16-*-*-*-c-80-UTFENC
 #define TERMINUS14 -*-terminus-medium-r-normal--14-*-*-*-c-*-UTFENC
@@ -199,23 +183,6 @@ Rxvt*foreground:   #aaaaaa
 !Rxvt*font:         ISOFONT
 !Rxvt*boldFont:     ISOFONT
 Rxvt*visualBell:   true
-Rxvt*colorBD:      #ffffff
-Rxvt*color0:       #000000
-Rxvt*color1:       #aa0000
-Rxvt*color2:       #00aa00
-Rxvt*color3:       #aa5522
-Rxvt*color4:       #0000aa
-Rxvt*color5:       #aa00aa
-Rxvt*color6:       #00aaaa
-Rxvt*color7:       #aaaaaa
-Rxvt*color8:       #555555
-Rxvt*color9:       #ff4444
-Rxvt*color10:      #44ff44
-Rxvt*color11:      #ffff00
-Rxvt*color12:      #4444ff
-Rxvt*color13:      #ff00ff
-Rxvt*color14:      #00ffff
-Rxvt*color15:      #ffffff
 Rxvt*cursorColor:  #90c090
 URxvt.cursorColor: #90c0c0
 URxvt.underlineColor: #777777
