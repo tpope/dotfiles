@@ -62,6 +62,7 @@ XTerm.VT100.foreground:  #aaaaaa
 XTerm.termName:    xterm-256color
 XTerm*ttyModes:    start ^- stop ^-
 XTerm*boldMode:    false
+XTerm*allowBoldFonts: false
 XTerm*scrollBar:   false
 !XTerm*backarrowKey: false
 XTerm*colorBDMode: true
