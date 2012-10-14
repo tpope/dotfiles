@@ -250,10 +250,6 @@ kterm*cursorColor:#9090c0
 Dtterm*background: #000000
 Dtterm*foreground: #aaaaaa
 
-!## DTSESSION {{{1
-Dtsession*wmStartupCommand: /opt/sfw/bin/fvwm2
-Dtsession*waitWmTimeout: 1
-
 !## XCONSOLE {{{1
 XConsole*file: /dev/xconsole
 XConsole*verbose: true
