@@ -107,18 +107,17 @@ elif [ "$DISPLAY" -a -z "$terminal" ]; then
         disown >/dev/null 2>&1
         sleep 5
         if [ "$new" -a -d "$dir" ]; then
+          echo 'Performing an initial "tpope setup web"'
           if killall $browser-bin 2>/dev/null; then
-            echo 'Performing an initial "tpope install"'
-            sleep 5
+            sleep 2
             find "$dir" \( -name "localstore.rdf" -o -name "bookmarks.html" \) -exec rm {} \;
-            tpope install
+            tpope setup web
             echo 'Restarting browser so changes will take effect'
             nohup nice -n 1 $browser "$@" >/dev/null 2>/dev/null &
             disown >/dev/null 2>&1
             sleep 5
           else
-            echo 'Performing an initial "tpope install"'
-            tpope install
+            tpope setup web
           fi
         fi
         sleep 5

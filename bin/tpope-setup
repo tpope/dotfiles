@@ -16,36 +16,43 @@ if [ "x$1" = "x--cron" -o "x$1" = "x--quiet" ]; then
   quiet=1; exec >/dev/null; shift
 fi
 
-if [ "x$1" = "x--root-only" ]; then
-  echo '--root-only has been removed' >&2
-  exit 1
-fi
+setup_basics() {
 
 if [ ! -f "$HOME/. tpope" -o -r "$HOME/. tpope" ]; then
-  [ -f "$HOME/. tpope" ] || hidden=1
+  [ -f "$HOME/. tpope" ] || basics=1
   touch "$HOME/. tpope"
   chmod 0000 "$HOME/. tpope"
 fi
 if [ ! -f "$HOME/.hushlogin" ]; then
   touch "$HOME/.hushlogin"
-  hidden=1
+  basics=1
 fi
 if [ ! -f "$HOME/.imaprc" ]; then
   cat > "$HOME/.imaprc" <<EOF
 I accept the risk
 set mail-subdirectory Mail
 EOF
-  hidden=1
+  basics=1
 fi
+[ -z "$basics" ] || echo "Initializing basic configuration."
+
+}
+
+setup_gui() {
+
 if inpath dcop && [ ! -f "$HOME/.kde/share/config/kdeglobals" ]; then
   mkdir -p "$HOME/.kde/share/config"
   cat > "$HOME/.kde/share/config/kdeglobals" <<EOF
 [General]
 TerminalApplication=\$HOME/bin/x-terminal-emulator
 EOF
-  hidden=1
+  gui=1
 fi
-[ -z "$hidden" ] || echo "Creating hidden files."
+[ -z "$gui" ] || echo "Initializing GUI configuration."
+
+}
+
+setup_web() {
 
 if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
   globalcfg="`lynx -dump lynxcfg: 2>/dev/null|sed -ne '/^References/,$p'|grep 'file://localhost/'|tail -1|sed -e 's,.*file://localhost,,'`"
@@ -127,6 +134,10 @@ fi
 
 [ -z "$web" ] || echo "Initializing browser configuration."
 
+}
+
+setup_cron() {
+
 if inpath crontab && [ ! -f "$HOME/.sandbox" ]; then
   crontab -l >/tmp/crontab.original.$$ 2>/dev/null
   cron="$?"
@@ -142,7 +153,7 @@ if [ "$cron" = 0 ]; then
   fi
 elif [ "$cron" = n ]; then
   cp /tmp/crontab.original.$$ /tmp/crontab.custom.$$
-  cronmsg="Installing skeleton crontab."
+  cronmsg="Initializing skeleton crontab."
 fi
 if [ "$cron" = 0 -o "$cron" = n ]; then
   if [ -x /bin/bash ]; then
@@ -177,10 +188,73 @@ fi
 rm /tmp/crontab.original.$$
 fi
 
+}
+
+setup_shell() {
+
 zsh="`grep 'zsh$' /etc/shells 2>/dev/null|head -1`"
-if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null && [ ! -f "$HOME/.sandbox" ]; then
+if [ -x "$zsh" ] && grep "^$LOGNAME:" /etc/passwd >/dev/null; then
   if ! grep "^$LOGNAME:.*zsh" /etc/passwd >/dev/null ; then
     echo "Changing login shell."
     chsh -s "$zsh"
   fi
 fi
+
+}
+
+[ $# -gt 0 ] || set -- default
+
+for arg in "$@"; do
+
+case "$arg" in
+
+  default)
+    setup_basics
+    setup_gui
+    setup_web
+    crontab -l 2>/dev/null | grep 'tpope cron' >/dev/null && setup_cron
+    ;;
+
+  sandbox)
+    touch "$HOME/.sandbox"
+    setup_basics
+    setup_gui
+    setup_web
+    ;;
+
+  all)
+    setup_basics
+    setup_gui
+    setup_web
+    setup_cron
+    setup_shell
+    ;;
+
+  basics)
+    setup_basics
+    ;;
+
+  gui)
+    setup_gui
+    ;;
+
+  web)
+    setup_web
+    ;;
+
+  cron)
+    setup_cron
+    ;;
+
+  shell)
+    setup_shell
+    ;;
+
+  *)
+    echo "Unknown setup "$arg". Proceeding with basics only." >&2
+    setup_basics
+    ;;
+
+esac
+
+done
