@@ -78,7 +78,7 @@ if ( $?tcsh ) then
   if ( -x "$HOME/bin/tpope-host" ) then
     set hostcolor = `tpope-host ansi`
   else
-    set hostcolor = `00;33`
+    set hostcolor = '00;33'
   endif
 
   set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
