@@ -84,15 +84,18 @@ if ( $?tcsh ) then
   set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
 
   switch ($TERM)
-
   case screen*:
     if ( $?STY || $?TMUX ) then
-      alias precmd 'printf "\033]1;'"i${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\033k'"${ttyat}"'\033\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
+      set prompt = "%{\ek%l\e\\%}$prompt"
     else
-      alias precmd 'printf "\033]1;'"i${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a\033k'"${ttyat}${HOST}"'\033\\" "`echo $cwd|sed -e s,^$HOME,~,`"'
+      set prompt = "%{\ek%l%m\e\\%}$prompt"
     endif
     breaksw
+  endsw
 
+  switch ($TERM)
+
+  case screen*:
   case xterm*:
   case rxvt*:
   case Eterm*:
@@ -101,7 +104,7 @@ if ( $?tcsh ) then
   case dtterm*:
   case ansi*:
   case cygwin*:
-    alias precmd 'printf "\033]1;'"${ttyat}${HOST}"'\a\033]2;'"${USER}@${HOST}"':%s'"${ttybracket}"'\a" "`echo $cwd|sed -e s,^$HOME,~,`"'
+    set prompt = "%{\e]1;${ttyat}%m\a\e]2;%n@%m:%~${ttybracket}\a%}$prompt"
     breaksw
 
   case linux*:
