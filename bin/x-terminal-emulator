@@ -15,7 +15,7 @@ fi
 [ -n "$XTERM" ] && [ -x "`which $XTERM 2>/dev/null`" ] && exec "$XTERM" "$@"
 
 # NOT exported
-[ -z "$RXVT_SOCKET" ] && RXVT_SOCKET="$HOME/.rxvt-unicode-`hostname`"
+[ -z "$RXVT_SOCKET" ] && RXVT_SOCKET="$HOME/.urxvt/urxvtd-`hostname`"
 if [ -S "$RXVT_SOCKET" -a -x "`which urxvtc 2>/dev/null`" ]; then
   urxvtc --help 2>/dev/null
   [ "$?" = 1 ] && exec urxvtc "$@"
