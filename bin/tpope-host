@@ -104,7 +104,7 @@ exec_nc() {
 case `basename "$0"` in
   ?)
     [ -n "$STY" ] && SCREEN="screen -ln"
-    exec $SCREEN ssh `gethost $hostinfo` "$@"
+    exec $SCREEN ssh `gethost $0` "$@"
     ;;
 esac
 
@@ -222,6 +222,6 @@ case "$1" in
     ;;
 
   *)
-    echo Warning: invalid command "$hostinfo" ;;
+    echo Warning: invalid command "$1" ;;
 
 esac
