@@ -110,20 +110,22 @@ esac
 
 host="`name`"
 case "$1" in
-  name|-h|--hostname) # hosts
+  name) # hosts
     echo `gethost ${2:-$host}`; exit 0 ;;
-  ansi|-c|--host-color) # hosts
+  ansi) # hosts
     getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
   color) # hosts
     getinfo `gethost ${2:-$host}`; echo $hcolor;exit 0 ;;
-  letter|-l|--letter) # hosts
+  letter) # hosts
     getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
-  rgb|-r|--rgb) # hosts
+  rgb|light) # hosts
     getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
-  screen-code|-s|--screen-code) # hosts
+  dark) # hosts
+    getinfo `gethost ${2:-$host}`; echo $hdrgb; exit 0 ;;
+  screen-code) # hosts
     getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
 
-  ssh|-S|--ssh) # ssh
+  shell|ssh) # ssh
     shift
     case "$1" in
       *.*) host="$1";;
@@ -133,7 +135,7 @@ case "$1" in
     exec ssh "$host`suffix $host`" "$@"
     ;;
 
-  batch-ssh|-b|--batch-ssh) # ssh
+  dispatch|batch-ssh) # ssh
     shift
     case "$1" in
       *.*|-*) host="$1" ;;
@@ -143,7 +145,7 @@ case "$1" in
     exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@"
     ;;
 
-  screen-ssh) # hosts
+  screen|screen-ssh) # hosts
     shift
     args=""
     case "$1" in
@@ -157,7 +159,7 @@ case "$1" in
     exec ssh -t "$host`suffix $host`" screen $resume "$@"
     ;;
 
-  tunnel|--tunnel) # hosts
+  tunnel) # hosts
     host="`gethost $2`"
     getinfo $host
     case "`cat /etc/resolv.conf 2>/dev/null`" in
@@ -173,7 +175,7 @@ case "$1" in
     exec ssh -ax home nc "$host" "$3" 2>/dev/null
     ;;
 
-  link|-H) # nothing
+  link) # nothing
     rm -f "$HOME"/bin/[A-Z]
     for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
       ln -s tpope-host "$HOME/bin/$ltr"
@@ -187,12 +189,10 @@ case "$1" in
     done
     ;;
 
-  ruptime|rwho|-u|-w|--ruptime|--rwho)
+  ruptime|rwho)
     PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
     command="$1"; shift
     [ "`uname -s`" != Linux ] || sep='\<'
-    [ "x$command" = x-w -o "x$command" = "x--rwho"    ] && command=rwho
-    [ "x$command" = x-u -o "x$command" = "x--ruptime" ] && command=ruptime
     if [ "$1" = "-p" ]; then
       RUPTIME=cat
       shift
@@ -215,13 +215,16 @@ case "$1" in
     fi
     exit 0
     ;;
-    -*) echo "Usage: `basename "$0"` <command> [hostname]" >&2; exit 1 ;;
-    *) echo Deprecated >&2; gethost ${1:-$host}; exit 1 ;;
-    esac
-    exit 2
+
+  '')
+    echo Deprecated >&2
+    name
+    exit 0
     ;;
 
   *)
-    echo Warning: invalid command "$1" ;;
+    echo "`basename "$0"` $1: unknown command." >&2
+    exit 1
+    ;;
 
 esac
