@@ -294,10 +294,9 @@ case "$basename" in
     fi
     ;;
 
-  sensible-editor)
+  sensible-editor|editor)
     if [ "$DISPLAY" -a ! -t 0 ]; then
       inpath gvim && exec gvim -f "$@"
-      #exit
       term="exec x-terminal-emulator -title Editor -e"
     fi
     if inpath gvim; then
@@ -313,7 +312,7 @@ case "$basename" in
       exit 1
     fi ;;
 
-  e)
+  edit|e)
     gvime_ok() { inpath gvim &&
       gvim --serverlist 2>/dev/null | grep '^E$' >/dev/null; }
     gvim_ok() { inpath gvim &&
@@ -341,9 +340,9 @@ case "$basename" in
       fi ;;
     esac
     if [ -n "$STY" ]; then
-      exec tpope screen -ln -fn -t Editor tpope sensible-editor "$@"
+      exec tpope screen -ln -fn -t Editor tpope editor "$@"
     else
-      exec tpope sensible-editor "$@"
+      exec tpope editor "$@"
     fi
   ;;
 
@@ -354,7 +353,7 @@ case "$basename" in
     mv "$1.$$" "$1"
     ;;
 
-  x-terminal-emulator|xterm) # xterm
+  x-terminal-emulator|terminal|xterm) # xterm
     exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
   host|hostman)
@@ -424,6 +423,9 @@ case "$basename" in
     fi
     echo "$prefix$out"
     ;;
+
+  browser)
+    exec "$HOME/bin/sensible-browser" "$@" ;;
 
   url) # urls
     if [ "$*" = "-" ]; then
