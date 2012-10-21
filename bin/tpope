@@ -321,20 +321,10 @@ case "$basename" in
       :*)
       if gvime_ok; then
         [ -n "$*" ] || exit 0
-        case "`vim --version 2>/dev/null|head -1`" in
-          "VIM - Vi IMproved "[7891]*)
-          exec gvim --servername E --remote-tab "$@" ;;
-          *)
-          exec gvim --servername E --remote "$@" ;;
-        esac
+        exec gvim --servername E --remote-tab "$@"
       elif gvim_ok; then
         [ -n "$*" ] || exit 0
-        case "`vim --version 2>/dev/null|head -1`" in
-          "VIM - Vi IMproved "[7891]*)
-          exec gvim --remote-tab "$@" ;;
-          *)
-          exec gvim --remote "$@" ;;
-        esac
+        exec gvim --remote-tab "$@"
       elif inpath gvim && [ -z "$*" ]; then
         exec gvim --servername e
       fi ;;
