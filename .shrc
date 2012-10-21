@@ -15,8 +15,8 @@ for dir in /bin /usr/bin /usr/ucb /usr/local/bin /opt/local/bin /opt/sfw/bin "$H
 done
 
 case ":$PATH" in
-  *:.git/safe/../../bin:*) ;;
-  *) PATH=".git/safe/../../bin:$PATH" ;;
+  *:.git/bin:*) ;;
+  *) PATH=".git/bin:$PATH" ;;
 esac
 
 for dir in /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/games /usr/bin/surfraw-elvi /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/local/sbin /usr/sbin /sbin /usr/etc; do

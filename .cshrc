@@ -10,6 +10,8 @@ foreach dir ( /usr/bin/X11 /opt/sfw/kde/bin /usr/openwin/bin /usr/dt/bin /usr/ga
   if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
+if ( $PATH !~ *.git/bin:* ) setenv PATH ".git/bin:$PATH"
+
 if ( -f "$HOME/.locale" && ! $?LANG && ! $?LC_ALL ) then
   setenv LANG "`cat ~/.locale`"
 endif
