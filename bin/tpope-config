@@ -48,21 +48,20 @@ case "$command" in
 
   pull) # hosts
     if [ "$#" = 0 ]; then
+      url=http://$default_host/tgz
       if [ -x "`which curl 2>/dev/null`" ]; then
-        webcat="curl -m8 -L -s -S"
+        curl -m8 -L -s -S $url
       elif [ -x "`which wget 2>/dev/null`" ]; then
-        webcat="wget -t1 -T8 -nv -O -"
+        wget -t1 -T8 -qO - $url
       elif [ -x "`which lynx 2>/dev/null`" ]; then
-        webcat="lynx -source"
+        lynx -source $url
       else
-        webcat="ssh $default_host curl -m8 -s -S"
-      fi
-      $webcat http://c.tpo.pe/tgz | tar xzf - -C "$HOME"
-      exec tpope config prune
+        ssh $default_host bin/tpope tar czf -
+      fi | tar xzf - -C "$HOME"
     fi
 
     for host in "$@"; do
-      $RSYNC_RSH "$host" '$HOME/bin/tpope' config tar cf - | tar xf - -C "$HOME"
+      $RSYNC_RSH "$host" bin/tpope config tar cf - | tar xf - -C "$HOME"
     done
     exec tpope config prune
     ;;
