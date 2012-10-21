@@ -63,6 +63,10 @@ RPS1="%(?..(%{"$'\e[01;35m'"%}%?%{$reset_color%}%)%<<)"
 setopt promptsubst
 
 _set_title() {
+  case "$1" in
+    *install*)
+      hash -r ;;
+  esac
   print -Pn '\e]1;%l@%m${1+*}\a'
   print -Pn '\e]2;%n@%m:%~'
   if [ -n "$1" ]; then
