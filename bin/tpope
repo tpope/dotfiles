@@ -362,11 +362,15 @@ case "$basename" in
     exec "$HOME/bin/tpope-media" "$@" ;;
 
   screen)
-  if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
-    TERM=rxvt-unicode
-  fi
-  exec screen "$@"
-  ;;
+    if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
+      TERM=rxvt-unicode
+    fi
+    case "$TERM" in
+      screen*|xterm*|rxvt*)
+        printf '\033]1;@%s\007' `tpope host name` ;;
+    esac
+    exec screen "$@"
+    ;;
 
   sursync|suscp) # rsync
   for arg in "$@"; do
