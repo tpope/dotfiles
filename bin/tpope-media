@@ -3,6 +3,22 @@
 
 # Provides a standard interface for sending commands to various media players.
 
+case "$1" in
+  softer)
+    for sink in `pactl list short sinks|cut -f 1`; do
+      pactl -- set-sink-volume $sink -5%
+    done || amixer set Master 5%-
+    exit 0
+    ;;
+
+  louder)
+    for sink in `pactl list short sinks|cut -f 1`; do
+      pactl -- set-sink-volume $sink +5%
+    done || amixer set Master 5%+
+    exit 0
+    ;;
+esac
+
 mediaaction() {
   if ps x|grep -v grep|grep ' g*mplayer' >/dev/null && [ -p "$HOME/.mplayer/mplayer" ]; then
     exec > "$HOME/.mplayer/mplayer"
