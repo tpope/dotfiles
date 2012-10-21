@@ -73,12 +73,12 @@ elif [ "$DISPLAY" -a -z "$terminal" ]; then
       fi
     done
     if [ -x "`which google-chrome 2>/dev/null`" ] && \
-        pidof google-chrome >/dev/null; then
+        pidof chrome >/dev/null; then
       nice -n 1 google-chrome "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
     fi
-    if [ -x "`which chromium-browser 2>/dev/null`" ] && \
-        pidof chromium-browser >/dev/null; then
-      nice -n 1 chromium-browser "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
+    if [ -x "`which chromium 2>/dev/null`" ] && \
+        pidof chromium >/dev/null; then
+      nice -n 1 chromium "$url" >/dev/null 2>/dev/null && fvwm_find_browser && exit 0
     fi
     if [ -x "`which opera 2>/dev/null`" ] && \
         pidof opera >/dev/null; then
