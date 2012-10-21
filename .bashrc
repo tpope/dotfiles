@@ -62,8 +62,6 @@ case $TERM in
     ;;
 esac
 
-alias sudo='sudo '
-
 [ ! -f /etc/bash_completion ] || . /etc/bash_completion
 
 _tpope() {

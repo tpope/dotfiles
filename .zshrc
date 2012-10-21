@@ -178,8 +178,6 @@ autoload -Uz zmv
 alias zmv='noglob zmv'
 alias ru='noglob ru'
 
-# which sudo >/dev/null && alias sudo='sudo ' # this makes $1 expand as an alias
-
 autoload -Uz zrecompile
 
 # }}}1
