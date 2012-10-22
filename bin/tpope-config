@@ -98,7 +98,6 @@ case "$command" in
     rm -rf \
       .fvwm/FvwmScript-Alert .fvwm/FvwmScript-Date .fvwm/FvwmScript-Time \
       bin/hostinfo \
-      .git_template/info/exclude \
       .fvwm/.fvwm-menu-headlines/extension.pl \
       .Eterm .terminfo/E \
       .terminfo/x/78 \
