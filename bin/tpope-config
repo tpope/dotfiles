@@ -109,6 +109,7 @@ case "$command" in
       .zsh/functions/_tpope \
       .vim/plugin/flatfoot.vim \
       .vim/plugin/pastie.vim \
+      .vim/templates/Makefile \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
