@@ -1,6 +1,8 @@
 #!/bin/sh
 # vim:set et sw=2:
 
+date
+env
 PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
 [ -n "$ENV" ] || ENV="$HOME/.shrc"
 . "$ENV"
