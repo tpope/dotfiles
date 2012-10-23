@@ -4,24 +4,6 @@
 # Handles everything to do with hostnames, particularly colorizing them in
 # shell prompts.
 
-PATH="/bin:/usr/bin:/usr/local/bin:$HOME/bin"
-hosts="renly balon brandon drogo lyanna rhaegar varys tywin"
-
-gethost() {
-  case "$1" in
-  [Rr]|renly*)                  echo renly ;;
-  [Nn]|balon*)                  echo balon ;;
-  [Gg]|gideon*|rhaegar*)        echo rhaegar ;;
-  [Ll]|ucas*|lyanna*)           echo lyanna ;;
-  [Mm]|matthew*|brandon*)       echo brandon ;;
-  [Oo]|todd*|drogo*)            echo drogo ;;
-  [Tt]|tywin*)                  echo tywin ;;
-  [Yy]|roxy*|varys*)            echo varys ;;
-  ?)                            echo localhost ;;
-  *) echo "$1" ;;
-esac
-}
-
 name() {
   if [ -n "$COMPUTERNAME" ]; then
     # Windows
@@ -29,25 +11,42 @@ name() {
   elif [ -r /proc/sys/kernel/hostname ]; then
     cat /proc/sys/kernel/hostname
   else
-    hostname | sed -e 's/\..*//'
+    hostname | cut -d. -f1
   fi
 }
 
-getinfo() {
-  `echo $1|tr A-Z.- a-z__` 2>/dev/null || unknown
-  case "$TERM" in screen*|xterm-*|rxvt-unicode) hterm="`echo $hterm|sed -e 's/01;3/00;9/'`" ;;
-  esac
+awkhost='
+ $1 == "Host" {
+   me = 0;
+   for (i=2;i<=NF;i++) {
+     gsub(/[.]/, "\\.", $i);
+     gsub(/[*]/, ".*", $i);
+     if (host ~ "^" $i "$")
+       me = 1
+   }
+ }
+'
+
+normalize() {
+  if [ localhost = "$1" -o - = "$1" -o -z "$1" ]; then
+    name
+  else
+    echo "$1"
+  fi
 }
 
-renly()       { hcolor=cyan;   $hcolor;hltr=R;hdom=tpope.us;}
-balon()       { hcolor=brown;  $hcolor;hltr=N;hdom=tpope.us;}
-brandon()     { hcolor=lime;   $hcolor;hltr=M;hdom=tpope.us;}
-drogo()       { hcolor=purple; $hcolor;hltr=O;hdom=tpope.us;}
-lyanna()      { hcolor=red;    $hcolor;hltr=L;hdom=tpope.us;}
-rhaegar()     { hcolor=navy;   $hcolor;hltr=G;hdom=tpope.us;}
-tywin()       { hcolor=magenta;$hcolor;hltr=T;hdom=tpope.us;}
-varys()       { hcolor=green;  $hcolor;hltr=Y;hdom=tpope.net;}
-unknown()     { hcolor=white;  $hcolor;hltr= ;hdom= ;}
+lookup() {
+  awk "$awkhost"' me && $1 == "'"$2"'" { printf("%s", $2); for(i=3;i<=NF;i++) printf(" %s",$i); print(""); fail=0; exit } END { exit fail }' \
+    fail=1 host="`normalize "$1"`" "$HOME/.ssh/config"
+}
+
+getfullname() {
+  lookup "$1" HostName || echo "$1"
+}
+
+getcolor() {
+  lookup "$1" '#Color' || echo white
+}
 
 red()         { hterm="00;31";hscrn="   r";hlrgb="#D47F7F";hdrgb="#550000";}
 green()       { hterm="00;32";hscrn="   g";hlrgb="#7FD47F";hdrgb="#005500";}
@@ -65,114 +64,85 @@ magenta()     { hterm="01;35";hscrn="+b M";hlrgb="#FF7FFF";hdrgb="#800080";}
 cyan()        { hterm="01;36";hscrn="+b C";hlrgb="#7FFFFF";hdrgb="#008080";}
 white()       { hterm="01;37";hscrn="+b W";hlrgb="#FFFFFF";hdrgb="#808080";}
 
-suffix() {
-  domains="`egrep '^search|^domain' /etc/resolv.conf 2>/dev/null`"
-  ifconfig="/sbin/ifconfig"
-  if $ifconfig -a 2>/dev/null|grep ':172\.' >/dev/null 2>&1; then
-    getinfo "$1"
-    case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
-  elif $ifconfig -a 2>/dev/null|grep ':192\.168\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-    getinfo "$1"
-    [ "$hdom" != "tpope.us" ] || suffix=".t"
-  elif $ifconfig -a 2>/dev/null|grep ':10\.' >/dev/null 2>&1 && [ -S "$SSH_AUTH_SOCK" -a "$1" != localhost ]; then
-    suffix=".t"
-  elif [ ! -x $ifconfig -a -x "`which connect 2>/dev/null`" ]; then
-    suffix=".p"
-  else
-    getinfo "$1"
-    case "$domains" in *$hdom*) suffix='' ;; *) suffix=".$hdom" ;; esac
-  fi
-  case "$1" in
-    [1-9]*) echo ;;
-    *) echo $suffix ;;
-  esac
-}
-
-exec_nc() {
-  if [ -x "`which nc 2>/dev/null`" ]; then
-    if [ -x "$HOME/bin/nc" ]; then
-      exec "$HOME/bin/nc" "$1" "$2"
-    elif [ -f /etc/debian_version ]; then
-      # Debian versions benefit from -q, some others choke on it
-      exec nc -q 1 "$1" "$2"
-    else
-      exec nc "$1" "$2"
-    fi
-  fi
-}
-
 case `basename "$0"` in
   ?)
     [ -n "$STY" ] && SCREEN="screen -ln"
-    exec $SCREEN ssh `gethost $0` "$@"
+    exec $SCREEN ssh "$@"
     ;;
 esac
 
-host="`name`"
-case "$1" in
+[ $# -gt 0 ] || exit 1
+
+command="$1"
+shift
+
+case "$command" in
   name) # hosts
-    echo `gethost ${2:-$host}`; exit 0 ;;
+    getfullname $1|cut -d. -f1; exit 0 ;;
   ansi) # hosts
-    getinfo `gethost ${2:-$host}`; echo $hterm; exit 0 ;;
+    `getcolor "$1"`
+    echo $hterm; exit 0 ;;
   color) # hosts
-    getinfo `gethost ${2:-$host}`; echo $hcolor;exit 0 ;;
+    getcolor "$1"
+    ;;
   letter) # hosts
-    getinfo `gethost ${2:-$host}`; echo $hltr;  exit 0 ;;
+    awk -v host="${1:-`name`}" "$awkhost"'me && $1 == "Host" && length($2) == 1 { print $2; exit }' "$HOME/.ssh/config"
+    ;;
   rgb|light) # hosts
-    getinfo `gethost ${2:-$host}`; echo $hlrgb; exit 0 ;;
+    `getcolor "$1"`
+    echo $hlrgb
+    ;;
   dark) # hosts
-    getinfo `gethost ${2:-$host}`; echo $hdrgb; exit 0 ;;
+    `getcolor "$1"`
+    echo $hdrgb
+    ;;
   screen-code) # hosts
-    getinfo `gethost ${2:-$host}`; echo $hscrn; exit 0 ;;
+    `getcolor "$1"`
+    echo $hscrn
+    ;;
 
   shell|ssh) # ssh
-    shift
-    case "$1" in
-      *.*) host="$1";;
-      *) host=`gethost ${1:-$host}` ;;
-    esac
-    shift
-    exec ssh "$host`suffix $host`" "$@"
+    exec ssh "$@"
     ;;
 
   dispatch|batch-ssh) # ssh
-    shift
-    case "$1" in
-      *.*|-*) host="$1" ;;
-      *) host=`gethost ${1:-$host}` ;;
-    esac
-    shift
-    exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$host`suffix $host`" "$@"
+    exec ssh -axqoBatchmode=yes -oSetupTimeOut=30 "$@"
     ;;
 
   screen|screen-ssh) # hosts
-    shift
     args=""
     case "$1" in
-      -*[Rr]*) resume="$1 $host"; shift ;;
+      -*[Rr]*) resume="$1 `name`"; shift ;;
     esac
     case "$1" in
-      *.*) host="$1" ;;
-      *) host=`gethost $1` ;;
+      localhost|-)
+        shift
+        exec tpope screen $resume "$@" ;;
+      -*|'')
+        exec tpope screen $resume "$@" ;;
     esac
+    host="$1"
     shift
-    exec ssh -t "$host`suffix $host`" screen $resume "$@"
+    exec ssh -t "$host" "[ -x bin/tpope ] && exec bin/tpope screen $resume $*; exec screen $resume $*"
     ;;
 
   tunnel) # hosts
-    host="`gethost $2`"
-    getinfo $host
+    fullname="`getfullname "$1"`"
+    domain="`echo "$fullname"|cut -d. -f 2-`"
     case "`cat /etc/resolv.conf 2>/dev/null`" in
-      *$hdom*)
-      if [ -x "`which nc 2>/dev/null`" ]; then
-        exec_nc "$host" "$3"
-      fi
+      *$domain*)
+        [ ! -x "`which nc 2>/dev/null`" ] || exec nc "$fullname" "$2"
       ;;
     esac
-    if [ "$hdom" = tpope.net -a -x "`which nc 2>/dev/null`" ]; then
-      exec_nc "$host.$hdom" "$3"
-    fi
-    exec ssh -ax home nc "$host" "$3" 2>/dev/null
+    cmd="`lookup $fullname ProxyCommand || echo none`"
+    case "$cmd" in
+      none|*tpope?host*)
+        exec nc "$fullname" "$2"
+        ;;
+      *)
+        exec `echo "$cmd"|sed -e s/%h/$fullname/ -e s/%p/$2/`
+        ;;
+    esac
     ;;
 
   link) # nothing
@@ -183,15 +153,13 @@ case "$1" in
     exit 0
     ;;
 
-  list|boxen) # nothing
-    for host in $hosts; do
-      echo $host
-    done
+  list) # nothing
+    awk '$1 == "HostName" { print $2 }' "$HOME/.ssh/config" | cut -d. -f1
+    exit 0
     ;;
 
   ruptime|rwho)
     PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
-    command="$1"; shift
     [ "`uname -s`" != Linux ] || sep='\<'
     if [ "$1" = "-p" ]; then
       RUPTIME=cat
@@ -203,22 +171,16 @@ case "$1" in
       [ -n "$1" ] && shift
     fi
     AWK='{print $1" "$0}'
-    [ "$command" = "rwho" -o "$command" = "-w" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
+    [ "$command" = "rwho" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
     [ -t 1 ] && TERMINAL=1
     if [ "$TERMINAL" ]; then
       $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
-        getinfo `gethost $host` 2>/dev/null || hterm="01;37"
+        `getcolor $host` 2>/dev/null || hterm="01;37"
         echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
       done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
     else
       $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
     fi
-    exit 0
-    ;;
-
-  '')
-    echo Deprecated >&2
-    name
     exit 0
     ;;
 
