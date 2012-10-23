@@ -352,8 +352,6 @@ case "$basename" in
   setup|install)
     if [ -x "$HOME/bin/tpope-setup" ]; then
       exec "$HOME/bin/tpope-setup" "$@"
-    elif [ -x "$HOME/bin/installer" ]; then
-      exec "$HOME/bin/installer" "$@"
     else
       exec "$HOME/bin/tpope-config" pull
     fi ;;
