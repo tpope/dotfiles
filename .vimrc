@@ -168,16 +168,8 @@ function! SL(function)
 endfunction
 
 command! -bar -nargs=1 -complete=file E :exe "edit ".substitute(<q-args>,'\(.*\):\(\d\+\):\=$','+\2 \1','')
-command! -bar -nargs=0 SudoW   :setl nomod|silent exe 'write !sudo tee % >/dev/null'|let &mod = v:shell_error
-command! -bar -nargs=* -bang W :write<bang> <args>
 command! -bar -nargs=0 -bang Scratch :silent edit<bang> \[Scratch]|set buftype=nofile bufhidden=hide noswapfile buflisted
 command! -bar -count=0 RFC     :e http://www.ietf.org/rfc/rfc<count>.txt|setl ro noma
-command! -bar -nargs=* -bang -complete=file Rename :
-      \ let v:errmsg = ""|
-      \ saveas<bang> <args>|
-      \ if v:errmsg == ""|
-      \   call delete(expand("#"))|
-      \ endif
 
 function! Synname()
   if exists("*synstack")
@@ -452,11 +444,6 @@ if has("autocmd")
           \ set ft=sh | 1
 
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf let b:chmod_new="go-rwx"
-    autocmd BufNewFile  * let b:chmod_exe=1
-    autocmd BufWritePre * if exists("b:chmod_exe") |
-          \ unlet b:chmod_exe |
-          \ if getline(1) =~ '^#!' | let b:chmod_new="+x" | endif |
-          \ endif
     autocmd BufWritePost,FileWritePost * if exists("b:chmod_new")|
           \ silent! execute "!chmod ".b:chmod_new." <afile>"|
           \ unlet b:chmod_new|
