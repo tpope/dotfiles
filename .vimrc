@@ -335,41 +335,6 @@ if has("eval")
   command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
 endif
 
-inoremap     <C-X><C-@> <C-A>
-" Emacs style mappings
-inoremap          <C-A> <C-O>^
-cnoremap          <C-A> <Home>
-cnoremap     <C-X><C-A> <C-A>
-" If at end of a line of spaces, delete back to the previous line.
-" Otherwise, <Left>
-inoremap <silent> <C-B> <C-R>=getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<Lt>C-D>\<Lt>Esc>kJs":"\<Lt>Left>"<CR>
-cnoremap          <C-B> <Left>
-" If at end of line, decrease indent, else <Del>
-inoremap <silent> <C-D> <C-R>=col('.')>strlen(getline('.'))?"\<Lt>C-D>":"\<Lt>Del>"<CR>
-cnoremap          <C-D> <Del>
-" If at end of line, fix indent, else <Right>
-inoremap <silent> <C-F> <C-R>=col('.')>strlen(getline('.'))?"\<Lt>C-F>":"\<Lt>Right>"<CR>
-inoremap          <C-E> <End>
-cnoremap          <C-F> <Right>
-noremap!          <M-a> <C-O>(
-map!              <M-b> <S-Left>
-noremap!          <M-d> <C-O>dw
-noremap!          <M-e> <C-O>)
-map!              <M-f> <S-Right>
-noremap!          <M-h> <C-W>
-noremap           <M-l> guiww
-noremap           <M-u> gUiww
-noremap!          <M-l> <Esc>guiw`]a
-noremap!          <M-u> <Esc>gUiw`]a
-noremap!          <M-{> <C-O>{
-noremap!          <M-}> <C-O>}
-if !has("gui_running")
-  silent! exe "set <S-Left>=\<Esc>b"
-  silent! exe "set <S-Right>=\<Esc>f"
-  silent! exe "set <F31>=\<Esc>d"
-  map! <F31> <M-d>
-endif
-
 if has("gui_mac")
   noremap <C-6> <C-^>
 endif
