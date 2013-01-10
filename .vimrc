@@ -328,8 +328,6 @@ function! Run()
 endfunction
 command! -bar Run :execute Run()
 
-  runtime! plugin/matchit.vim
-  runtime! macros/matchit.vim
 endif
 
 " Section: Mappings {{{1
