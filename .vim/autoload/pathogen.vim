@@ -1,6 +1,6 @@
 " pathogen.vim - path option manipulation
 " Maintainer:   Tim Pope <http://tpo.pe/>
-" Version:      2.1
+" Version:      2.2
 
 " Install in ~/.vim/autoload (or ~\vimfiles\autoload).
 "
@@ -30,18 +30,19 @@ endfunction
 " does not end in {} or * is given to pathogen#runtime_prepend_subdirectories()
 " instead.
 function! pathogen#infect(...) abort " {{{1
-  let path = a:0 ? a:1 : 'bundle/{}'
-  if path =~# '^[^\\/]\+$'
-    call s:warn('Change pathogen#infect('.string(path).') to pathogen#infect('.string(path.'/{}').')')
-    call pathogen#incubate(path . '/{}')
-  elseif path =~# '^[^\\/]\+[\\/]\%({}\|\*\)$'
-    call pathogen#incubate(path)
-  elseif path =~# '[\\/]\%({}\|\*\)$'
-    call pathogen#surround(path)
-  else
-    call s:warn('Change pathogen#infect('.string(path).') to pathogen#infect('.string(path.'/{}').')')
-    call pathogen#surround(path . '/{}')
-  endif
+  for path in a:0 ? reverse(copy(a:000)) : ['bundle/{}']
+    if path =~# '^[^\\/]\+$'
+      call s:warn('Change pathogen#infect('.string(path).') to pathogen#infect('.string(path.'/{}').')')
+      call pathogen#incubate(path . '/{}')
+    elseif path =~# '^[^\\/]\+[\\/]\%({}\|\*\)$'
+      call pathogen#incubate(path)
+    elseif path =~# '[\\/]\%({}\|\*\)$'
+      call pathogen#surround(path)
+    else
+      call s:warn('Change pathogen#infect('.string(path).') to pathogen#infect('.string(path.'/{}').')')
+      call pathogen#surround(path . '/{}')
+    endif
+  endfor
   call pathogen#cycle_filetype()
   return ''
 endfunction " }}}1
@@ -166,7 +167,7 @@ endfunction " }}}1
 " Prepend all subdirectories of path to the rtp, and append all 'after'
 " directories in those subdirectories.  Deprecated.
 function! pathogen#runtime_prepend_subdirectories(path) " {{{1
-  call s:warn('Change pathogen#runtime_prepend_subdirectories('.string(source_path).') to pathogen#surround('.string(source_path.'/{}').')')
+  call s:warn('Change pathogen#runtime_prepend_subdirectories('.string(a:path).') to pathogen#surround('.string(a:path.'/{}').')')
   return pathogen#surround(a:path . pathogen#separator() . '{}')
 endfunction " }}}1
 
@@ -205,8 +206,12 @@ endfunction " }}}1
 
 " Deprecated alias for pathogen#incubate().
 function! pathogen#runtime_append_all_bundles(...) abort " {{{1
-  call s:warn('Change pathogen#runtime_append_all_bundles('.string(source_path).') to pathogen#incubate('.string(source_path.'/{}').')')
-  return call('pathogen#incubate', map(copy(a:000, 'v:val . "/{}"'))
+  if a:0
+    call s:warn('Change pathogen#runtime_append_all_bundles('.string(a:1).') to pathogen#incubate('.string(a:1.'/{}').')')
+  else
+    call s:warn('Change pathogen#runtime_append_all_bundles() to pathogen#incubate()')
+  endif
+  return call('pathogen#incubate', map(copy(a:000),'v:val . "/{}"'))
 endfunction
 
 let s:done_bundles = ''
