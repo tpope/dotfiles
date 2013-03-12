@@ -1,6 +1,7 @@
 " sleuth.vim - Heuristically set buffer options
 " Maintainer:   Tim Pope <http://tpo.pe/>
-" Version:      1.0
+" Version:      1.1
+" GetLatestVimScripts: 4375 1 :AutoInstall: sleuth.vim
 
 if exists("g:loaded_sleuth") || v:version < 700 || &cp
   finish
@@ -9,11 +10,13 @@ let g:loaded_sleuth = 1
 
 function! s:guess(lines) abort
   let options = {}
+  let heuristics = {'spaces': 0, 'hard': 0, 'soft': 0}
   let ccomment = 0
+  let podcomment = 0
 
   for line in a:lines
 
-    if line =~# '^\s\+$'
+    if line =~# '^\s*$'
       continue
     endif
 
@@ -27,11 +30,24 @@ function! s:guess(lines) abort
       continue
     endif
 
+    if line =~# '^=\w'
+      let podcomment = 1
+    endif
+    if podcomment
+      if line =~# '^=\%(end\|cut\)\>'
+        let podcomment = 0
+      endif
+      continue
+    endif
+
     let softtab = repeat(' ', 8)
     if line =~# '^\t'
-      let options.expandtab = 0
+      let heuristics.hard += 1
     elseif line =~# '^' . softtab
-      let options.expandtab = 1
+      let heuristics.soft += 1
+    endif
+    if line =~# '^  '
+      let heuristics.spaces += 1
     endif
     let indent = len(matchstr(substitute(line, '\t', softtab, 'g'), '^ *'))
     if indent > 1 && get(options, 'shiftwidth', 99) > indent
@@ -39,6 +55,15 @@ function! s:guess(lines) abort
     endif
 
   endfor
+
+  if heuristics.hard && !heuristics.spaces
+    return {'expandtab': 0, 'shiftwidth': &tabstop}
+  elseif heuristics.soft != heuristics.hard
+    let options.expandtab = heuristics.soft > heuristics.hard
+    if heuristics.hard
+      let options.tabstop = 8
+    endif
+  endif
 
   return options
 endfunction
@@ -77,9 +102,6 @@ function! s:apply_if_ready(options) abort
     for [option, value] in items(a:options)
       call setbufvar('', '&'.option, value)
     endfor
-    if &verbose
-      echomsg string(a:options)
-    endif
     return 1
   endif
 endfunction
@@ -91,10 +113,9 @@ function! s:detect() abort
   endif
   let patterns = s:patterns_for(&filetype)
   call filter(patterns, 'v:val !~# "/"')
-  if !empty(patterns)
-    let pattern = len(patterns) == 1 ? patterns[0] : '{'.join(patterns, ',').'}'
-    let dir = expand('%:p:h')
-    while isdirectory(dir) && dir !=# fnamemodify(dir, ':h')
+  let dir = expand('%:p:h')
+  while isdirectory(dir) && dir !=# fnamemodify(dir, ':h')
+    for pattern in patterns
       for neighbor in split(glob(dir.'/'.pattern), "\n")
         if neighbor !=# expand('%:p')
           call extend(options, s:guess(readfile(neighbor, '', 1024)), 'keep')
@@ -103,9 +124,9 @@ function! s:detect() abort
           return
         endif
       endfor
-      let dir = fnamemodify(dir, ':h')
-    endwhile
-  endif
+    endfor
+    let dir = fnamemodify(dir, ':h')
+  endwhile
   if has_key(options, 'shiftwidth')
     return s:apply_if_ready(extend({'expandtab': 1}, options))
   endif
