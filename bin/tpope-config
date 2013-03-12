@@ -109,6 +109,8 @@ case "$command" in
       .vim/plugin/flatfoot.vim \
       .vim/plugin/pastie.vim \
       .vim/templates/Makefile \
+      .vim/plugin/rails.vim \
+      .vim/autoload/rails.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
