@@ -117,7 +117,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
   esac
   unset tty
 
-  execbin=`echo $0|sed -e 's/^-//' -e 's/\.shrc/_/'`
+  execbin=`echo "$0"|sed -e 's/^-//' -e 's/\.shrc/_/'`
 
   if [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ]; then
     promptchar='#'
@@ -127,7 +127,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     umask 002
   fi
 
-  PS1="$LOGNAME@$hostname `basename $execbin`$promptchar "
+  PS1="$LOGNAME@$hostname `basename "$execbin"`$promptchar "
 
   if [ "`basename "$execbin"`" != sh ]; then
 
