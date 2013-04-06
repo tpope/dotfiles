@@ -197,7 +197,7 @@ zstyle -e ':completion:*' completer '
 zstyle ':completion::prefix:*' completer _complete _ignored:complete
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' glob 1
-zstyle ':completion::complete:*:(all-|)files' ignored-patterns '*\~'
+zstyle ':completion::complete:*:(all-|)files' ignored-patterns '*\~' tags
 zstyle ':completion::complete:*' ignore-parents parent pwd
 zstyle ':completion::complete:rm::(all-|)files' ignored-patterns
 # zstyle ':completion:*' group-name ''
