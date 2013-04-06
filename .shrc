@@ -7,10 +7,7 @@
 
 for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin"; do
   if [ -d "$dir" ]; then
-    case ":$PATH:" in
-      *:"$dir":*) ;;
-      *) PATH="$dir:$PATH" ;;
-    esac
+    PATH="""${dir}:`echo "$PATH"|sed -e "s#${dir}:##"`"
   fi
 done
 
