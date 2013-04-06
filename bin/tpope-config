@@ -9,7 +9,7 @@ base_files="\
 .screenrc .tmux.conf .terminfo/s/screen-256color \
 .terminfo/x/xterm-256color .terminfo/r/rxvt-unicode \
 .vim/after .vim/autoload .vim/colors .vim/plugin .vim/syntax .vim/templates \
-.vimrc .lessfilter .muttrc .urlview .mailcap .curlrc \
+.vimrc .less .lesskey .lessfilter .muttrc .urlview .mailcap .curlrc \
 .gnupg/gpg.conf .ssh/config .ssh/authorized_keys \
 .cvsignore .gitconfig .git_template \
 .xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
