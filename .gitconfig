@@ -6,7 +6,7 @@
 	ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
 	rlog = !sh -c 'git log --color \"$@\"|fmt -s -w 79|less -FRSX' git-rlog
 	summary = log --abbrev-commit --pretty=oneline --author="Tim.Pope" --since=last.mon --reverse
-	trust = !ln -sf ../bin .git
+	trust = "mkdir -p .git/safe"
 [branch]
 	autosetupmerge = always
 	autosetuprebase = always

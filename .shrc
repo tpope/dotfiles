@@ -14,10 +14,7 @@ for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin"; d
   fi
 done
 
-case ":$PATH:" in
-  *:.git/bin:*) ;;
-  *) PATH=".git/bin:$PATH" ;;
-esac
+PATH=".git/safe/../../bin:`echo "$PATH"|sed -e 's,\.git/[^:]*bin:,,g'`"
 
 for dir in /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin; do
   if [ -d "$dir" ]; then

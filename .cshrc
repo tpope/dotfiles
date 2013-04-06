@@ -10,7 +10,7 @@ foreach dir ( /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /us
   if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
-if ( $PATH !~ *.git/bin:* ) setenv PATH ".git/bin:$PATH"
+if ( $PATH !~ *.git/safe/../../bin:* ) setenv PATH ".git/safe/../../bin:$PATH"
 
 if ( -f "$HOME/.locale" && ! $?LANG && ! $?LC_ALL ) then
   setenv LANG "`cat ~/.locale`"
