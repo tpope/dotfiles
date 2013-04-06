@@ -6,7 +6,7 @@
 # a gui browser, and -dump a formatted dump of the website.
 
 [ "$PATH" ] || PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin"
-ulimit -u 384 >/dev/null 2>/dev/null
+ulimit -u 1536 >/dev/null 2>/dev/null
 [ -f "$HOME/.sb.local" ] && . "$HOME/.sb.local"
 
 if [ "$1" = "-T" ]; then

@@ -64,8 +64,8 @@ export RSYNC_RSH LYNX_CFG
 
 ulim="ulimit -S -u"
 $ulim >/dev/null 2>/dev/null || ulim="ulimit -S -p"
-unum=512
-[ -z "$CRON" ] || unum=384
+unum=2048
+[ -z "$CRON" ] || unum=1536
 cunum="`$ulim 2>/dev/null`"
 case "$cunum" in [0-9]*) ;; *) cunum=65535 ;; esac
 [ "$unum" -ge "$cunum" ] || $ulim "$unum" 2>/dev/null
