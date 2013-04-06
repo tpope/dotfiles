@@ -16,12 +16,7 @@ xset dpms 600
 if [ -f "$HOME/.xmodmap" ]; then
   xmodmap "$HOME/.xmodmap"
 else
-  xmodmap -e "keysym Caps_Lock = Control_L"
-  xmodmap -e "keysym Scroll_Lock = Caps_Lock Scroll_Lock"
-  xmodmap -e "clear control"
-  xmodmap -e "clear lock"
-  xmodmap -e "add lock = Caps_Lock"
-  xmodmap -e "add control = Control_L Control_R"
+  setxkbmap -option ctrl:nocaps
 fi
 
 if [ ! -f "$HOME/. tpope" ]; then
