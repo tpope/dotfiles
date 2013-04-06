@@ -68,7 +68,10 @@ function! s:ReadTemplate(type,filename)
   let title    = substitute(name,'_\(.\)',' \u\1','g')
   let name     = substitute(name,'_\(.\)',' \1','g')
   silent! execute '%s/\$\(Id\|Rev\|Revision\):[^$]*\$/$\1$/g'
-  if exists("g:template_email")
+  if !exists("g:template_email")
+    let g:template_email = system('git config --get user.email')[0:-2]
+  endif
+  if !empty(g:template_email)
     call s:Replace('@AUTHOR_EMAIL@','@AUTHOR@ <@EMAIL@>')
     call s:Replace('@EMAIL@',g:template_email)
   else
