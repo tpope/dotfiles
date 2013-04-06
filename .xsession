@@ -3,10 +3,15 @@
 
 date
 env
-PATH="$HOME/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin:/usr/games"
+PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11"
 [ -n "$ENV" ] || ENV="$HOME/.shrc"
 . "$ENV"
+export ENV
 unset STY TMUX
+
+BROWSER="$HOME/bin/sensible-browser"
+TERMINAL="$HOME/bin/x-terminal-emulator"
+export TERMINAL BROWSER
 
 xsetroot -solid '#000420'
 xset r rate 600 30
