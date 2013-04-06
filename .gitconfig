@@ -40,6 +40,8 @@
 [merge "railsschema"]
 	name = newer Rails schema version
 	driver = hookup resolve-schema %A %O %B %L
+[pull]
+	rebase = true
 [push]
 	default = tracking
 [rebase]
