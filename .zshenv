@@ -11,9 +11,10 @@ if [ -f "$HOME/.locale" -a -z "$LANG" -a -z "$LC_ALL" ]; then
   export LANG
 fi
 
-CLASSPATH=.
-[ -d "$HOME/java" ]  && CLASSPATH="$CLASSPATH:$HOME/java"
-[ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java"
+if [ -z "$CLASSPATH" ]; then
+  CLASSPATH=.
+  [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java/*"
+fi
 
 for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
   case ":$PERL5LIB:" in

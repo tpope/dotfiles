@@ -18,8 +18,7 @@ endif
 
 setenv ENV "$HOME/.shrc"
 setenv CLASSPATH '.'
-if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java"
-if ( -d "$HOME/java" )  setenv CLASSPATH "${CLASSPATH}:$HOME/java"
+if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
 setenv RUBYLIB  "$HOME/src/ruby/lib:$HOME/.ruby/lib"
 setenv RUBYOPT "-rtpope"
 setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"

@@ -38,8 +38,7 @@ fi
 
 if [ -z "$CLASSPATH" ]; then
   CLASSPATH=.
-  [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java"
-  [ -d "$HOME/src/java" ]  && CLASSPATH="$CLASSPATH:$HOME/src/java"
+  [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java/*"
   export CLASSPATH
 fi
 
