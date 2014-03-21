@@ -4,9 +4,7 @@
 date
 env
 PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11"
-[ -n "$ENV" ] || ENV="$HOME/.shrc"
-. "$ENV"
-export ENV
+. "$HOME/.zshenv"
 unset STY TMUX
 
 BROWSER="$HOME/bin/sensible-browser"

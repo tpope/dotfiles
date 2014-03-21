@@ -1,15 +1,15 @@
 # ~/.zshrc
 # vim:set et sw=2:
 
-# Environment {{{1
+# External {{{1
 
-export ENV="$HOME/.shrc"
-interactive=1
-. "$ENV"
-unset interactive
+HASHROCKET_DIR="$HOME/src/hashrocket"
+[ ! -r "$HASHROCKET_DIR/dotmatrix/.hashrc" ] || . "$HASHROCKET_DIR/dotmatrix/.hashrc"
 
 [ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
-[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(rbenv init -|grep -v export.PATH)"
+[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(~/.rbenv/bin/rbenv init -)"
+
+. "$HOME/.shrc"
 
 # }}}1
 # Prompt {{{1
@@ -172,7 +172,7 @@ namedir() { export $1=$PWD; : ~$1 }
 # }}}1
 # Aliases {{{1
 
-alias lsd='ls -ld *(-/DN)'
+alias lsd='ls -d *(-/DN)'
 alias b='noglob sensible-browser'
 autoload -Uz zmv
 alias zmv='noglob zmv'

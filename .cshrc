@@ -17,6 +17,7 @@ if ( -f "$HOME/.locale" && ! $?LANG && ! $?LC_ALL ) then
 endif
 
 setenv ENV "$HOME/.shrc"
+setenv BASH_ENV "$HOME/.zshenv"
 setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
 setenv RUBYLIB  "$HOME/src/ruby/lib:$HOME/.ruby/lib"

@@ -1,16 +1,12 @@
-# ~/.bashrc
-# vim:set et sw=2:
+. "$HOME/.zshenv"
 
-[ "$PS1" ] && interactive=1
-export ENV="$HOME/.shrc"
-. "$ENV"
-unset interactive
+HASHROCKET_DIR="$HOME/src/hashrocket"
+[ ! -r "$HASHROCKET_DIR/dotmatrix/.hashrc" ] || . "$HASHROCKET_DIR/dotmatrix/.hashrc"
 
 [ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
-[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(rbenv init -|grep -v export.PATH)"
+[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(~/.rbenv/bin/rbenv init -)"
 
-if [ "$PS1" ]; then
-# If running interactively, then:
+. "$HOME/.shrc"
 
 shopt -s extglob 2>/dev/null
 set -o noclobber
@@ -95,5 +91,3 @@ complete -F _tpope tpope
 complete -F _services start stop restart reload force-reload
 
 unset hostcolor usercolor dircolor ttybracket ttyat
-
-fi

@@ -1,77 +1,10 @@
-# ~/.shrc
-# vim: set ft=sh et sw=2:
+#! sh
 
-# This location of this file is normally in $ENV, so that it is sourced by the
-# bourne shell on startup.  It is also sourced by zsh, bash, and ksh, from
-# .zshrc, .bashrc, and .profile, respectively.
+. "$HOME/.zshenv"
 
-for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin"; do
-  if [ -d "$dir" ]; then
-    PATH="""${dir}:`echo "$PATH"|sed -e "s#${dir}:##"`"
-  fi
-done
+if [ -n "$PS1" ]; then
 
-PATH=".git/safe/../../bin:`echo "$PATH"|sed -e 's,\.git/[^:]*bin:,,g'`"
-
-for dir in /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin; do
-  if [ -d "$dir" ]; then
-    case ":$PATH:" in
-      *:"$dir":*) ;;
-      *) PATH="$PATH:$dir" ;;
-    esac
-  fi
-done
-
-HASHROCKET_DIR="$HOME/src/hashrocket"
-[ ! -r "$HASHROCKET_DIR/dotmatrix/.hashrc" ] || . "$HASHROCKET_DIR/dotmatrix/.hashrc"
-
-if [ -z "$LANG" -a -z "$LC_ALL" -a -f "$HOME/.locale" ]; then
-  LANG=`cat "$HOME/.locale"`
-  export LANG
-fi
-
-if [ -z "$CLASSPATH" ]; then
-  CLASSPATH=.
-  [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java/*"
-  export CLASSPATH
-fi
-
-RUBYLIB="$HOME/src/ruby/lib:$HOME/.ruby/lib"
-RUBYOPT=-rtpope
-export RUBYLIB RUBYOPT
-
-if [ -z "$PERL5LIB" ]; then
-  for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
-    case ":$PERL5LIB:" in
-      *:"$dir":*) ;;
-      *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB:$dir"
-    esac
-  done
-  PERL5LIB="`echo "$PERL5LIB"|sed -e 's/^://'`"
-  export PERL5LIB
-fi
-
-hostname="`(hostname 2>/dev/null || cat /proc/sys/kernel/hostname)|sed -e 's/\..*//'`"
-RSYNC_RSH='ssh -axqoBatchmode=yes'
-LYNX_CFG="$HOME/.lynx.cfg"
-export RSYNC_RSH LYNX_CFG
-
-ulim="ulimit -S -u"
-$ulim >/dev/null 2>/dev/null || ulim="ulimit -S -p"
-unum=2048
-[ -z "$CRON" ] || unum=1536
-cunum="`$ulim 2>/dev/null`"
-case "$cunum" in [0-9]*) ;; *) cunum=65535 ;; esac
-[ "$unum" -ge "$cunum" ] || $ulim "$unum" 2>/dev/null
-unset ulim unum cunum
-
-if [ -t 1 ]; then
-
-RSYNC_RSH='ssh -ax'
-
-if [ "$interactive" -o "$_" = "interactive" ] || \
-  echo $0|\grep '^[^.]*sh[0-9.-]*$' >/dev/null; then
-
+  hostname="`(hostname 2>/dev/null || cat /proc/sys/kernel/hostname)|sed -e 's/\..*//'`"
   [ "$TERM" != linux ] || TMOUT=43200
 
   if [ -x "`which vim 2>/dev/null`" ]; then
@@ -140,7 +73,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
     alias b='sensible-browser'
     alias mpl='mplayer -fs -loop 0'
 
-    alias wordgrep='cat /usr/share/dict/words|tpope page egrep -i'
+    alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"
 
     alias start='"$HOME"/bin/tpope service start'
     alias stop='"$HOME"/bin/tpope service stop'
@@ -178,8 +111,7 @@ if [ "$interactive" -o "$_" = "interactive" ] || \
 
   fi
   export VISUAL BROWSER PAGER LESS LESSOPEN PS1
-fi
-unset promptchar interactive execbin hostname oldterm dir mtime atime cygwin
+  unset promptchar interactive execbin hostname cygwin
 fi
 
 test -f "$HOME/.shrc.local" && . "$HOME/.shrc.local"

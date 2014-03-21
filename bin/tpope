@@ -17,8 +17,8 @@ case "$PATH" in
   *) PATH="$HOME/bin:$PATH" ;;
 esac
 
-if [ -f "$ENV" ]; then
-  . "$ENV"
+if [ -f "$HOME/.zshenv" ]; then
+  . "$HOME/.zshenv"
 fi
 
 basename=`basename "$0"`

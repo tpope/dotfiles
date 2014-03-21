@@ -167,25 +167,20 @@ fi
 if [ "$cron" = 0 -o "$cron" = n ]; then
   if [ -x /bin/bash ]; then
     shell=/bin/bash
-    env=BASH_ENV
   else
     shell=/bin/sh
-    env=ENV
   fi
-  [ -n "$RUBYLIB" ]   || RUBYLIB="$HOME/src/ruby/lib:$HOME/.ruby/lib"
-  [ ! -f "$HOME/.ruby/lib/tpope.rb" ] || rubyopt="
-RUBYOPT=rtpope"
   cat >/tmp/crontab.template.$$ <<EOF
 # -*- crontab -*- vim:set ft=crontab:
 # crontab for $LOGNAME@$hostname
 CRON=1
 SHELL=$shell
-$env=$HOME/.shrc
+ENV=$HOME/.shrc
+BASH_ENV=$HOME/.zshenv
 PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
-RUBYLIB=$RUBYLIB$rubyopt
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
-20 */4 * * *	tpope cron
+20 * * * *	tpope cron
 EOF
   cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
   if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then
