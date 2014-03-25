@@ -3,9 +3,6 @@
 
 # External {{{1
 
-HASHROCKET_DIR="$HOME/src/hashrocket"
-[ ! -r "$HASHROCKET_DIR/dotmatrix/.hashrc" ] || . "$HASHROCKET_DIR/dotmatrix/.hashrc"
-
 [ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
 [ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(~/.rbenv/bin/rbenv init -)"
 
@@ -135,7 +132,7 @@ fi
 
 setopt histexpiredupsfirst histreduceblanks
 
-fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc ~/.rvm/scripts/zsh/Completion $HASHROCKET_DIR/dotmatrix/.zsh/functions)
+fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc ~/.rvm/scripts/zsh/Completion)
 watch=(notme)
 PERIOD=3600
 periodic() { rehash }
