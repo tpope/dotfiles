@@ -115,6 +115,7 @@ case "$command" in
       .vim/plugin/afterimage.vim \
       .vim/plugin/speeddating.vim \
       .vim/plugin/capslock.vim \
+      .vim/plugin/rake.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
