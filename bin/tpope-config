@@ -112,6 +112,7 @@ case "$command" in
       .vim/templates/Makefile \
       .vim/plugin/rails.vim \
       .vim/autoload/rails.vim \
+      .vim/plugin/afterimage.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
