@@ -113,6 +113,7 @@ case "$command" in
       .vim/plugin/rails.vim \
       .vim/autoload/rails.vim \
       .vim/plugin/afterimage.vim \
+      .vim/plugin/speeddating.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
