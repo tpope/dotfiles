@@ -125,18 +125,10 @@ let g:is_bash = 1
 let g:lisp_rainbow = 1
 let g:markdown_fenced_languages = ['ruby', 'html', 'javascript', 'css', 'erb=eruby.html', 'bash=sh']
 let g:liquid_highlight_types = g:markdown_fenced_languages + ['jinja=liquid', 'html+erb=eruby.html', 'html+jinja=liquid.html']
-let g:netrw_list_hide = '^\.,^tags$'
-let g:ruby_minlines = 500
-let g:rubycomplete_buffer_loading = 1
-let g:rubycomplete_rails = 1
 let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 
 let g:CSApprox_verbose_level = 0
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-let g:miniBufExplForceSyntaxEnable = 1
-let g:NERDCreateDefaultMappings = 0
-let g:NERDSpaceDelims = 1
-let g:NERDShutUp = 1
 let g:NERDTreeHijackNetrw = 0
 let g:paredit_leader = "<Leader>"
 let g:ragtag_global_maps = 1
@@ -144,8 +136,6 @@ let g:space_disable_select_mode = 1
 let g:syntastic_enable_signs = 1
 let g:syntastic_auto_loc_list = 1
 let g:VCSCommandDisableMappings = 1
-let g:Tex_CompileRule_dvi = 'latex -interaction=nonstopmode -src-specials $*'
-let g:Tex_SmartKeyQuote = 0
 let g:showmarks_enable = 0
 let g:surround_{char2nr('-')} = "<% \r %>"
 let g:surround_{char2nr('=')} = "<%= \r %>"
@@ -378,13 +368,11 @@ nmap <silent> <F7> :if exists(':Glcd')<Bar>exe 'Glcd'<Bar>elseif exists(':Rlcd')
 map <F8>    :wa<Bar>make<CR>
 map <F9>    :Run<CR>
 map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
-map <silent> <F11> :if exists(":BufExplorer")<Bar>exe "BufExplorer"<Bar>else<Bar>buffers<Bar>endif<CR>
 map <C-F4>  :bdelete<CR>
 
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
 
-map <Leader>l       <Plug>CapsLockToggle
 imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
 nmap du             <Plug>SpeedDatingNowUTC
@@ -426,8 +414,6 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    autocmd User Rails Rnavcommand steps
-          \ features/step_definitions -suffix=_steps.rb -default=controller()
     autocmd User Fugitive
           \ if filereadable(fugitive#buffer().repo().dir('fugitive.vim')) |
           \   source `=fugitive#buffer().repo().dir('fugitive.vim')` |
@@ -513,16 +499,6 @@ if has("autocmd")
     autocmd User Bundler if &makeprg !~ 'bundle' | setl makeprg^=bundle\ exec\  | endif
     autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % formatoptions+=l
-    autocmd FileType tex if exists("*IMAP")|
-          \ call IMAP('{}','{}',"tex")|
-          \ call IMAP('[]','[]',"tex")|
-          \ call IMAP('{{','{{',"tex")|
-          \ call IMAP('$$','$$',"tex")|
-          \ call IMAP('^^','^^',"tex")|
-          \ call IMAP('::','::',"tex")|
-          \ call IMAP('`/','`/',"tex")|
-          \ call IMAP('`"\','`"\',"tex")|
-          \ endif
     autocmd FileType vbnet        runtime! indent/vb.vim
     autocmd FileType vim  setlocal keywordprg=:help nojoinspaces
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
