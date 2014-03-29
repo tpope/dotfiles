@@ -1,13 +1,12 @@
 $:.unshift(*%w(~/src/ruby/lib ~/.ruby/lib).map {|d| File.expand_path d})
 $:.unshift('.') if $:.delete('.')
 
-Gem.path.grep(/@global$/).each do |gemset|
-  $:.concat(Dir.glob("#{gemset}/gems/*").map { |gem| "#{gem}/lib" })
-end if defined?(Bundler)
-$:.uniq!
-
 begin
   require 'rubygems'
+  Gem.path.grep(/@global$/).each do |gemset|
+    $:.concat(Dir.glob("#{gemset}/gems/*").map { |gem| "#{gem}/lib" })
+  end if defined?(Bundler)
+  $:.uniq!
 rescue LoadError
 end
 
