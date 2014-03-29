@@ -416,7 +416,7 @@ case "$basename" in
     echo "$prefix$out"
     ;;
 
-  browser)
+  browse|browser)
     exec "$HOME/bin/sensible-browser" "$@" ;;
 
   url) # urls

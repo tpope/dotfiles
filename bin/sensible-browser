@@ -14,10 +14,6 @@ if [ "$1" = "-T" ]; then
   terminal=' '
 fi
 
-content_type() {
-  curl -I "$1" 2>/dev/null|grep '^Content-[Tt]ype:'|sed -e 's/^Content-[Tt]ype: *//' -e 's/;.*//'
-}
-
 if [ "$1" = "-dump" ]; then
   shift
   terminal='-dump'
@@ -41,6 +37,8 @@ fi
 fvwm_find_browser() {
   if [ -x "`which FvwmCommand 2>/dev/null`" -a -n "$FVWM_USERDIR" ]; then
     FvwmCommand FuncFindWebBrowser
+  elif [ -x "`which awesome-client 2>/dev/null`" -a -n "$DBUS_SESSION_BUS_ADDRESS" ]; then
+    echo 'browser()' | awesome-client
   fi
   return 0
 }

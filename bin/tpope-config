@@ -14,6 +14,7 @@ base_files="\
 .cvsignore .gitconfig .git_template \
 .xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
 .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-DateTime \
+.config/awesome/rc.lua .config/awesome/theme.lua \
 bin/x-terminal-emulator bin/sensible-browser bin/tpope \
 bin/tpope-config bin/tpope-host bin/tpope-media bin/tpope-setup \
 .ruby/lib/tpope.rb .irbrc .pryrc"

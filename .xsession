@@ -33,18 +33,25 @@ if [ -x /usr/bin/ssh-agent -a -z "$SSH_AUTH_SOCK" ]; then
 fi
 
 [ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
-[ ! -x "`which pulseaudio 2>/dev/null`" ] || pulseaudio &
+if [ -x /usr/bin/gnome-keyring-daemon -a -z "$GNOME_KEYRING_CONTROL" ]; then
+  eval "`gnome-keyring-daemon`"
+fi
+[ ! -x "`which pulseaudio 2>/dev/null`" ] || pulseaudio --start
 [ ! -x "`which bluetooth-applet 2>/dev/null`" ] || bluetooth-applet &
+[ ! -x "`which nm-applet 2>/dev/null`" ] || nm-applet &
+[ ! -x /usr/lib/notify-osd/notify-osd ] || /usr/lib/notify-osd/notify-osd &
+[ ! -x "`which gtk-redshift 2>/dev/null`" ] || gtk-redshift -l 40:-74 -t 6500:3700 &
 
 xsetroot -solid '#000840'
 
 [ ! -f "$HOME/.xsession.local" ] || . "$HOME/.xsession.local"
 
-if [ -n "$GNOME_FVWM" -a -x /usr/bin/fvwm2 -a -x /usr/bin/gnome-session -a -x /usr/bin/gnome-control-center ] && fvwm2 --version >/dev/null 2>&1; then
-  export WINDOW_MANAGER=fvwm2
-  exec $sshagent gnome-session
-fi
+{
+  while xrandr --auto; do
+    sleep 5
+  done
+} &
 
-for wm in fvwm2 icewm startkde fluxbox enlightenment mwm twm xterm; do
+for wm in awesome fvwm2 icewm startkde fluxbox enlightenment mwm twm xterm; do
   [ -x "`which $wm 2>/dev/null`" ] && exec $sshagent $wm
 done
