@@ -497,7 +497,7 @@ if has("autocmd")
     autocmd FileType help nnoremap <silent><buffer> q :q<CR>
     autocmd FileType html setlocal iskeyword+=~
     autocmd FileType java silent! compiler javac | setlocal makeprg=javac\ %
-    autocmd FileType lua  includeexpr=substitute(v:fname,'\\.','/','g').'.lua'
+    autocmd FileType lua  setlocal includeexpr=substitute(v:fname,'\\.','/','g').'.lua'
     autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm gg}' |endif|silent! setlocal spell
     autocmd FileType perl silent! compiler perl
     autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1
