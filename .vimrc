@@ -239,84 +239,39 @@ nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
 nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
 
 function! Run()
-  let old_makeprg = &makeprg
-  let old_errorformat = &errorformat
-  try
-    let cmd = matchstr(getline(1),'^#!\zs[^ ]*')
-    if exists('b:run_command')
-      exe b:run_command
-    elseif cmd != '' && executable(cmd)
-      wa
-      let &makeprg = matchstr(getline(1),'^#!\zs.*').' %'
-      make
-    elseif &ft == 'mail' || &ft == 'text' || &ft == 'help' || &ft == 'gitcommit'
-      setlocal spell!
-    elseif exists('b:rails_root') && exists(':Rake')
-      wa
-      Rake
-    elseif &ft == 'cucumber'
-      wa
-      compiler cucumber
-      make %
-    elseif &ft == 'ruby'
-      wa
-      if executable(expand('%:p')) || getline(1) =~ '^#!'
-        compiler ruby
-        let &makeprg = 'ruby'
-        make %
-      elseif expand('%:t') =~ '_test\.rb$'
-        compiler rubyunit
-        let &makeprg = 'ruby'
-        make %
-      elseif expand('%:t') =~ '_spec\.rb$'
-        compiler rspec
-        let &makeprg = 'rspec'
-        make %
-      elseif &makeprg ==# 'bundle'
-        make
-      elseif executable('pry') && exists('b:rake_root')
-        execute '!pry -I"'.b:rake_root.'/lib" -r"%:p"'
-      elseif executable('pry')
-        !pry -r"%:p"
-      else
-        !irb -r"%:p"
-      endif
-    elseif &ft == 'html' || &ft == 'xhtml' || &ft == 'php' || &ft == 'aspvbs' || &ft == 'aspperl'
-      wa
-      if !exists('b:url')
-        call OpenURL(expand('%:p'))
-      else
-        call OpenURL(b:url)
-      endif
-    elseif &ft == 'vim'
-      w
-      if exists(':Runtime')
-        return 'Runtime %'
-      else
-        unlet! g:loaded_{expand('%:t:r')}
-        return 'source %'
-      endif
-    elseif &ft == 'sql'
-      1,$DBExecRangeSQL
-    elseif expand('%:e') == 'tex'
-      wa
-      exe "normal :!rubber -f %:r && xdvi %:r >/dev/null 2>/dev/null &\<CR>"
-    elseif &ft == 'dot'
-      let &makeprg = 'dotty'
-      make %
+  let cmd = matchstr(getline(1),'^#!\zs[^ ]*')
+  if exists('b:run_command')
+    exe b:run_command
+  elseif cmd != '' && executable(cmd)
+    wa
+    let cmd = matchstr(getline(1),'^#!\zs.*').' %'
+    if exists(':Dispatch')
+      execute 'Dispatch '.cmd
     else
-      wa
-      if &makeprg =~ '%'
-        make
-      else
-        make %
-      endif
+      execute '!'.cmd
     endif
-    return ''
-  finally
-    let &makeprg = old_makeprg
-    let &errorformat = old_errorformat
-  endtry
+  elseif &ft == 'mail' || &ft == 'text' || &ft == 'help' || &ft == 'gitcommit'
+    setlocal spell!
+  elseif exists('b:rails_root') && exists(':Rake')
+    wa
+    Rake
+  elseif &ft == 'ruby' && b:dispatch =~# '-Wc'
+    wa
+    if executable('pry') && exists('b:rake_root')
+      execute '!pry -I"'.b:rake_root.'/lib" -r"%:p"'
+    elseif executable('pry')
+      !pry -r"%:p"
+    else
+      !irb -r"%:p"
+    endif
+  elseif exists('b:dispatch') && b:dispatch =~# '^:.'
+    execute b:dispatch
+  elseif exists(':Dispatch') && exists('b:dispatch')
+    Dispatch
+  elseif exists('b:dispatch')
+    execute '!'.b:dispatch
+  endif
+  return ''
 endfunction
 command! -bar Run :execute Run()
 
@@ -367,7 +322,7 @@ map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
 nmap <silent> <F6> :if &previewwindow<Bar>pclose<Bar>elseif exists(':Gstatus')<Bar>exe 'Gstatus'<Bar>else<Bar>ls<Bar>endif<CR>
 nmap <silent> <F7> :if exists(':Glcd')<Bar>exe 'Glcd'<Bar>elseif exists(':Rlcd')<Bar>exe 'Rlcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
-map <F8>    :wa<Bar>make<CR>
+map <F8>    :wa<Bar>if exists(':Make')<Bar>exe 'Make'<Bar>else<Bar>make<Bar>endif<CR>
 map <F9>    :Run<CR>
 map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
 map <C-F4>  :bdelete<CR>
@@ -416,6 +371,7 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
+    autocmd User Rails let b:dispatch = ':Rake' | let b:start = ':Rserver'
     autocmd User Fugitive
           \ if filereadable(fugitive#buffer().repo().dir('fugitive.vim')) |
           \   source `=fugitive#buffer().repo().dir('fugitive.vim')` |
@@ -435,7 +391,7 @@ if has("autocmd")
           \ unlet b:chmod_new|
           \ endif
 
-    autocmd BufWritePost,FileWritePost ~/.Xdefaults,~/.Xresources silent! !xrdb -load % >/dev/null 2>&1
+    autocmd BufReadPost ~/.Xdefaults,~/.Xresources let b:dispatch = 'xrdb -load %'
     autocmd BufWritePre,FileWritePre /etc/* if &ft == "dns" |
           \ exe "normal msHmt" |
           \ exe "gl/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
@@ -477,32 +433,39 @@ if has("autocmd")
     autocmd FileType apache       setlocal commentstring=#\ %s
     autocmd FileType aspvbs,vbnet setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
     autocmd FileType css  silent! setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType cucumber silent! compiler cucumber | setl makeprg=cucumber\ "%:p" | imap <buffer><expr> <Tab> pumvisible() ? "\<C-N>" : (CucumberComplete(1,'') >= 0 ? "\<C-X>\<C-O>" : (getline('.') =~ '\S' ? ' ' : "\<C-I>"))
+    autocmd FileType cucumber let b:dispatch = 'cucumber %' | imap <buffer><expr> <Tab> pumvisible() ? "\<C-N>" : (CucumberComplete(1,'') >= 0 ? "\<C-X>\<C-O>" : (getline('.') =~ '\S' ? ' ' : "\<C-I>"))
     autocmd FileType git,gitcommit setlocal foldmethod=syntax foldlevel=1
     autocmd FileType gitcommit setlocal spell
     autocmd FileType gitrebase nnoremap <buffer> S :Cycle<CR>
     autocmd FileType help setlocal ai fo+=2n | silent! setlocal nospell
     autocmd FileType help nnoremap <silent><buffer> q :q<CR>
-    autocmd FileType html setlocal iskeyword+=~
-    autocmd FileType java silent! compiler javac | setlocal makeprg=javac\ %
+    autocmd FileType html setlocal iskeyword+=~ | let b:dispatch = ':OpenURL %'
+    autocmd FileType java let b:dispatch = 'javac %'
     autocmd FileType lua  setlocal includeexpr=substitute(v:fname,'\\.','/','g').'.lua'
     autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm gg}' |endif|silent! setlocal spell
-    autocmd FileType perl silent! compiler perl
+    autocmd FileType perl let b:dispatch = 'perl -Wc %'
     autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1
     autocmd FileType ruby setlocal tw=79 comments=:#\  isfname+=:
     autocmd FileType ruby
+          \ let b:start = executable('pry') ? 'pry -r "%:p"' : 'irb -r "%:p"' |
           \ if expand('%') =~# '_test\.rb$' |
-          \   compiler rubyunit | setl makeprg=testrb\ \"%:p\" |
+          \   let b:dispatch = 'testrb %' |
           \ elseif expand('%') =~# '_spec\.rb$' |
-          \   compiler rspec | setl makeprg=rspec\ \"%:p\" |
+          \   let b:dispatch = 'rspec %' |
           \ else |
-          \   compiler ruby | setl makeprg=ruby\ -wc\ \"%:p\" |
+          \   let b:dispatch = 'ruby -wc %' |
           \ endif
-    autocmd User Bundler if &makeprg !~ 'bundle' | setl makeprg^=bundle\ exec\  | endif
     autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak nolist
-    autocmd FileType tex  silent! compiler tex | setlocal makeprg=latex\ -interaction=nonstopmode\ % formatoptions+=l
+    autocmd FileType tex let b:dispatch = 'latex -interaction=nonstopmode %' | setlocal formatoptions+=l
     autocmd FileType vbnet        runtime! indent/vb.vim
-    autocmd FileType vim  setlocal keywordprg=:help nojoinspaces
+    autocmd FileType vim  setlocal keywordprg=:help nojoinspaces |
+          \ if exists(':Runtime') |
+          \   let b:dispatch = ':Runtime' |
+          \   let b:start = ':Runtime|PP' |
+          \ else |
+          \   let b:dispatch = ":unlet! g:loaded_{expand('%:t:r')}|source %" |
+          \ endif
+    autocmd FileType timl let b:dispatch = ':w|source %' | let b:start = b:dispatch . '|TLrepl'
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
