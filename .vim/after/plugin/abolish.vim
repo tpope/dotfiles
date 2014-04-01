@@ -8,6 +8,7 @@ Abolish austrail{a,an,ia,ian}                 austral{ia,ian}
 Abolish cal{a,e}nder{,s}                      cal{e}ndar{}
 Abolish {c,m}arraige{,s}                      {}arriage{}
 Abolish {,in}consistan{cy,cies,t,tly}         {}consisten{}
+Abolish destionation{,s}                      destination{}
 Abolish delimeter{,s}                         delimiter{}
 Abolish {,non}existan{ce,t}                   {}existen{}
 Abolish despara{te,tely,tion}                 despera{}
