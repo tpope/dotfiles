@@ -1,5 +1,4 @@
 " ~/.vimrc
-" vim:set ft=vim et tw=78 sw=2:
 
 if filereadable(expand('~/src/vim/bundle/vim-pathogen/autoload/pathogen.vim'))
   source ~/src/vim/bundle/vim-pathogen/autoload/pathogen.vim
