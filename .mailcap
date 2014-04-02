@@ -1,10 +1,10 @@
 # ~/.mailcap
 
-text/html; sensible-browser '%s'; description="HTML Text"; nametemplate=%s.html
-text/html; sensible-browser -dump '%s'; description="HTML Text"; copiousoutput; nametemplate=%s.html
-text/x-url; sensible-browser `cat '%s'`; description=URL
-text/x-url; sensible-browser -dump `cat '%s'`; description=URL; copiousoutput
-text/xml; sensible-browser '%s'; description="XML Text"; nametemplate=%s.xml; test=test -n "$DISPLAY"
+text/html; tpope browse '%s'; description="HTML Text"; nametemplate=%s.html
+text/html; tpope browse -dump '%s'; description="HTML Text"; copiousoutput; nametemplate=%s.html
+text/x-url; tpope browse `cat '%s'`; description=URL
+text/x-url; tpope browse -dump `cat '%s'`; description=URL; copiousoutput
+text/xml; tpope browse '%s'; description="XML Text"; nametemplate=%s.xml; test=test -n "$DISPLAY"
 text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
 text/richtext; richtext -t; description="Rich Text"; copiousoutput
 text/x-vcalendar; korganizer '%s'; description="vCalendar File"; test=test -n "$DISPLAY"
