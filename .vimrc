@@ -125,7 +125,8 @@ endif
 if v:version >= 700
 let g:is_bash = 1
 let g:lisp_rainbow = 1
-let g:markdown_fenced_languages = ['ruby', 'html', 'javascript', 'css', 'erb=eruby.html', 'bash=sh']
+let g:sh_noisk = 1
+let g:markdown_fenced_languages = ['ruby', 'html', 'javascript', 'css', 'erb=eruby.html', 'bash=sh', 'sh']
 let g:liquid_highlight_types = g:markdown_fenced_languages + ['jinja=liquid', 'html+erb=eruby.html', 'html+jinja=liquid.html']
 let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 
@@ -381,11 +382,10 @@ if has("autocmd")
 
     autocmd BufNewFile */init.d/*
           \ if filereadable("/etc/init.d/skeleton") |
-          \   0r /etc/init.d/skeleton |
-          \   $delete |
-          \   silent! execute "%s/\\$\\(Id\\):[^$]*\\$/$\\1$/eg" |
+          \   keepalt read /etc/init.d/skeleton |
+          \   1delete_ |
           \ endif |
-          \ set ft=sh | 1
+          \ set ft=sh
 
     autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf,*/.pam_environment let b:chmod_new="go-rwx"
     autocmd BufWritePost,FileWritePost * if exists("b:chmod_new")|
@@ -417,6 +417,7 @@ if has("autocmd")
     autocmd FileType xml,xsd,xslt,javascript setlocal ts=2
     autocmd FileType text,txt,mail          setlocal ai com=fb:*,fb:-,n:>
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
+    autocmd FileType sh,zsh,csh,tcsh        let &l:path = substitute($PATH, ':', ',', 'g')
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/env<Space><C-R>=&ft<CR>
     autocmd FileType c,cpp,cs,java,perl,javscript,php,aspperl,tex,css let b:surround_101 = "\r\n}"
     autocmd FileType apache       setlocal commentstring=#\ %s
