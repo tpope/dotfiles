@@ -407,21 +407,7 @@ if has("autocmd")
   augroup END " }}}2
   augroup FTCheck " {{{2
     autocmd!
-    autocmd BufNewFile,BufRead */apache2/[ms]*-*/* set ft=apache
     autocmd BufNewFile,BufRead *named.conf*       set ft=named
-    autocmd BufNewFile,BufRead *.cl[so]           set ft=tex
-    autocmd BufNewFile,BufRead *.vb               set ft=vbnet
-    autocmd BufNewFile,BufRead *.CBL,*.COB,*.LIB  set ft=cobol
-    autocmd BufNewFile,BufRead /var/www/*
-          \ let b:url=expand("<afile>:s?^/var/www/?http://localhost/?")
-    " autocmd BufNewFile,BufRead,StdinReadPost *
-          " \ if !did_filetype() && (getline(1) =~ '^!!\@!'
-          " \   || getline(2) =~ '^!!\@!' || getline(3) =~ '^!'
-          " \   || getline(4) =~ '^!' || getline(5) =~ '^!') |
-          " \   setf router |
-          " \ endif
-    " autocmd BufRead * if ! did_filetype() && getline(1)." ".getline(2).
-    "       \ " ".getline(3) =~? '<\%(!DOCTYPE \)\=html\>' | setf html | endif
     autocmd BufNewFile,BufRead *.txt,README,INSTALL,NEWS,TODO if &ft == ""|set ft=text|endif
   augroup END " }}}2
   augroup FTOptions " {{{2
