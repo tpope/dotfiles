@@ -323,10 +323,10 @@ map <F3>    :cnext<CR>
 map <F4>    :cc<CR>
 map <F5>    :cprev<CR>
 nmap <silent> <F6> :if &previewwindow<Bar>pclose<Bar>elseif exists(':Gstatus')<Bar>exe 'Gstatus'<Bar>else<Bar>ls<Bar>endif<CR>
-nmap <silent> <F7> :if exists(':Glcd')<Bar>exe 'Glcd'<Bar>elseif exists(':Rlcd')<Bar>exe 'Rlcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
-map <F8>    :wa<Bar>if exists(':Make')<Bar>exe 'Make'<Bar>else<Bar>make<Bar>endif<CR>
-map <F9>    :Run<CR>
-map <silent> <F10>   :let tagsfile = tempname()\|silent exe "!ctags -f ".tagsfile." \"%\""\|let &l:tags .= "," . tagsfile\|unlet tagsfile<CR>
+nmap <silent> <F7> :if exists(':Lcd')<Bar>exe 'Lcd'<Bar>elseif exists(':Cd')<Bar>exe 'Cd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
+map <F8>    :Make<CR>
+map <F9>    :Dispatch<CR>
+map <F10>   :Start<CR>
 map <C-F4>  :bdelete<CR>
 
 noremap  <S-Insert> <MiddleMouse>
@@ -393,6 +393,7 @@ if has("autocmd")
           \ unlet b:chmod_new|
           \ endif
 
+    autocmd BufReadPost * if getline(1) =~# '^#!' | let b:dispatch = getline(1)[2:-1] . ' %' | let b:start = b:dispatch | endif
     autocmd BufReadPost ~/.Xdefaults,~/.Xresources let b:dispatch = 'xrdb -load %'
     autocmd BufWritePre,FileWritePre /etc/* if &ft == "dns" |
           \ exe "normal msHmt" |
