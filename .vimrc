@@ -7,7 +7,7 @@ if has("win32")
   let &runtimepath = substitute(&runtimepath,'\(Documents and Settings\|Users\)[\\/][^\\/,]*[\\/]\zsvimfiles\>','.vim','g')
 endif
 silent! execute pathogen#infect("~/src/vim/vendor/{}")
-silent! execute pathogen#infect("~/src/vim/bundle{}")
+silent! execute pathogen#infect("~/src/vim/bundle/{}")
 
 " Section: Options {{{1
 " ---------------------
