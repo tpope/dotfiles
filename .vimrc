@@ -16,7 +16,6 @@ set nocompatible
 set autoindent
 set autowrite       " Automatically save before commands like :next and :make
 set backspace=2
-set backupskip+=*.tmp,crontab.*
 if has("balloon_eval") && has("unix")
   set ballooneval
 endif
@@ -45,8 +44,6 @@ if (&termencoding ==# 'utf-8' || &encoding ==# 'utf-8') && version >= 700
 else
   set listchars=tab:>\ ,trail:-,extends:>,precedes:<
 endif
-set modeline
-set modelines=5     " Debian likes to disable this
 set mousemodel=popup
 set pastetoggle=<F2>
 set scrolloff=1
@@ -85,13 +82,6 @@ if v:version >= 600
   set mouse=nvi
 endif
 
-if v:version < 602 || $DISPLAY =~ '^localhost:' || $DISPLAY == ''
-  set clipboard-=exclude:cons\\\|linux
-  set clipboard+=exclude:cons\\\|linux\\\|screen.*
-  if $TERM =~ '^screen'
-    set mouse=
-  endif
-endif
 
 if !has("gui_running") && $DISPLAY == '' || !has("gui")
   set mouse=
@@ -104,10 +94,6 @@ if $TERM =~ '^screen'
   if $TERM != 'screen.linux' && &t_Co == 8
     set t_Co=16
   endif
-endif
-
-if $TERM == 'xterm-color' && &t_Co == 8
-  set t_Co=16
 endif
 
 if has("dos16") || has("dos32") || has("win32") || has("win64")
@@ -124,7 +110,6 @@ endif
 
 if v:version >= 700
 let g:is_bash = 1
-let g:lisp_rainbow = 1
 let g:sh_noisk = 1
 let g:markdown_fenced_languages = ['ruby', 'html', 'javascript', 'css', 'erb=eruby.html', 'bash=sh', 'sh']
 let g:liquid_highlight_types = g:markdown_fenced_languages + ['jinja=liquid', 'html+erb=eruby.html', 'html+jinja=liquid.html']
@@ -133,11 +118,8 @@ let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 let g:CSApprox_verbose_level = 0
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 let g:NERDTreeHijackNetrw = 0
-let g:paredit_leader = "<Leader>"
 let g:ragtag_global_maps = 1
 let g:space_disable_select_mode = 1
-let g:syntastic_enable_signs = 1
-let g:syntastic_auto_loc_list = 1
 let g:VCSCommandDisableMappings = 1
 let g:showmarks_enable = 0
 let g:surround_{char2nr('-')} = "<% \r %>"
@@ -146,7 +128,6 @@ let g:surround_{char2nr('8')} = "/* \r */"
 let g:surround_{char2nr('s')} = " \r"
 let g:surround_{char2nr('^')} = "/^\r$/"
 let g:surround_indent = 1
-let g:dbext_default_history_file = "/tmp/".$LOGNAME.".dbext_sql_history.txt"
 
 function! s:try(cmd, default)
   if exists(':' . a:cmd) && !v:count
@@ -288,14 +269,11 @@ if has('digraphs')
 endif
 
 nnoremap Y  y$
-nnoremap Q  :<C-U>q<CR>
 if exists(":nohls")
   nnoremap <silent> <C-L> :nohls<CR><C-L>
 endif
 inoremap <C-C> <Esc>`^
 
-nnoremap =p m`=ap``
-" nnoremap == ==
 vnoremap     <M-<> <gv
 vnoremap     <M->> >gv
 vnoremap     <Space> I<Space><Esc>gv
@@ -310,7 +288,6 @@ inoremap <M-I>      <C-O>^
 inoremap <M-A>      <C-O>$
 noremap! <C-J>      <Down>
 noremap! <C-K><C-K> <Up>
-inoremap <CR>       <C-G>u<CR>
 if has("eval")
   command! -buffer -bar -range -nargs=? Slide :exe 'norm m`'|exe '<line1>,<line2>move'.((<q-args> < 0 ? <line1>-1 : <line2>)+(<q-args>=='' ? 1 : <q-args>))|exe 'norm ``'
 endif
@@ -320,15 +297,11 @@ map! <F1>   <Esc>
 if has("gui_running")
   map <F2>  :Fancy<CR>
 endif
-map <F3>    :cnext<CR>
-map <F4>    :cc<CR>
-map <F5>    :cprev<CR>
 nmap <silent> <F6> :if &previewwindow<Bar>pclose<Bar>elseif exists(':Gstatus')<Bar>exe 'Gstatus'<Bar>else<Bar>ls<Bar>endif<CR>
 nmap <silent> <F7> :if exists(':Lcd')<Bar>exe 'Lcd'<Bar>elseif exists(':Cd')<Bar>exe 'Cd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
 map <F8>    :Make<CR>
 map <F9>    :Dispatch<CR>
 map <F10>   :Start<CR>
-map <C-F4>  :bdelete<CR>
 
 noremap  <S-Insert> <MiddleMouse>
 noremap! <S-Insert> <MiddleMouse>
@@ -337,8 +310,6 @@ imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
 nmap du             <Plug>SpeedDatingNowUTC
 nmap dx             <Plug>SpeedDatingNowLocal
-" Merge consecutive empty lines and clean up trailing whitespace
-map <Leader>fm :g/^\s*$/,/\S/-j<Bar>%s/\s\+$//<CR>
 map <Leader>v  :so ~/.vimrc<CR>
 
 inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M:%S","%a, %d %b %Y %H:%M:%S %z","%Y %b %d","%d-%b-%y","%a %b %d %T %Z %Y"],'strftime(v:val)')+[localtime()]),0)<CR>
@@ -347,14 +318,8 @@ inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M
 " --------------------------
 
 if has("autocmd")
-  if $HOME !~# '^/Users/'
-    filetype off " Debian preloads this before the runtimepath is set
-  endif
-  if version>600
-    filetype plugin indent on
-  else
-    filetype on
-  endif
+  filetype plugin indent on
+
   augroup Misc " {{{2
     autocmd!
 
@@ -387,12 +352,6 @@ if has("autocmd")
           \ endif |
           \ set ft=sh
 
-    autocmd BufNewFile */.netrc,*/.fetchmailrc,*/.my.cnf,*/.pam_environment let b:chmod_new="go-rwx"
-    autocmd BufWritePost,FileWritePost * if exists("b:chmod_new")|
-          \ silent! execute "!chmod ".b:chmod_new." <afile>"|
-          \ unlet b:chmod_new|
-          \ endif
-
     autocmd BufReadPost * if getline(1) =~# '^#!' | let b:dispatch = getline(1)[2:-1] . ' %' | let b:start = b:dispatch | endif
     autocmd BufReadPost ~/.Xdefaults,~/.Xresources let b:dispatch = 'xrdb -load %'
     autocmd BufWritePre,FileWritePre /etc/* if &ft == "dns" |
@@ -400,8 +359,6 @@ if has("autocmd")
           \ exe "gl/^\\s*\\d\\+\\s*;\\s*Serial$/normal ^\<C-A>" |
           \ exe "normal g`tztg`s" |
           \ endif
-    autocmd BufReadPre *.pdf setlocal binary
-    " autocmd BufReadCmd *.jar call zip#Browse(expand("<amatch>"))
     autocmd CursorHold,BufWritePost,BufReadPost,BufLeave *
       \ if !$VIMSWAP && isdirectory(expand("<amatch>:h")) | let &swapfile = &modified | endif
   augroup END " }}}2
@@ -421,8 +378,6 @@ if has("autocmd")
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/env<Space><C-R>=&ft<CR>
     autocmd FileType c,cpp,cs,java,perl,javscript,php,aspperl,tex,css let b:surround_101 = "\r\n}"
     autocmd FileType apache       setlocal commentstring=#\ %s
-    autocmd FileType aspvbs,vbnet setlocal comments=sr:'\ -,mb:'\ \ ,el:'\ \ ,:',b:rem formatoptions=crq
-    autocmd FileType css  silent! setlocal omnifunc=csscomplete#CompleteCSS
     autocmd FileType cucumber let b:dispatch = 'cucumber %' | imap <buffer><expr> <Tab> pumvisible() ? "\<C-N>" : (CucumberComplete(1,'') >= 0 ? "\<C-X>\<C-O>" : (getline('.') =~ '\S' ? ' ' : "\<C-I>"))
     autocmd FileType git,gitcommit setlocal foldmethod=syntax foldlevel=1
     autocmd FileType gitcommit setlocal spell
@@ -432,9 +387,7 @@ if has("autocmd")
     autocmd FileType html setlocal iskeyword+=~ | let b:dispatch = ':OpenURL %'
     autocmd FileType java let b:dispatch = 'javac %'
     autocmd FileType lua  setlocal includeexpr=substitute(v:fname,'\\.','/','g').'.lua'
-    autocmd FileType mail if getline(1) =~ '^[A-Za-z-]*:\|^From ' | exe 'norm gg}' |endif|silent! setlocal spell
     autocmd FileType perl let b:dispatch = 'perl -Wc %'
-    autocmd FileType pdf  setlocal foldmethod=syntax foldlevel=1
     autocmd FileType ruby setlocal tw=79 comments=:#\  isfname+=:
     autocmd FileType ruby
           \ let b:start = executable('pry') ? 'pry -r "%:p"' : 'irb -r "%:p"' |
@@ -447,8 +400,7 @@ if has("autocmd")
           \ endif
     autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex let b:dispatch = 'latex -interaction=nonstopmode %' | setlocal formatoptions+=l
-    autocmd FileType vbnet        runtime! indent/vb.vim
-    autocmd FileType vim  setlocal keywordprg=:help nojoinspaces |
+    autocmd FileType vim  setlocal keywordprg=:help |
           \ if exists(':Runtime') |
           \   let b:dispatch = ':Runtime' |
           \   let b:start = ':Runtime|PP' |
