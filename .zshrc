@@ -132,7 +132,7 @@ fi
 
 setopt histexpiredupsfirst histreduceblanks
 
-fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc ~/.rvm/scripts/zsh/Completion)
+fpath=($fpath ~/.zsh/functions ~/.zsh/functions.zwc)
 watch=(notme)
 PERIOD=3600
 periodic() { rehash }
