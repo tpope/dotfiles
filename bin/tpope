@@ -235,17 +235,26 @@ case "$basename" in
     exit 0
   ;;
 
-  runcontrol|service) # services
+  runcontrol) # services
+    echo "Deprecated in favor of tpope service $2 $1" >&2
+    exec "$HOME/bin/tpope" service "$2" "$1"
+    ;;
+
+  service) # services
     root_init
     if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
+      if [ -x /usr/sbin/service ]; then
+        exec /usr/sbin/service "$@"
+      else
         echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
         exit 1
+      fi
     fi
     while [ "$#" -gt 0 ]; do
       if [ -x /usr/sbin/service ]; then
-        as_root /usr/sbin/service "$2" "$1"
+        as_root /usr/sbin/service "$1" "$2"
       else
-        as_root "/etc/init.d/$2" "$1"
+        as_root "/etc/init.d/$1" "$2"
       fi
       shift 2
     done
