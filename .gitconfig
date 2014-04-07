@@ -1,10 +1,10 @@
 [advice]
 	statusHints = false
 [alias]
-	one = show -s --pretty='format:%h (%s)'
-	recursive-update = "!sh -c 'find \"${@-.}\" -type d -name .git -exec dirname {} \\; -exec git --git-dir={} remote update \\;' recursive-update"
 	ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
-	rlog = !sh -c 'git log --color \"$@\"|fmt -s -w 79|less -FRSX' git-rlog
+	one = show -s --pretty='format:%h (%s)'
+	recursive-update = "!sh -c 'find \"${@:-.}\" -type d -name .git -exec dirname {} \\; -exec git --git-dir={} remote update \\;' _"
+	rlog = !sh -c 'git log --color \"$@\"|fmt -s -w 79|less -FRSX' _
 	summary = log --abbrev-commit --pretty=oneline --author="Tim.Pope" --since=last.mon --reverse
 	trust = "!mkdir -p .git/safe .git/$LOGNAME@`tpope host name`"
 [branch]
