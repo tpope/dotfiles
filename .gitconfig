@@ -1,6 +1,7 @@
 [advice]
 	statusHints = false
 [alias]
+	cherry-lick = !sh -c 'hub checkout HEAD^{} -- && hub cherry-pick \"$@\"' _
 	ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
 	one = show -s --pretty='format:%h (%s)'
 	recursive-update = "!sh -c 'find \"${@:-.}\" -type d -name .git -exec dirname {} \\; -exec git --git-dir={} remote update \\;' _"
