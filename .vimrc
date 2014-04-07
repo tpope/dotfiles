@@ -222,43 +222,6 @@ nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
 nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
 nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
 
-function! Run()
-  let cmd = matchstr(getline(1),'^#!\zs[^ ]*')
-  if exists('b:run_command')
-    exe b:run_command
-  elseif cmd != '' && executable(cmd)
-    wa
-    let cmd = matchstr(getline(1),'^#!\zs.*').' %'
-    if exists(':Dispatch')
-      execute 'Dispatch '.cmd
-    else
-      execute '!'.cmd
-    endif
-  elseif &ft == 'mail' || &ft == 'text' || &ft == 'help' || &ft == 'gitcommit'
-    setlocal spell!
-  elseif exists('b:rails_root') && exists(':Rake')
-    wa
-    Rake
-  elseif &ft == 'ruby' && b:dispatch =~# '-Wc'
-    wa
-    if executable('pry') && exists('b:rake_root')
-      execute '!pry -I"'.b:rake_root.'/lib" -r"%:p"'
-    elseif executable('pry')
-      !pry -r"%:p"
-    else
-      !irb -r"%:p"
-    endif
-  elseif exists('b:dispatch') && b:dispatch =~# '^:.'
-    execute b:dispatch
-  elseif exists(':Dispatch') && exists('b:dispatch')
-    Dispatch
-  elseif exists('b:dispatch')
-    execute '!'.b:dispatch
-  endif
-  return ''
-endfunction
-command! -bar Run :execute Run()
-
   0verbose runtime! plugin/matchit.vim
   0verbose runtime! macros/matchit.vim
 endif
