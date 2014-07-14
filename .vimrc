@@ -19,8 +19,8 @@ set backspace=2
 if has("balloon_eval") && has("unix")
   set ballooneval
 endif
-if exists("&breakindent")
-  set breakindent showbreak=+++
+if exists("+breakindent")
+  set breakindent showbreak=\ +
 endif
 set cmdheight=2
 set commentstring=#\ %s
