@@ -8,7 +8,7 @@ base_files="\
 .inputrc .dir_colors \
 .screenrc .tmux.conf .terminfo/s/screen-256color \
 .terminfo/x/xterm-256color .terminfo/r/rxvt-unicode \
-.vim/after .vim/autoload .vim/colors .vim/plugin .vim/syntax .vim/templates \
+.vim/after .vim/autoload .vim/colors .vim/plugin \
 .vimrc .less .lesskey .lessfilter .muttrc .urlview .mailcap .curlrc \
 .gnupg/gpg.conf .ssh/config .ssh/authorized_keys \
 .cvsignore .gitconfig .git_template \
@@ -109,15 +109,16 @@ case "$command" in
       .zsh/functions/_tpope \
       .vim/plugin/flatfoot.vim \
       .vim/plugin/pastie.vim \
-      .vim/templates/Makefile \
       .vim/plugin/rails.vim \
       .vim/autoload/rails.vim \
       .vim/plugin/afterimage.vim \
       .vim/plugin/speeddating.vim \
       .vim/plugin/capslock.vim \
       .vim/plugin/rake.vim \
+      .vim/plugin/ztemplate.vim \
       .vim/syntax/vbnet.vim \
       .vim/syntax/router.vim \
+      .vim/templates \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
