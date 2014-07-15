@@ -116,6 +116,7 @@ case "$command" in
       .vim/plugin/capslock.vim \
       .vim/plugin/rake.vim \
       .vim/plugin/ztemplate.vim \
+      .vim/plugin/fugitive.vim \
       .vim/syntax/vbnet.vim \
       .vim/syntax/router.vim \
       .vim/templates \
