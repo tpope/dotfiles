@@ -308,7 +308,6 @@ if has("autocmd")
             \ let &backupext = strftime(".%Y%m%d%H%M%S~",getftime(expand("<afile>:p")))
     endif
 
-    autocmd User Rails let b:dispatch = ':Rake' | let b:start = ':Rserver'
     autocmd User Fugitive
           \ if filereadable(fugitive#buffer().repo().dir('fugitive.vim')) |
           \   source `=fugitive#buffer().repo().dir('fugitive.vim')` |
@@ -364,7 +363,7 @@ if has("autocmd")
           \   let b:dispatch = 'testrb %' |
           \ elseif expand('%') =~# '_spec\.rb$' |
           \   let b:dispatch = 'rspec %' |
-          \ else |
+          \ elseif !exists('b:dispatch') |
           \   let b:dispatch = 'ruby -wc %' |
           \ endif
     autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak nolist
@@ -376,7 +375,7 @@ if has("autocmd")
           \ else |
           \   let b:dispatch = ":unlet! g:loaded_{expand('%:t:r')}|source %" |
           \ endif
-    autocmd FileType timl let b:dispatch = ':w|source %' | let b:start = b:dispatch . '|TLrepl'
+    autocmd FileType timl let b:dispatch = ':w|source %' | let b:start = b:dispatch . '|TLrepl' | command! -bar -bang Console Wepl
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
   augroup END "}}}2
