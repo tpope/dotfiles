@@ -119,6 +119,7 @@ case "$command" in
       .vim/syntax/vbnet.vim \
       .vim/syntax/router.vim \
       .vim/templates \
+      .vim/after/plugin/abolish.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
