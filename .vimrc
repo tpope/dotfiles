@@ -82,6 +82,11 @@ if v:version >= 600
   set mouse=nvi
 endif
 
+if !empty($SUDO_USER) && $USER !=# $SUDO_USER
+  set viminfo=
+  set directory-=~/tmp
+  set backupdir-=~/tmp
+endif
 
 if !has("gui_running") && $DISPLAY == '' || !has("gui")
   set mouse=
