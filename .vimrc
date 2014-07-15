@@ -185,14 +185,6 @@ function! s:scratch_maps() abort
   nnoremap          <buffer> =f :Scratch<Bar>setfiletype<Space>
 endfunction
 
-function! Synname()
-  if exists("*synstack")
-    return map(synstack(line('.'),col('.')),'synIDattr(v:val,"name")')
-  else
-    return synIDattr(synID(line('.'),col('.'),1),'name')
-  endif
-endfunction
-
 command! -bar Invert :let &background = (&background=="light"?"dark":"light")
 
 function! Fancy()
@@ -235,8 +227,6 @@ nnoremap gA :OpenURL http://www.answers.com/<cword><CR>
 nnoremap gG :OpenURL http://www.google.com/search?q=<cword><CR>
 nnoremap gW :OpenURL http://en.wikipedia.org/wiki/Special:Search?search=<cword><CR>
 
-  0verbose runtime! plugin/matchit.vim
-  0verbose runtime! macros/matchit.vim
 endif
 
 " Section: Mappings {{{1
