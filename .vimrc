@@ -134,6 +134,7 @@ let g:ctrlp_working_path_mode = ''
 let g:NERDTreeHijackNetrw = 0
 let g:ragtag_global_maps = 1
 let g:space_disable_select_mode = 1
+let g:splitjoin_normalize_whitespace = 1
 let g:VCSCommandDisableMappings = 1
 let g:showmarks_enable = 0
 let g:surround_{char2nr('-')} = "<% \r %>"
@@ -277,8 +278,6 @@ noremap! <S-Insert> <MiddleMouse>
 
 imap <C-L>          <Plug>CapsLockToggle
 imap <C-G>c         <Plug>CapsLockToggle
-nmap du             <Plug>SpeedDatingNowUTC
-nmap dx             <Plug>SpeedDatingNowLocal
 map <Leader>v  :so ~/.vimrc<CR>
 
 inoremap <silent> <C-G><C-T> <C-R>=repeat(complete(col('.'),map(["%Y-%m-%d %H:%M:%S","%a, %d %b %Y %H:%M:%S %z","%Y %b %d","%d-%b-%y","%a %b %d %T %Z %Y"],'strftime(v:val)')+[localtime()]),0)<CR>
@@ -292,7 +291,6 @@ if has("autocmd")
   augroup Misc " {{{2
     autocmd!
 
-    autocmd FileType netrw nnoremap <buffer> gr :grep <C-R>=shellescape(fnamemodify(expand('%').'/'.getline('.'),':.'),1)<CR><Home><C-Right> -r<Space>
     autocmd FileType netrw call s:scratch_maps()
     autocmd FileType gitcommit if getline(1)[0] ==# '#' | call s:scratch_maps() | endif
     autocmd FocusLost   * silent! wall
