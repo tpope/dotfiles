@@ -14,16 +14,14 @@ silent! execute pathogen#infect("~/src/vim/bundle/{}")
 
 set nocompatible
 set autoindent
+set autoread
 set autowrite       " Automatically save before commands like :next and :make
 set backspace=2
-if has("balloon_eval") && has("unix")
-  set ballooneval
-endif
-if exists("+breakindent")
+if exists('+breakindent')
   set breakindent showbreak=\ +
 endif
 set cmdheight=2
-set commentstring=#\ %s
+setglobal commentstring=#\ %s
 set complete-=i     " Searching includes can be slow
 set dictionary+=/usr/share/dict/words
 set display=lastline
@@ -31,34 +29,52 @@ if has("eval")
   let &fileencodings = substitute(&fileencodings,"latin1","cp1252","")
 endif
 set fileformats=unix,dos,mac
+set foldmethod=marker
+set foldopen+=jump
+if v:version + has("patch541") >= 704
+  set formatoptions+=j
+endif
 set grepprg=grep\ -rnH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude=tags
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor\ --column
+  if &grepformat !~# '%c'
+    set grepformat^=%f:%l:%c:%m
+  endif
+endif
 if has("eval")
   let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 endif
+set history=200
 set incsearch       " Incremental search
 set laststatus=2    " Always show status line
 set lazyredraw
+set linebreak
 if (&termencoding ==# 'utf-8' || &encoding ==# 'utf-8') && version >= 700
   let &listchars = "tab:\u21e5\u00b7,trail:\u2423,extends:\u21c9,precedes:\u21c7,nbsp:\u26ad"
   let &fillchars = "vert:\u259a,fold:\u00b7"
 else
   set listchars=tab:>\ ,trail:-,extends:>,precedes:<
 endif
+if exists('+macmeta')
+  set macmeta
+endif
+set mouse=nvi
 set mousemodel=popup
 set pastetoggle=<F2>
+set printoptions=paper:letter
 set scrolloff=1
+set shiftround
 set showcmd         " Show (partial) command in status line.
 set showmatch       " Show matching brackets.
+set sidescrolloff=5
 set smartcase       " Case insensitive searches become sensitive with capitals
 set smarttab        " sw at the start of the line, sts everywhere else
 if exists("+spelllang")
   set spelllang=en_us
 endif
 set spellfile=~/.vim/spell/en.utf-8.add
-set splitbelow      " Split windows at bottom
 set statusline=[%n]\ %<%.99f\ %h%w%m%r%{SL('CapsLockStatusline')}%y%{SL('fugitive#statusline')}%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}%*%=%-14.(%l,%c%V%)\ %P
-" set suffixes+=.aux,.dvi,.swo  " Lower priority in wildcards
-set tags+=../tags;/
+setglobal tags=./tags;
 set timeoutlen=1200 " A little bit more time for macros
 set ttimeoutlen=50  " Make Esc work faster
 if exists('+undofile')
@@ -71,16 +87,8 @@ set visualbell
 set virtualedit=block
 set wildmenu
 set wildmode=longest:full,full
-set wildignore+=tags
+set wildignore+=tags,.*.un~,*.pyc
 set winaltkeys=no
-
-if v:version >= 600
-  set autoread
-  set foldmethod=marker
-  set printoptions=paper:letter
-  set sidescrolloff=5
-  set mouse=nvi
-endif
 
 if !empty($SUDO_USER) && $USER !=# $SUDO_USER
   set viminfo=
