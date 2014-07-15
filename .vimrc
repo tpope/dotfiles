@@ -130,6 +130,7 @@ let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
 
 let g:CSApprox_verbose_level = 0
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+let g:ctrlp_working_path_mode = ''
 let g:NERDTreeHijackNetrw = 0
 let g:ragtag_global_maps = 1
 let g:space_disable_select_mode = 1
