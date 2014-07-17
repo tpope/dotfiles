@@ -410,11 +410,7 @@ if (&t_Co > 2 || has("gui_running")) && has("syntax")
   endif
   set list
   if !exists('g:colors_name')
-    if filereadable(expand("~/.vim/colors/tim.vim"))
-      colorscheme tim
-    elseif filereadable(expand("~/.vim/colors/tpope.vim"))
-      colorscheme tpope
-    endif
+    silent! colorscheme tpope
   endif
 
   augroup RCVisual

@@ -8,8 +8,8 @@ base_files="\
 .inputrc .dir_colors \
 .screenrc .tmux.conf .terminfo/s/screen-256color \
 .terminfo/x/xterm-256color .terminfo/r/rxvt-unicode \
-.vim/after .vim/autoload .vim/colors .vim/plugin \
-.vimrc .less .lesskey .lessfilter .muttrc .urlview .mailcap .curlrc \
+.vim/after .vimrc .less .lesskey .lessfilter \
+.muttrc .urlview .mailcap .curlrc \
 .gnupg/gpg.conf .ssh/config .ssh/authorized_keys \
 .cvsignore .gitconfig .git_template \
 .xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
@@ -102,29 +102,17 @@ case "$command" in
       .fvwm/.fvwm-menu-headlines/extension.pl \
       .Eterm .terminfo/E \
       .terminfo/x/78 \
-      .vim/after/syntax/dosbatch.vim \
       .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
       .zsh/functions/_daemons \
       .ssh/authorized_keys2 \
       .zsh/functions/_tpope \
-      .vim/plugin/flatfoot.vim \
-      .vim/plugin/pastie.vim \
-      .vim/plugin/rails.vim \
-      .vim/autoload/rails.vim \
-      .vim/plugin/afterimage.vim \
-      .vim/plugin/speeddating.vim \
-      .vim/plugin/capslock.vim \
-      .vim/plugin/rake.vim \
-      .vim/plugin/ztemplate.vim \
-      .vim/plugin/fugitive.vim \
-      .vim/syntax/vbnet.vim \
-      .vim/syntax/router.vim \
-      .vim/templates \
-      .vim/after/plugin/abolish.vim \
       bin/media \
       bin/installer \
       bin/tpope-hostman \
       bin/sync-tpope
+      if [ -f .vim/plugin/ztemplate.vim ]; then
+        rm -rf .vim/plugin .vim/autoload .vim/colors .vim/syntax .vim/templates
+      fi
     ;;
 
   '')
