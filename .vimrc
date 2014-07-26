@@ -35,12 +35,6 @@ if v:version + has("patch541") >= 704
   set formatoptions+=j
 endif
 set grepprg=grep\ -rnH\ --exclude='.*.swp'\ --exclude='*~'\ --exclude=tags
-if executable('ag')
-  set grepprg=ag\ --nogroup\ --nocolor\ --column
-  if &grepformat !~# '%c'
-    set grepformat^=%f:%l:%c:%m
-  endif
-endif
 if has("eval")
   let &highlight = substitute(&highlight,'NonText','SpecialKey','g')
 endif
