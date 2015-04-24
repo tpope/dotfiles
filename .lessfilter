@@ -6,6 +6,10 @@ if [ -d "$1" ]; then
   else
     CLICOLOR_FORCE=1 exec ls -lF "$1"
   fi
+else
+  case $1 in
+    *.json) if [ -x `which jq 2>/dev/null` ]; then exec jq -C . "$1"; fi ;;
+  esac
 fi
 
 exit 1
