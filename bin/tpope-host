@@ -158,32 +158,6 @@ case "$command" in
     exit 0
     ;;
 
-  ruptime|rwho)
-    PATH=/usr/local/bin:/usr/bin:/bin:/usr/ucb
-    [ "`uname -s`" != Linux ] || sep='\<'
-    if [ "$1" = "-p" ]; then
-      RUPTIME=cat
-      shift
-    elif [ -x "`which $command 2>/dev/null`" -a "`name`" != grex.cyberspace.org ]; then
-      RUPTIME="$command"
-    else
-      RUPTIME="finger $command$1@tpope.us"
-      [ -n "$1" ] && shift
-    fi
-    AWK='{print $1" "$0}'
-    [ "$command" = "rwho" ] && AWK='BEGIN {FS="[ :][ :]*" } {print $2" "$0}'
-    [ -t 1 ] && TERMINAL=1
-    if [ "$TERMINAL" ]; then
-      $RUPTIME "$@"|grep -v '^\[tpope\.net'|awk "$AWK"|while read host line; do
-        `getcolor $host` 2>/dev/null || hterm="01;37"
-        echo "$line"|sed -e 's/'$sep$host'\([: ]\)/\['$hterm'm'$host'\[01;30m\1\[00m/'
-      done|sed -e 's/ up/ \[01;33mup\[00m/' -e 's/ down/ \[01;34mdown\[00m/' -e 's/^tpope /\[01;33mtpope\[00m /g' -e 's/^root /\[01;37mroot\[00m /g'
-    else
-      $RUPTIME "$@"|grep -v '^\[tpope\.net\]'
-    fi
-    exit 0
-    ;;
-
   *)
     echo "`basename "$0"` $1: unknown command." >&2
     exit 1
