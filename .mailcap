@@ -23,7 +23,7 @@ image/*; anytopnm '%s' | pnmscale -xysize 80 46 | ppmtopgm | pgmtopbm | pbmtoasc
 image/x-xpm; vim -R '%s'; edit=vim '%s'; description="XPM Image"; needsterminal
 application/msword; openoffice '%s'\; sleep 1; description="Micro$oft Word Document"; test=test -n "$DISPLAY" -a -x "`which openoffice 2>/dev/null`"
 application/msword; antiword '%s'; description="Micro$oft Word Document"; copiousoutput
-application/x-bittorrent; transmission '%s'; description="BitTorrent File"; test=test -n "$DISPLAY"
+application/x-bittorrent; transmission-remote transmission --add '%s' || transmission-gtk '%s' || xmessage '%s'; description="BitTorrent File"
 #application/excel; openoffice %s
 #application/msexcel; openoffice %s
 #application/vnd.ms-excel; openoffice %s
