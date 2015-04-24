@@ -14,7 +14,7 @@ done
 
 PATH=".git/safe/../../bin:`echo "$PATH"|sed -e 's,\.git/[^:]*bin:,,g'`"
 
-for dir in /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin; do
+for dir in /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin /usr/games; do
   if [ -d "$dir" ]; then
     case ":$PATH:" in
       *:"$dir":*) ;;

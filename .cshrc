@@ -6,7 +6,7 @@
 foreach dir ( /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin" )
   if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
-foreach dir ( /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin )
+foreach dir ( /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin /usr/games )
   if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
 end
 
