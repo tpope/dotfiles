@@ -12,6 +12,7 @@ if [ -n "$PS1" ]; then
   elif [ -x "`which vi 2>/dev/null`" ]; then
     VISUAL=vi
   fi
+  EDITOR="$VISUAL"
   BROWSER="$HOME/bin/sensible-browser"
   [ ! -x "`which less 2>/dev/null`" ] || PAGER=less
   if [ -x /usr/bin/lesspipe ]; then
@@ -111,7 +112,7 @@ if [ -n "$PS1" ]; then
     set -o emacs -o noclobber >/dev/null 2>&1
 
   fi
-  export VISUAL BROWSER PAGER LESS LESSOPEN PS1
+  export VISUAL EDITOR BROWSER PAGER LESS LESSOPEN PS1
   unset promptchar interactive execbin hostname cygwin
 fi
 
