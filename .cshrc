@@ -28,8 +28,8 @@ if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
 
 unset dir
 
-if ( { limit maxproc 512 } ) then >&/dev/null
-  limit maxproc 512 >&/dev/null
+if ( { limit maxproc 1024 } ) then >&/dev/null
+  limit maxproc 1024 >&/dev/null
   if ($?CRON == 1) limit maxproc 384 >&/dev/null
 endif
 
