@@ -577,6 +577,47 @@ EOF
     done
     ;;
 
+  vimclone)
+    case "$1" in
+      *://*|*@*)
+        repo="$1"
+        ;;
+      */*)
+        repo="git://github.com/$1.git"
+        ;;
+      *)
+        repo="git@github.com:tpope/$1.git"
+        ;;
+    esac
+    case "$repo" in
+      *@*)
+        dest="$HOME/src/vim/bundle"
+        ;;
+      */*)
+        dest="$HOME/src/vim/vendor"
+        ;;
+    esac
+    mkdir -p "$dest"
+    cd "$dest"
+    basename=`basename "$repo" .git`
+    if [ -d $basename ]; then
+      cd $basename
+      git pull --rebase
+    else
+      git clone "$repo" || exit 1
+      cd ./$basename
+      for server in $(vim --serverlist); do
+        vim --servername "$server" --remote-expr "pathogen#surround('$PWD')" >/dev/null
+        vim --servername "$server" --remote-expr "pathogen#execute('filetype off', 'filetype on')"
+        vim --servername "$server" --remote-expr "call('pathogen#execute', map(split(glob('$PWD/plugin/**.vim'), \"\n\"), '\"source \".v:val'))"
+      done
+    fi
+    echo $PWD
+    if [ -d doc ]; then
+      vim -u NONE -c'helptags doc' -cq >/dev/null 2>&1 </dev/null
+    fi
+    ;;
+
   whois)
     [ -d /private ] || args=-H
     if [ "$1" != "-H" -a -t 1 ]; then
