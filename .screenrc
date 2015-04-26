@@ -4,7 +4,7 @@ term screen-256color
 startup_message off
 shell -$SHELL
 hardstatus on
-hardstatus lastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
+hardstatus alwayslastline '%H:  %-Lw%34>[%n*%f %t]%+Lw'
 escape ^\\\ # Ctrl+\ as escape command.
 bindkey ^Q command
 bindkey ^Z command
