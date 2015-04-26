@@ -46,6 +46,22 @@ xsetroot -solid '#000840'
 
 [ ! -f "$HOME/.xsession.local" ] || . "$HOME/.xsession.local"
 
+rm -f "$HOME/.env.$DISPLAY"
+touch "$HOME/.env.$DISPLAY"
+chmod 0600 "$HOME/.env.$DISPLAY"
+for var in DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS SSH_AGENT_PID SSH_AUTH_SOCK GNOME_KEYRING_PID; do
+  eval val=\$$var
+  if [ -n "$val" ]; then
+    echo "$var='$val'" >> "$HOME/.env.$DISPLAY"
+    exports="$exports $var"
+    if [ "$DISPLAY" = ":0" ]; then
+      screen -S `tpope host name` -X setenv $var "$val" 2>/dev/null
+      tmux setenv -g $var "$val" 2>/dev/null
+    fi
+  fi
+done
+[ -z "$exports" ] || echo "export$exports" >> "$HOME/.env.$DISPLAY"
+
 {
   while xrandr --auto; do
     sleep 5

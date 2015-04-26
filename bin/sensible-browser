@@ -35,6 +35,9 @@ else
 fi
 
 fvwm_find_browser() {
+  if [ -f "$HOME/.env.$DISPLAY" ]; then
+    . "$HOME/.env.$DISPLAY"
+  fi
   if [ -x "`which FvwmCommand 2>/dev/null`" -a -n "$FVWM_USERDIR" ]; then
     FvwmCommand FuncFindWebBrowser
   elif [ -x "`which awesome-client 2>/dev/null`" -a -n "$DBUS_SESSION_BUS_ADDRESS" ]; then

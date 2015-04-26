@@ -61,6 +61,12 @@ if [ -n "$PS1" ]; then
 
     [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
 
+    rf() {
+      . "$HOME/.zshenv"
+      [ ! -r "$HOME/.env.$DISPLAY" ] || . "$HOME/.env.$DISPLAY"
+      hash -r
+    }
+
     alias ll='ls -l'
     alias cp='cp -i'
     alias mv='mv -i'
