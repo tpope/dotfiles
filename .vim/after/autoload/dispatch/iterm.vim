@@ -16,12 +16,12 @@ function! dispatch#iterm#handle(request) abort
     let exec = dispatch#prepare_make(a:request)
     return dispatch#iterm#spawn(exec, a:request, 0)
   elseif a:request.action ==# 'start'
-    return dispatch#iterm#spawn(a:request.expanded, a:request, !a:request.background)
+    return dispatch#iterm#spawn(dispatch#prepare_start(a:request), a:request, !a:request.background)
   endif
 endfunction
 
 function! dispatch#iterm#spawn(command, request, activate) abort
-  let script = dispatch#isolate(dispatch#set_title(a:request), a:command)
+  let script = dispatch#isolate([], dispatch#set_title(a:request), a:command)
   return s:osascript(
       \ 'if application "iTerm" is not running',
       \   'error',
@@ -38,6 +38,22 @@ function! dispatch#iterm#spawn(command, request, activate) abort
       \   'end tell',
       \   a:activate ? 'activate' : '',
       \ 'end tell')
+endfunction
+
+function! dispatch#iterm#activate(pid) abort
+  let tty = matchstr(system('ps -p '.a:pid), 'tty\S\+')
+  if !empty(tty)
+    return s:osascript(
+        \ 'if application "iTerm" is not running',
+        \   'error',
+        \ 'end if') && s:osascript(
+        \ 'tell application "iTerm"',
+        \   'activate',
+        \   'tell the current terminal',
+        \      'select session id "/dev/'.tty.'"',
+        \   'end tell',
+        \ 'end tell')
+  endif
 endfunction
 
 function! s:osascript(...) abort
