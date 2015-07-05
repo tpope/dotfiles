@@ -132,6 +132,7 @@ Rxvt*foreground:   #aaaaaa
 !Rxvt*font:         ISOFONT
 !Rxvt*boldFont:     ISOFONT
 Rxvt*visualBell:   true
+URxvt.termName: rxvt-256color
 URxvt.underlineColor: #777777
 #if WIDTH > 1800
 URxvt*keysym.C-F1:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
