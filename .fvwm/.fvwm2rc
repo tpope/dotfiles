@@ -974,26 +974,7 @@ Key W            A  4S  Pick FuncCaptureWindow
 # }}}2
 # Multimedia {{{2
 
-DestroyFunc FuncCloseXmms
-AddToFunc FuncCloseXmms
-+ I Exec exec tpope media quit
-
-Key bracketleft  A  4M  Exec exec tpope media prev
-Key bracketright A  4M  Exec exec tpope media next
-Key backslash    A  4M  Exec exec tpope media toggle
-Key bracketleft  A  4   Exec exec tpope media softer
-Key bracketright A  4   Exec exec tpope media louder
-Key backslash    A  4   Exec exec tpope media pause
-
-Key XF86AudioLowerVolume A A Exec exec tpope media softer
-Key XF86AudioRaiseVolume A A Exec exec tpope media louder
-
 Key XF86Standby   A A   Exec exec xscreensaver-command -activate
-Key XF86AudioStop A A   Exec exec tpope media stop
-Key XF86AudioPlay A A   Exec exec tpope media toggle
-Key XF86AudioPrev A A   Exec exec tpope media prev
-Key XF86AudioNext A A   Exec exec tpope media next
-Key XF86AudioMute A A   Exec exec tpope media pause
 
 # }}}2
 # }}}1
