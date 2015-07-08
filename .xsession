@@ -32,6 +32,7 @@ if [ -x /usr/bin/ssh-agent -a -z "$SSH_AUTH_SOCK" ]; then
   sshagent="/usr/bin/ssh-agent --"
 fi
 
+[ ! -x "`which bindkeys 2>/dev/null`" ] || xbindkeys -n &
 [ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
 if [ -x /usr/bin/gnome-keyring-daemon -a -z "$GNOME_KEYRING_CONTROL" ]; then
   eval "`gnome-keyring-daemon`"

@@ -298,13 +298,15 @@ awful.tag.setmwfact(0.5806)
 -- }}}
 
 -- {{{ Menu
-function keymap()
-    os.execute('setxkbmap -option ctrl:nocaps us')
+
+local function restart()
+    os.execute("pkill -s 0 -HUP xbindkeys")
+    awful.util.restart()
 end
 
 -- Create a laucher widget and a main menu
 exitmenu = {
-   { "&Restart", awful.util.restart },
+   { "&Restart", restart },
    { "&Quit", awesome.quit },
    { "Start &Gnome", function() awesome.exec("gnome-session") end },
    { "Start &KDE", function() awesome.exec("startkde") end },
@@ -477,8 +479,7 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Standard program
-    awful.key({ modkey, "Control" }, "r", awesome.restart),
-    awful.key({ modkey, "Mod1"    }, "r", keymap),
+    awful.key({ modkey, "Control" }, "r", restart),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit),
 
     awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),

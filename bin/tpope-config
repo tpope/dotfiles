@@ -12,7 +12,7 @@ base_files="\
 .muttrc .urlview .mailcap .curlrc \
 .gnupg/gpg.conf .ssh/config .ssh/authorized_keys \
 .cvsignore .gitconfig .git_template \
-.xsession .Xresources .gtkrc .gtkrc-2.0 .netscape/user.js \
+.xsession .Xresources .xbindkeys.scm .gtkrc .gtkrc-2.0 .netscape/user.js \
 .pixmaps/mini .fvwm/.fvwm2rc .fvwm/FvwmScript-DateTime \
 .config/awesome/rc.lua .config/awesome/theme.lua \
 bin/x-terminal-emulator bin/sensible-browser bin/tpope \
