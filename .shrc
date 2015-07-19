@@ -63,7 +63,11 @@ if [ -n "$PS1" ]; then
 
     rf() {
       . "$HOME/.zshenv"
-      [ ! -r "$HOME/.env.$DISPLAY" ] || . "$HOME/.env.$DISPLAY"
+      dp=`echo $DISPLAY|sed -e 's/\..*$//'`
+      if [ -r "$HOME/.env.$dp" ]; then
+        . "$HOME/.env.$dp"
+      fi
+      unset dp
       hash -r
     }
 
