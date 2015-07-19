@@ -10,7 +10,7 @@ fi
 unset vars
 
 ENV="$HOME/.shrc"
-BASH_ENV="$HOME/.shenv"
+BASH_ENV="$HOME/.zshenv"
 export ENV BASH_ENV
 
 for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin"; do
@@ -33,6 +33,9 @@ done
 unset dir
 export PATH
 
+[ -n "$SRC" ] || SRC="$HOME/src"
+export SRC
+
 if [ -z "$LANG" -a -z "$LC_ALL" -a -f "$HOME/.locale" ]; then
   LANG=`cat "$HOME/.locale"`
   export LANG
@@ -44,20 +47,9 @@ if [ -z "$CLASSPATH" ]; then
   export CLASSPATH
 fi
 
-RUBYLIB="$HOME/src/ruby/lib:$HOME/.ruby/lib"
+RUBYLIB="$SRC/ruby/lib:$HOME/.ruby/lib"
 RUBYOPT=-rtpope
 export RUBYLIB RUBYOPT
-
-if [ -z "$PERL5LIB" ]; then
-  for dir in "$HOME/.perl5" "$HOME/perl5" "$HOME/.perl" "$HOME/perl"; do
-    case ":$PERL5LIB:" in
-      *:"$dir":*) ;;
-      *) [ ! -d "$dir" ] || PERL5LIB="$PERL5LIB:$dir"
-    esac
-  done
-  PERL5LIB="`echo "$PERL5LIB"|sed -e 's/^://'`"
-  export PERL5LIB
-fi
 
 if [ -t 1 ]; then
   RSYNC_RSH='ssh -ax'

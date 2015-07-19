@@ -20,13 +20,14 @@ if ( -f "$HOME/.locale" && ! $?LANG && ! $?LC_ALL ) then
   setenv LANG "`cat ~/.locale`"
 endif
 
+if ( ! $?SRC ) setenv SRC "$HOME/src"
+
 setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
-setenv CLASSPATH '.'
+if ( ! $?CLASSPATH ) setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
-setenv RUBYLIB  "$HOME/src/ruby/lib:$HOME/.ruby/lib"
+setenv RUBYLIB  "$SRC/ruby/lib:$HOME/.ruby/lib"
 setenv RUBYOPT "-rtpope"
-setenv PERL5LIB "$HOME/.perl5:$HOME/perl5:$HOME/.perl:$HOME/perl"
 setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
 if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
 
