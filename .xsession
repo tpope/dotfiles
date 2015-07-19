@@ -69,6 +69,10 @@ done
   done
 } &
 
-for wm in awesome fvwm2 icewm startkde fluxbox enlightenment mwm twm xterm; do
-  [ -x "`which $wm 2>/dev/null`" ] && exec $sshagent $wm
+if [ $# -gt 0 ]; then
+  exec "$@"
+fi
+
+for wm in $wm awesome icewm fluxbox twm xterm; do
+  type $wm >/dev/null && exec $execpre $wm
 done

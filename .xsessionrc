@@ -1,0 +1,2 @@
+#! sh
+STARTUP="$HOME/.xsession $STARTUP"
