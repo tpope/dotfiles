@@ -45,24 +45,56 @@ case "$1" in
     exit
     ;;
 
-  sink)
-    sinks=`pactl list short sinks | wc -l`
-    find_pulse sink-inputs $3 ${4:-`hostname`} Sink | while read si sink; do
-      if [ "$2" = +1 -o "$2" = next ]; then
-        for id in `pactl list short sinks|cut -f1`; do
-          if [ $sink = $id ]; then
-            next=1
-          elif [ -n "$next" ]; then
-            next=
-            sink=$id
-          fi
-        done
-        if [ -n "$next" ]; then
-          sink=`pactl list short sinks | head -1 | cut -f1`
+  sink|source)
+    caps=`echo $1|sed -e 's/^./\u&/'`
+    puttype=sink-input
+    [ sink = "$1" ] || puttype=source-output
+    hostname=${4:-`hostname`}
+    if [ -n "$3" -a --default != "$3" ]; then
+      current=`find_pulse ${puttype}s $3 $hostname $caps | awk 'NR == 1 { print $2 }'`
+    fi
+    if [ -z "$current" ]; then
+      current=`pactl info|awk "/Default $caps:/ { print \\\$3 }"`
+      current=`pactl list short ${1}s | awk -v c="$current" '$2 == c { print $1 }'`
+    fi
+    [ -n "$current" ] || current=0
+    if [ +0 = "$2" ]; then
+      target=$current
+    elif [ "$2" = +1 -o "$2" = next ]; then
+      for id in `pactl list short ${1}s | cut -f1`; do
+        if [ $current = $id ]; then
+          next=1
+        elif [ -n "$next" ]; then
+          next=
+          target=$id
         fi
+      done
+      if [ -n "$next" ]; then
+        target=`pactl list short ${1}s | head -1 | cut -f1`
       fi
-      pactl move-sink-input $si $sink
-    done
+    elif [ "$2" = -1 -o "$2" = prev ]; then
+      for id in `pactl list short ${1}s | cut -f1`; do
+        if [ $current = $id ]; then
+          target=${last-`pactl list short ${1}s | tail -1 | cut -f1`}
+        fi
+        last=$id
+      done
+    else
+      target=$2
+    fi
+    if [ --default = "$3" ]; then
+      pactl set-default-$1 $target
+    elif [ -n "$3" ]; then
+      for put in `find_pulse ${puttype}s $3 $hostname`; do
+        pactl move-$puttype $put $target
+      done
+    else
+      pactl set-default-$1 $target
+      for put in `pactl list short ${puttype}s | cut -f 1`; do
+        pactl move-$puttype $put $target
+      done
+    fi
+    exit 0
     ;;
 esac
 
