@@ -437,8 +437,6 @@ end
 globalkeys = awful.util.table.join(
     awful.key({modkey, "Mod1"   }, "a", executor('import -window root $HOME/Pictures/root-`date +%Y-%m-%d_%H-%M-%S`.png')),
     awful.key({modkey, "Shift"  }, "a", executor('import $HOME/Pictures/selection-`date +%Y-%m-%d_%H-%M-%S`.png')),
-    awful.key({ modkey, }, "equal", function() client.focus:raise() end),
-    awful.key({ modkey, }, "minus", function() client.focus:lower() end),
     -- awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     -- awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
