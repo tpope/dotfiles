@@ -55,3 +55,7 @@
 (xbindmod '(control bracketright) "tpope media seek +5")
 (xbindmodmod1 '(bracketleft) "tpope media prev")
 (xbindmodmod1 '(bracketright) "tpope media next")
+
+(let ((local-file (string-append (or (getenv "HOME") ".") "/.xbindkeysrc.local.scm")))
+  (if (access? local-file R_OK)
+    (load local-file)))
