@@ -73,6 +73,6 @@ if [ $# -gt 0 ]; then
   exec "$@"
 fi
 
-for wm in $wm awesome icewm fluxbox twm xterm; do
+for wm in $wm awesome xmonad icewm fluxbox twm xterm; do
   type $wm >/dev/null && exec $execpre $wm
 done
