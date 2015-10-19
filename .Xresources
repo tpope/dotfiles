@@ -39,6 +39,7 @@ XTerm*scrollBar:   false
 !XTerm*backarrowKey: false
 XTerm*colorBDMode: true
 XTerm*visualBell: true
+XTerm*bellIsUrgent: true
 XTerm*eightBitInput: false
 XTerm*modifyCursorKeys: 2
 XTerm*trimSelection: true
@@ -132,6 +133,7 @@ Rxvt*foreground:   #aaaaaa
 !Rxvt*font:         ISOFONT
 !Rxvt*boldFont:     ISOFONT
 Rxvt*visualBell:   true
+URxvt.urgentOnBell: true
 URxvt.termName: rxvt-256color
 URxvt.underlineColor: #777777
 #if WIDTH > 1800
