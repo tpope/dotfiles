@@ -299,32 +299,173 @@ awful.tag.setmwfact(0.5806)
 
 -- {{{ Menu
 
-local function restart()
+awful.menu.menu_keys = {
+    up = { "Up", "k" },
+    down = { "Down", "j" },
+    exec = { "Return", "Right" },
+    enter = { "Right" },
+    back = { "Left" },
+    close = { "Escape", "[", "Tab" }
+}
+
+function restart()
     os.execute("pkill -s 0 -HUP xbindkeys")
     awful.util.restart()
 end
 
--- Create a laucher widget and a main menu
-exitmenu = {
-   { "&Restart", restart },
-   { "&Quit", awesome.quit },
-   { "Start &Gnome", function() awesome.exec("gnome-session") end },
-   { "Start &KDE", function() awesome.exec("startkde") end },
-   { "Start &Fvwm2", function() awesome.exec("fvwm2") end },
+function parse_desktop_file(file)
+    local program = { show = true, file = file }
+    for line in io.lines(file) do
+        for key, value in line:gmatch("([%w-]+)=(.+)") do
+            program[key] = value
+        end
+    end
+
+    if program.NoDisplay == "true" or program.OnlyShowIn ~= nil and program.OnlyShowIn ~= "awesome" then
+        program.show = false
+    end
+
+    if program.Exec then
+        local cmdline = program.Exec:gsub('%%c', program.Name)
+        cmdline = cmdline:gsub('%%[fmuFMU]', '')
+        cmdline = cmdline:gsub('%%k', program.file)
+        if program.icon_path then
+            cmdline = cmdline:gsub('%%i', '--icon ' .. program.icon_path)
+        else
+            cmdline = cmdline:gsub('%%i', '')
+        end
+        if program.Terminal == "true" then
+            cmdline = terminal .. ' -e ' .. cmdline
+        end
+        program.cmdline = cmdline
+    end
+
+    return program
+end
+
+function desktop_applications()
+    local applications = {}
+    local f = io.popen('find /usr/share/applications /usr/local/share/applcations "${XDG_DATA_HOME:-$HOME/.local/share}/applications" -name "*.desktop" 2>/dev/null')
+    for line in f:lines() do
+        applications[line] = parse_desktop_file(line)
+    end
+    f:close()
+    -- table.sort(applications, function(a, b) return (a.Name or ""):lower() < (b.Name or ""):lower() end)
+    return applications
+end
+
+function desktop_applications_by_category(applications)
+    applications = applications or desktop_applications()
+    local programs = {}
+    for _, program in pairs(applications) do
+        for category in (program.Categories or "Other"):gmatch('[^;]+') do
+            if not programs[category] then
+                programs[category] = {}
+            end
+            table.insert(programs[category], program)
+        end
+    end
+    for _, t in pairs(programs) do
+        table.sort(t, function(a, b) return (a.Name or ""):lower() < (b.Name or ""):lower() end)
+    end
+    return programs
+end
+
+function spawn_desktop(program)
+    if program.Exec then
+        local cmdline = program.Exec:gsub('%%c', program.Name)
+        cmdline = cmdline:gsub('%%[fmuFMU]', '')
+        cmdline = cmdline:gsub('%%k', program.file)
+        if program.Icon then
+            cmdline = cmdline:gsub('%%i', '--icon ' .. program.Icon)
+        else
+            cmdline = cmdline:gsub('%%i', '')
+        end
+        if program.Terminal == "true" then
+            cmdline = terminal .. ' -e ' .. cmdline
+        end
+        awesome.spawn(cmdline, program.StartupNotify == "true" or program.Terminal == "true")
+    end
+
+end
+
+function icon_path(name)
+    for _, root in ipairs({os.getenv('HOME') .. '/.local/share/icons' , '/usr/share/icons'}) do
+        for _, dir in ipairs({'hicolor/scalable', 'hicolor/32x32', 'hicolor/48x48', 'gnome/32x32'}) do
+            for _, ext in ipairs({'png'}) do
+                local path = root .. '/' .. dir .. '/' .. name .. '.' .. ext
+                if awful.util.file_readable(path) then
+                    return path
+                end
+            end
+        end
+    end
+end
+
+local desktop_categories = {
+    { "&Accessories", "Utility", 'applications-accessories' },
+    { "&Development", "Development", 'applications-development' },
+    { "&Education", "Education", 'applications-science' },
+    { "&Games", "Game", 'applications-games' },
+    { "G&raphics", "Graphics", 'applications-graphics' },
+    { "&Internet", "Network", 'applications-internet' },
+    { "M&ultimedia", "AudioVideo", 'applications-multimedia' },
+    { "O&ffice", "Office", 'applications-office' },
+    { "&Other", "Other", 'applications-other' },
+    { "&Settings", "Settings", 'preferences-desktop' },
+    { "S&ystem Tools", "System", 'applications-system' },
 }
 
--- Load Debian menu entries
-require("debian.menu")
+function desktop_menu_items(items)
+    items = items or {}
+    local programs = desktop_applications_by_category()
+    for i, category in ipairs(desktop_categories) do
+        local subitems = {}
+        for _, program in ipairs(programs[category[2]] or {}) do
+            if program.NoDisplay ~= "true" and (program.OnlyShowIn == nil or program.OnlyShowIn == "awesome") then
+                table.insert( subitems, {
+                    program.Name or "?",
+                    function () spawn_desktop(program) end,
+                    program.Icon and (
+                    icon_path('apps/' .. program.Icon) or
+                    icon_path('devices/' .. program.Icon) or
+                    icon_path('places/' .. program.Icon) or
+                    icon_path('categories/' .. program.Icon))
+                })
+            end
+        end
+        if table.getn(subitems) > 0 then
+            table.insert(items, {category[1], subitems, icon_path('categories/' .. category[3])})
+        end
+    end
+    return items
+end
 
-mymainmenu = awful.menu({ items = {
-    { "&Terminal", function () shell_host('localhost') end},
-    { "&Browser", browser },
-    { "&Debian", debian.menu.Debian_menu.Debian },
-    { "E&xit", exitmenu },
-}})
+local exitmenu = {
+    { "&Restart", restart },
+    { "Restart with global &config", function() awesome.exec("awesome -c /etc/xdg/awesome/rc.lua") end },
+    { "&Quit", awesome.quit },
+    { "Start &Unity", function() awesome.exec("unity") end },
+    { "Start &Gnome", function() awesome.exec("gnome-session") end },
+    { "Start &KDE", function() awesome.exec("startkde") end },
+}
 
-menu_launcher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
-                                     menu = mymainmenu})
+for _, app in pairs(desktop_applications()) do
+    if app['X-GNOME-Provides'] == 'windowmanager' then
+        table.insert(exitmenu, {"Start " .. app.Name, function() awesome.exec(app.Exec) end})
+    end
+end
+
+menuitems = desktop_menu_items()
+table.insert(menuitems, 1, {"&Terminal", function () shell_host('localhost') end, icon_path('apps/utilities-terminal')})
+table.insert(menuitems, 2, {"&Multiplexor", function () mux_host('localhost') end, icon_path('apps/utilities-system-monitor')})
+table.insert(menuitems, 3, {"&Browser", browser, icon_path('apps/web-browser')})
+table.insert(menuitems, {"E&xit", exitmenu, icon_path('actions/system-log-out')})
+
+mymainmenu = awful.menu({ items = menuitems})
+
+mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
+menu = mymainmenu})
 -- }}}
 
 -- {{{ Wibox
@@ -403,7 +544,7 @@ for s = 1, screen.count() do
     -- Add widgets to the wibox - order matters
     mywibox[s].widgets = {
         {
-            menu_launcher,
+            mylauncher,
             mytaglist[s],
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
