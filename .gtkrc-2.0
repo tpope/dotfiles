@@ -19,3 +19,4 @@ widget_class "*Notebook*" style "serif"
 widget_class "*Text*" style "mono"
 
 gtk-key-theme-name = "Emacs"
+include ".gtkrc-2.0.mine"
