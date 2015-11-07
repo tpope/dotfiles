@@ -400,9 +400,9 @@ case "$basename" in
     ;;
 
   dl) # urls
-    if [ "$HOME/dl" != `pwd` ]; then
-      mkdir -p "$HOME/dl"
-      prefix="~/dl/"
+    if [ "$HOME/Downloads" != "`pwd`" ]; then
+      prefix="$HOME/Downloads/"
+      mkdir -p "$prefix"
     fi
     if [ -n "$2" ]; then
       out="$2"
@@ -518,7 +518,7 @@ EOF
   xdvi)
     [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
   xpdf)
-    [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/dl/*.pdf;;
+    [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/Downloads/*.pdf ;;
   gv)
     [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
 

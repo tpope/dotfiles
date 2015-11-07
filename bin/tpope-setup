@@ -78,7 +78,7 @@ DEFAULT_USER_MODE:INTERMEDIATE
 EMACS_KEYS_ALWAYS_ON:TRUE
 EXTERNAL:http:sensible-browser %s:TRUE
 EXTERNAL:file:sensible-browser %s:TRUE
-SAVE_SPACE:~/dl
+SAVE_SPACE:~/Downloads
 STARTFILE:http://www.google.com/
 EOF
   web=1
@@ -94,7 +94,7 @@ set terminal.screen.underline = 1
 set terminal.screen.type = 1
 set document.colors.use_document_colors = 1
 set document.colors.vlink = "fuchsia"
-set document.download.directory = "~/dl"
+set document.download.directory = "~/Downloads"
 set document.plain.display_links = 1
 EOF
   web=1
@@ -104,7 +104,7 @@ elif inpath links && [ ! -d "$HOME/.links" -a ! -d "$HOME/.elinks" ]; then
 # ~/.links/links.cfg
 terminal "xterm" 0 0 1 us-ascii
 terminal "screen" 0 0 1 us-ascii
-download_dir "~/dl"
+download_dir "~/Downloads"
 EOF
   web=1
 fi
@@ -129,17 +129,6 @@ for dir in .mozilla/firefox 'Library/Application Support/Firefox'; do
     fi
   done
 done
-
-if [ ! -e "$HOME/dl" ]; then
-  if [ -d "$HOME/Downloads" ]; then
-    ln -s Downloads "$HOME/dl"
-    web=1
-  elif [ -d "$HOME/.mozilla" -o -f "$HOME/.lynx.cfg" -o -n "$web" ]; then
-    mkdir "$HOME/dl"
-    chmod 0755 "$HOME/dl"
-    web=1
-  fi
-fi
 
 [ -z "$web" ] || echo "Initializing browser configuration."
 
