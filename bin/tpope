@@ -11,12 +11,6 @@
 # login shell), and the cron function, which calls my setup script, cleans up
 # temp files, and optionally downloads my latest set of configuration files.
 
-[ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
-case "$PATH" in
-  "$HOME/bin:"*) ;;
-  *) PATH="$HOME/bin:$PATH" ;;
-esac
-
 if [ -f "$HOME/.zshenv" ]; then
   . "$HOME/.zshenv"
 fi

@@ -166,7 +166,7 @@ CRON=1
 SHELL=$shell
 ENV=$HOME/.shrc
 BASH_ENV=$HOME/.zshenv
-PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin
+PATH=$HOME/.bin:$HOME/.local/bin:$HOME/bin:/usr/local/bin:/usr/bin:/bin
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
 20 * * * *	tpope cron

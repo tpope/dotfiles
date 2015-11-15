@@ -13,9 +13,9 @@ ENV="$HOME/.shrc"
 BASH_ENV="$HOME/.zshenv"
 export ENV BASH_ENV
 
-for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin"; do
+for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin" "$HOME/.local/bin" "$HOME/.bin"; do
   if [ -d "$dir" ]; then
-    PATH="""${dir}:`echo "$PATH"|sed -e "s#${dir}:##"`"
+    PATH="""${dir}:`echo "$PATH"|sed -e "s#${dir}:##g"`"
   fi
 done
 
