@@ -110,8 +110,7 @@ if [ -n "$PS1" ]; then
     esac
 
     if ! grep --color 2>&1 | grep un >/dev/null; then
-      GREP_OPTIONS='--color=auto --exclude=*~ --exclude=tags'
-      export GREP_OPTIONS
+      alias grep='grep --color=auto --exclude=.*.swp --exclude=*~ --exclude=tags'
     fi
 
     unalias gp >/dev/null 2>&1
