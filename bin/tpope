@@ -23,7 +23,7 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lv pg gp e rm dl sursync vnc whois xrandr rds swap diff"
+  aliases="launch lv pg gp e rm dl sursync vnc whois swap diff mux hmux"
   PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin
   for app in apt-get aptitude emerge opkg yum xdvi xpdf gv; do
     [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
@@ -32,7 +32,7 @@ if [ aliases = "$basename" ]; then
   exit 0
 fi
 
-inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
+inpath() { type "$1" >/dev/null 2>&1; }
 
 root_init() {
   if inpath cygstart; then
@@ -140,7 +140,7 @@ case "$basename" in
       exit 0
     fi
     sleep 1
-    tpope install --cron
+    tpope setup --cron
     cl=4
     for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
       [ "$i" -gt 90 ] && cl=3
@@ -349,15 +349,11 @@ case "$basename" in
   x-terminal-emulator|terminal|xterm) # xterm
     exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
-  host|hostman)
+  host)
     exec "$HOME/bin/tpope-host" "$@" ;;
 
-  setup|install)
-    if [ -x "$HOME/bin/tpope-setup" ]; then
-      exec "$HOME/bin/tpope-setup" "$@"
-    else
-      exec "$HOME/bin/tpope-config" pull
-    fi ;;
+  setup)
+    exec "$HOME/bin/tpope-setup" "$@" ;;
 
   media)
     exec "$HOME/bin/tpope-media" "$@" ;;
@@ -383,15 +379,6 @@ case "$basename" in
   [ "$basename" = suscp ] && args=-P
   sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axtF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
   ;;
-
-  sync)
-    if [ "$#" = 0 ]; then
-      exec "$HOME/bin/tpope-config" pull
-    else
-      echo "Use tpope config sync instead." >&2
-      exit 1
-    fi
-    ;;
 
   dl) # urls
     if [ "$HOME/Downloads" != "`pwd`" ]; then
@@ -457,7 +444,7 @@ case "$basename" in
         exec "$basename" "$@" ;;
       install|upgrade|dist-upgrade) root_init; as_root "$basename" "$@"
         ret="$?"
-        [ "$ret" != 0 ] || tpope install --quiet &
+        [ "$ret" != 0 ] || tpope setup --quiet &
         exit $ret
         ;;
       *) root_init; as_root exec "$basename" "$@" ;;
@@ -475,12 +462,6 @@ case "$basename" in
     else
       exec diff "$@"
     fi ;;
-
-  rds)
-    width="`xwininfo -root|grep Width|sed -e 's/^.*: *//'`"
-    height="`xwininfo -root|grep Height|sed -e 's/^.*: *//'`"
-    exec rdesktop -a 16 -r "disk:io=$HOME/io" -g "`expr "$width" - 10`"x"`expr "$height" - 68`" "$@"
-    ;;
 
   rubydemo)
     exec ruby - "$*" <<-EOF
@@ -619,19 +600,6 @@ EOF
     else
       exec /usr/bin/whois "$@"
     fi ;;
-
-  xrandr)
-    case "$DISPLAY" in
-      ""|localhost:*) DISPLAY=:0; export DISPLAY ;;
-    esac
-    /usr/bin/xrandr "$@"
-    ret="$?"
-    if [ "$ret" = 0 -a "$#" != 0 -a "x$*" != "x-q" ]; then
-      xrdb -load "$HOME/.Xresources"
-      FvwmCommand Restart >/dev/null 2>&1
-    fi
-    exit "$ret"
-    ;;
 
   '') echo "Usage: `basename "$0"` <command> [options]" ;;
 
