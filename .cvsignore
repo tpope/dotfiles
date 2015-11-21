@@ -5,7 +5,8 @@ syntax: glob
 .*.sw?
 .sw?
 Session.vim
-tags
+/tags
+/doc/tags
 .DS_Store
 .AppleDouble
 foo
