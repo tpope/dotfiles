@@ -108,7 +108,7 @@ do_clean() {
 
 pager() {
   if [ -t 1 ]; then
-    "$HOME/bin/tpope" sensible-pager "$@"
+    tpope sensible-pager "$@"
   else
     cat "$@"
   fi
@@ -180,10 +180,10 @@ case "$basename" in
 
   pg)
     if [ "$#" != 1 -o -e "$1" ]; then
-      exec "$HOME/bin/tpope" sensible-pager "$@"
+      exec tpope sensible-pager "$@"
     else
       echo "Warning: use gp instead." >&2
-      exec "$HOME/bin/tpope" gp "$@"
+      exec tpope gp "$@"
     fi
     ;;
 
@@ -231,7 +231,7 @@ case "$basename" in
 
   runcontrol) # services
     echo "Deprecated in favor of tpope service $2 $1" >&2
-    exec "$HOME/bin/tpope" service "$2" "$1"
+    exec tpope service "$2" "$1"
     ;;
 
   service) # services

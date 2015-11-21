@@ -86,12 +86,12 @@ if [ -n "$PS1" ]; then
 
     alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"
 
-    alias service='"$HOME"/bin/tpope service'
-    alias start='"$HOME"/bin/tpope runcontrol start'
-    alias stop='"$HOME"/bin/tpope runcontrol stop'
-    alias restart='"$HOME"/bin/tpope runcontrol restart'
-    alias reload='"$HOME"/bin/tpope runcontrol reload'
-    alias force-reload='"$HOME"/bin/tpope runcontrol force-reload'
+    alias service='tpope service'
+    alias start='tpope runcontrol start'
+    alias stop='tpope runcontrol stop'
+    alias restart='tpope runcontrol restart'
+    alias reload='tpope runcontrol reload'
+    alias force-reload='tpope runcontrol force-reload'
 
     [ "$VISUAL" != vim ] || alias vi='vim'
 
@@ -115,7 +115,7 @@ if [ -n "$PS1" ]; then
 
     unalias gp >/dev/null 2>&1
     for cmd in `tpope aliases`; do
-      alias $cmd="\"\$HOME\"/bin/tpope $cmd"
+      alias $cmd="tpope $cmd"
     done
 
     set -o emacs -o noclobber >/dev/null 2>&1
