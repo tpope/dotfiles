@@ -50,7 +50,7 @@ if ( -x /usr/local/bin/vim || -x /usr/bin/vim ) then
 else if ( -x /usr/bin/vi || -x /bin/vi ) then
   setenv VISUAL vi
 endif
-setenv BROWSER "$HOME/bin/sensible-browser"
+setenv BROWSER "tpope browser"
 if ( -x /usr/local/bin/less || -x /usr/bin/less || -x /bin/less ) setenv PAGER less
 setenv LESS 'RFX#10'
 if ( -x /usr/bin/lesspipe ) then

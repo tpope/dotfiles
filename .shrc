@@ -13,7 +13,7 @@ if [ -n "$PS1" ]; then
     VISUAL=vi
   fi
   EDITOR="$VISUAL"
-  BROWSER="$HOME/bin/sensible-browser"
+  BROWSER="tpope browser"
   [ ! -x "`which less 2>/dev/null`" ] || PAGER=less
   if [ -x /usr/bin/lesspipe ]; then
     LESSOPEN='|lesspipe %s'
@@ -81,7 +81,7 @@ if [ -n "$PS1" ]; then
     alias gst='git status'
     alias ri='ri -f bs'
 
-    alias b='sensible-browser'
+    alias b='tpope browser'
     alias mpl='mplayer -fs -loop 0'
 
     alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"

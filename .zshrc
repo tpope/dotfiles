@@ -170,7 +170,7 @@ namedir() { export $1=$PWD; : ~$1 }
 # Aliases {{{1
 
 alias lsd='ls -d *(-/DN)'
-alias b='noglob sensible-browser'
+alias b='noglob tpope browser'
 autoload -Uz zmv
 alias zmv='noglob zmv'
 alias ru='noglob ru'
@@ -226,7 +226,7 @@ compinit -u
 # End of lines added by compinstall
 
 compdef '_files -W /var/log -g "*~*.(gz|old|*[0-9])(-.)"' lv logview
-compdef '_arguments "-dump[dump to stdout]" "-T[force console]" "-G[force gui]" :url:_webbrowser' sensible-browser
+compdef '_arguments "-dump[dump to stdout]" "-T[force console]" "-G[force gui]" :url:_webbrowser' tpope-browse tpope-browser sensible-browser
 compdef '_arguments "*:picture file:_files -g \*.\(\#i\)\(png\|gif\|jpeg\|jpg\|tiff\|tif\|pbm\|pgm\|ppm\|xbm\|xpm\|ras\(\|t\)\|tga\|rle\|rgb\|bmp\|pcx\|fits\|pm\)\(-.\)"' feh
 compdef _tpope tpope
 
@@ -260,8 +260,8 @@ _tpope() {
 # Mime {{{1
 
 autoload -Uz zsh-mime-setup
-zstyle ':mime:*' x-browsers sensible-browser
-zstyle ':mime:*' tty-browsers sensible-browser
+zstyle ':mime:*' x-browsers 'tpope browser'
+zstyle ':mime:*' tty-browsers 'tpope browser'
 zstyle ':mime:*' mailcap ~/.mailcap
 
 # }}}1

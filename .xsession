@@ -7,7 +7,7 @@ PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11"
 . "$HOME/.zshenv"
 unset STY TMUX
 
-BROWSER="$HOME/bin/sensible-browser"
+BROWSER="tpope browse"
 TERMINAL="$HOME/bin/x-terminal-emulator"
 export TERMINAL BROWSER
 
