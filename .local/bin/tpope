@@ -1,0 +1,607 @@
+#!/bin/sh
+# vim:set et sw=2:
+
+# This is a multipurpose script that is easier to copy around than 30-odd
+# single purpose ones.  If a function grows too big, it earns its own file,
+# and this script is modified to call that file instead.
+
+# Of particular interest here is the service function, which calls the
+# appropriate script in /etc/init.d, the setup function, which does various
+# tasks involved with moving in (such as setting up a crontab and changing my
+# login shell), and the cron function, which calls my setup script, cleans up
+# temp files, and optionally downloads my latest set of configuration files.
+
+if [ -f "$HOME/.zshenv" ]; then
+  . "$HOME/.zshenv"
+fi
+
+basename=`basename "$0"`
+if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
+  tpope="$basename " basename="$1"
+  shift
+fi
+
+if [ aliases = "$basename" ]; then
+  # Optimization: put this early since it is called for every shell
+  aliases="launch lv pg gp e rm dl sursync vnc whois swap diff mux hmux"
+  PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin
+  for app in apt-get aptitude emerge opkg yum xdvi xpdf gv; do
+    [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
+  done
+  echo $aliases
+  exit 0
+fi
+
+inpath() { type "$1" >/dev/null 2>&1; }
+
+root_init() {
+  if inpath cygstart; then
+    as_root() { "$@"; }
+  elif [ "`id -u`" -ne 0 ]; then
+    if inpath sudo && sudo -l >/dev/null 2>&1; then
+      as_root() {
+        if [ "$1" = exec ]; then ex="exec"; shift; fi
+        $ex sudo "$@"
+      }
+    else
+      echo "Warning: sudo not installed or not configured" >&2
+      as_root() {
+        if [ "$1" = exec ]; then ex="exec"; shift; fi
+        $ex su -c "$*"
+      }
+    fi
+  else
+    as_root() { "$@" ; }
+  fi
+}
+
+most_recent() {
+  prog="$1"
+  shift
+  file="`ls -1t "$@" 2>/dev/null|head -1`"
+  if [ -f "$file" ]; then
+    exec "$prog" "$file"
+  else
+    exec "$prog"
+  fi
+}
+
+do_clean() {
+  if [ "$1" = -v ]; then
+    destroy()    { find "$@" ! -type d -print 2>/dev/null; }
+    empty_dirs() { find "$@" -mindepth 1 -type d -empty -print; }
+    shift
+  else
+    empty_dirs() { find "$@" -mindepth 1 -type d -empty -print0 2>/dev/null | \
+        xargs -0 rmdir >/dev/null 2>&1; }
+    if inpath wipe; then
+      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
+          xargs -0 wipe -fcsq >/dev/null 2>&1; }
+    elif inpath shred; then
+      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
+          xargs -0 shred -fun 4 >/dev/null 2>&1; }
+    else
+      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
+          xargs -0 rm >/dev/null 2>&1; }
+    fi
+  fi
+  case "$1" in
+    1|2|3|4) unit=$1 ;;
+    5) unit=4 ;;
+    '') unit=2 ;;
+    *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
+  esac
+  cd
+  destroy . \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/tv shows" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .zcompdump -o -name texput.log -o -name screen-exchange \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
+  destroy . -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" \) \( -mtime +`expr $unit \* 15` \)
+  destroy /tmp /var/tmp tmp -user "$LOGNAME" -atime +`expr $unit \* 15 + 30` -type f
+  [ $unit = 4 ] && unit=6
+  destroy .trash .local/share/Trash/files .mutt_cache -atime +`expr $unit \* 15`
+  destroy .trash .local/share/Trash/files -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
+  destroy .trash .local/share/Trash/files -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
+  empty_dirs .trash .local/share/Trash/files
+  trash-empty  `expr $unit \* 15 + 1` 2>/dev/null
+  autotrash -d `expr $unit \* 15 + 1` 2>/dev/null
+  tpope config prune
+  return 0
+}
+
+pager() {
+  if [ -t 1 ]; then
+    tpope sensible-pager "$@"
+  else
+    cat "$@"
+  fi
+}
+
+case "$basename" in
+
+  chat)
+    hostname="`tpope host name`"
+    if [ -x "$HOME/.irssi/Chat-script" -a -z "$*" ]; then
+      "$HOME/.irssi/Chat-script" $hostname
+    elif [ -z "$*" ]; then
+      exec tpope host ssh tpope.net -t '$HOME/.irssi/Chat-script' $hostname
+    else
+      exec tpope host ssh tpope.net -t '$HOME/.irssi/Chat-script' "$@"
+    fi ;;
+
+  clean) do_clean "$@" ;;
+
+  config) exec "$HOME/bin/tpope-config" "$@" ;;
+
+  cron)
+    [ ! -x "`which renice 2>/dev/null`" ] || renice 12 $$ >/dev/null 2>&1
+    if [ "$1" = --login ]; then
+      [ ! -x "`which nice 2>/dev/null`" ] || nice="nice"
+      ($nice find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || $nice find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
+      # The part after the || is for versions of find that don't support
+      # -maxdepth, such as busybox
+      exit 0
+    fi
+    sleep 1
+    tpope setup --cron
+    cl=4
+    for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
+      [ "$i" -gt 90 ] && cl=3
+    done
+    do_clean $cl
+    touch "$HOME/. tpope"
+    exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope config pull && touch "$HOME/.autodl"' \; 2>/dev/null
+  ;;
+
+  launch) # precommand
+    exec >/dev/null 2>&1 </dev/null
+    if [ "$1" = "-d" ]; then
+      shift
+      pidof -x "$1" >/dev/null && exit 0
+    fi
+    for arg in "$2" "$3" "$4"; do
+      case "$arg" in
+        /*) [ -e "$arg" ] && dontcd=1 ;;
+        -*) [ -e "$arg" ] && dontcd=1 ;;
+      esac
+    done
+    [ ! -x /usr/bin/setsid ] || setsid=/usr/bin/setsid
+    [ "$dontcd" ] || cd
+    $setsid $prefix "$@" &
+    exit 0
+  ;;
+
+  logview|lv)
+    cd /var/log
+    root=
+    for file in "$@"; do
+      [ -f "$file" -a ! -r "$file" ] && root=as_root
+    done
+    [ -z "$root" ] || root_init
+    $root exec less "-RFX#10" +G "$@"
+    ;;
+
+  pg)
+    if [ "$#" != 1 -o -e "$1" ]; then
+      exec tpope sensible-pager "$@"
+    else
+      echo "Warning: use gp instead." >&2
+      exec tpope gp "$@"
+    fi
+    ;;
+
+  ps-grep|gp) # grep
+    LESS="-FRSX#10"
+    export LESS
+    (
+    arg="$1"; shift
+    cols="pid,user,ni,tt,stat,start,command"
+    if [ "`uname`" = Darwin ]; then
+      ps axwwo $cols|head -1
+      exec ps axwwo $cols |egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
+    elif [ "`uname`" = Linux -o ! -x /usr/bin/ps ]; then
+      ps fo $cols|head -1
+      exec ps axfo $cols  |egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
+    else
+      /usr/bin/ps -f|head -1
+      exec /usr/bin/ps -ef|egrep -v 'grep\>|\<gp\>'|sed -ne '2,$p'|egrep "$arg" "$@"
+    fi
+    ) | pager
+    ;;
+
+  rclink) # services
+    if [ "$#" -eq 0 -o "$#" -gt 4 ]; then
+        echo "Usage: $tpope$basename <init-script> [ <start-levels> [ <start> [ <stop> ] ] ]"
+        exit 1
+    fi
+    root_init
+    sed -ne '/# chkconfig: /s///p' "/etc/init.d/$1" \
+      2>/dev/null |read run start stop trash
+    [ "$stop" ] || run=2345 start=20 stop=20
+    [ -z "$2" ] || run="$2"
+    [ -z "$3" ] || start="$3" stop="$3"
+    [ -z "$4" ] || stop="$4"
+    for i in 0 1 2 3 4 5 6; do
+      as_root rm -f /etc/rc$i.d/[SK][0-9][0-9]"$1"
+      case $run in
+        [Xx])   ;;
+        *$i*) as_root ln -s "../init.d/$1" "/etc/rc$i.d/S$start$1" ;;
+        *)    as_root ln -s "../init.d/$1" "/etc/rc$i.d/K$stop$1" ;;
+      esac
+    done
+    exit 0
+  ;;
+
+  runcontrol) # services
+    echo "Deprecated in favor of tpope service $2 $1" >&2
+    exec tpope service "$2" "$1"
+    ;;
+
+  service) # services
+    root_init
+    if [ "`expr $# % 2`" -ne 0 -o "$#" -eq 0 ]; then
+      if [ -x /usr/sbin/service ]; then
+        exec /usr/sbin/service "$@"
+      else
+        echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
+        exit 1
+      fi
+    fi
+    while [ "$#" -gt 0 ]; do
+      if [ -x /usr/sbin/service ]; then
+        as_root /usr/sbin/service "$1" "$2"
+      else
+        as_root "/etc/init.d/$1" "$2"
+      fi
+      shift 2
+    done
+    exit 0
+  ;;
+
+  page) # precommand
+    exec "$@" | pager ;;
+
+  sensible-pager|pager)
+    term=exec
+    if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" -a "$HOME/.rvm/README" != "$1" ]; then
+      term="x-terminal-emulator -title Pager -e"
+      if [ -z "$1" -o "x$1" = x- ]; then
+        tempfile=/tmp/sensible-pager.$$
+        cat > $tempfile
+        [ "x$1" = x- ] && shift
+      fi
+    fi
+    if inpath less; then
+      inpath lesspipe && LESSOPEN='|lesspipe %s'
+      export LESSOPEN
+      pager="less -RFX#10"
+    elif inpath more; then
+      pager="more"
+    elif inpath pg; then
+      pager="pg"
+    else
+      pager="cat"
+    fi
+    if [ ! "$tempfile" ]; then
+      $term $pager "$@"
+    else
+      $term $pager "$tempfile"
+      rm "$tempfile"
+    fi
+    ;;
+
+  tail)
+    if inpath less; then
+      inpath lesspipe && LESSOPEN='|lesspipe %s'
+      export LESSOPEN
+      less "-RFX#10" +F "$@"
+    else
+      exec tail -f "$@"
+    fi
+    ;;
+
+  sensible-editor|editor)
+    if [ "$DISPLAY" -a ! -t 0 ]; then
+      inpath gvim && exec gvim -f "$@"
+      term="exec x-terminal-emulator -title Editor -e"
+    fi
+    if inpath gvim; then
+      $term vim "$@"
+    elif inpath vim; then
+      $term vim "$@"
+    elif inpath vi; then
+      $term vi "$@"
+    elif inpath nano; then
+      $term nano "$@"
+    else
+      echo 'No editor found!' >&2
+      exit 1
+    fi ;;
+
+  edit|e)
+    gvime_ok() { inpath gvim &&
+      gvim --serverlist 2>/dev/null | grep '^E$' >/dev/null; }
+    gvim_ok() { inpath gvim &&
+      gvim --serverlist 2>/dev/null | grep '.' >/dev/null; }
+    case "$DISPLAY" in
+      :*)
+      if gvime_ok; then
+        [ -n "$*" ] || exit 0
+        exec gvim --servername E --remote-tab "$@"
+      elif gvim_ok; then
+        [ -n "$*" ] || exit 0
+        exec gvim --remote-tab "$@"
+      elif inpath gvim && [ -z "$*" ]; then
+        exec gvim --servername e
+      fi ;;
+    esac
+    if [ -n "$STY" ]; then
+      exec tpope screen -ln -fn -t Editor tpope editor "$@"
+    else
+      exec tpope editor "$@"
+    fi
+  ;;
+
+  swap)
+    set -e
+    mv "$2" "$1.$$"
+    mv "$1" "$2"
+    mv "$1.$$" "$1"
+    ;;
+
+  x-terminal-emulator|terminal|xterm) # xterm
+    exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+
+  host)
+    exec "$HOME/bin/tpope-host" "$@" ;;
+
+  setup)
+    exec "$HOME/bin/tpope-setup" "$@" ;;
+
+  media)
+    exec "$HOME/bin/tpope-media" "$@" ;;
+
+  screen)
+    if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
+      TERM=rxvt-unicode
+    fi
+    case "$TERM" in
+      screen*|xterm*|rxvt*)
+        printf '\033]1;@%s\007' `tpope host name` ;;
+    esac
+    exec screen "$@"
+    ;;
+
+  sursync|suscp) # rsync
+  for arg in "$@"; do
+    case "$arg" in
+      [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
+    esac
+  done
+  args=-P
+  [ "$basename" = suscp ] && args=-P
+  sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axtF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
+  ;;
+
+  dl) # urls
+    if [ "$HOME/Downloads" != "`pwd`" ]; then
+      prefix="$HOME/Downloads/"
+      mkdir -p "$prefix"
+    fi
+    if [ -n "$2" ]; then
+      out="$2"
+    else
+      out="`echo "$1"|sed -e 's/?.*//'`"
+      out="`basename "$out"`"
+    fi
+    if [ -e "$1" ]; then
+      cp -a "$1" "$prefix$out"
+    elif inpath wget; then
+      wget -nv -O "$prefix$out" "$1" || exit "$?"
+    elif inpath curl; then
+      curl -L -s -S "$1" > "$prefix$out" || exit "$?"
+    elif inpath lynx; then
+      lynx -source "$1" > "$prefix$out" || exit "$?"
+    else
+      echo "Can't find any download tools." >&2
+      exit 1
+    fi
+    echo "$prefix$out"
+    ;;
+
+  browse|browser)
+    exec "$HOME/bin/sensible-browser" "$@" ;;
+
+  url) # urls
+    if [ "$*" = "-" ]; then
+      url="`cat`"
+    else
+      url="$*"
+    fi
+    if [ ! -e "$url" ]; then
+    case url in
+      /*|./*) ;;
+      *://*|*.*.*/*) url="`echo $url|tr -d ' \t\n\r\f'`" ;;
+      *) url="http://www.google.com/search?q=`echo $url|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;;
+    esac
+    fi
+  exec "$HOME/bin/sensible-browser" "$url" ;;
+
+  vnc)
+  if [ -f "$HOME/.vnc/$1" ]; then
+    exec xvncviewer -passwd "$HOME/.vnc/$1" "$@"
+  else
+    exec xvncviewer "$@"
+  fi
+  exit 1
+  ;;
+
+  opkg)
+    case "$1" in
+      '') exec "$basename" "$@" ;;
+      *) root_init; as_root exec "$basename" "$@" ;;
+    esac ;;
+  apt-get|aptitude|emerge|yum)
+    case "$1" in
+      changelog|download|help|search|server|show|source)
+        exec "$basename" "$@" ;;
+      install|upgrade|dist-upgrade) root_init; as_root "$basename" "$@"
+        ret="$?"
+        [ "$ret" != 0 ] || tpope setup --quiet &
+        exit $ret
+        ;;
+      *) root_init; as_root exec "$basename" "$@" ;;
+    esac ;;
+
+  diff)
+    PATH="`echo $PATH|sed -e "s,\\($HOME/bin\\):\\(.*\\),\\2:\\1,"`"
+    if [ -t 1 ]; then
+      if inpath git; then
+        [ "x-uN" = "x$1" ] && shift
+        exec git diff --no-index "$@"
+      else
+        exec diff -uprN "$@" | pager
+      fi
+    else
+      exec diff "$@"
+    fi ;;
+
+  rubydemo)
+    exec ruby - "$*" <<-EOF
+    print ARGV.join(' ') + ' #=> '
+    begin
+      p(eval(ARGV.join(' '),binding,'(demo)'))
+    rescue Exception => e
+      puts "#<#{e.class}: #{e.message[/.*/]}>"
+    end
+EOF
+    ;;
+
+  see)
+    if inpath see; then
+      see=see
+    elif inpath cygstart; then
+      see=cygstart
+    elif [ "`uname`" = Darwin ] && inpath open; then
+      see=open
+    else
+      see=less
+    fi
+    if [ -f "$*" ]; then
+      exec $see "$*"
+    else
+      exec $see "$@"
+    fi ;;
+
+  xdvi)
+    [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
+  xpdf)
+    [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/Downloads/*.pdf ;;
+  gv)
+    [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
+
+  rm)
+    if inpath trash-put; then
+      trash=trash-put
+    elif inpath rmtrash; then
+      trash=rmtrash
+    else
+      exec rm "$@"
+    fi
+    trash() {
+      if [ -L "$1" ]; then
+        rm -- "$1"
+      elif [ -d "$1" -a -z "$recurse" ]; then
+        echo "tpope rm: cannot remove \`$1': Is a directory"
+      elif [ ! -e "$1" -a -z "$force" ]; then
+        echo "tpope rm: cannot remove \`$1': No such file or directory"
+      else
+        case "$1" in
+          /*) absolute="$1" ;;
+          *)  absolute="`pwd`/$1" ;;
+        esac
+        case "$file" in
+          "$HOME"/*) $trash -- "$1" ;;
+          *) rm $force $recurse -- "$1" ;;
+        esac
+      fi
+    }
+    for arg in "$@"; do
+      case "$arg" in
+        --) break ;;
+        -*)
+          case "$arg" in
+            -*[\ -eg-qs-~]*)
+              echo "tpope rm: invalid option $arg" >&2
+              exit 1
+              ;;
+          esac
+          case "$arg" in -*f*) force=-f ;; esac
+          case "$arg" in -*r*) recurse=-r ;; esac
+          ;;
+        *)
+      esac
+    done
+    for arg in "$@"; do
+      case "$arg" in
+        --) everything=1 ;;
+        -*)
+          if [ -n "$everything" ]; then
+            trash "$arg"
+          fi
+          ;;
+        *) trash "$arg" ;;
+      esac
+    done
+    ;;
+
+  vimclone)
+    case "$1" in
+      *://*|*@*)
+        repo="$1"
+        ;;
+      */*)
+        repo="git://github.com/$1.git"
+        ;;
+      *)
+        repo="git@github.com:tpope/$1.git"
+        ;;
+    esac
+    case "$repo" in
+      *@*)
+        dest="$HOME/src/vim/bundle"
+        ;;
+      */*)
+        dest="$HOME/src/vim/vendor"
+        ;;
+    esac
+    mkdir -p "$dest"
+    cd "$dest"
+    basename=`basename "$repo" .git`
+    if [ -d $basename ]; then
+      cd $basename
+      git pull --rebase
+    else
+      git clone "$repo" || exit 1
+      cd ./$basename
+      for server in $(vim --serverlist); do
+        vim --servername "$server" --remote-expr "pathogen#surround('$PWD')" >/dev/null
+        vim --servername "$server" --remote-expr "pathogen#execute('filetype off', 'filetype on')"
+        vim --servername "$server" --remote-expr "call('pathogen#execute', map(split(glob('$PWD/plugin/**.vim'), \"\n\"), '\"source \".v:val'))"
+      done
+    fi
+    echo $PWD
+    if [ -d doc ]; then
+      vim -u NONE -c'helptags doc' -cq >/dev/null 2>&1 </dev/null
+    fi
+    ;;
+
+  whois)
+    [ -d /private ] || args=-H
+    if [ "$1" != "-H" -a -t 1 ]; then
+      exec /usr/bin/whois $args "$@" | pager
+    else
+      exec /usr/bin/whois "$@"
+    fi ;;
+
+  '') echo "Usage: `basename "$0"` <command> [options]" ;;
+
+  *) echo "`basename "$0"` $basename: unknown command." >&2; exit 1 ;;
+esac

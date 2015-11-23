@@ -234,7 +234,7 @@ _tpope() {
   local cmd=$(basename $words[1])
   if [[ $CURRENT = 2 ]]; then
     local tmp
-    tmp=($(grep '^  [a-z-]*[|)]' "$HOME/bin/$cmd" | sed -e 's/).*//' | tr '|' ' '))
+    tmp=($(grep '^  [a-z-]*[|)]' "$HOME/bin/$cmd" "$HOME/.local/bin/$cmd" 2>/dev/null | sed -e 's/).*//' | tr '|' ' '))
     _describe -t commands "${words[1]} command" tmp --
   else
 
