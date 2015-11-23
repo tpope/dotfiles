@@ -123,7 +123,8 @@ for dir in .mozilla/firefox 'Library/Application Support/Firefox'; do
       ln -s "$HOME/.netscape/user.js" "$subdir/user.js"
       web=1
     fi
-    if [ -d "$subdir/chrome" -a ! -e "$subdir/chrome/userContent.css" -a ! -L "$subdir/chrome/userContent.css" ]; then
+    mkdir -p "$subdir/chrome"
+    if [ ! -e "$subdir/chrome/userContent.css" -a ! -L "$subdir/chrome/userContent.css" ]; then
       ln -s "$HOME/.netscape/userContent.css" "$subdir/chrome/userContent.css"
       web=1
     fi
