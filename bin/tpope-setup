@@ -47,20 +47,6 @@ fi
 
 }
 
-setup_gui() {
-
-if inpath dcop && [ ! -f "$HOME/.kde/share/config/kdeglobals" ]; then
-  mkdir -p "$HOME/.kde/share/config"
-  cat > "$HOME/.kde/share/config/kdeglobals" <<EOF
-[General]
-TerminalApplication=\$HOME/bin/x-terminal-emulator
-EOF
-  gui=1
-fi
-[ -z "$gui" ] || echo "Initializing GUI configuration."
-
-}
-
 setup_web() {
 
 if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
@@ -204,7 +190,6 @@ case "$arg" in
 
   default)
     setup_basics
-    setup_gui
     setup_web
     crontab -l 2>/dev/null | grep 'tpope cron' >/dev/null && setup_cron
     ;;
@@ -212,13 +197,11 @@ case "$arg" in
   sandbox)
     touch "$HOME/.sandbox"
     setup_basics
-    setup_gui
     setup_web
     ;;
 
   all)
     setup_basics
-    setup_gui
     setup_web
     setup_cron
     setup_shell
@@ -226,10 +209,6 @@ case "$arg" in
 
   basics)
     setup_basics
-    ;;
-
-  gui)
-    setup_gui
     ;;
 
   web)
