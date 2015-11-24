@@ -27,22 +27,24 @@ if [ -n "$PS1" ]; then
   [ -z "$MAIL" ] || export MAIL
 
   umask 022
-  [ ! -x /bin/stty ] || stty -ixon
 
-  if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-    tty=`tty|sed -e 's,^/dev/,,'`
+  if [ -t 1 ]; then
+    [ ! -x /bin/stty ] || stty -ixon
+    if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
+      tty=`tty 2>/dev/null|sed -e 's,^/dev/,,'`
+      case "$TERM" in
+        screen*)
+          [ "$STY" -o "$TMUX" ] || h="$hostname"
+          printf '\033]1;%s@%s\a' "$tty" "$hostname"
+          [ -n "$TMUX" ] || printf '\033k%s@%s\033\\' "$tty" "$h"
+          unset h
+          ;;
+        xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
+          printf '\033]1;%s@%s\a' "$tty" "$hostname"
+          ;;
+      esac
+    fi
   fi
-  case "$TERM" in
-    screen*)
-    [ "$STY" -o "$TMUX" ] || h="$hostname"
-    printf '\033]1;%s@%s\a' "$tty" "$hostname"
-    printf '\033k%s@%s\033\\' "$tty" "$h"
-    unset h
-    ;;
-    xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
-    printf '\033]1;%s@%s\a' "$tty" "$hostname"
-    ;;
-  esac
   unset tty
 
   execbin=`echo "$0"|sed -e 's/^-//' -e 's/\.shrc/_/'`
@@ -71,6 +73,15 @@ if [ -n "$PS1" ]; then
       hash -r
     }
 
+    o() {
+      [ -z "$1" ] || cd "$1" || return
+      if [ -f Session.vim ]; then
+        vim --servername $(basename $PWD) -S
+      else
+        vim --servername $(basename $PWD) .
+      fi
+    }
+
     alias ll='ls -l'
     alias cp='cp -i'
     alias mv='mv -i'
@@ -81,7 +92,7 @@ if [ -n "$PS1" ]; then
     alias gst='git status'
     alias ri='ri -f bs'
 
-    alias b='tpope browser'
+    alias b='sensible-browser'
     alias mpl='mplayer -fs -loop 0'
 
     alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"
@@ -115,7 +126,7 @@ if [ -n "$PS1" ]; then
 
     unalias gp >/dev/null 2>&1
     for cmd in `tpope aliases`; do
-      alias $cmd="tpope $cmd"
+      alias $cmd="\"\$HOME\"/.local/bin/tpope $cmd"
     done
 
     set -o emacs -o noclobber >/dev/null 2>&1

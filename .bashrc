@@ -5,7 +5,7 @@
 
 . "$HOME/.shrc"
 
-shopt -s extglob 2>/dev/null
+shopt -s extglob cdable_vars 2>/dev/null
 set -o noclobber
 
 export HISTCONTROL=ignoredups

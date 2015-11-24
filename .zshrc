@@ -117,7 +117,7 @@ unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color
 setopt rmstarsilent histignoredups
 setopt noclobber nonomatch
 setopt completeinword extendedglob
-setopt autocd
+setopt autocd cdable_vars
 
 HISTSIZE=100
 
@@ -151,20 +151,6 @@ for host in $hosts; do
 done
 
 unset host
-
-if [ -n "$USERPROFILE" ] && which cygpath >/dev/null; then
-  typeset home="`cygpath "$USERPROFILE"`"
-  typeset docs="$home/My Documents"
-  typeset desktop="`cygpath -D 2>/dev/null`"
-  [ -n "$APPDATA" ] || APPDATA="$USERPROFILE/Application Data"
-  typeset appdata="`cygpath "$APPDATA"`"
-  : ~home ~docs ~desktop ~appdata
-elif [ -d "$HOME/Documents" ]; then
-  typeset docs="$HOME/Documents"
-  : ~docs
-fi
-
-namedir() { export $1=$PWD; : ~$1 }
 
 # }}}1
 # Aliases {{{1
