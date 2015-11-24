@@ -4,11 +4,6 @@
 # Does various tasks involved with moving in (such as setting up a crontab and
 # changing my login shell).
 
-[ -z "$PATH" ] && PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin"
-case "$PATH" in
-  "$HOME/bin:"*) ;;
-  *) PATH="$HOME/bin:$PATH" ;;
-esac
 hostname="`(hostname 2>/dev/null || cat /proc/sys/kernel/hostname)|sed -e 's/\..*//'`"
 inpath() { [ -x "`which "$1" 2>/dev/null`" ]; }
 
