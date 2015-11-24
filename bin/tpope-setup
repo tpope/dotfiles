@@ -27,6 +27,15 @@ if [ ! -f "$HOME/.hushlogin" ]; then
   touch "$HOME/.hushlogin"
   basics=1
 fi
+if [ ! -f "$HOME/.local/bin/open" ]; then
+  for file in xdg-open cygstart.exe; do
+    if [ -x /usr/bin/$file ]; then
+      ln -s /usr/bin/$file "$HOME/.local/bin/open"
+      basics=1
+      break
+    fi
+  done
+fi
 if [ ! -f "$HOME/.imaprc" ]; then
   cat > "$HOME/.imaprc" <<EOF
 I accept the risk
