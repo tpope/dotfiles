@@ -47,10 +47,6 @@ if [ -z "$CLASSPATH" ]; then
   export CLASSPATH
 fi
 
-RUBYLIB="$SRC/ruby/lib:$HOME/.ruby/lib"
-RUBYOPT=-rtpope
-export RUBYLIB RUBYOPT
-
 if [ -t 1 ]; then
   RSYNC_RSH='ssh -ax'
 else

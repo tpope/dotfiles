@@ -2,10 +2,7 @@
 
 ENV['HOME'] ||= ENV['USERPROFILE'] || File.dirname(__FILE__)
 
-$LOAD_PATH.unshift(File.expand_path('~/.ruby/lib'), File.expand_path('~/.ruby'))
-$LOAD_PATH.uniq!
-
-%w(tpope rubygems pry pry-editline).each do |lib|
+%w(rubygems pry pry-editline).each do |lib|
   begin
     require lib
   rescue LoadError

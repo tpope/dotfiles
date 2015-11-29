@@ -15,11 +15,3 @@ end if defined?(Bundler)
 $:.uniq!
 
 Pry.load_plugins if Pry.config.should_load_plugins
-
-$LOAD_PATH.unshift(File.expand_path('~/.ruby/lib'), File.expand_path('~/.ruby'))
-$LOAD_PATH.uniq!
-
-begin
-  require 'tpope'
-rescue LoadError
-end

@@ -26,8 +26,6 @@ setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
 if ( ! $?CLASSPATH ) setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
-setenv RUBYLIB  "$SRC/ruby/lib:$HOME/.ruby/lib"
-setenv RUBYOPT "-rtpope"
 setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
 if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
 
