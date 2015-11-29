@@ -137,7 +137,7 @@ case "$command" in
     fullname="`getfullname "$1"`"
     domain="`echo "$fullname"|cut -d. -f 2-`"
     case "`cat /etc/resolv.conf 2>/dev/null`" in
-      *$domain*)
+      *$domain\ *|*$domain)
         [ ! -x "`which nc 2>/dev/null`" ] || exec nc "$fullname" "$2"
       ;;
     esac
