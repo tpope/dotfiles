@@ -103,7 +103,13 @@ case "$command" in
     ;;
 
   shell|ssh) # ssh
-    exec ssh "$@"
+    if [ $# = 1 -a localhost = "$1" ]; then
+      exec "$SHELL"
+    elif [ localhost = "$1" ]; then
+      exec "$SHELL" -c 'exec "$@"' "$@"
+    else
+      exec ssh "$@"
+    fi
     ;;
 
   dispatch|batch-ssh) # ssh
