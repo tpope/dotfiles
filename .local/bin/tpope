@@ -116,6 +116,9 @@ pager() {
 
 case "$basename" in
 
+  browse|browser)
+    exec "$HOME/.local/bin/tpope-browser" "$@" ;;
+
   chat)
     hostname="`tpope host name`"
     if [ -x "$HOME/.irssi/Chat-script" -a -z "$*" ]; then
@@ -406,9 +409,6 @@ case "$basename" in
     echo "$prefix$out"
     ;;
 
-  browse|browser)
-    exec "$HOME/bin/sensible-browser" "$@" ;;
-
   url) # urls
     if [ "$*" = "-" ]; then
       url="`cat`"
@@ -422,7 +422,7 @@ case "$basename" in
       *) url="http://www.google.com/search?q=`echo $url|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;;
     esac
     fi
-  exec "$HOME/bin/sensible-browser" "$url" ;;
+  exec "$HOME/.local/bin/tpope-browser" "$url" ;;
 
   vnc)
   if [ -f "$HOME/.vnc/$1" ]; then
