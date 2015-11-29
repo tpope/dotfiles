@@ -9,12 +9,17 @@ Pry.config.history.file = if defined?(Rails)
                             File.expand_path('~/.history.rb')
                           end
 
+Gem.path.each do |gemset|
+  $:.concat(Dir.glob("#{gemset}/gems/pry-*/lib"))
+end if defined?(Bundler)
+$:.uniq!
+
+Pry.load_plugins if Pry.config.should_load_plugins
+
 $LOAD_PATH.unshift(File.expand_path('~/.ruby/lib'), File.expand_path('~/.ruby'))
 $LOAD_PATH.uniq!
 
-%w(tpope pry-editline).each do |lib|
-  begin
-    require lib
-  rescue LoadError
-  end
+begin
+  require 'tpope'
+rescue LoadError
 end
