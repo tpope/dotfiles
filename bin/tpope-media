@@ -242,10 +242,25 @@ case $cmd in
       current=`find_pulse ${puttype}s $2 $hostname $caps | awk 'NR == 1 { print $2 }'`
     fi
     if [ -z "$current" ]; then
-      current=`pactl info|awk "/Default $caps:/ { print \\\$3 }"`
-      current=`pactl list short ${cmd}s | awk -v c="$current" '$2 == c { print $1 }'`
+      default=`pactl info|awk "/Default $caps:/ { print \\\$3 }"`
+      default=`pactl list short ${cmd}s | awk -v c="$default" '$2 == c { print $1 }'`
     fi
-    [ -n "$current" ] || current=0
+    if [ list = "$1" ]; then
+      [ -n "$2" ] || current=$default
+      [ -n "$current" ] || exit 1
+      pactl list "${cmd}s" | while read label content; do
+        case $label in
+          Sink|Source)
+            [ "#$current" != "$content" ]
+            printf '%s\t' $?
+            ;;
+          Name:) printf '%s\t' "$content" ;;
+          Description:) echo "$content" ;;
+        esac
+      done
+    exit
+    fi
+    [ -n "$current" ] || current=${default:-0}
     case $1 in
       toggle|on|off)
         type=`echo $1|sed -e 's/on/0/' -e 's/off/1/'`
