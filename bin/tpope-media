@@ -71,7 +71,7 @@ mplayer_tell() {
     seek) echo seek ${2:--15} ;;
     rate)
       rate=`normalize_rate $2`
-      case $2 in
+      case $rate in
         [0-9]*) echo speed_set $rate ;;
         [+-]*) echo speed_incr $rate ;;
         [*]*) echo speed_mult $rate|sed -e 's/\*//' ;;
@@ -161,7 +161,7 @@ find_pulse() {
 }
 
 list_pulse() {
-  pactl list short "${1}s" | grep -v '\.monitor'
+  pactl list short "${1}s" | egrep -v '\.monitor|module-combine-sink\.c'
 }
 
 tell() {
@@ -203,9 +203,12 @@ case $cmd in
     ;;
 
   pause)
+    status=1
     for prog in `list`; do
       ! playing $prog || tell $prog pause
+      status=0
     done
+    exit $status
     ;;
 
   activate)
@@ -221,7 +224,7 @@ case $cmd in
     done
     ;;
 
-  toggle|play|resume|stop|next|prev|seek|volume|rate|raise|quit)
+  toggle|play|resume|stop|next|prev|seek|volume|rate|raise|quit|get)
     for prog in `list`; do
       if playing $prog && tell $prog "$cmd" "$@"; then
         exit 0
@@ -298,17 +301,16 @@ case $cmd in
             target=$id
           fi
         done
-        if [ -n "$next" ]; then
-          target=`list_pulse $cmd | head -1 | cut -f1`
-        fi
+        [ -n "$target" ] || target=`list_pulse $cmd | head -1 | cut -f1`
         ;;
       prev)
-        for id in `list_pulse  $cmd | cut -f1`; do
+        for id in `list_pulse $cmd | cut -f1`; do
           if [ $current = $id ]; then
-            target=${last-`list_pulse $cmd | tail -1 | cut -f1`}
+            target=$last
           fi
           last=$id
         done
+        [ -n "$target" ] || target=`list_pulse $cmd | tail -1 | cut -f1`
         ;;
       *)
         target=$1
