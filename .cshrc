@@ -162,10 +162,8 @@ end
 if ( $?tcsh ) then
   if ( -f /etc/complete.tcsh ) source /etc/complete.tcsh
   set hosts=(localhost `tpope host list`)
-  alias _extract_subcommands 'grep "^  [a-z-]*[|)]" \!*|sed -e "s/) .*//"|tr "|" " "'
+  alias _extract_subcommands 'grep "^  [a-z-]*[|)]" \!*|sed -e "s/).*//"|tr "|" " "'
   complete tpope 'p@1@`_extract_subcommands "$HOME/.local/bin/tpope"`@' \
-  'n@host@`_extract_subcommands $HOME/bin/tpope-host`@' 'N/host/$hosts/' \
-  'n@config@`_extract_subcommands $HOME/bin/tpope-config`@' 'N/config/$hosts/' \
   'n/*/f/'
   foreach cmd ( start stop restart reload force-reload status )
     complete $cmd 'p@1@`(cd /etc/init.d; echo *)`@'
