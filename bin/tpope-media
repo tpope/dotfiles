@@ -41,7 +41,12 @@ mpris() {
     quit) cmd=Quit ;;
     raise) cmd=Raise ;;
     stop) cmd=Player.Stop ;;
-    play|resume) cmd=Player.Play ;;
+    play|resume)
+      if mpris_player_get $dest PlaybackStatus | grep Paused >/dev/null; then
+        cmd=Player.PlayPause
+      else
+        cmd=Player.Play
+      fi ;;
     pause) cmd=Player.Pause ;;
     toggle) cmd=Player.PlayPause ;;
     next) cmd=Player.Next ;;
