@@ -11,11 +11,7 @@ set -o noclobber
 export HISTCONTROL=ignoredups
 unset HISTFILE
 
-if [ -x "$HOME/bin/tpope-host" ]; then
-  hostcolor=`tpope-host ansi`
-else
-  hostcolor="01;37"
-fi
+hostcolor=`tpope-host ansi 2>/dev/null`
 
 [ "$UID" ] || UID=`id -u`
 usercolor='01;33'

@@ -33,11 +33,7 @@ _git_prompt_info() {
 
 autoload -Uz colors && colors
 
-if [ -x "$HOME/bin/tpope-host" ]; then
-  hostcolor=$'\e['`tpope-host ansi`m
-else
-  hostcolor=$'\e[01;37m'
-fi
+hostcolor=$'\e['`tpope-host ansi 2>/dev/null`m
 
 local usercolor="$fg_bold[yellow]"
 local dircolor="$fg_bold[blue]"
