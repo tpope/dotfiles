@@ -117,7 +117,6 @@ case "$command" in
     ;;
 
   screen|screen-ssh) # hosts
-    args=""
     case "$1" in
       -*[Rr]*) resume="$1 `name`"; shift ;;
     esac
@@ -130,7 +129,58 @@ case "$command" in
     esac
     host="$1"
     shift
-    exec ssh -t "$host" "[ -x bin/tpope ] && exec bin/tpope screen $resume $*; exec screen $resume $*"
+    exec ssh -t "$host" "[ -x .local/bin/tpope ] && exec .local/bin/tpope screen $resume $*; exec screen $resume $*"
+    ;;
+
+
+  mux) # hosts
+    mux=mux
+    if [ "x$1" = x-s ]; then
+      mux='mux -s'
+      shift
+    fi
+    if [ -n "$TMUX" ]; then
+      mux='mux -s'
+    fi
+    if [ "x$1" = x-d ]; then
+      detach=-d
+      shift
+    fi
+    case "$1" in
+      ''|-) host=localhost ;;
+      *:*)
+        host=`echo "$1"|sed -e 's/:.*//'`
+        dir=`echo "$1"|sed -e 's/[^:]*://'`
+        ;;
+      *) host="$1" ;;
+    esac
+    [ "$#" = 0 ] || shift
+    [ -n "$dir" ] || dir=.
+    [ -n "$1" ] || set -- `name`
+    if [ localhost = "$host" ]; then
+      cd "$HOME"
+      cd "$dir"
+
+      case "$TERM" in
+        screen*|xterm*|rxvt*)
+          printf '\033]1;%s\007' "$1" ;;
+      esac
+
+      if [ mux = "$mux" ] && type tmux >/dev/null 2>&1; then
+        if tmux has-session -t "$1" >/dev/null; then
+          exec tmux attach-session $detach -t "$1"
+        else
+          tmux new-session $detach -s "$1"
+        fi
+      elif type screen >/dev/null 2>&1; then
+        exec screen ${detach--x}RR "$1"
+      else
+        echo "Warning: no multiplexor" >&2
+        exec $SHELL
+      fi
+    fi
+    sandbox="https://tpo.pe/sandbox"
+    exec ssh -t "$host" "[ -x \"\$HOME/.local/bin/tpope\" ] && exec \"\$HOME/.local/bin/tpope\" host $mux 'localhost:$dir' $*; cd '$dir' || exit 3; if [ -x /usr/bin/wget ]; then wget -qO- $sandbox; elif [ -x /usr/bin/curl ]; then curl -sS $sandbox; else echo Welp >&2; fi|exec sh -"
     ;;
 
   tunnel) # hosts
