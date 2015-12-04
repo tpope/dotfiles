@@ -57,7 +57,7 @@ case "$command" in
       elif [ -x "`which lynx 2>/dev/null`" ]; then
         lynx -source $url
       else
-        ssh $default_host bin/tpope tar czf -
+        ssh $default_host bin/tpope config tar czf -
       fi | tar xzf - -C "$HOME"
     fi
 
