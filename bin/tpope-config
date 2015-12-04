@@ -95,25 +95,10 @@ case "$command" in
 
   prune) # nothing
     cd
-    [ ! -L .bash_logout ] || rm .bash_logout
     rm -rf \
       bin/tpope-host \
       bin/sensible-browser \
-      .fvwm \
-      bin/hostinfo \
-      .Eterm .terminfo/E \
-      .terminfo/x/78 \
-      .zsh/functions/_git-trac .zsh/functions/_editor .zsh/functions/_sb \
-      .zsh/functions/_daemons \
-      .ssh/authorized_keys2 \
-      .zsh/functions/_tpope \
-      bin/media \
-      bin/installer \
-      bin/tpope-hostman \
-      bin/sync-tpope
-      if [ -f .vim/plugin/ztemplate.vim ]; then
-        rm -rf .vim/plugin .vim/autoload .vim/colors .vim/syntax .vim/templates
-      fi
+      .fvwm
     ;;
 
   '')
