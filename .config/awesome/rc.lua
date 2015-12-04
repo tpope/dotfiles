@@ -197,21 +197,13 @@ function raise_host (host)
     run_or_raise(nil, {instance = '@' .. host})
 end
 
-function screen_host (host)
-    local cmd = terminal .. ' -T @' .. host .. ' -name @' .. host ..
-    " -cr  '" .. host_cursor_rgb(host) ..
-    -- "' -fade 10 -fadecolor '" .. host_cursor_rgb(host) ..
-    "' -e "
+function mux_host (host)
     if host:find(' ') then
         awful.util.spawn('ssh -X ' .. host)
     else
-        if host == 'localhost' then
-            cmd = cmd .. 'tpope host screen -dRR'
-        else
-            cmd = cmd .. 'tpope host screen -dRR ' .. host
-        end
+        local cmd = terminal .. ' -e tpope host mux -d ' .. host
         print(cmd)
-        run_or_raise(cmd, {icon_name = '^@' .. host})
+        run_or_raise(cmd, {instance = 'mux@' .. host})
     end
 end
 
@@ -225,14 +217,11 @@ function shell_host (arg)
     end
     local exec = ''
     if host ~= 'localhost' then
-        exec = ' -e ssh ' .. arg:gsub(' ', ' -t ', 1)
+        exec = ' -e tpope host shell ' .. arg:gsub(' ', ' -t ', 1)
     elseif arg:find(' ') then
         exec = ' -e' .. arg:match(' .*')
     end
-    local cmd = terminal .. ' -T ' .. cmd .. '@' .. host .. ' -name ' .. cmd .. '@' .. host ..
-    " -cr  '" .. host_cursor_rgb(host) ..
-    -- "' -fade 10 -fadecolor  '" .. host_cursor_rgb(host) ..
-    "'" .. exec
+    local cmd = terminal .. exec
     print(cmd)
     awful.util.spawn(cmd)
 end
@@ -638,9 +627,9 @@ globalkeys = awful.util.table.join(
     -- awful.key({ modkey            }, "e", function () run_or_raise('gvim', { class = '[Vv]im$' }) end),
     awful.key({ modkey            }, "c", chat),
     awful.key({ modkey            }, "z", function () raise_host('localhost') end),
-    awful.key({ modkey, "Mod1"    }, "z", function () screen_host('localhost') end),
+    awful.key({ modkey, "Mod1"    }, "z", function () mux_host('localhost') end),
     awful.key({ modkey, "Control" }, "z", function () shell_host('localhost') end),
-    awful.key({ modkey, "Mod1"    }, "s", function () pick_host(screen_host) end),
+    awful.key({ modkey, "Mod1"    }, "s", function () pick_host(mux_host) end),
     awful.key({ modkey, "Control" }, "s", function () pick_host(shell_host) end),
     awful.key({ modkey            }, "s", function () pick_host(raise_host) end),
     awful.key({ modkey }, "x", function () local c = browser() if c then c:swap(awful.client.getmaster()) end end),

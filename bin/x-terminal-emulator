@@ -12,7 +12,38 @@ elif [ "$1" = "-E" ]; then
   exec "$term" "$@"
 fi
 
-[ -n "$XTERM" ] && [ -x "`which $XTERM 2>/dev/null`" ] && exec "$XTERM" "$@"
+ex=_
+for arg in "$@"; do
+  if [ x-name = "x$arg" ]; then
+    break
+  elif [ $ex = tpope-host-mux ]; then
+    [ x-d != "x$arg" ] || continue
+    set -- -T "@$arg" -name "mux@$arg" -cr "`tpope host light $arg`"  "$@"
+    break
+  elif [ $ex = tpope-host-shell -o $ex = ssh ]; then
+    case $arg in
+      -*) ;;
+      *)
+        if [ -z "$host" ]; then
+          host="$arg"
+          set -- -name "shell@$host" -cr "`tpope host light $host`" "$@"
+        else
+          shift 2
+          set -- -name "$arg@$host" "$@"
+          break
+        fi
+        ;;
+    esac
+  elif [ $ex = tpope -o $ex = tpope-host ]; then
+    ex="$ex-$arg"
+  elif [ $ex = __ -a tpope = "$arg" ]; then
+    ex=tpope
+  elif [ $ex = __ -a tpope-host = "$arg" ]; then
+    ex=tpope-host
+  elif [ $ex = _ -a x-e = "x$arg" ]; then
+    ex=__
+  fi
+done
 
 # NOT exported
 [ -z "$RXVT_SOCKET" ] && RXVT_SOCKET="$HOME/.urxvt/urxvtd-`hostname`"
