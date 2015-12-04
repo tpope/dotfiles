@@ -16,7 +16,7 @@ base_files="\
 .pixmaps/mini .netscape/user.js \
 .config/awesome/rc.lua .config/awesome/theme.lua .xmonad/xmonad.hs \
 bin/x-terminal-emulator .local/bin/tpope-browser bin/tpope .local/bin/tpope \
-bin/tpope-config bin/tpope-host bin/tpope-media bin/tpope-setup \
+bin/tpope-config .local/bin/tpope-host bin/tpope-media bin/tpope-setup \
 .ruby/lib/tpope.rb .irbrc .pryrc"
 
 extra_files="\
@@ -97,6 +97,7 @@ case "$command" in
     cd
     [ ! -L .bash_logout ] || rm .bash_logout
     rm -rf \
+      bin/tpope-host \
       bin/sensible-browser \
       .fvwm \
       bin/hostinfo \

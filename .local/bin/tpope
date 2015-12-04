@@ -353,7 +353,7 @@ case "$basename" in
     exec "$HOME/bin/x-terminal-emulator" "$@" ;;
 
   host)
-    exec "$HOME/bin/tpope-host" "$@" ;;
+    exec "$HOME/.local/bin/tpope-host" "$@" ;;
 
   setup)
     exec "$HOME/bin/tpope-setup" "$@" ;;
