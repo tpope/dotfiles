@@ -132,7 +132,7 @@ case "$basename" in
 
   clean) do_clean "$@" ;;
 
-  config) exec "$HOME/bin/tpope-config" "$@" ;;
+  config) exec "$HOME/.local/bin/tpope-config" "$@" ;;
 
   cron)
     [ ! -x "`which renice 2>/dev/null`" ] || renice 12 $$ >/dev/null 2>&1
