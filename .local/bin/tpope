@@ -11,9 +11,10 @@
 # login shell), and the cron function, which calls my setup script, cleans up
 # temp files, and optionally downloads my latest set of configuration files.
 
-if [ -f "$HOME/.zshenv" ]; then
-  . "$HOME/.zshenv"
-fi
+case $PATH in
+  *"$HOME/.local/bin":*) ;;
+  *) [ ! -f "$HOME/.zshenv" ] || . "$HOME/.zshenv" ;;
+esac
 
 basename=`basename "$0"`
 if [ "$basename" = tpope -o "$basename" = tp -o "$basename" = t ]; then
