@@ -31,6 +31,7 @@ export RSYNC_RSH
 files="$base_files"
 
 if [ x--extra = "x$1" ]; then
+  extra=--extra
   files="$base_files $extra_files"
   shift
 fi
@@ -39,6 +40,7 @@ command="$1"
 shift
 
 if [ x--extra = "x$1" ]; then
+  extra=--extra
   files="$base_files $extra_files"
   shift
 fi
@@ -57,31 +59,37 @@ case "$command" in
       elif [ -x "`which lynx 2>/dev/null`" ]; then
         lynx -source $url
       else
-        ssh $default_host bin/tpope config tar czf -
+        ssh $default_host .local/bin/tpope config tar czf -
       fi | tar xzf - -C "$HOME"
     fi
 
     for host in "$@"; do
-      $RSYNC_RSH "$host" bin/tpope config tar cf - | tar xf - -C "$HOME"
+      $RSYNC_RSH "$host" .local/bin/tpope config tar cf - | tar xf - -C "$HOME"
     done
     exec tpope config prune
     ;;
 
   push) # hosts
-    tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" tar xf -
+    tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" 'tar xf -; .local/bin/tpope config prune'
     ;;
 
   sync) # hosts
     rsync="rsync -urltRC"
 
+    if [ x--push = "x$1" ]; then
+      shift
+      for host in "$@"; do
+        (cd; $rsync $files --rsync-path='sh -c '\''rsync "$@"; .local/bin/tpope config prune'\'' -' "$host:")
+      done
+      exit 0
+    fi
+
     [ $# -gt 0 ] || set $default_host
     for host in "$@"; do
       $rsync "$host:$files" "$HOME" 2>/dev/null
     done
-    for host in "$@"; do
-      (cd; $rsync $files "$host:")
-    done
-    exec tpope config prune
+    tpope config prune
+    exec tpope config sync $extra --push "$@"
     ;;
 
   clone) # directories
