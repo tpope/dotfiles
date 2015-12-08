@@ -17,7 +17,7 @@ base_files="\
 .config/awesome/rc.lua .config/awesome/theme.lua .xmonad/xmonad.hs \
 bin/x-terminal-emulator .local/bin/tpope-browser bin/tpope .local/bin/tpope \
 .local/bin/tpope-config .local/bin/tpope-host bin/tpope-media bin/tpope-setup \
-.ruby/lib/tpope.rb .irbrc .pryrc"
+.irbrc .pryrc"
 
 extra_files="\
 .netrc .gnupg/pubring.gpg .netscape/userContent.css"
@@ -107,6 +107,7 @@ case "$command" in
       bin/tpope-config \
       bin/tpope-host \
       bin/sensible-browser \
+      .ruby/lib/tpope.rb \
       .fvwm
     ;;
 
