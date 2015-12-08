@@ -52,8 +52,7 @@ if [ -t 1 ]; then
 else
   RSYNC_RSH='ssh -axqoBatchmode=yes'
 fi
-LYNX_CFG="$HOME/.lynx.cfg"
-export RSYNC_RSH LYNX_CFG
+export RSYNC_RSH
 
 ulim="ulimit -S -u"
 $ulim >/dev/null 2>/dev/null || ulim="ulimit -S -p"

@@ -53,13 +53,13 @@ fi
 
 setup_web() {
 
-if inpath lynx && [ ! -f "$HOME/.lynx.cfg" ]; then
+if [ -n "$LYNX_CFG" -a ! -f "$LYNX_CFG" ]; then
   globalcfg="`lynx -dump lynxcfg: 2>/dev/null|sed -ne '/^References/,$p'|grep 'file://localhost/'|tail -1|sed -e 's,.*file://localhost,,'`"
   [ -n "$globalcfg" ] || \
   for f in /usr/local/lib/lynx.cfg /usr/local/etc/lynx.cfg /etc/lynx.cfg; do
     [ ! -f "$f" ] || globalcfg="$f"
   done
-  cat > "$HOME/.lynx.cfg" <<EOF
+  cat > "$LYNX_CFG" <<EOF
 # ~/.lynx.cfg
 INCLUDE:$globalcfg
 ACCEPT_ALL_COOKIES:TRUE

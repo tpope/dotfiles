@@ -57,7 +57,6 @@ else
   setenv LESSOPEN '|"$HOME/.lessfilter" %s'
 endif
 if ( ! $?HOST ) set HOST = `tpope host name`
-setenv LYNX_CFG "$HOME/.lynx.cfg"
 
 set noclobber
 # }}}
