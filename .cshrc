@@ -16,10 +16,6 @@ end
 
 if ( $PATH !~ *.git/safe/../../bin:* ) setenv PATH ".git/safe/../../bin:$PATH"
 
-if ( -f "$HOME/.locale" && ! $?LANG && ! $?LC_ALL ) then
-  setenv LANG "`cat ~/.locale`"
-endif
-
 if ( ! $?SRC ) setenv SRC "$HOME/src"
 
 setenv ENV "$HOME/.shrc"

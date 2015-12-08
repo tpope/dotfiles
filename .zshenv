@@ -36,11 +36,6 @@ export PATH
 [ -n "$SRC" ] || SRC="$HOME/src"
 export SRC
 
-if [ -z "$LANG" -a -z "$LC_ALL" -a -f "$HOME/.locale" ]; then
-  LANG=`cat "$HOME/.locale"`
-  export LANG
-fi
-
 if [ -z "$CLASSPATH" ]; then
   CLASSPATH=.
   [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java/*"
