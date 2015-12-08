@@ -27,7 +27,7 @@ if [ aliases = "$basename" ]; then
   aliases="launch lv pg gp e rm dl sursync vnc whois swap diff mux hmux"
   PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin
   for app in apt-get aptitude emerge opkg yum xdvi xpdf gv; do
-    [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/bin/$app" ] && aliases="$aliases $app"
+    [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/.local/bin/$app" ] && aliases="$aliases $app"
   done
   echo $aliases
   exit 0
@@ -351,16 +351,16 @@ case "$basename" in
     ;;
 
   x-terminal-emulator|terminal|xterm) # xterm
-    exec "$HOME/bin/x-terminal-emulator" "$@" ;;
+    exec "$HOME/.local/bin/x-terminal-emulator" "$@" ;;
 
   host)
     exec "$HOME/.local/bin/tpope-host" "$@" ;;
 
   setup)
-    exec "$HOME/bin/tpope-setup" "$@" ;;
+    exec "$HOME/.local/bin/tpope-setup" "$@" ;;
 
   media)
-    exec "$HOME/bin/tpope-media" "$@" ;;
+    exec "$HOME/.local/bin/tpope-media" "$@" ;;
 
   screen)
     if [ "$TERM" = "rxvt" -a -f /usr/share/terminfo/r/rxvt-unicode ]; then
@@ -452,7 +452,7 @@ case "$basename" in
     esac ;;
 
   diff)
-    PATH="`echo $PATH|sed -e "s,\\($HOME/bin\\):\\(.*\\),\\2:\\1,"`"
+    PATH="`echo $PATH|sed -e "s,\\($HOME/.local/bin\\):\\(.*\\),\\2:\\1,"`"
     if [ -t 1 ]; then
       if inpath git; then
         [ "x-uN" = "x$1" ] && shift

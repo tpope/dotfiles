@@ -54,15 +54,15 @@ esac
 [ ! -f /etc/bash_completion ] || . /etc/bash_completion
 
 _tpope() {
-  while [ -x "$HOME/bin/${COMP_WORDS[0]}-${COMP_WORDS[1]}" ]; do
+  while [ -x "$HOME/.local/bin/${COMP_WORDS[0]}-${COMP_WORDS[1]}" ]; do
     COMP_WORDS=("${COMP_WORDS[0]}-${COMP_WORDS[1]}" "${COMP_WORDS[@]:2}")
     COMP_CWORD=$((COMP_CWORD-1))
   done
   local cmd=${COMP_WORDS[0]} sub=${COMP_WORDS[1]} cur=${COMP_WORDS[COMP_CWORD]}
   if [[ $COMP_CWORD == 1 ]]; then
-    COMPREPLY=($(compgen -W "$(grep '^  [a-z-]*[|)]' "$HOME/bin/$cmd" | sed -e 's/).*//' | tr '|' ' ')" "$cur"))
+    COMPREPLY=($(compgen -W "$(grep '^  [a-z-]*[|)]' "$HOME/.local/bin/$cmd" | sed -e 's/).*//' | tr '|' ' ')" "$cur"))
   else
-    local selector=$(egrep "^  ([a-z-]*[|])*$sub([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/bin/$cmd" | sed -e 's/.*# *//')
+    local selector=$(egrep "^  ([a-z-]*[|])*$sub([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/.local/bin/$cmd" | sed -e 's/.*# *//')
     case "$selector" in
       hosts|ssh)
         COMPREPLY=($(compgen -W "localhost $(tpope-host list)" "$cur")) ;;

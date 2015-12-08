@@ -13,10 +13,10 @@ base_files="\
 .gnupg/gpg.conf .ssh/config .ssh/authorized_keys \
 .cvsignore .gitconfig .git_template \
 .xsession .xsessionrc .Xresources .xbindkeysrc.scm .gtkrc-2.0.mine \
-.pixmaps/mini .netscape/user.js \
+.pixmaps/mini .netscape/user.js .local/bin/tpope-browser \
 .config/awesome/rc.lua .config/awesome/theme.lua .xmonad/xmonad.hs \
-bin/x-terminal-emulator .local/bin/tpope-browser bin/tpope .local/bin/tpope \
-.local/bin/tpope-config .local/bin/tpope-host bin/tpope-media bin/tpope-setup \
+.local/bin/x-terminal-emulator .local/bin/tpope .local/bin/tpope-config \
+.local/bin/tpope-host .local/bin/tpope-media .local/bin/tpope-setup \
 .irbrc .pryrc"
 
 extra_files="\
@@ -104,9 +104,13 @@ case "$command" in
   prune) # nothing
     cd
     rm -rf \
+      bin/tpope \
       bin/tpope-config \
       bin/tpope-host \
+      bin/tpope-media \
+      bin/tpope-setup \
       bin/sensible-browser \
+      bin/x-terminal-emulator \
       .ruby/lib/tpope.rb \
       .fvwm
     ;;

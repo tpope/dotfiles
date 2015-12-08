@@ -3,12 +3,11 @@
 
 date
 env
-PATH="$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11"
 . "$HOME/.zshenv"
 unset STY TMUX
 
-BROWSER="tpope browse"
-TERMINAL="$HOME/bin/x-terminal-emulator"
+BROWSER="tpope browser"
+TERMINAL=x-terminal-emulator
 export TERMINAL BROWSER
 
 xsetroot -solid '#000420'
