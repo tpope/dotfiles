@@ -18,16 +18,18 @@ normalize_rate() {
 mpris_player_change() {
   old=`mpris_player_get $1 $2 | tail -1 | sed -e 's/.* //'`
   arg=`echo $3|sed -e 's/%/*0.01/'`
-  case $arg in
-    [-+*/]*) arg=`perl -e "print $old$arg"` ;;
-    *) arg=`perl -e "print $arg"` ;;
-  esac
+  if [ -z "$4" ]; then
+    case $arg in
+      [-+*/]*) arg=`perl -e "print $old$arg"` ;;
+      *) arg=`perl -e "print $arg"` ;;
+    esac
+  fi
   dbus-send --print-reply \
     --dest="org.mpris.MediaPlayer2.$dest" \
     /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Set \
     string:org.mpris.MediaPlayer2.Player \
     string:$2 \
-    variant:double:$arg \
+    variant:${4-double}:$arg \
     >/dev/null 2>&1
 }
 
