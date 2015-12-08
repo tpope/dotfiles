@@ -65,13 +65,6 @@ magenta()     { hterm="01;35";hscrn="+b M";hlrgb="#FF7FFF";hdrgb="#800080";}
 cyan()        { hterm="01;36";hscrn="+b C";hlrgb="#7FFFFF";hdrgb="#008080";}
 white()       { hterm="01;37";hscrn="+b W";hlrgb="#FFFFFF";hdrgb="#808080";}
 
-case `basename "$0"` in
-  ?)
-    [ -n "$STY" ] && SCREEN="screen -ln"
-    exec $SCREEN ssh "$@"
-    ;;
-esac
-
 [ $# -gt 0 ] || exit 1
 
 command="$1"
@@ -200,14 +193,6 @@ case "$command" in
         exec `echo "$cmd"|sed -e s/%h/$fullname/ -e s/%p/$2/`
         ;;
     esac
-    ;;
-
-  link) # nothing
-    rm -f "$HOME"/bin/[A-Z]
-    for ltr in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z; do
-      ln -s tpope-host "$HOME/bin/$ltr"
-    done
-    exit 0
     ;;
 
   list) # nothing
