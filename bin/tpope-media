@@ -8,7 +8,7 @@ mpris_list() {
 }
 
 mpris_player_get() {
-  dbus-send --print-reply --dest="org.mpris.MediaPlayer2.$1" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:"$2"
+  dbus-send --print-reply --dest="org.mpris.MediaPlayer2.$1" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:"$2" | sed -ne '2,$p'
 }
 
 normalize_rate() {
@@ -37,7 +37,14 @@ mpris() {
   case $1 in
     get) mpris_player_get $dest $2; return ;;
     volume) mpris_player_change $dest Volume $2; return ;;
-    rate) mpris_player_change $dest Rate `normalize_rate $2`; return ;;
+    rate)
+      if [ "`mpris_player_get $dest MaximumRate`" = "`mpris_player_get $dest MinimumRate`" ]; then
+        return 1
+      else
+        mpris_player_change $dest Rate `normalize_rate $2`
+        return
+      fi
+      ;;
     quit) cmd=Quit ;;
     raise) cmd=Raise ;;
     stop) cmd=Player.Stop ;;
@@ -178,7 +185,7 @@ status() {
   if type "${1}_status" >/dev/null 2>&1; then
     ${1}_status
   else
-    mpris_player_get "$1" PlaybackStatus | tail -1 | sed -e 's/"$//' -e 's/.*"//'
+    mpris_player_get "$1" PlaybackStatus | sed -e 's/"$//' -e 's/.*"//'
   fi
 }
 
