@@ -172,6 +172,23 @@ URxvt.keysym.C-0:      command:\033]721;12\007
 URxvt.keysym.C-comma:  command:\033]720;12\007
 URxvt.keysym.C-period: command:\033]721;12\007
 
+URxvt.keysym.KP_Up: string:\033[A
+URxvt.keysym.KP_Down: string:\033[B
+URxvt.keysym.KP_Right: string:\033[C
+URxvt.keysym.KP_Left: string:\033[D
+URxvt.keysym.KP_Begin: string:\033[E
+URxvt.keysym.KP_Insert: string:\033[2~
+URxvt.keysym.KP_Delete: string:\033[3~
+URxvt.keysym.KP_Next: string:\033[5~
+URxvt.keysym.KP_Prior: string:\033[6~
+URxvt.keysym.KP_Home: string:\033[7~
+URxvt.keysym.KP_End: string:\033[8~
+URxvt.keysym.KP_Enter: string:\015
+URxvt.keysym.KP_Add: string:+
+URxvt.keysym.KP_Subtract: string:-
+URxvt.keysym.KP_Multiply: string:*
+URxvt.keysym.KP_Divide: string:/
+
 URxvt.iso14755_52: false
 URxvt.perl-ext:    default,searchable-scrollback<C-S-plus>,matcher<C-1>,selection-pastebin,remote-clipboard,selection-autotransform
 URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
