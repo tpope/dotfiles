@@ -123,61 +123,62 @@ XTerm.fontMenu.font6.Label:   VGA
 XTerm*faceSize: 10
 
 !## RXVT {{{1
-#define UNIVGA -bolkhov-vga-medium-r-normal--16-*-*-*-c-80-UTFENC
 #define TERMINUS14 -*-terminus-medium-r-normal--14-*-*-*-c-*-UTFENC
 #define TERMINUS16 -*-terminus-medium-r-normal--16-*-*-*-c-*-UTFENC
 
-Rxvt*scrollBar:    false
-Rxvt*background:   #000000
-Rxvt*foreground:   #aaaaaa
-!Rxvt*font:         ISOFONT
-!Rxvt*boldFont:     ISOFONT
 Rxvt*visualBell:   true
 URxvt.urgentOnBell: true
 URxvt.termName: rxvt-256color
+
+Rxvt*scrollBar:    false
+URxvt.thickness: 4
+URxvt.scrollBar_floating: true
+URxvt.scrollstyle: plain
+
+Rxvt*background:   #000000
+Rxvt*foreground:   #aaaaaa
 URxvt.underlineColor: #777777
-#if WIDTH > 1800
-URxvt*keysym.C-F1:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
-#elif WIDTH > 1450
-URxvt*keysym.C-F1: command:\033]710;TERMINUS16,UTFFONT\007
-#else
-URxvt*keysym.C-F1: command:\033]710;UTFFONT\007
-#endif
-URxvt*keysym.C-F2: command:\033]710;FIXED-normal--6-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F3: command:\033]710;FIXED-normal--7-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F4: command:\033]710;FIXED-normal--8-*-*-*-c-*-UTFENC\007
-!URxvt*keysym.C-F5: command:\033]710;FIXED-normal--9-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F5: command:\033]710;FIXED-normal--10-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F6: command:\033]710;FIXED-semicondensed--13-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F7: command:\033]710;FIXED-normal--13-*-*-*-c-*-UTFENC\007
-!URxvt*keysym.C-F8: command:\033]710;FIXED-normal--14-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F8: command:\033]710;TERMINUS14,FIXED-normal--13-*-*-*-c-80-UTFENC\007
-URxvt*keysym.C-F9: command:\033]710;TERMINUS16,FIXED-normal--18-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F10:command:\033]710;FIXED-normal--18-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
-URxvt*keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
-URxvt*keysym.C-9:  command:\033]720;12\007
-URxvt*keysym.C-0:  command:\033]721;12\007
-URxvt*keysym.XF86Back: \033[d
-URxvt*keysym.XF86Forward: \033[c
-URxvt.keysym.C-1:      perl:matcher
-URxvt.keysym.C-grave:  perl:matcher:list
+URxvt.boldFont:
+URxvt.italicFont:
+URxvt.boldItalicFont:
+
 #if WIDTH > 1800
 URxvt.font: FIXED-normal--20-*-*-*-c-*-UTFENC
+URxvt.keysym.C-F1:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
 #elif WIDTH > 1450
 URxvt.font: TERMINUS16,UTFFONT
+URxvt.keysym.C-F1: command:\033]710;TERMINUS16,UTFFONT\007
 #else
 URxvt.font:        UTFFONT
+URxvt.keysym.C-F1: command:\033]710;UTFFONT\007
 #endif
-URxvt.boldFont:
+
+URxvt.keysym.C-F2: command:\033]710;FIXED-normal--6-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F3: command:\033]710;FIXED-normal--7-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F4: command:\033]710;FIXED-normal--8-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F5: command:\033]710;FIXED-normal--10-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F6: command:\033]710;FIXED-semicondensed--13-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F7: command:\033]710;FIXED-normal--13-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F8: command:\033]710;TERMINUS14,FIXED-normal--13-*-*-*-c-80-UTFENC\007
+URxvt.keysym.C-F9: command:\033]710;TERMINUS16,FIXED-normal--18-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F10:command:\033]710;FIXED-normal--18-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
+URxvt.keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
+
+URxvt.keysym.C-1:      perl:matcher
+URxvt.keysym.C-grave:  perl:matcher:list
+URxvt.keysym.C-9:      command:\033]720;12\007
+URxvt.keysym.C-0:      command:\033]721;12\007
+URxvt.keysym.C-comma:  command:\033]720;12\007
+URxvt.keysym.C-period: command:\033]721;12\007
+
 URxvt.iso14755_52: false
-URxvt.perl-lib:    HOME/.perl/urxvt
 URxvt.perl-ext:    default,searchable-scrollback<C-S-plus>,matcher<C-1>,selection-pastebin,remote-clipboard,selection-autotransform
 URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
 	sub { /\\n/ ? ("join lines with spaces" => sub {  s{^\\s+}{}mg; s/ \*\\n/ /g; s{ $}{}; }) : () }, \n\
 	sub { /./ ? ("string quote" => sub {  s([\\\\\\042$@]|#[{])(\\\\$&)g; s{\\n}{\\\\n}g; s{\\t}{\\\\t}g; s{\\r}{\\\\r}g; s{[\\000-\\037]}{sprintf("%03o",ord($&))}eg; $_ = qq("$_"); }) : () }, \n\
 	sub { /\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/ ? ("quote for irc" => sub { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; }) : () };
-URxvt.urlLauncher: tpope browse
+URxvt.urlLauncher: tpope browser
 URxvt.selection-pastebin.cmd: scp -p % tpo.pe:pastes
 URxvt.selection-pastebin.url: http:\/\/tpo.pe/pastes/%
 URxvt.remote-selection.store: ssh tpo.pe 'cat >/tmp/tpope-distributed-selection'
