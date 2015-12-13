@@ -24,9 +24,9 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lv pg gp e rm dl sursync vnc whois swap diff mux hmux"
+  aliases="launch lv pg gp e rm dl sursync vnc whois swap diff"
   PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin
-  for app in apt-get aptitude emerge opkg yum xdvi xpdf gv; do
+  for app in apt apt-get aptitude emerge opkg yum; do
     [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/.local/bin/$app" ] && aliases="$aliases $app"
   done
   echo $aliases
@@ -53,17 +53,6 @@ root_init() {
     fi
   else
     as_root() { "$@" ; }
-  fi
-}
-
-most_recent() {
-  prog="$1"
-  shift
-  file="`ls -1t "$@" 2>/dev/null|head -1`"
-  if [ -f "$file" ]; then
-    exec "$prog" "$file"
-  else
-    exec "$prog"
   fi
 }
 
@@ -439,7 +428,7 @@ case "$basename" in
       '') exec "$basename" "$@" ;;
       *) root_init; as_root exec "$basename" "$@" ;;
     esac ;;
-  apt-get|aptitude|emerge|yum)
+  apt|apt-get|aptitude|emerge|yum)
     case "$1" in
       changelog|download|help|search|server|show|source)
         exec "$basename" "$@" ;;
@@ -463,40 +452,6 @@ case "$basename" in
     else
       exec diff "$@"
     fi ;;
-
-  rubydemo)
-    exec ruby - "$*" <<-EOF
-    print ARGV.join(' ') + ' #=> '
-    begin
-      p(eval(ARGV.join(' '),binding,'(demo)'))
-    rescue Exception => e
-      puts "#<#{e.class}: #{e.message[/.*/]}>"
-    end
-EOF
-    ;;
-
-  see)
-    if inpath see; then
-      see=see
-    elif inpath cygstart; then
-      see=cygstart
-    elif [ "`uname`" = Darwin ] && inpath open; then
-      see=open
-    else
-      see=less
-    fi
-    if [ -f "$*" ]; then
-      exec $see "$*"
-    else
-      exec $see "$@"
-    fi ;;
-
-  xdvi)
-    [ "$#" = 0 ] ||exec xdvi "$@"; most_recent xdvi *.dvi;;
-  xpdf)
-    [ "$#" = 0 ] ||exec xpdf "$@"; most_recent xpdf *.pdf "$HOME"/Downloads/*.pdf ;;
-  gv)
-    [ "$#" = 0 ] ||exec gv "$@"; most_recent gv *.pdf *.ps;;
 
   rm)
     if inpath trash-put; then
