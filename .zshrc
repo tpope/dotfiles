@@ -292,13 +292,16 @@ bindkey -M emacs "\ea" change-first-word
 bindkey -M emacs "^XD" describe-key-briefly
 
 fg-widget() {
-  stty icanon echo -inlcr < /dev/tty
-  stty lnext '^V' quit '^\' susp '^Z' < /dev/tty
-  zle reset-prompt
-  if jobs %- >/dev/null 2>&1; then
-    fg %-
+  if [[ $#BUFFER -eq 0 ]]; then
+    if jobs %- >/dev/null 2>&1; then
+      BUFFER='fg %-'
+    else
+      BUFFER='fg'
+    fi
+    zle accept-line
   else
-    fg
+    zle push-input
+    zle clear-screen
   fi
 }
 zle -N fg-widget
