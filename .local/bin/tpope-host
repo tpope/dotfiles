@@ -163,7 +163,7 @@ case "$command" in
         if tmux has-session -t "$1" >/dev/null; then
           exec tmux attach-session $detach -t "$1"
         else
-          tmux new-session $detach -s "$1"
+          exec tmux new-session $detach -s "$1"
         fi
       elif type screen >/dev/null 2>&1; then
         exec screen ${detach--x}RR "$1"
