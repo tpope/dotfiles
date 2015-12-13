@@ -363,6 +363,11 @@ if has("autocmd")
           \ endif
     autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak nolist
     autocmd FileType tex let b:dispatch = 'latex -interaction=nonstopmode %' | setlocal formatoptions+=l
+          \ | let b:surround_{char2nr('x')} = "\\texttt{\r}"
+          \ | let b:surround_{char2nr('l')} = "\\\1identifier\1{\r}"
+          \ | let b:surround_{char2nr('e')} = "\\begin{\1environment\1}\n\r\n\\end{\1\1}"
+          \ | let b:surround_{char2nr('v')} = "\\verb|\r|"
+          \ | let b:surround_{char2nr('V')} = "\\begin{verbatim}\n\r\n\\end{verbatim}"
     autocmd FileType vim  setlocal keywordprg=:help |
           \ if exists(':Runtime') |
           \   let b:dispatch = ':Runtime' |
