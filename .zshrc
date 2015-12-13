@@ -318,10 +318,10 @@ bindkey -M vicmd ga what-cursor-position
 
 new-screen() {
   [ -z "$STY" ] || screen < "$TTY"
+  [ -z "$TMUX" ] || tmux new-window
 }
 zle -N new-screen
 [[ -z "$terminfo[kf12]" ]] || bindkey "$terminfo[kf12]" new-screen
-[[ -z "$terminfo[kf11]" ]] || bindkey -s "$terminfo[kf11]" "^Ascreen ^E\n"
 
 autoload -Uz edit-command-line
 zle -N edit-command-line
