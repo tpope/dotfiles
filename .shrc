@@ -73,15 +73,6 @@ if [ -n "$PS1" ]; then
       hash -r
     }
 
-    o() {
-      [ -z "$1" ] || cd "$1" || return
-      if [ -f Session.vim ]; then
-        vim --servername $(basename $PWD) -S
-      else
-        vim --servername $(basename $PWD) .
-      fi
-    }
-
     alias ll='ls -l'
     alias cp='cp -i'
     alias mv='mv -i'
