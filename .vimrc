@@ -1,16 +1,20 @@
 " ~/.vimrc
 
-if !exists('$SRC')
-  let $SRC = resolve(expand('~/src'))
+if has('vim_starting')
+  if has("win32")
+    let &runtimepath = substitute(&runtimepath,'\(Documents and Settings\|Users\)[\\/][^\\/,]*[\\/]\zsvimfiles\>','.vim','g')
+  endif
+  if exists('$SRC')
+    set runtimepath^=$SRC/vim runtimepath+=$SRC/vim/after
+  elseif isdirectory(expand('~/Code'))
+    set runtimepath^=~/Code/vim runtimepath+=~/Code/vim/after
+  elseif isdirectory(expand('~/src'))
+    set runtimepath^=~/src/vim runtimepath+=~/src/vim/after
+  endif
+  runtime! bundle/vim-pathogen/autoload/pathogen.vim
+  silent! execute pathogen#infect("vendor/{}")
+  silent! execute pathogen#infect("bundle/{}")
 endif
-if filereadable(expand('$SRC/vim/bundle/vim-pathogen/autoload/pathogen.vim'))
-  source $SRC/vim/bundle/vim-pathogen/autoload/pathogen.vim
-endif
-if has("win32")
-  let &runtimepath = substitute(&runtimepath,'\(Documents and Settings\|Users\)[\\/][^\\/,]*[\\/]\zsvimfiles\>','.vim','g')
-endif
-silent! execute pathogen#infect("$SRC/vim/vendor/{}")
-silent! execute pathogen#infect("$SRC/vim/bundle/{}")
 
 " Section: Options {{{1
 " ---------------------
