@@ -1,0 +1,1 @@
+[[ -o interactive ]] || . "$HOME/.shrc"
