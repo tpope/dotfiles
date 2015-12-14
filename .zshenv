@@ -3,11 +3,8 @@
 # This file is sourced into all Bourne compatible shells.
 
 if [ -r "$HOME/.env.local" ]; then
-  . "$HOME/.env.local"
-  vars=`awk -F= '/^[A-Z].*=/ { print $1 }' "$HOME/.env.local"`
-  [ -z "$vars" ] || eval "export $vars"
+  eval "`command grep '^[A-Z].*=' "$HOME/.env.local"|sed -e 's/^/export /'`"
 fi
-unset vars
 
 ENV="$HOME/.shrc"
 BASH_ENV="$HOME/.zshenv"

@@ -3,8 +3,8 @@
 
 # Common {{{1
 
-if ( -f "$HOME/.env.local" ) then
-  eval `grep '^[A-Z].*=' "$HOME/.env.local"|sed -e 's/=/ /' -e 's/^/setenv /'`
+if ( -r "$HOME/.env.local" ) then
+  eval `grep '^[A-Z].*=' "$HOME/.env.local"|sed -e 's/=/ /' -e 's/^/;setenv /'`
 endif
 
 foreach dir ( /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin" "$HOME/.local/bin" "$HOME/.bin" )
