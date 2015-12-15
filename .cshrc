@@ -26,8 +26,7 @@ setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
 if ( ! $?CLASSPATH ) setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
-setenv RSYNC_RSH 'ssh -axqoBatchMode=yes'
-if ( { test -t 1 } ) setenv RSYNC_RSH 'ssh -ax'
+if ( ! $?RSYNC_RSH ) setenv RSYNC_RSH 'ssh -ax'
 
 unset dir
 

@@ -39,11 +39,7 @@ if [ -z "$CLASSPATH" ]; then
   export CLASSPATH
 fi
 
-if [ -t 1 ]; then
-  RSYNC_RSH='ssh -ax'
-else
-  RSYNC_RSH='ssh -axqoBatchmode=yes'
-fi
+[ -n "$RSYNC_RSH" ] || RSYNC_RSH='ssh -ax'
 export RSYNC_RSH
 
 ulim="ulimit -S -u"
