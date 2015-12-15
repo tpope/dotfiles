@@ -148,7 +148,6 @@ if [ "$cron" = 0 -o "$cron" = n ]; then
 # crontab for $LOGNAME@$hostname
 CRON=1
 SHELL=$shell
-ENV=$HOME/.shrc
 BASH_ENV=$HOME/.zshenv
 PATH=$HOME/.bin:$HOME/.local/bin:$HOME/bin:/usr/local/bin:/usr/bin:/bin
 RSYNC_RSH=ssh -axqoBatchMode=yes
