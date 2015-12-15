@@ -1,4 +1,5 @@
 # ~/.profile
 
-. "$HOME/.shrc"
+[ ! -f "$HOME/.profile.local" ] || . "$HOME/.profile.local"
+[ -n "$ENV" ] || . "$HOME/.zshenv"
 . "$HOME/.zlogin"
