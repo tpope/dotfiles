@@ -10,24 +10,24 @@ ENV="$HOME/.shrc"
 BASH_ENV="$HOME/.zshenv"
 export ENV BASH_ENV
 
-for dir in /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin" "$HOME/.local/bin" "$HOME/.bin"; do
-  if [ -d "$dir" ]; then
-    PATH="""${dir}:`echo "$PATH"|sed -e "s#${dir}:##g"`"
-  fi
+ifs=$IFS
+IFS=:
+PATH=$HOME/.local/bin:$PATHPREPEND:$HOME/.rbenv/shims:$HOME/.rbenv/bin:/usr/local/bin:$PATH:/usr/sbin:/sbin
+newpath=.git/safe/../../bin
+for dir in ${path:-$PATH}; do
+  case :$newpath: in
+    *:$dir:*) ;;
+    *) [ -z "$dir" -o ! -d "$dir" ] || newpath=$newpath:$dir ;;
+  esac
 done
+PATH=$newpath
 
-PATH=".git/safe/../../bin:`echo "$PATH"|sed -e 's,\.git/[^:]*bin:,,g'`"
-
-for dir in /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin /usr/games; do
-  if [ -d "$dir" ]; then
-    case ":$PATH:" in
-      *:"$dir":*) ;;
-      *) PATH="$PATH:$dir" ;;
-    esac
-  fi
-done
-
-unset dir
+if [ -n "$ifs" ]; then
+  IFS=$ifs
+else
+  unset IFS
+fi
+unset ifs dir newpath
 export PATH
 
 [ -n "$SRC" ] || SRC="$HOME/src"

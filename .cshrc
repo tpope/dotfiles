@@ -11,14 +11,16 @@ if ( $?CDPATH ) then
   set cdpath = ("`echo $CDPATH|tr ':' '\n'`")
 endif
 
-foreach dir ( /usr/local/bin "$HOME/.rbenv/bin" "$HOME/.rbenv/shims" "$HOME/bin" "$HOME/.local/bin" "$HOME/.bin" )
-  if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
+set newpath = ()
+if ( $?PATHPREPEND ) then
+  set newpath = ( `echo "$PATHPREPEND"|tr ':' '\n'` )
+endif
+set newpath = ( $newpath $path )
+setenv PATH ".git/safe/../../bin:$HOME/.local/bin"
+foreach dir ( $newpath )
+  if ( :${PATH}: !~ *:${dir}:* ) setenv PATH "${PATH}:${dir}"
 end
-foreach dir ( /usr/lib/surfraw /var/lib/gems/1.9.1/bin /var/lib/gems/1.8/bin /usr/sbin /sbin /usr/games )
-  if ( $PATH !~ *$dir* && -d "$dir" ) setenv PATH "${dir}:${PATH}"
-end
-
-if ( $PATH !~ *.git/safe/../../bin:* ) setenv PATH ".git/safe/../../bin:$PATH"
+unset dir newpath
 
 if ( ! $?SRC ) setenv SRC "$HOME/src"
 
@@ -27,8 +29,6 @@ setenv BASH_ENV "$HOME/.zshenv"
 if ( ! $?CLASSPATH ) setenv CLASSPATH '.'
 if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
 if ( ! $?RSYNC_RSH ) setenv RSYNC_RSH 'ssh -ax'
-
-unset dir
 
 if ( { limit maxproc 1024 } ) then >&/dev/null
   limit maxproc 1024 >&/dev/null
