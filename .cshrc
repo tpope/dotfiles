@@ -22,13 +22,12 @@ foreach dir ( $newpath )
 end
 unset dir newpath
 
-if ( ! $?SRC ) setenv SRC "$HOME/src"
 
 setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
-if ( ! $?CLASSPATH ) setenv CLASSPATH '.'
-if ( -d "$HOME/.java" ) setenv CLASSPATH "${CLASSPATH}:$HOME/.java/*"
+if ( ! $?CLASSPATH ) setenv CLASSPATH ".:$HOME/.java/*"
 if ( ! $?RSYNC_RSH ) setenv RSYNC_RSH 'ssh -ax'
+if ( ! $?SRC ) setenv SRC "$HOME/src"
 
 if ( { limit maxproc 1024 } ) then >&/dev/null
   limit maxproc 1024 >&/dev/null

@@ -30,17 +30,10 @@ fi
 unset ifs dir newpath
 export PATH
 
-[ -n "$SRC" ] || SRC="$HOME/src"
-export SRC
-
-if [ -z "$CLASSPATH" ]; then
-  CLASSPATH=.
-  [ -d "$HOME/.java" ] && CLASSPATH="$CLASSPATH:$HOME/.java/*"
-  export CLASSPATH
-fi
-
+[ -n "$CLASSPATH" ] || CLASSPATH=.:$HOME/.java/*
 [ -n "$RSYNC_RSH" ] || RSYNC_RSH='ssh -ax'
-export RSYNC_RSH
+[ -n "$SRC" ] || SRC=$HOME/src
+export CLASSPATH RSYNC_RSH SRC
 
 ulim="ulimit -S -u"
 $ulim >/dev/null 2>/dev/null || ulim="ulimit -S -p"
