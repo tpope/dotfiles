@@ -1,12 +1,6 @@
-. "$HOME/.zshenv"
-
-[ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
-[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(~/.rbenv/bin/rbenv init -)"
-
 . "$HOME/.shrc"
 
 shopt -s extglob cdable_vars 2>/dev/null
-set -o noclobber
 
 export HISTCONTROL=ignoredups
 unset HISTFILE

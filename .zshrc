@@ -3,9 +3,6 @@
 
 # External {{{1
 
-[ ! -f "$HOME/.rvm/scripts/rvm" ] || . "$HOME/.rvm/scripts/rvm"
-[ ! -f "$HOME/.rbenv/bin/rbenv" ] || eval "$(~/.rbenv/bin/rbenv init -)"
-
 . "$HOME/.shrc"
 
 # }}}1
@@ -111,7 +108,7 @@ unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color
 # Options {{{1
 
 setopt rmstarsilent histignoredups
-setopt noclobber nonomatch
+setopt nonomatch
 setopt completeinword extendedglob
 setopt autocd cdable_vars
 

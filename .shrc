@@ -2,31 +2,29 @@
 
 . "$HOME/.zshenv"
 
-if [ -n "$PS1" ]; then
+case $- in *i*)
 
-  hostname="`(hostname 2>/dev/null || cat /proc/sys/kernel/hostname)|sed -e 's/\..*//'`"
+  set -o emacs -o noclobber >/dev/null 2>&1
+
   [ "$TERM" != linux ] || TMOUT=43200
 
-  if [ -x "`which vim 2>/dev/null`" ]; then
-    VISUAL=vim
-  elif [ -x "`which vi 2>/dev/null`" ]; then
-    VISUAL=vi
-  fi
+  type vim >/dev/null 2>&1 && VISUAL=vim || VISUAL=vi
   EDITOR="$VISUAL"
   BROWSER="tpope browser"
-  [ ! -x "`which less 2>/dev/null`" ] || PAGER=less
+  type less >/dev/null 2>&1 && PAGER=less || true
   if [ -x /usr/bin/lesspipe ]; then
     LESSOPEN='|lesspipe %s'
   else
     LESSOPEN='|"$HOME/.lessfilter" %s'
   fi
   LESS="FRX#10"
+  export VISUAL EDITOR BROWSER PAGER LESS LESSOPEN
 
   [ -n "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
-  [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
+  [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/spool/mail/$LOGNAME
   [ -z "$MAIL" ] || export MAIL
 
-  umask 022
+  hostname=`tpope-host name`
 
   if [ -t 1 ]; then
     [ ! -x /bin/stty ] || stty -ixon
@@ -34,7 +32,7 @@ if [ -n "$PS1" ]; then
       tty=`tty 2>/dev/null|sed -e 's,^/dev/,,'`
       case "$TERM" in
         screen*)
-          [ "$STY" -o "$TMUX" ] || h="$hostname"
+          [ "$STY" -o "$TMUX" ] || h=$hostname
           printf '\033]1;%s@%s\a' "$tty" "$hostname"
           [ -n "$TMUX" ] || printf '\033k%s@%s\033\\' "$tty" "$h"
           unset h
@@ -43,25 +41,31 @@ if [ -n "$PS1" ]; then
           printf '\033]1;%s@%s\a' "$tty" "$hostname"
           ;;
       esac
+      unset tty h
     fi
   fi
-  unset tty
 
-  execbin=`echo "$0"|sed -e 's/^-//' -e 's/\.shrc/_/'`
+  umask 022
 
   if [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ]; then
     promptchar='#'
   else
     promptchar='$'
     [ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "$LOGNAME" ] && \
-    umask 002
+      umask 002
   fi
 
-  PS1="$LOGNAME@$hostname `basename $execbin`$promptchar "
+  execbin=`basename "$0"|sed -e 's/^-//'`
 
-  if [ "`basename "$execbin"`" != sh ]; then
+  [ .shrc = "$execbin" ] || PS1="$LOGNAME@$hostname $execbin$promptchar "
 
-    [ -z "$CYGWIN" -a ! -x /usr/bin/cygpath ] || cygwin=1
+  unset promptchar execbin hostname
+
+  if type alias >/dev/null 2>&1; then
+
+    if type rbenv >/dev/null 2>&1; then
+      eval "`rbenv init -|grep -v PATH`"
+    fi
 
     rf() {
       . "$HOME/.zshenv"
@@ -112,19 +116,18 @@ if [ -n "$PS1" ]; then
     esac
 
     if ! grep --color 2>&1 | grep un >/dev/null; then
-      alias grep='grep --color=auto --exclude=.*.swp --exclude=*~ --exclude=tags'
+      alias grep='grep --color=auto --exclude=".*.swp" --exclude="*~" --exclude=tags'
     fi
 
-    unalias gp >/dev/null 2>&1
+    unalias gp >/dev/null 2>&1 || true
     for cmd in `tpope aliases`; do
-      alias $cmd="\"\$HOME\"/.local/bin/tpope $cmd"
+      alias $cmd="tpope $cmd"
     done
-
-    set -o emacs -o noclobber >/dev/null 2>&1
+    unset cmd
 
   fi
-  export VISUAL EDITOR BROWSER PAGER LESS LESSOPEN PS1
-  unset promptchar interactive execbin hostname cygwin
-fi
 
-test -f "$HOME/.shrc.local" && . "$HOME/.shrc.local"
+  ;;
+esac
+
+[ ! -f "$HOME/.shrc.local" ] || . "$HOME/.shrc.local"
