@@ -21,7 +21,6 @@ set alias_file=~/.mail_aliases
 set sendmail_wait=1
 `test "$GPG_AGENT_INFO" && echo set pgp_use_gpg_agent || echo set`
 set pgp_replysign
-#`[ -s "$HOME/.gnupg/secring.gpg" ] && echo set pgp_autosign || echo set nopgp_autosign`
 set nopgp_autosign
 set pgp_replysignencrypted
 set pgp_timeout=900
@@ -36,7 +35,7 @@ set`[ -d "$HOME/.smime/certificates" ] && " smime_default_key=$(hostname).pem"`
 set`[ -x /usr/bin/muttprint ] && echo " print_command=muttprint"`
 set`[ -d "$HOME/.mutt_cache" ] && echo " header_cache=~/.mutt_cache message_cachedir=~/.mutt_cache"`
 
-mailboxes "!" # "imap://lucille/" "imap://michael/" "imap://lindsay/" "imap://tobias/"
+mailboxes "!"
 auto_view text/richtext text/html
 #set implicit_autoview
 alternative_order text/enriched text/richtext text/plain text
@@ -46,10 +45,6 @@ alternative_order text/enriched text/richtext text/plain text
 # ---------------------
 unhdr_order *
 hdr_order Date: Delivery-date: To: Envelope-to: Delivered-To: X-Original-To: Cc: Bcc: From From: Reply-To: X-Disposition-Notification-To: Mail-Followup-To: X-URL: Organization: Organisation: X-MimeOLE User-Agent: X-HTTP-UserAgent: X-Mailer: X-Newsreader: X-Editor: X-Operating-System: Subject: X-Spam-Status:
-
-# my_hdr X-Face: v\`JKpo,b5$)a,tsNE*-C*G\;\\nd27sN0\#)PC&3z!EY,H_j.3Vv0D*9WzU$:v\`azl2B~J@1\;K\n VucJ2UwOKJU2>phfPKU[[NZ\`tgMT\`~@CS-0A!rQ\"W({|&uXCG8%W-i]\'i~+0MBLH(&!a*ta1w-,ll{\n %lCi\`a\$nH\"!v@x\'%h1B~^OSz1BV+B\;3Rt-y&U}0_h04lIMVe53~rE:l[WSS[_=\;aZrq%N\'W.1ipwXX\n ]?\"%GUe?)-2ac\"&F\#SyIYi.9)Z*6p\\%b6hYCF}>bGW
-# my_hdr X-All-Your-Base-Are-Belong-To: Us
-my_hdr X-URL: http://www.tpope.net/
 
 # Header weeding
 
@@ -87,21 +82,14 @@ bind attach i exit
 macro generic <f12> "<shell-escape>[ -z \"$STY\" ] || screen\n"
 macro pager \ef "<enter-command>set nopipe_decode\n<pipe-message>sed -ne '/\^X-Face:/,/\^[\^ \\t]/ p'|sed -ne 's/\^X-Face://' -e '/\^[ \\t]/ p'|sed -e 's/\^[ \\t]\+//'|{ echo '/* Width=48, Height=48 */'; uncompface; }|icontopbm|{ xli -fork -title 'X-Face' stdin || aview; }\n<enter-command>set nopipe_decode\n" "Show X-Face"
 macro pager \cb "<enter-command>set pipe_decode\n<pipe-message>urlview\n<enter-command>set nopipe_decode\n" 'call urlview to extract URLs out of a message'
-#macro index \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
 macro pager \eS "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --spam --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as spam'
-#macro index \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
 macro pager \eH "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --ham --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as ham'
-#macro index \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
 macro pager \eF "<enter-command>set nopipe_decode\n<pipe-message>sa-learn --forget --no-sync\n<enter-command>set nopipe_decode\n" 'Mark message as forgotten'
 
 # Section: Hooks {{{1
 # -------------------
 charset-hook ^iso-8859-1$ cp1252
-#send-hook . 'set pgp_create_traditional=yes; unmy_hdr From:' #; set from='
 send-hook . 'unmy_hdr From:'
-send-hook ~C@jmwaller\\.com 'my_hdr From: Tim Pope <timothy.pope@jmwaller.com>'
-send-hook ~C@tamuk\\.edu 'my_hdr From: Tim Pope <kstrp00@tamuk.edu>'
-#send-hook '~p ~P ~s"(test|fuck|^[jf][^A-Z]*$)"' 'set record='
 
 message-hook '~A' 'unignore X-Face; ignore X-Spam-Status'
 message-hook '~P|~h ^X-All-Your-Base-Are-Belong-To:' 'ignore X-Face X-Spam-Status'
@@ -111,14 +99,6 @@ save-hook '~f"@(ebay|amazon|paypal|buy|newegg)\\.com$" !~l'        =purchase
 save-hook '~s"\\<(order|invoice|purchase|payment|shipped)\\>" !~l' =purchase
 save-hook '~s"\\<(vim|ruby|rails)\\>" !~l' =geek
 fcc-hook  '~p ~P ~s"(test|fu[c]k|^[jf][^A-Z]*$)"' /dev/null
-#save-hook '~H .' =definitely-spam
-#reply-hook . 'set pgp_autosign=yes; set pgp_create_traditional=ask-no'
-#reply-hook '~h ^X-Mailer: (Internet Mail Service|AOL|Microsoft Outlook)' 'set pgp_create_traditional=ask-yes'
-#reply-hook '~h ^User-Agent: (Mutt)' 'set pgp_create_traditional=no'
-
-#spam "X-Spam-Status: Yes, hits=([0-9][0-9][0-9]+)" "%1S"
-#spam "X-Spam-Status: Yes, hits=([0-9][0-9])\." "%1SA"
-#spam "X-Spam-Status: (Yes|No), hits=([3-9])\." "0%2SA"
 
 score '~A' 50
 score '~p' 10
@@ -212,23 +192,13 @@ color body      brightyellow    black "(^| |\t)_[a-z0-9][a-z0-9,.!?_-]*_"
 color body      brightblack     black   "^[-_=*]{3,}\n"
 color body      yellow          black   "^SPAM:"
 
-# Section: Lists {{{1
-# -------------------
-lists mutt-users speedseductionlist zaurus-general debian-knoppix
-
 # Section: IMAP {{{1
 # ------------------
 `mutt -v|grep +USE_IMAP >/dev/null && echo set imap_list_subscribed=yes || echo set`
 
 account-hook . 'unset imap_user tunnel'; folder-hook . 'set folder="$HOME/Mail" record="=sent"'
 
-account-hook imap://localhost/ 'set tunnel="/usr/sbin/imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
-account-hook imap://michael/   'set tunnel="ssh -qax michael /usr/sbin/imapd"'; folder-hook imap://michael/ 'set folder=imap://michael/'
-account-hook imap://buster/    'set tunnel="ssh -qax buster  /usr/sbin/imapd"'; folder-hook imap://buster/  'set folder=imap://buster/'
-account-hook imap://tobias/    'set tunnel="ssh -qax tobias  /usr/sbin/imapd"'; folder-hook imap://tobias/  'set folder=imap://tobias/'
-account-hook imap://lindsay/   'set tunnel="ssh -qax lindsay /usr/sbin/imapd"'; folder-hook imap://lindsay/ 'set folder=imap://lindsay/'
-account-hook imap://gob/       'set tunnel="ssh -qax gob     /usr/sbin/imapd"'; folder-hook imap://gob/     'set folder=imap://gob/'
-account-hook imap://george/    'set tunnel="ssh -qax george  /usr/sbin/imapd"'; folder-hook imap://george/  'set folder=imap://george/'
+account-hook imap://localhost/ 'set tunnel="imapd"'; folder-hook imap://localhost/ 'set folder=imap://localhost/'
 
 # }}}1
 # Section: Misc {{{1
@@ -236,11 +206,3 @@ account-hook imap://george/    'set tunnel="ssh -qax george  /usr/sbin/imapd"'; 
 `[ -s ~/.muttrc-$(hostname) ] && echo source ~/.muttrc-$(hostname) || echo set`
 `[ -s ~/.muttrc.local ] && echo source ~/.muttrc.local || echo set`
 `[ -s ~/.mail_aliases ] && echo source ~/.mail_aliases || echo set`
-# Section: Aliases {{{1
-# ---------------------
-alias michael Tim Pope <tpope@michael.tpope.us>
-alias buster  Tim Pope <tpope@buster.tpope.us>
-alias tobias  Tim Pope <tpope@tobias.tpope.us>
-alias lindsay Tim Pope <tpope@lindsay.tpope.us>
-alias gob     Tim Pope <tpope@gob.tpope.us>
-alias george  Tim Pope <tpope@george.tpope.us>

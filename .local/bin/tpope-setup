@@ -31,13 +31,6 @@ if [ ! -f "$HOME/.local/bin/open" ]; then
     fi
   done
 fi
-if [ ! -f "$HOME/.imaprc" ]; then
-  cat > "$HOME/.imaprc" <<EOF
-I accept the risk
-set mail-subdirectory Mail
-EOF
-  basics=1
-fi
 if [ Darwin = "`uname`" ]; then
   (
   cd "$HOME/.terminfo"
