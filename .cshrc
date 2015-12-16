@@ -29,11 +29,6 @@ if ( ! $?CLASSPATH ) setenv CLASSPATH ".:$HOME/.java/*"
 if ( ! $?RSYNC_RSH ) setenv RSYNC_RSH 'ssh -ax'
 if ( ! $?SRC ) setenv SRC "$HOME/src"
 
-if ( { limit maxproc 1024 } ) then >&/dev/null
-  limit maxproc 1024 >&/dev/null
-  if ($?CRON == 1) limit maxproc 384 >&/dev/null
-endif
-
 if ( $?prompt == 0 ) exit
 if ( "$prompt" == "" ) exit
 # }}}1

@@ -34,12 +34,3 @@ export PATH
 [ -n "$RSYNC_RSH" ] || RSYNC_RSH='ssh -ax'
 [ -n "$SRC" ] || SRC=$HOME/src
 export CLASSPATH RSYNC_RSH SRC
-
-ulim="ulimit -S -u"
-$ulim >/dev/null 2>/dev/null || ulim="ulimit -S -p"
-unum=2048
-[ -z "$CRON" ] || unum=1536
-cunum="`$ulim 2>/dev/null`"
-case "$cunum" in [0-9]*) ;; *) cunum=65535 ;; esac
-[ "$unum" -ge "$cunum" ] || $ulim "$unum" 2>/dev/null
-unset ulim unum cunum

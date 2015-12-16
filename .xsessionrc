@@ -1,2 +1,5 @@
 #! sh
+
+ulimit -S -u 2048 2>/dev/null || ulimit -S -p 2048 2>/dev/null || true
+
 STARTUP="$HOME/.xsession $STARTUP"
