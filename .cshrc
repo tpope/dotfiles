@@ -32,7 +32,6 @@ if ( $?prompt == 0 ) exit
 if ( "$prompt" == "" ) exit
 # }}}1
 # Environment {{{1
-umask 022
 if ( -x /bin/stty ) stty -ixon
 
 if ( -x /usr/local/bin/vim || -x /usr/bin/vim ) then
@@ -59,7 +58,6 @@ if ( `id|sed -e 's/^uid=\([0-9]*\).*$/\1/'` == 0 ) then
 else
   set usercolor = "01;33"
   set promptchar = "%"
-  if ( `id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'` == `id -un` ) umask 002
 endif
 
 if ( -x /usr/bin/tty || -x /usr/local/bin/tty ) then

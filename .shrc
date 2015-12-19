@@ -41,16 +41,9 @@ case $- in *i*)
     fi
   fi
 
-  umask 022
-
-  if [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ]; then
-    [ -n "$PS1" ] || PS1='# '
-  else
-    [ -n "$PS1" ] || PS1='$ '
-    [ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "$LOGNAME" ] && \
-      umask 002
+  if [ -z "$PS1" ]; then
+    [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ] && PS1='# ' || PS1='$ '
   fi
-
   case $PS1 in
     ?' ') PS1="$LOGNAME@$hostname `basename $0|sed -e 's/^-//'`$PS1" ;;
   esac
