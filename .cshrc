@@ -22,7 +22,6 @@ foreach dir ( $newpath )
 end
 unset dir newpath
 
-
 setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
 if ( ! $?CLASSPATH ) setenv CLASSPATH ".:$HOME/.java/*"
@@ -127,12 +126,10 @@ unset hostcolor usercolor promptchar oldterm ttyat ttybracket
 # }}}1
 # Aliases {{{1
 if ( -x /usr/bin/dircolors || -x /usr/local/bin/dircolors ) then
-  eval `dircolors -c $HOME/.dir_colors`
-  alias ls 'ls -hF --color=auto'
+  set ls_colors = `dircolors -c $HOME/.dir_colors|cut -d"'" -f 2`
+  alias ls 'env LS_COLORS="$ls_colors" ls -hF --color=auto'
 else
-  alias ls 'ls -hF'
-  setenv CLICOLOR 1
-  setenv LSCOLORS ExGxFxdxCxfxDxxbadacad
+  alias ls 'env CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
 endif
 
 if ( ! $?MAIL && -f "/var/mail/$USER" ) setenv MAIL "/var/mail/$USER"

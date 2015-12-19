@@ -1,10 +1,11 @@
 #!/bin/sh
 
 if [ -d "$1" ]; then
-  if [ -n "$LS_COLORS" ]; then
+  if [ -x /usr/bin/dircolors -o -x /usr/local/bin/dircolors ]; then
+    eval `dircolors -b "$HOME/.dir_colors"`
     exec ls --color=force -lF "$1"
   else
-    CLICOLOR_FORCE=1 exec ls -lF "$1"
+    CLICOLOR=1 CLICOLOR_FORCE=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad exec ls -lF "$1"
   fi
 else
   case $1 in
