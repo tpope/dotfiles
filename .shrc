@@ -48,18 +48,18 @@ case $- in *i*)
   umask 022
 
   if [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ]; then
-    promptchar='#'
+    [ -n "$PS1" ] || PS1='# '
   else
-    promptchar='$'
+    [ -n "$PS1" ] || PS1='$ '
     [ "`id|sed -e 's/^.*gid=[0-9]*(\([^)]*\)).*/\1/'`" = "$LOGNAME" ] && \
       umask 002
   fi
 
-  execbin=`basename "$0"|sed -e 's/^-//'`
+  case $PS1 in
+    ?' ') PS1="$LOGNAME@$hostname `basename $0|sed -e 's/^-//'`$PS1" ;;
+  esac
 
-  [ .shrc = "$execbin" ] || PS1="$LOGNAME@$hostname $execbin$promptchar "
-
-  unset promptchar execbin hostname
+  unset hostname
 
   if type alias >/dev/null 2>&1; then
 
