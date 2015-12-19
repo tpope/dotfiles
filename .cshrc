@@ -132,8 +132,6 @@ else
   alias ls 'env CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
 endif
 
-if ( ! $?MAIL && -f "/var/mail/$USER" ) setenv MAIL "/var/mail/$USER"
-
 eval `grep '^    alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
 
 if ( $?VISUAL && "$VISUAL" == vim ) alias vi vim

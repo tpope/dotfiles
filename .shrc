@@ -20,10 +20,6 @@ case $- in *i*)
   LESS="FRX#10"
   export VISUAL EDITOR BROWSER PAGER LESS LESSOPEN
 
-  [ -n "$MAIL" -o ! -f /var/mail/$LOGNAME ] || MAIL=/var/mail/$LOGNAME
-  [ -n "$MAIL" -o ! -f /var/spool/mail/$LOGNAME ] || MAIL=/var/spool/mail/$LOGNAME
-  [ -z "$MAIL" ] || export MAIL
-
   hostname=`tpope-host name`
 
   if [ -t 1 ]; then
