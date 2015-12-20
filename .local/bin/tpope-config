@@ -4,7 +4,7 @@
 base_files="\
 .shrc .profile .bashrc .bash_profile .bash_logout \
 .cshrc .login .logout \
-.zshenv .zprofile .zshrc .zlogin .zlogout \
+.zshenv .zprofile .zshrc .zlogout \
 .inputrc .dir_colors \
 .screenrc .tmux.conf .terminfo/s/screen-256color \
 .terminfo/x/xterm-256color .terminfo/r/rxvt-unicode .terminfo/r/rxvt-256color \
@@ -104,6 +104,7 @@ case "$command" in
   prune) # nothing
     cd
     rm -rf \
+      .zlogin \
       bin/tpope \
       bin/tpope-config \
       bin/tpope-host \

@@ -1,118 +1,97 @@
 #! sh
 
-. "$HOME/.zshenv"
+[ -n "$ENV" ] || . "$HOME/.profile" >/dev/null
 
-case $- in *i*)
+set -o emacs -o noclobber
 
-  set -o emacs -o noclobber >/dev/null 2>&1
+[ "$TERM" != linux ] || TMOUT=43200
 
-  [ "$TERM" != linux ] || TMOUT=43200
+hostname=`tpope-host name`
 
-  type vim >/dev/null 2>&1 && VISUAL=vim || VISUAL=vi
-  EDITOR="$VISUAL"
-  BROWSER="tpope browser"
-  type less >/dev/null 2>&1 && PAGER=less || true
-  if [ -x /usr/bin/lesspipe ]; then
-    LESSOPEN='|lesspipe %s'
-  else
-    LESSOPEN='|"$HOME/.lessfilter" %s'
+if [ -t 1 ]; then
+  [ ! -x /bin/stty ] || stty -ixon
+  if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
+    tty=`tty 2>/dev/null|sed -e 's,^/dev/,,'`
+    case "$TERM" in
+      screen*)
+        [ "$STY" -o "$TMUX" ] || h=$hostname
+        printf '\033]1;%s@%s\a' "$tty" "$hostname"
+        [ -n "$TMUX" ] || printf '\033k%s@%s\033\\' "$tty" "$h"
+        unset h
+        ;;
+      xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
+        printf '\033]1;%s@%s\a' "$tty" "$hostname"
+        ;;
+    esac
+    unset tty h
   fi
-  LESS="FRX#10"
-  export VISUAL EDITOR BROWSER PAGER LESS LESSOPEN
+fi
 
-  hostname=`tpope-host name`
-
-  if [ -t 1 ]; then
-    [ ! -x /bin/stty ] || stty -ixon
-    if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
-      tty=`tty 2>/dev/null|sed -e 's,^/dev/,,'`
-      case "$TERM" in
-        screen*)
-          [ "$STY" -o "$TMUX" ] || h=$hostname
-          printf '\033]1;%s@%s\a' "$tty" "$hostname"
-          [ -n "$TMUX" ] || printf '\033k%s@%s\033\\' "$tty" "$h"
-          unset h
-          ;;
-        xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
-          printf '\033]1;%s@%s\a' "$tty" "$hostname"
-          ;;
-      esac
-      unset tty h
-    fi
-  fi
-
-  if [ -z "$PS1" ]; then
-    [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ] && PS1='# ' || PS1='$ '
-  fi
-  case $PS1 in
-    ?' ') PS1="$LOGNAME@$hostname `basename $0|sed -e 's/^-//'`$PS1" ;;
-  esac
-
-  unset hostname
-
-  if type alias >/dev/null 2>&1; then
-
-    if type rbenv >/dev/null 2>&1; then
-      eval "`rbenv init -|grep -v PATH`"
-    fi
-
-    rf() {
-      . "$HOME/.zshenv"
-      dp=`echo $DISPLAY|sed -e 's/\..*$//'`
-      if [ -r "$HOME/.env.$dp" ]; then
-        . "$HOME/.env.$dp"
-      fi
-      unset dp
-      hash -r
-    }
-
-    alias ll='ls -l'
-    alias cp='cp -i'
-    alias mv='mv -i'
-    alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
-
-    alias j='jobs'
-
-    alias gst='git status'
-    alias ri='ri -f bs'
-
-    alias b='tpope-browser'
-    alias mpl='mplayer -fs -loop 0'
-
-    alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"
-
-    alias service='tpope service'
-    alias start='tpope runcontrol start'
-    alias stop='tpope runcontrol stop'
-    alias restart='tpope runcontrol restart'
-    alias reload='tpope runcontrol reload'
-    alias force-reload='tpope runcontrol force-reload'
-
-    [ "$VISUAL" != vim ] || alias vi='vim'
-
-    if [ -x /usr/bin/dircolors -o -x /usr/local/bin/dircolors ]; then
-      eval `dircolors -b "$HOME/.dir_colors"|head -n 1`
-      case "$TERM" in
-        xterm*|screen*) LS_COLORS=`echo "$LS_COLORS"|sed -e 's/01;3/00;9/g'` ;;
-      esac
-      alias ls='LS_COLORS="$LS_COLORS" ls -hF --color=auto'
-    else
-      alias ls='CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
-    fi
-
-    if ! grep --color 2>&1 | grep un >/dev/null; then
-      alias grep='grep --color=auto --exclude=".*.swp" --exclude="*~" --exclude=tags'
-    fi
-
-    unalias gp >/dev/null 2>&1 || true
-    for cmd in `tpope aliases`; do
-      alias $cmd="tpope $cmd"
-    done
-    unset cmd
-
-  fi
-
-  ;;
+if [ -z "$PS1" ]; then
+  [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ] && PS1='# ' || PS1='$ '
+fi
+case $PS1 in
+  ?' ') PS1="$LOGNAME@$hostname `basename $0|sed -e 's/^-//'`$PS1" ;;
 esac
 
-[ ! -f "$HOME/.shrc.local" ] || . "$HOME/.shrc.local"
+unset hostname
+
+if type rbenv >/dev/null 2>&1; then
+  eval "`rbenv init -|grep -v PATH`"
+fi
+
+rf() {
+  . "$HOME/.profile" >/dev/null
+  dp=`echo $DISPLAY|sed -e 's/\..*$//'`
+  if [ -r "$HOME/.env.$dp" ]; then
+    . "$HOME/.env.$dp"
+  fi
+  unset dp
+  hash -r
+}
+
+alias ll='ls -l'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
+
+alias j='jobs'
+
+alias gst='git status'
+alias ri='ri -f bs'
+
+alias b='tpope-browser'
+alias mpl='mplayer -fs -loop 0'
+
+alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"
+
+alias service='tpope service'
+alias start='tpope runcontrol start'
+alias stop='tpope runcontrol stop'
+alias restart='tpope runcontrol restart'
+alias reload='tpope runcontrol reload'
+alias force-reload='tpope runcontrol force-reload'
+
+[ "$VISUAL" != vim ] || alias vi='vim'
+
+if [ -x /usr/bin/dircolors -o -x /usr/local/bin/dircolors ]; then
+  eval `dircolors -b "$HOME/.dir_colors"|head -n 1`
+  case "$TERM" in
+    xterm*|screen*) LS_COLORS=`echo "$LS_COLORS"|sed -e 's/01;3/00;9/g'` ;;
+  esac
+  alias ls='ls -hF --color=auto'
+else
+  alias ls='CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
+fi
+
+if ! grep --color 2>&1 | grep un >/dev/null; then
+  alias grep='grep --color=auto --exclude=".*.swp" --exclude="*~" --exclude=tags'
+fi
+
+unalias gp >/dev/null 2>&1
+for cmd in `tpope aliases`; do
+  alias $cmd="\"\$HOME\"/.local/bin/tpope $cmd"
+done
+unset cmd
+
+[ ! -r "$HOME/.shrc.local" ] || . "$HOME/.shrc.local"

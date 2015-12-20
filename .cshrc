@@ -130,7 +130,7 @@ else
   alias ls 'env CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
 endif
 
-eval `grep '^    alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
+eval `grep '^alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
 
 if ( $?VISUAL && "$VISUAL" == vim ) alias vi vim
 
