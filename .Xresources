@@ -5,9 +5,9 @@
 #endif
 
 *international: true
+*customization: -color
 
 !## TERMINAL COLORS {{{1
-*customization: -color
 *color0:  #000000
 *color1:  #aa0000
 *color2:  #00aa00
@@ -27,6 +27,7 @@
 *colorBD: #ffffff
 ! }}}1
 !## XTERM {{{1
+XTerm.customization:     -none
 XTerm.background:        #000000
 XTerm.VT100.background:  #000000
 XTerm.foreground:        #aaaaaa
