@@ -47,9 +47,11 @@ fi
 
 case "$command" in
   tar)
-    exec tar "$@" -C "$HOME" -X "$HOME/.cvsignore" $files ;;
+    cd
+    exec tar "$@" -X "$HOME/.cvsignore" $files ;;
 
   pull) # hosts
+    cd
     if [ "$#" = 0 ]; then
       url=http://$default_host/tgz
       if [ -x "`which curl 2>/dev/null`" ]; then
@@ -60,17 +62,18 @@ case "$command" in
         lynx -source $url
       else
         ssh $default_host .local/bin/tpope config tar czf -
-      fi | tar xzf - -C "$HOME"
+      fi | tar xzf -
     fi
 
     for host in "$@"; do
-      $RSYNC_RSH "$host" .local/bin/tpope config tar cf - | tar xf - -C "$HOME"
+      $RSYNC_RSH "$host" .local/bin/tpope config tar cf - | tar xf -
     done
     exec tpope config prune
     ;;
 
   push) # hosts
-    tar cf - -C "$HOME" $files | $RSYNC_RSH "${1-$default_host}" 'tar xf -; .local/bin/tpope config prune'
+    cd
+    tar cf - $files | $RSYNC_RSH "${1-$default_host}" 'tar xf -; .local/bin/tpope config prune'
     ;;
 
   sync) # hosts

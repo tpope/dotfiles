@@ -36,8 +36,14 @@ normalize() {
   fi
 }
 
+for AWK in $AWK gawk nawk mawk awk; do
+  if type $AWK >/dev/null 2>&1; then
+    break
+  fi
+done
+
 lookup() {
-  awk "$awkhost"' me && $1 == "'"$2"'" { printf("%s", $2); for(i=3;i<=NF;i++) printf(" %s",$i); print(""); fail=0; exit } END { exit fail }' \
+  $AWK "$awkhost"' me && $1 == "'"$2"'" { printf("%s", $2); for(i=3;i<=NF;i++) printf(" %s",$i); print(""); fail=0; exit } END { exit fail }' \
     fail=1 host="`normalize "$1"`" "$HOME/.ssh/config"
 }
 

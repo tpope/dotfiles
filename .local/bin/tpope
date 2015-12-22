@@ -438,7 +438,7 @@ case "$basename" in
     esac ;;
 
   diff)
-    PATH="`echo $PATH|sed -e "s,\\($HOME/.local/bin\\):\\(.*\\),\\2:\\1,"`"
+    PATH=`echo $PATH|sed -e "s,\\($HOME/.local/bin\\):\\(.*\\),\\2:\\1,"`
     if [ -t 1 ]; then
       if inpath git; then
         [ "x-uN" = "x$1" ] && shift

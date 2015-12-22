@@ -84,7 +84,7 @@ else
   alias ls='CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
 fi
 
-if ! grep --color 2>&1 | grep un >/dev/null; then
+if ! grep --color 2>&1 | grep option >/dev/null; then
   alias grep='grep --color=auto --exclude=".*.swp" --exclude="*~" --exclude=tags'
 fi
 
