@@ -1,4 +1,5 @@
 local theme = dofile('/usr/share/awesome/themes/default/theme.lua')
+theme.wallpaper = nil
 theme.wallpaper_cmd = { 'xsetroot -solid "#111111"' }
 theme.menu_border_color = theme.border_normal
 theme.border_normal = '#444444'

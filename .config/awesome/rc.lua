@@ -1,10 +1,23 @@
 -- vim:set sw=4 et path=/usr/share/awesome/lib:
 
-require("awful")
+local awful = require("awful")
 require("awful.autofocus")
-require("awful.rules")
-require("beautiful")
-require("naughty")
+awful.rules = require("awful.rules")
+local wibox = require("wibox")
+local beautiful = require("beautiful")
+local naughty = require("naughty")
+
+-- {{{ Utilities
+
+local function add_signal(object, signal, callback)
+    if object.connect_signal then
+        object.connect_signal(signal, callback)
+    else
+        object.add_signal(signal, callback)
+    end
+end
+
+-- }}}
 
 -- Debugging {{{
 
@@ -49,7 +62,7 @@ end
 -- Handle runtime errors after startup
 do
     local in_error = false
-    awesome.add_signal("debug::error", function (err)
+    add_signal(awesome, "debug::error", function (err)
         -- Make sure we don't go into an endless error loop
         if in_error then return end
         in_error = true
@@ -455,11 +468,6 @@ menu = mymainmenu})
 -- }}}
 
 -- {{{ Wibox
--- Create a textclock widget
-mytextclock = awful.widget.textclock({ align = "right" })
-
--- Create a systray
-mysystray = widget({ type = "systray" })
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -467,88 +475,109 @@ mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
 mytaglist.buttons = awful.util.table.join(
-                    awful.button({ }, 1, awful.tag.viewonly),
-                    awful.button({ modkey }, 1, awful.client.movetotag),
-                    awful.button({ }, 3, awful.tag.viewtoggle),
-                    awful.button({ modkey }, 3, awful.client.toggletag),
-                    awful.button({ }, 4, awful.tag.viewnext),
-                    awful.button({ }, 5, awful.tag.viewprev)
-                    )
+awful.button({ }, 1, awful.tag.viewonly),
+awful.button({ modkey }, 1, awful.client.movetotag),
+awful.button({ }, 3, awful.tag.viewtoggle),
+awful.button({ modkey }, 3, awful.client.toggletag)
+)
 mytasklist = {}
 mytasklist.buttons = awful.util.table.join(
-                     awful.button({ }, 1, function (c)
-                                              if c == client.focus then
-                                                  c.minimized = true
-                                              else
-                                                  if not c:isvisible() then
-                                                      awful.tag.viewonly(c:tags()[1])
-                                                  end
-                                                  -- This will also un-minimize
-                                                  -- the client, if needed
-                                                  client.focus = c
-                                                  c:raise()
-                                              end
-                                          end),
-                     awful.button({ }, 3, function ()
-                                              if instance then
-                                                  instance:hide()
-                                                  instance = nil
-                                              else
-                                                  instance = awful.menu.clients({ width=250 })
-                                              end
-                                          end),
-                     awful.button({ }, 4, function ()
-                                              awful.client.focus.byidx(1)
-                                              if client.focus then client.focus:raise() end
-                                          end),
-                     awful.button({ }, 5, function ()
-                                              awful.client.focus.byidx(-1)
-                                              if client.focus then client.focus:raise() end
-                                          end))
+awful.button({ }, 1, function (c)
+    if c == client.focus then
+        c.minimized = true
+    else
+        if not c:isvisible() then
+            awful.tag.viewonly(c:tags()[1])
+        end
+        -- This will also un-minimize
+        -- the client, if needed
+        client.focus = c
+        c:raise()
+    end
+end),
+awful.button({ }, 3, function (c)
+    if instance then
+        instance:hide()
+        instance = nil
+    else
+        instance = client_menu_launcher(c)
+    end
+end),
+awful.button({ }, 4, function ()
+    awful.client.focus.byidx(1)
+    if client.focus then client.focus:raise() end
+end),
+awful.button({ }, 5, function ()
+    awful.client.focus.byidx(-1)
+    if client.focus then client.focus:raise() end
+end))
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
+    mypromptbox[s] = awful.widget.prompt()
+    -- mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
     mylayoutbox[s]:buttons(awful.util.table.join(
-                           awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
-                           awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
-                           awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
-                           awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
+    awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
+    awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
+    awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
+    awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
     -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
+    mytaglist[s] = awful.widget.taglist(s, (awful.widget.taglist.label or awful.widget.taglist.filter).all, mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(function(c)
-                                              return awful.widget.tasklist.label.currenttags(c, s)
-                                          end, mytasklist.buttons)
+    if awful.widget.tasklist.label then
+       mytasklist[s] = awful.widget.tasklist(function(c)
+          return awful.widget.tasklist.label.currenttags(c, s)
+       end, mytasklist.buttons)
+    else
+       mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
+    end
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 16 })
-    -- Add widgets to the wibox - order matters
-    mywibox[s].widgets = {
-        {
-            mylauncher,
-            mytaglist[s],
-            mypromptbox[s],
-            layout = awful.widget.layout.horizontal.leftright
-        },
-        mylayoutbox[s],
-        mytextclock,
-        s == 1 and mysystray or nil,
-        mytasklist[s],
-        layout = awful.widget.layout.horizontal.rightleft
-    }
-end
--- }}}
+    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 24 })
+
+    if wibox.layout then
+       local left_layout = wibox.layout.fixed.horizontal()
+       left_layout:add(mylauncher)
+       left_layout:add(mytaglist[s])
+       left_layout:add(mypromptbox[s])
+       local layout = wibox.layout.align.horizontal()
+       local right_layout = wibox.layout.fixed.horizontal()
+       if s == 1 then right_layout:add(wibox.widget.systray()) end
+       right_layout:add(awful.widget.textclock())
+       right_layout:add(mylayoutbox[s])
+       layout:set_left(left_layout)
+       layout:set_middle(mytasklist[s])
+       layout:set_right(right_layout)
+       mywibox[s]:set_widget(layout)
+    else
+       -- Add widgets to the wibox - order matters
+       mywibox[s].widgets = {
+          {
+             mylauncher,
+             mytaglist[s],
+             mypromptbox[s],
+             layout = awful.widget.layout.horizontal.leftright
+          },
+          mylayoutbox[s],
+          awful.widget.textclock({ align = "right" }, nil, 5),
+          s == 1 and widget({ type = "systray" }) or nil,
+          mytasklist[s],
+          layout = awful.widget.layout.horizontal.rightleft
+       }
+    end
+
+ end
+ -- }}}
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-    awful.button({ }, 3, function () mymainmenu:toggle() end),
-    awful.button({ }, 4, awful.tag.viewnext),
-    awful.button({ }, 5, awful.tag.viewprev)
+awful.button({ }, 3, function () mymainmenu:toggle() end),
+awful.button({ }, 4, awful.tag.viewnext),
+awful.button({ }, 5, awful.tag.viewprev)
 ))
 -- }}}
 
@@ -739,28 +768,40 @@ awful.rules.rules = {
 -- }}}
 
 -- {{{ Signals
+
 -- Signal function to execute when a new client appears.
-client.add_signal("manage", function (c, startup)
+add_signal(client, "manage", function (c, startup)
     if c.instance and c.instance:find('@[%w-]+%*?$') then
         local host, color, dark
         host = c.instance:match('@[%w-]+'):sub(2)
         if host == 'localhost' then host = hostname end
         color = awful.util.pread('tpope host color ' .. host):sub(1, -2)
         dark = awful.util.pread('tpope host dark ' .. host):sub(1, -2)
-        if c.instance:find('^@') then
-            c.icon = image(os.getenv('HOME') .. '/.pixmaps/mini/terminal/left-' .. color .. '.xpm')
+        local icon
+        if c.instance:find('^mux@') then
+            icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/left-' .. color .. '.xpm'
         else
-            c.icon = image(os.getenv('HOME') .. '/.pixmaps/mini/terminal/right-' .. color .. '.xpm')
+            icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/right-' .. color .. '.xpm'
+        end
+        if image then
+            c.icon = image(icon)
+        else
+            c.icon = awesome.load_image(icon)
         end
     end
 
     -- Enable sloppy focus
-    c:add_signal("mouse::enter", function(c)
+    local client_callback = function(c)
         if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
             and awful.client.focus.filter(c) then
             client.focus = c
         end
-    end)
+    end
+    if client.connect_signal then
+        c:connect_signal("mouse::enter", client_callback)
+    else
+        c:add_signal("mouse::enter", client_callback)
+    end
 
     if not startup then
         -- Set the windows at the slave,
@@ -775,6 +816,7 @@ client.add_signal("manage", function (c, startup)
     end
 end)
 
-client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+add_signal(client, "focus", function(c) c.border_color = beautiful.border_focus end)
+add_signal(client, "unfocus", function(c) c.border_color = beautiful.border_normal end)
+
 -- }}}
