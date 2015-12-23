@@ -760,9 +760,6 @@ client.add_signal("manage", function (c, startup)
         else
             c.icon = image(os.getenv('HOME') .. '/.pixmaps/mini/terminal/right-' .. color .. '.xpm')
         end
-        awful.titlebar.add(c, { modkey = modkey, height = 16, fg_focus = dark })
-    else
-        awful.titlebar.add(c, { modkey = modkey, height = 16 })
     end
 
     -- Enable sloppy focus
