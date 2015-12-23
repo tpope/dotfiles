@@ -5,11 +5,6 @@ require("awful.autofocus")
 require("awful.rules")
 require("beautiful")
 require("naughty")
--- require("revelation")
-require("obvious.loadavg")
-require("obvious.temp_info")
-require("obvious.battery")
-vicious = require("vicious")
 
 -- Debugging {{{
 
@@ -542,9 +537,6 @@ for s = 1, screen.count() do
         },
         mylayoutbox[s],
         mytextclock,
-        obvious.battery(),
-        -- obvious.loadavg(),
-        obvious.temp_info({margin = { left = 5, right = 5 }}),
         s == 1 and mysystray or nil,
         mytasklist[s],
         layout = awful.widget.layout.horizontal.rightleft
