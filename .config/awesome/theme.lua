@@ -7,4 +7,7 @@ theme.titlebar_bg_normal = theme.border_normal
 theme.titlebar_bg_focus = theme.border_focus
 theme.titlebar_fg_normal = '#777777'
 theme.titlebar_fg_focus = '#000000'
+theme.font = 'sans 12'
+theme.menu_width = 320
+theme.menu_height = 32
 return theme

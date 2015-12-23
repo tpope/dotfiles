@@ -305,12 +305,15 @@ end
 function parse_desktop_file(file)
     local program = { show = true, file = file }
     for line in io.lines(file) do
+        if line ~= "[Desktop Entry]" and line:sub(0, 1) == "[" then
+            break
+        end
         for key, value in line:gmatch("([%w-]+)=(.+)") do
             program[key] = value
         end
     end
 
-    if program.NoDisplay == "true" or program.OnlyShowIn ~= nil and program.OnlyShowIn ~= "awesome" then
+    if program.NoDisplay == "true" or program.OnlyShowIn ~= nil then
         program.show = false
     end
 
@@ -339,7 +342,6 @@ function desktop_applications()
         applications[line] = parse_desktop_file(line)
     end
     f:close()
-    -- table.sort(applications, function(a, b) return (a.Name or ""):lower() < (b.Name or ""):lower() end)
     return applications
 end
 
