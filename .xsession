@@ -62,12 +62,6 @@ for var in DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS SSH_AGENT_PID SSH_AUTH_SO
 done
 [ -z "$exports" ] || echo "export$exports" >> "$HOME/.env.$DISPLAY"
 
-{
-  while xrandr --auto; do
-    sleep 5
-  done
-} &
-
 if [ $# -gt 0 ]; then
   exec "$@"
 fi
