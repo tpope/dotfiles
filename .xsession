@@ -3,33 +3,16 @@
 
 date
 env
-. "$HOME/.zshenv"
 unset STY TMUX
 
-BROWSER="tpope browser"
-TERMINAL=x-terminal-emulator
-export TERMINAL BROWSER
-
-xsetroot -solid '#000420'
-xset r rate 600 30
-xset b 40 440 60
-xset dpms 600
-
-if [ -f "$HOME/.xmodmap" ]; then
-  xmodmap "$HOME/.xmodmap"
-else
-  setxkbmap -option ctrl:nocaps
-fi
-
 if [ ! -f "$HOME/. tpope" ]; then
-  echo 'Performing an initial "tpope install"'
-  tpope install
+  echo 'Performing an initial "tpope setup"'
+  tpope setup
 fi
 tpope cron --login
 
-if [ -x /usr/bin/ssh-agent -a -z "$SSH_AUTH_SOCK" ]; then
-  sshagent="/usr/bin/ssh-agent --"
-fi
+xset r rate 500 30
+setxkbmap -option ctrl:nocaps,terminate:ctrl_alt_bksp
 
 [ ! -x "`which bindkeys 2>/dev/null`" ] || xbindkeys -n &
 [ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
@@ -67,5 +50,5 @@ if [ $# -gt 0 ]; then
 fi
 
 for wm in $wm awesome xmonad icewm fluxbox twm xterm; do
-  type $wm >/dev/null && exec $execpre $wm
+  type $wm >/dev/null && exec $wm
 done
