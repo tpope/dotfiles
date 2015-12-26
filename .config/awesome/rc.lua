@@ -6,6 +6,8 @@ awful.rules = require("awful.rules")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
+local menubar
+pcall(function() menubar = require('menubar') end)
 
 -- {{{ Utilities
 
@@ -53,6 +55,122 @@ end
 
 -- }}}
 
+-- {{{ XDG
+
+xdg = {}
+
+function xdg.parse_file(filename)
+    local contents = {}
+    local section = ''
+    local file, err = io.open(filename)
+    if not file then return nil, err end
+    for line in file:lines() do
+        section = line:match("^%[(.*)%]$") or section
+        for key, value in line:gmatch("([%w-]+)=(.+)") do
+            contents[section] = contents[section] or {}
+            contents[section][key] = value
+        end
+    end
+    file:close()
+    return contents
+end
+
+function xdg.command_line(program, terminal)
+    if not program then return end
+    local entry = program['Desktop Entry'] or program
+    if entry.Exec then
+        local cmdline = entry.Exec:gsub('%%c', entry.Name)
+        cmdline = cmdline:gsub('%%[fmuFMU]', '')
+        cmdline = cmdline:gsub('%%k', program.filename or '')
+        if entry.Icon then
+            cmdline = cmdline:gsub('%%i', '--icon ' .. entry.Icon)
+        else
+            cmdline = cmdline:gsub('%%i', '')
+        end
+        if terminal and entry.Terminal == "true" then
+            cmdline = terminal .. ' -e ' .. cmdline
+        end
+        return cmdline
+    end
+end
+
+function xdg.startup_notify(entry)
+  return entry.StartupNotify == "true" or entry.Terminal == "true"
+end
+
+function xdg.show(entry, session_name)
+    if not entry then
+        return false
+    end
+    entry = entry['Desktop Entry'] or entry
+    session_name = session_name or os.getenv('XDG_SESSION_DESKTOP') or os.getenv('SESSION_DESKTOP') or os.getenv('GDMSESSION') or 'Old'
+    show = true
+    if entry.NoDisplay == "true" or entry.OnlyShowIn ~= nil then
+        show = false
+    end
+    for session in (entry.OnlyShowIn or ''):gmatch("[^;]+") do
+        if session == session_name then
+            show = true
+        end
+    end
+    for session in (entry.NotShowIn or ''):gmatch("[^;]+") do
+        if session == session_name then
+            show = false
+        end
+    end
+    return show
+end
+
+xdg.data_home = os.getenv("XDG_DATA_HOME") or os.getenv("HOME") .. "/.local/share"
+
+function xdg.parse_all_applications()
+    local applications, list, app, basename = {}, {}
+    for _, dir in ipairs({
+        "/usr/share",
+        "/usr/local/share",
+        xdg.data_home
+    }) do
+        dir = dir .. "/applications"
+        local f = io.popen('find "' .. dir .. '" -name "*.desktop" 2>/dev/null')
+        for line in f:lines() do
+            app = xdg.parse_file(line) or {}
+            basename = line:sub(dir:len() + 2)
+            if app['Desktop Entry'] and app['Desktop Entry'].Hidden ~= "true" then
+                app.filename = line
+                app.basename = basename
+                app.dirname = dir
+                applications[basename] = app
+            else
+                applications[basename] = nil
+            end
+        end
+        f:close()
+    end
+    for _, app in pairs(applications) do
+        table.insert(list, app)
+    end
+    table.sort(list, function(a, b)
+        return (a['Desktop Entry'].Name or ""):lower() < (b['Desktop Entry'].Name or ""):lower()
+    end)
+    return list
+end
+
+function xdg.applications_by_category(applications)
+    local categorized = {}
+    for _, app in ipairs(applications) do
+        entry = app['Desktop Entry']
+        for category in (entry.Categories or 'Other'):gmatch('[^;]+') do
+            if not categorized[category] then
+                categorized[category] = {}
+            end
+            table.insert(categorized[category], app)
+        end
+    end
+    return categorized
+end
+
+-- }}}
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -77,11 +195,10 @@ do
         in_error = false
     end)
 end
+
 -- }}}
 
 -- {{{ Variable definitions
-
-beautiful.init(awful.util.getdir("config") .. "/theme.lua")
 
 local hostname = awful.util.pread('tpope host name'):sub(1, -2)
 local modkey = "Mod4"
@@ -103,6 +220,98 @@ local layouts =
     -- awful.layout.suit.max.fullscreen
     -- awful.layout.suit.magnifier
 }
+
+beautiful.init(awful.util.getdir("config") .. "/theme.lua")
+if standalone and awful.util.file_readable(os.getenv('HOME') .. '/.fehbg') then
+    os.execute('"$HOME/.fehbg"')
+end
+
+-- }}}
+
+-- {{{ Icons
+
+local icon_suffixes = {'.png', '.xpm'}
+
+if not awesome.version:match('v3.[0-4]') then
+    table.insert(icon_suffixes, '.svg')
+end
+
+local function icon_path(opts)
+    opts = opts or {}
+    local contexts = opts.contexts or {'apps', 'actions', 'devices', 'places', 'categories', 'status'}
+    local size = opts.size or 48
+    local icon_path = {}
+    local xsize = string.format('%dx%d', size, size)
+    for _, root in ipairs({os.getenv('HOME') .. '/.local/share/icons' , '/usr/share/icons'}) do
+        local dir
+        for _, theme in ipairs({
+            'hicolor/' .. xsize .. '/%s',
+            'hicolor/scalable/%s',
+            'hicolor/64x64/%s',
+            'hicolor/48x48/%s',
+            'hicolor/128x128/%s',
+            'hicolor/256x256/%s',
+            'hicolor/512x512/%s',
+            'hicolor/48x48/%s',
+            'gnome/' .. xsize .. '/%s',
+            'gnome/48x48/%s'}) do
+            for _, context in ipairs(contexts) do
+                dir = root .. '/' .. theme:format(context)
+                if awful.util.file_readable(dir) then
+                    table.insert(icon_path, dir)
+                end
+            end
+        end
+    end
+    table.insert(icon_path, '/usr/share/pixmaps')
+    table.insert(icon_path, '/usr/share/icons')
+    return icon_path
+end
+
+local fallback_icon = '/usr/share/icons/HighContrast/%dx%d/status/dialog-question.png'
+
+local function lookup_icon(name, opts)
+    if not name or name:find('/') then
+        return name
+    else
+        local suffixes = icon_suffixes
+        for _, suffix in ipairs(suffixes) do
+            if name:match('%' .. suffix .. '$') then
+                suffixes = {''}
+                break
+            end
+        end
+        local path = icon_path(opts)
+        for _, suffix in ipairs(suffixes) do
+            for _, dir in ipairs(path) do
+                local path = dir .. '/' .. name .. suffix
+                if awful.util.file_readable(path) then
+                    return path
+                end
+            end
+        end
+        local fallback = fallback_icon:gsub('%%d', (opts and opts.size or 48))
+        if awful.util.file_readable(fallback) then
+            return fallback
+        end
+    end
+end
+
+naughty.config.notify_callback = function(args)
+    if args.appname == 'Spotify' then
+        -- Seems to cause awesome to crash
+        args.icon = nil
+    elseif type(args.icon) == "string" and not args.icon:find('/') then
+        local svg = '/usr/share/notify-osd/icons/Humanity/scalable/status/' .. args.icon .. '.svg'
+        if not awesome.version:match('v3.[0-4]') and awful.util.file_readable(svg) then
+            args.icon = svg
+        else
+            args.icon = lookup_icon(args.icon)
+        end
+    end
+    return args
+end
+
 -- }}}
 
 -- Activation {{{
@@ -287,172 +496,237 @@ awful.tag.setmwfact(0.5806)
 awful.menu.menu_keys = {
     up = { "Up", "k" },
     down = { "Down", "j" },
-    exec = { "Return", "Right" },
-    enter = { "Right" },
-    back = { "Left" },
+    exec = { "Return", "Right", "l" },
+    enter = { "Right", "l" },
+    back = { "Left", "h" },
     close = { "Escape", "[", "Tab" }
 }
 
-function restart()
-    os.execute("pkill -s 0 -HUP xbindkeys")
+local function restart()
     awful.util.restart()
 end
 
-function parse_desktop_file(file)
-    local program = { show = true, file = file }
-    for line in io.lines(file) do
-        if line ~= "[Desktop Entry]" and line:sub(0, 1) == "[" then
-            break
-        end
-        for key, value in line:gmatch("([%w-]+)=(.+)") do
-            program[key] = value
-        end
-    end
-
-    if program.NoDisplay == "true" or program.OnlyShowIn ~= nil then
-        program.show = false
-    end
-
-    if program.Exec then
-        local cmdline = program.Exec:gsub('%%c', program.Name)
-        cmdline = cmdline:gsub('%%[fmuFMU]', '')
-        cmdline = cmdline:gsub('%%k', program.file)
-        if program.icon_path then
-            cmdline = cmdline:gsub('%%i', '--icon ' .. program.icon_path)
-        else
-            cmdline = cmdline:gsub('%%i', '')
-        end
-        if program.Terminal == "true" then
-            cmdline = terminal .. ' -e ' .. cmdline
-        end
-        program.cmdline = cmdline
-    end
-
-    return program
-end
-
-function desktop_applications()
-    local applications = {}
-    local f = io.popen('find /usr/share/applications /usr/local/share/applcations "${XDG_DATA_HOME:-$HOME/.local/share}/applications" -name "*.desktop" 2>/dev/null')
-    for line in f:lines() do
-        applications[line] = parse_desktop_file(line)
-    end
-    f:close()
-    return applications
-end
-
-function desktop_applications_by_category(applications)
-    applications = applications or desktop_applications()
-    local programs = {}
-    for _, program in pairs(applications) do
-        for category in (program.Categories or "Other"):gmatch('[^;]+') do
-            if not programs[category] then
-                programs[category] = {}
-            end
-            table.insert(programs[category], program)
-        end
-    end
-    for _, t in pairs(programs) do
-        table.sort(t, function(a, b) return (a.Name or ""):lower() < (b.Name or ""):lower() end)
-    end
-    return programs
-end
-
-function spawn_desktop(program)
-    if program.Exec then
-        local cmdline = program.Exec:gsub('%%c', program.Name)
-        cmdline = cmdline:gsub('%%[fmuFMU]', '')
-        cmdline = cmdline:gsub('%%k', program.file)
-        if program.Icon then
-            cmdline = cmdline:gsub('%%i', '--icon ' .. program.Icon)
-        else
-            cmdline = cmdline:gsub('%%i', '')
-        end
-        if program.Terminal == "true" then
-            cmdline = terminal .. ' -e ' .. cmdline
-        end
-        awesome.spawn(cmdline, program.StartupNotify == "true" or program.Terminal == "true")
-    end
-
-end
-
-function icon_path(name)
-    for _, root in ipairs({os.getenv('HOME') .. '/.local/share/icons' , '/usr/share/icons'}) do
-        for _, dir in ipairs({'hicolor/scalable', 'hicolor/32x32', 'hicolor/48x48', 'gnome/32x32'}) do
-            for _, ext in ipairs({'png'}) do
-                local path = root .. '/' .. dir .. '/' .. name .. '.' .. ext
-                if awful.util.file_readable(path) then
-                    return path
-                end
-            end
-        end
-    end
-end
-
-local desktop_categories = {
+local menu_categories = {
     { "&Accessories", "Utility", 'applications-accessories' },
     { "&Development", "Development", 'applications-development' },
     { "&Education", "Education", 'applications-science' },
     { "&Games", "Game", 'applications-games' },
     { "G&raphics", "Graphics", 'applications-graphics' },
-    { "&Internet", "Network", 'applications-internet' },
+    { "I&nternet", "Network", 'applications-internet' },
     { "M&ultimedia", "AudioVideo", 'applications-multimedia' },
     { "O&ffice", "Office", 'applications-office' },
     { "&Other", "Other", 'applications-other' },
-    { "&Settings", "Settings", 'preferences-desktop' },
+    { "&Settings", "Settings", 'applications-utilities' },
     { "S&ystem Tools", "System", 'applications-system' },
 }
 
-function desktop_menu_items(items)
-    items = items or {}
-    local programs = desktop_applications_by_category()
-    for i, category in ipairs(desktop_categories) do
-        local subitems = {}
-        for _, program in ipairs(programs[category[2]] or {}) do
-            if program.NoDisplay ~= "true" and (program.OnlyShowIn == nil or program.OnlyShowIn == "awesome") then
-                table.insert( subitems, {
-                    program.Name or "?",
-                    function () spawn_desktop(program) end,
-                    program.Icon and (
-                    icon_path('apps/' .. program.Icon) or
-                    icon_path('devices/' .. program.Icon) or
-                    icon_path('places/' .. program.Icon) or
-                    icon_path('categories/' .. program.Icon))
-                })
+local applications = xdg.parse_all_applications()
+local applications_by_category = xdg.applications_by_category(applications)
+
+local function lazy_menu_icon(item, theme)
+    local size = theme and theme.height or beautiful.menu_height
+    local icon = item[3]
+    table.remove(item, 3)
+    if icon then
+        setmetatable(item, {__index = function(t, k)
+            if k == 3 then
+                t[k] = lookup_icon(icon, {size = size}) or false
+                return t[k]
             end
-        end
-        if table.getn(subitems) > 0 then
-            table.insert(items, {category[1], subitems, icon_path('categories/' .. category[3])})
+        end})
+    end
+    return item
+end
+
+local menutheme = {height = math.min(beautiful.menu_height * 2, 48), width = beautiful.menu_width * 3 / 4}
+local menusubtheme = {height = beautiful.menu_height, width = beautiful.menu_width}
+local menuitems = {}
+
+local function menu_insert(item)
+    table.insert(menuitems, lazy_menu_icon(item, menutheme))
+end
+
+menu_insert({"&Terminal", function () shell_host('localhost') end, 'utilities-terminal'})
+menu_insert({"&Multiplexor", function () mux_host('localhost') end, 'utilities-system-monitor'})
+menu_insert({"&Browser", browser, 'web-browser'})
+
+for _, category in ipairs(menu_categories) do
+    local subitems = {theme = menusubtheme, category = category[2]}
+    if awesome.version:match('v3.[0-4]') then
+        subitems = {}
+    end
+    for _, app in ipairs(applications_by_category[category[2]] or {}) do
+        local entry = app['Desktop Entry']
+        local cmdline = xdg.command_line(entry, terminal)
+        if cmdline and xdg.show(entry, session_name) then
+            local exec = function()
+                run_or_raise(cmdline, {class = {entry.StartupWMClass}, instance = {entry.StartupWMClass}})
+            end
+            local actions = {
+                {entry.Comment or entry.GenericName or entry.Name, exec, theme = {font = beautiful.font:gsub('(.*) ', '%1 Bold ', 1)}},
+                cmd = exec
+            }
+            for action in (entry.Actions or ''):gmatch('[^;]+') do
+                local a = app['Desktop Action ' .. action]
+                if a then
+                    table.insert(actions, lazy_menu_icon({a.Name or '?', xdg.command_line(a), a.Icon}))
+                end
+            end
+            table.insert(actions, {"Open Desktop Entry", "xdg-open " .. app.filename})
+            table.insert(actions, {"Edit Desktop Entry", function () return edit(app.filename) end})
+            local mine = xdg.data_home .. '/applications/' .. app.basename
+            if mine ~= app.filename then
+                table.insert(actions, {"Override Desktop Entry", function()
+                    if not awful.util.file_readable(mine) then
+                        local source = io.open(app.filename, "r")
+                        local dest = io.open(mine, "w")
+                        dest:write(source:read("*a"))
+                        dest:close()
+                        source:close()
+                    end
+                    edit(mine)
+                end})
+            end
+            table.insert(subitems, lazy_menu_icon({
+                entry.Name or '?',
+                awesome.version:match('v3.[0-4]') and exec or actions,
+                entry.Icon,
+                theme = {submenu = ""},
+                cmdline = cmdline
+            }))
         end
     end
-    return items
+    if table.getn(subitems) > 0 then
+        menu_insert({category[1], subitems, category[3], category = category[2]})
+    end
 end
 
 local exitmenu = {
     { "&Restart", restart },
     { "Restart with global &config", function() awesome.exec("awesome -c /etc/xdg/awesome/rc.lua") end },
     { "&Quit", awesome.quit },
-    { "Start &Unity", function() awesome.exec("unity") end },
-    { "Start &Gnome", function() awesome.exec("gnome-session") end },
-    { "Start &KDE", function() awesome.exec("startkde") end },
 }
-
-for _, app in pairs(desktop_applications()) do
-    if app['X-GNOME-Provides'] == 'windowmanager' then
-        table.insert(exitmenu, {"Start " .. app.Name, function() awesome.exec(app.Exec) end})
+if not awesome.version:match('v3.[0-4]') then exitmenu.theme = menusubtheme end
+for _, app in pairs(applications) do
+    if app and app['Desktop Entry']['X-GNOME-Provides'] == 'windowmanager' then
+        table.insert(exitmenu, {
+            app['Desktop Entry'].Name,
+            function() awesome.exec(app['Desktop Entry'].Exec) end
+        })
     end
 end
 
-menuitems = desktop_menu_items()
-table.insert(menuitems, 1, {"&Terminal", function () shell_host('localhost') end, icon_path('apps/utilities-terminal')})
-table.insert(menuitems, 2, {"&Multiplexor", function () mux_host('localhost') end, icon_path('apps/utilities-system-monitor')})
-table.insert(menuitems, 3, {"&Browser", browser, icon_path('apps/web-browser')})
-table.insert(menuitems, {"E&xit", exitmenu, icon_path('actions/system-log-out')})
+menu_insert({"E&xit", exitmenu, 'system-log-out'})
 
-mymainmenu = awful.menu({ items = menuitems})
+local mymainmenu = awful.menu({ items = menuitems, theme = menutheme})
 
-mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
-menu = mymainmenu})
+local mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
+                                           menu = mymainmenu})
+
+local function client_menu_launcher(c, coords)
+    if client_menu and client_menu.wibox.visible then
+        cm = client_menu
+        client_menu = nil
+        return cm:hide()
+    end
+    local active, id, desc, icon
+    local checked = lookup_icon('emblem-default', {size = beautiful.menu_height, contexts = {'emblems'}})
+    local machine_arg = c.machine or '""'
+    local outputs = {}
+    local f = io.popen('tpope media sink list ' .. c.pid .. ' ' .. machine_arg)
+    for line in f:lines() do
+        active, id, desc = string.match(line, "(%S+)\t(%S+)\t(.+)")
+        if active == "1" then
+            icon = checked
+        else
+            icon = nil
+        end
+        if id then
+            table.insert(outputs, {
+                desc,
+                function() awful.util.spawn('tpope media sink ' .. id .. ' '  .. c.pid .. ' ' .. machine_arg, false) end,
+                icon
+            })
+        end
+    end
+    f:close()
+    local inputs = {}
+    local f = io.popen('tpope media source list ' .. c.pid .. ' ' .. machine_arg)
+    for line in f:lines() do
+        active, id, desc = string.match(line, "(%S+)\t(%S+)\t(.+)")
+        if active == "1" then
+            icon = checked
+        else
+            icon = nil
+        end
+        if id then
+            table.insert(inputs, {
+                desc,
+                function() awful.util.spawn('tpope media source ' .. id .. ' '  .. c.pid .. ' ' .. machine_arg, false) end,
+                icon
+            })
+        end
+    end
+    f:close()
+    toggles = {}
+    moves = {}
+    for _, t in ipairs(tags[mouse.screen]) do
+        icon = nil
+        for _, t2 in ipairs(c:tags()) do
+            if t == t2 then
+                icon = checked
+            end
+        end
+        table.insert(toggles, {t.name, function() awful.client.toggletag(t, c) end, icon })
+        table.insert(moves, {t.name, function() awful.client.movetotag(t, c) end, icon })
+    end
+    items = {
+        { "Fo&cus", function() client.focus = c; c:raise() end },
+        { "&Kill", function() c:kill() end },
+        { c.minimized and "R&estore" or "Minimiz&e", function() c.minimized = not c.minimized end },
+        { c.float and "Un&float" or "&Float", function() awful.client.floating.toggle(c) end },
+        { c.ontop and "Not On &Top" or "On &Top", function() c.ontop = not c.ontop end },
+        { c.sticky and "Un&stick" or "&Stick", function() c.sticky = not c.sticky end },
+        { "&Move To Tag", moves },
+        { "To&ggle Tag", toggles },
+    }
+    if next(outputs) then
+        table.insert(items, {"Audio &Out", outputs})
+    end
+    if next(inputs) then
+        table.insert(items, {"Audio &In", inputs})
+    end
+    client_menu = awful.menu({ items = items })
+    client_menu:show({keygrabber = true, coords = coords})
+end
+
+if menubar then
+    menubar.menu_gen.generate = function()
+        local apps = {}, category
+        for _, cat in ipairs(menuitems) do
+            if cat.category then
+                category = 'other'
+                for k, v in pairs(menubar.menu_gen.all_categories) do
+                    if cat.category == v.app_type then
+                        category = k
+                    end
+                end
+                for _, item in ipairs(cat[2]) do
+                    if item.cmdline then
+                        table.insert(apps, {
+                            category = category,
+                            cmdline = item.cmdline,
+                            name = item[1],
+                            icon = item[3],
+                        })
+                    end
+                end
+            end
+        end
+        return apps
+    end
+end
+
 -- }}}
 
 -- {{{ Wibox
@@ -651,7 +925,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n", awful.client.restore),
 
     -- Prompt
-    awful.key({ modkey },            "r", function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey },            "r", function () if menubar then menubar.show() else mypromptbox[mouse.screen]:run() end end),
     awful.key({ modkey, "Mod1" },    "r", function () awful.prompt.run(
         { prompt = "Run in terminal: " },
         mypromptbox[mouse.screen].widget,
@@ -690,6 +964,8 @@ clientkeys = awful.util.table.join(
     awful.key({modkey, "Control"  }, "a", function (c)
         os.execute('import -window ' .. c.window .. ' $HOME/Pictures/' .. (c.title or "unnamed") .. ' -`date +%Y-%m-%d_%H-%M-%S`.png') end),
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
+    awful.key({ "Control", "Mod1" }, "Tab",    function (c) client_menu_launcher(c) end),
+    awful.key({ modkey,           }, "c",      function (c) client_menu_launcher(c, c:geometry()) end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),

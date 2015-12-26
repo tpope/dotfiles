@@ -8,7 +8,11 @@ theme.titlebar_bg_normal = theme.border_normal
 theme.titlebar_bg_focus = theme.border_focus
 theme.titlebar_fg_normal = '#777777'
 theme.titlebar_fg_focus = '#000000'
-theme.font = 'sans 12'
-theme.menu_width = 320
+theme.font = 'Sans 14'
+theme.menu_width = 384
 theme.menu_height = 32
+if not awesome.version:match('v3.[0-4]') then
+  theme.menu_submenu_icon = nil
+  theme.menu_submenu = "▶ "
+end
 return theme
