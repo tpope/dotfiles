@@ -163,7 +163,7 @@ function client_match (conditions, client)
 end
 
 function browser ()
-    return run_or_raise('tpope browse', {class = "Uzbl-tabbed", role = 'browser'})
+    return run_or_raise('tpope browse', {class = "Uzbl-tabbed", role = '^browser$'})
 end
 
 -- }}}

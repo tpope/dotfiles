@@ -29,20 +29,22 @@ fi
 xdotool_find_browser() {
   if [ -x "`which xdotool 2>/dev/null`" ]; then
     classes=${1:-'^(Navigator|Google-chrome|Chromium|Konqueror|Dillo|Uzbl)'}
-    xdotool search --desktop `xdotool get_desktop` --class "$classes" windowactivate ||
-      xdotool search --onlyvisible --class "$classes" windowactivate ||
-      xdotool search --class "$classes" windowactivate
+    desktop=`xdotool get_desktop`
+    id=`(
+    xdotool search --desktop $desktop --class "$classes" ||
+      xdotool search --onlyvisible --class "$classes" ||
+      xdotool search --class "$classes")|tail -1`
+    [ -n "$id" ] && xdotool windowactivate $id
   else
     false
   fi
 }
 
 find_browser() {
-  instance="echo $1|sed -e 's/\(.\)/\U\1/"
   if [ -x "`which xdotool 2>/dev/null`" ]; then
-    wmctrl -x -a "$instance"
+    xdotool_find_browser "^$1"
   else
-    xdotool_find_browser "^$instance"
+    wmctrl -x -a "$1"
   fi
 }
 
