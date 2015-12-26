@@ -27,16 +27,19 @@ fi
 
 [ ! -f "$HOME/.xsession.local" ] || . "$HOME/.xsession.local"
 
-rm -f "$HOME/.env.$DISPLAY"
-touch "$HOME/.env.$DISPLAY"
+: > "$HOME/.env.$DISPLAY"
 chmod 0600 "$HOME/.env.$DISPLAY"
-for var in DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS SSH_AGENT_PID SSH_AUTH_SOCK GNOME_KEYRING_PID; do
+for var in DISPLAY XAUTHORITY DESKTOP_SESSION GDMSESSION \
+  XDG_SEAT XDG_SEAT_PATH XDG_SESSION_TYPE XDG_SESSION_ID XDG_VTNR \
+  XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_CONFIG_DIRS XDG_DATA_DIRS \
+  XDG_RUNTIME_DIR XDG_GREETER_DATA_DIR MANDATORY_PATH DEFAULTS_PATH \
+  DBUS_SESSION_BUS_ADDRESS SSH_AGENT_PID SSH_AUTH_SOCK GNOME_KEYRING_PID; do
   eval val=\$$var
   if [ -n "$val" ]; then
     echo "$var='$val'" >> "$HOME/.env.$DISPLAY"
     exports="$exports $var"
     if [ "$DISPLAY" = ":0" ]; then
-      screen -S `tpope host name` -X setenv $var "$val" 2>/dev/null
+      screen -S `tpope host name` -X setenv $var "$val" >/dev/null 2>&1
       tmux setenv -g $var "$val" 2>/dev/null
     fi
   fi
