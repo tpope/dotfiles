@@ -25,8 +25,6 @@ fi
 [ ! -x /usr/lib/notify-osd/notify-osd ] || /usr/lib/notify-osd/notify-osd &
 [ ! -x "`which gtk-redshift 2>/dev/null`" ] || gtk-redshift -l 40:-74 -t 6500:3700 &
 
-xsetroot -solid '#000840'
-
 [ ! -f "$HOME/.xsession.local" ] || . "$HOME/.xsession.local"
 
 rm -f "$HOME/.env.$DISPLAY"
@@ -44,6 +42,9 @@ for var in DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS SSH_AGENT_PID SSH_AUTH_SO
   fi
 done
 [ -z "$exports" ] || echo "export$exports" >> "$HOME/.env.$DISPLAY"
+
+xsetroot -solid '#111111'
+[ ! -x "$HOME/.fehbg" ] || "$HOME/.fehbg"
 
 if [ $# -gt 0 ]; then
   exec "$@"
