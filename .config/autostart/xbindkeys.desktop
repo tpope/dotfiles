@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=xbindkeys
+TryExec=xbindkeys
+Exec=xbindkeys -n
+StartupNotify=false

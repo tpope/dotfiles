@@ -1,9 +1,10 @@
 #!/bin/sh
 # vim:set et sw=2:
 
-date
-env
 unset STY TMUX
+
+date >&2
+env >&2
 
 if [ ! -f "$HOME/. tpope" ]; then
   echo 'Performing an initial "tpope setup"'
@@ -13,17 +14,6 @@ tpope cron --login
 
 xset r rate 500 30
 setxkbmap -option ctrl:nocaps,terminate:ctrl_alt_bksp
-
-[ ! -x "`which bindkeys 2>/dev/null`" ] || xbindkeys -n &
-[ ! -x "`which unclutter 2>/dev/null`" ] || unclutter -idle 10 -noevents &
-if [ -x /usr/bin/gnome-keyring-daemon -a -z "$GNOME_KEYRING_CONTROL" ]; then
-  eval "`gnome-keyring-daemon`"
-fi
-[ ! -x "`which pulseaudio 2>/dev/null`" ] || pulseaudio --start
-[ ! -x "`which bluetooth-applet 2>/dev/null`" ] || bluetooth-applet &
-[ ! -x "`which nm-applet 2>/dev/null`" ] || nm-applet &
-[ ! -x /usr/lib/notify-osd/notify-osd ] || /usr/lib/notify-osd/notify-osd &
-[ ! -x "`which gtk-redshift 2>/dev/null`" ] || gtk-redshift -l 40:-74 -t 6500:3700 &
 
 [ ! -f "$HOME/.xsession.local" ] || . "$HOME/.xsession.local"
 
@@ -46,13 +36,40 @@ for var in DISPLAY XAUTHORITY DESKTOP_SESSION GDMSESSION \
 done
 [ -z "$exports" ] || echo "export$exports" >> "$HOME/.env.$DISPLAY"
 
+if [ $# = 0 ]; then
+  set -- x-terminal-emulator
+  for wm in $wm awesome xmonad gnome-session lxsession twm; do
+    if type $wm >/dev/null 2>&1; then
+      set -- $wm
+      break
+    fi
+  done
+fi
+
+case $1 in
+  *xmonad-session) ;;
+  *start*|*session|true) exec "$@" ;;
+esac
+
 xsetroot -solid '#111111'
 [ ! -x "$HOME/.fehbg" ] || "$HOME/.fehbg"
 
-if [ $# -gt 0 ]; then
-  exec "$@"
+"$@" &
+wmpid=$!
+
+sleep 0.1
+
+: ${XDG_CURRENT_DESKTOP:=${XDG_SESSION_DESKTOP:-${GDMSESSION:-Old}}}
+if type xdg-autostart >/dev/null 2>&1; then
+  xdg-autostart "$XDG_CURRENT_DESKTOP"
+elif type dex >/dev/null 2>&1; then
+  dex -a -e "$XDG_CURRENT_DESKTOP"
+elif type lxsession-xdg-autostart >/dev/null 2>&1; then
+  lxsession-xdg-autostart -d "$XDG_CURRENT_DESKTOP"
+elif type fbautostart >/dev/null 2>&1; then
+  FBXDG_DE="$XDG_CURRENT_DESKTOP" fbautostart
+elif type xbindkeys >/dev/null 2>&1; then
+  xbindkeys -n &
 fi
 
-for wm in $wm awesome xmonad icewm fluxbox twm xterm; do
-  type $wm >/dev/null && exec $wm
-done
+wait $wmpid
