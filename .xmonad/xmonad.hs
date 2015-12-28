@@ -1,3 +1,4 @@
+import System.Exit
 import XMonad
 import XMonad.Config.Desktop
 import XMonad.Hooks.EwmhDesktops hiding (fullscreenEventHook)
@@ -29,6 +30,10 @@ myManageHook = composeAll (
   , title =? "Event Tester" --> doFloat
   ])
 
+myExit :: X ()
+myExit = do
+  return ()
+
 main = xmonad $ withUrgencyHook BorderUrgencyHook {urgencyBorderColor = "yellow"}
               $ ewmh
               $ desktopConfig
@@ -47,7 +52,8 @@ main = xmonad $ withUrgencyHook BorderUrgencyHook {urgencyBorderColor = "yellow"
   , (modm .|. shiftMask, xK_p)
   ]
   `additionalKeys`
-  [ ((modm .|. controlMask, xK_r), restart "awesome" False)
+  [ ((modm .|. shiftMask  , xK_q), myExit >> io (exitWith ExitSuccess))
+  , ((modm .|. controlMask, xK_r), myExit >> restart "awesome" False)
   , ((modm, xK_f), sendMessage (Toggle "Full"))
   , ((modm, xK_u), focusUrgent)
   ]
