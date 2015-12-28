@@ -10,6 +10,7 @@ import XMonad.Layout.Fullscreen
 import XMonad.Layout.Named
 import XMonad.Layout.NoBorders
 import XMonad.Layout.ToggleLayouts
+import qualified XMonad.StackSet as W
 import XMonad.Util.EZConfig
 import XMonad.Util.SpawnOnce
 
@@ -54,7 +55,10 @@ main = xmonad $ withUrgencyHook BorderUrgencyHook {urgencyBorderColor = "yellow"
   `additionalKeys`
   [ ((modm .|. shiftMask  , xK_q), myExit >> io (exitWith ExitSuccess))
   , ((modm .|. controlMask, xK_r), myExit >> restart "awesome" False)
-  , ((modm, xK_f), sendMessage (Toggle "Full"))
-  , ((modm, xK_u), focusUrgent)
+  , ((modm                , xK_f), sendMessage (Toggle "Full"))
+  , ((modm                , xK_a), windows W.focusMaster)
+  , ((modm .|. shiftMask  , xK_a), windows W.swapMaster)
+  , ((modm                , xK_u), focusUrgent)
+  , ((modm                , xK_v), focusUrgent)
   ]
   where modm = mod4Mask
