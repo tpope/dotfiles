@@ -33,6 +33,7 @@ myManageHook = composeAll (
 
 myExit :: X ()
 myExit = do
+  spawn "pkill -f \"taffybar.* --display $DISPLAY\""
   return ()
 
 main = xmonad $ withUrgencyHook BorderUrgencyHook {urgencyBorderColor = "yellow"}
@@ -40,11 +41,13 @@ main = xmonad $ withUrgencyHook BorderUrgencyHook {urgencyBorderColor = "yellow"
               $ desktopConfig
   { modMask = modm
   , terminal = "tpope terminal"
+  , handleEventHook =
+    handleEventHook defaultConfig <+> fullscreenEventHook
   , layoutHook = myLayout
   , manageHook =
     fullscreenManageHook <+> manageHook desktopConfig <+> myManageHook
-  , handleEventHook =
-    handleEventHook defaultConfig <+> fullscreenEventHook
+  , startupHook =
+    spawnOnce "test -z \"$XDG_MENU_PREFIX\" -a -d \"$HOME/.config/taffybar\" && taffybar --display $DISPLAY"
   }
   `removeKeys`
   [ (modm .|. shiftMask, xK_slash)
