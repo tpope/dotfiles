@@ -512,6 +512,20 @@ awful.button({ }, 5, function ()
     if client.focus then client.focus:raise() end
 end))
 
+local function battery_markup ()
+    local out = awful.util.pread("acpi 2>/dev/null | grep -v unavailable | head -1")
+    local percent = tonumber(out:match("(%d?%d?%d)%%"))
+    local color
+    if out:match('Discharging') then
+        color = (percent <= 20 and "#ff0000" or "#aaaa00")
+    elseif out:match('Charging') then
+        color = '#00aa00'
+    else
+        color = '#808080'
+    end
+    return '<span color="' .. color .. '">↯</span>' .. percent .. '%'
+end
+
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
@@ -540,34 +554,46 @@ for s = 1, screen.count() do
     mywibox[s] = awful.wibox({ position = "top", screen = s, height = 24 })
 
     if wibox.layout then
-       local left_layout = wibox.layout.fixed.horizontal()
-       left_layout:add(mylauncher)
-       left_layout:add(mytaglist[s])
-       left_layout:add(mypromptbox[s])
-       local layout = wibox.layout.align.horizontal()
-       local right_layout = wibox.layout.fixed.horizontal()
-       if s == 1 then right_layout:add(wibox.widget.systray()) end
-       right_layout:add(awful.widget.textclock())
-       right_layout:add(mylayoutbox[s])
-       layout:set_left(left_layout)
-       layout:set_middle(mytasklist[s])
-       layout:set_right(right_layout)
-       mywibox[s]:set_widget(layout)
+        local left_layout = wibox.layout.fixed.horizontal()
+        left_layout:add(mylauncher)
+        left_layout:add(mytaglist[s])
+        left_layout:add(mypromptbox[s])
+        local layout = wibox.layout.align.horizontal()
+        local right_layout = wibox.layout.fixed.horizontal()
+        if s == 1 then
+            local battery_widget = battery_markup()
+            if battery_widget then
+                battery_widget = wibox.widget.textbox(battery_widget)
+                local battery_widget_timer = timer({ timeout = 10 })
+                battery_widget_timer:connect_signal("timeout", function()
+                    battery_widget:set_markup(battery_markup() or '')
+                end)
+                battery_widget_timer:start()
+                right_layout:add(battery_widget)
+            end
+            right_layout:add(wibox.widget.systray())
+        end
+        right_layout:add(awful.widget.textclock(nil, 5))
+        right_layout:add(mylayoutbox[s])
+        layout:set_left(left_layout)
+        layout:set_middle(mytasklist[s])
+        layout:set_right(right_layout)
+        mywibox[s]:set_widget(layout)
     else
-       -- Add widgets to the wibox - order matters
-       mywibox[s].widgets = {
-          {
-             mylauncher,
-             mytaglist[s],
-             mypromptbox[s],
-             layout = awful.widget.layout.horizontal.leftright
-          },
-          mylayoutbox[s],
-          awful.widget.textclock({ align = "right" }, nil, 5),
-          s == 1 and widget({ type = "systray" }) or nil,
-          mytasklist[s],
-          layout = awful.widget.layout.horizontal.rightleft
-       }
+        -- Add widgets to the wibox - order matters
+        mywibox[s].widgets = {
+            {
+                mylauncher,
+                mytaglist[s],
+                mypromptbox[s],
+                layout = awful.widget.layout.horizontal.leftright
+            },
+            mylayoutbox[s],
+            awful.widget.textclock({ align = "right" }, nil, 5),
+            s == 1 and widget({ type = "systray" }) or nil,
+            mytasklist[s],
+            layout = awful.widget.layout.horizontal.rightleft
+        }
     end
 
  end
