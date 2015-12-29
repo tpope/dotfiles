@@ -59,8 +59,8 @@ ACCEPT_ALL_COOKIES:TRUE
 DEFAULT_EDITOR:tpope sensible-editor
 DEFAULT_USER_MODE:INTERMEDIATE
 EMACS_KEYS_ALWAYS_ON:TRUE
-EXTERNAL:http:tpope browse %s:TRUE
-EXTERNAL:file:tpope browse %s:TRUE
+EXTERNAL:http:tpope browser %s:TRUE
+EXTERNAL:file:tpope browser %s:TRUE
 SAVE_SPACE:~/Downloads
 STARTFILE:http://www.google.com/
 EOF
@@ -81,12 +81,14 @@ set document.download.directory = "~/Downloads"
 set document.plain.display_links = 1
 EOF
   web=1
-elif inpath links && [ ! -d "$HOME/.links" -a ! -d "$HOME/.elinks" ]; then
-  mkdir "$HOME/.links"
-  cat > "$HOME/.links/links.cfg" <<EOF
+elif inpath links && [ ! -d "$HOME/.links2" ]; then
+  mkdir "$HOME/.links2"
+  cat > "$HOME/.links2/links.cfg" <<EOF
 # ~/.links/links.cfg
-terminal "xterm" 0 0 1 us-ascii
-terminal "screen" 0 0 1 us-ascii
+terminal "screen-256color" 0 1 1 utf-8
+terminal "xterm-256color" 0 1 1 utf-8
+terminal "rxvt-256color" 0 1 1 utf-8
+terminal "linux" 0 1 1 us-ascii
 download_dir "~/Downloads"
 EOF
   web=1
