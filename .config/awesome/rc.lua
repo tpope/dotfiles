@@ -17,6 +17,8 @@ local function add_signal(object, signal, callback)
     end
 end
 
+local standalone = not os.getenv('XDG_MENU_PREFIX')
+
 -- }}}
 
 -- Debugging {{{
@@ -526,7 +528,7 @@ local function battery_markup ()
     return '<span color="' .. color .. '">↯</span>' .. percent .. '%'
 end
 
-for s = 1, screen.count() do
+for s = 1, standalone and screen.count() or 0 do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
     -- mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
@@ -630,8 +632,8 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true, coords={x=0, y=16}}) end),
-    awful.key({ modkey,           }, "a", function () mymainmenu:show({keygrabber=true, coords={x=0, y=16}}) end),
+    awful.key({ modkey,           }, "w", function () mymainmenu:show({keygrabber=true, coords={x=0, y=0}}) end),
+    awful.key({ modkey,           }, "a", function () mymainmenu:show({keygrabber=true, coords={x=0, y=0}}) end),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
