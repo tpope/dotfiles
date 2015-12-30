@@ -1,4 +1,4 @@
--- vim:set sw=4 et path=/usr/share/awesome/lib:
+-- vim:set sw=4 et:
 
 local awful = require("awful")
 require("awful.autofocus")
@@ -16,8 +16,6 @@ local function add_signal(object, signal, callback)
         object.add_signal(signal, callback)
     end
 end
-
-local standalone = not os.getenv('XDG_MENU_PREFIX')
 
 -- }}}
 
@@ -79,18 +77,15 @@ end
 -- }}}
 
 -- {{{ Variable definitions
--- Themes define colours, icons, and wallpapers
+
 beautiful.init(awful.util.getdir("config") .. "/theme.lua")
 
--- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
--- If you do not like this or do not have such a key,
--- I suggest you to remap Mod4 to another key using xmodmap or other tools.
--- However, you can use another modifier like Mod1, but it may interact with others.
-modkey = "Mod4"
+local hostname = awful.util.pread('tpope host name'):sub(1, -2)
+local modkey = "Mod4"
+local standalone = not os.getenv('XDG_MENU_PREFIX')
+local terminal = os.getenv('TERMINAL') or 'x-terminal-emulator'
 
--- Table of layouts to cover with awful.layout.inc, order matters.
-layouts =
+local layouts =
 {
     -- awful.layout.suit.floating,
     awful.layout.suit.tile,
@@ -195,9 +190,6 @@ end
 -- }}}
 
 -- Terminal {{{
-
-terminal = "x-terminal-emulator"
-hostname = awful.util.pread('tpope host name'):sub(1, -2)
 
 function host_cursor_rgb (host)
     return awful.util.pread("tpope host light " .. host):sub(1, -2)
