@@ -34,6 +34,9 @@ function inspect (object)
     if type(object) == 'string' then
         return string.format("%q", object)
     elseif type(object) == 'table' then
+        if next(object) == nil then
+            return "{}"
+        end
         local output = "{"
         for k, v in pairs(object) do
             output = output .. tostring(k) .. '=' .. inspect(v) .. ', '
@@ -102,79 +105,74 @@ local layouts =
 }
 -- }}}
 
--- Run or Raise {{{
+-- Activation {{{
+
+local function activate(c, trigger)
+    local t = c:tags()[1]
+    if trigger ~= 'rules' and t and not c:isvisible() then
+        awful.tag.viewonly(t)
+    end
+
+    client.focus = c
+    c:raise()
+    return c
+end
+
+if awful.ewmh then
+    client.disconnect_signal("request::activate", awful.ewmh.activate)
+    client.connect_signal("request::activate", activate)
+end
 
 --- Spawns cmd if no client can be found matching properties
 -- If such a client can be found, pop to first tag where it is visible, and give it focus
 -- @param cmd the command to execute
 -- @param properties a table of properties to match against clients.  Possible entries: any properties of the client object
-function run_or_raise(cmd, properties)
-   local clients = client.get()
-   local focused = awful.client.next(0)
-   local findex = 0
-   local matched_clients = {}
-   local n = 0
-   for i, c in pairs(clients) do
-      --make an array of matched clients
-      if client_match(properties, c) then
-         n = n + 1
-         matched_clients[n] = c
-         if c == focused then
-            findex = n
-         end
-      end
-   end
-   if n > 0 then
-      local c = matched_clients[1]
-      -- if the focused window matched switch focus to next in list
-      if 0 < findex and findex < n then
-         c = matched_clients[findex+1]
-      end
-      local ctags = c:tags()
-      if table.getn(ctags) == 0 then
-         -- ctags is empty, show client on current tag
-         local curtag = awful.tag.selected()
-         awful.client.movetotag(curtag, c)
-      else
-         -- Otherwise, pop to first tag client is visible on
-         awful.tag.viewonly(ctags[1])
-      end
-      -- And then focus the client
-      client.focus = c
-      c:raise()
-      return c
-   end
-   if cmd then
-       awful.util.spawn(cmd)
-   end
+local function run_or_raise(cmd, properties)
+    local clients = client.get()
+    local focused = awful.client.next(0)
+    local findex = 0
+    local matched_clients = {}
+    local n = 0
+    for i, c in pairs(clients) do
+        --make an array of matched clients
+        if awful.rules.match_any(c, properties) then
+            n = n + 1
+            matched_clients[n] = c
+            if c == focused then
+                findex = n
+            end
+        end
+    end
+    if n > 0 then
+        local c = matched_clients[1]
+        -- if the focused window matched switch focus to next in list
+        if 0 < findex and findex < n then
+            c = matched_clients[findex+1]
+        end
+        activate(c, 'run_or_raise')
+        return c
+    end
+    if cmd then
+        awful.util.spawn(cmd)
+    end
 end
 
--- Returns true if all pairs in table1 are present in table2
-function client_match (conditions, client)
-   for k, v in pairs(conditions) do
-      if client[k] == v or tostring(client[k]):find(v) then
-         return true
-      end
-   end
-   return false
-end
-
-function browser ()
-    return run_or_raise('tpope browse', {class = "Uzbl-tabbed", role = '^browser$'})
+local function browser()
+    return run_or_raise('tpope browser', {class = {"^Uzbl-tabbed$"}, role = {'^browser$'}})
 end
 
 -- }}}
 
 -- Editor {{{
 
-editor_cmd = 'tpope edit'
+local editor_cmd = 'tpope edit'
 
-function complete_file (text, cur_pos, ncomp)
+local function complete_file(text, cur_pos, ncomp)
     text, cur_pos, ncomp = awful.completion.shell("gvim " .. text, 5 + cur_pos, ncomp)
     return text:sub(6), cur_pos - 5, ncomp
 end
 
-function prompt_file (callback)
+local function prompt_file(callback)
     awful.prompt.run({prompt = "File: "},
     mypromptbox[mouse.screen].widget,
     callback,
@@ -182,34 +180,31 @@ function prompt_file (callback)
     )
 end
 
-function edit (file)
-    awful.util.spawn(editor_cmd .. ' "' .. file .. '"')
-    run_or_raise(nil, { class = '[Vv]im$' })
+local function edit(file)
+    if file then
+        awful.util.spawn(editor_cmd .. ' "' .. file .. '"', false)
+    end
+    run_or_raise(nil, { class = {'[Vv]im$'} })
 end
 
 -- }}}
 
 -- Terminal {{{
 
-function host_cursor_rgb (host)
-    return awful.util.pread("tpope host light " .. host):sub(1, -2)
+local function raise_host(host)
+    run_or_raise(nil, {instance = {'@' .. host}})
 end
 
-function raise_host (host)
-    run_or_raise(nil, {instance = '@' .. host})
-end
-
-function mux_host (host)
+local function mux_host(host)
     if host:find(' ') then
         awful.util.spawn('ssh -X ' .. host)
     else
         local cmd = terminal .. ' -e tpope host mux -d ' .. host
-        print(cmd)
-        run_or_raise(cmd, {instance = 'mux@' .. host})
+        run_or_raise(cmd, {instance = {'mux@' .. host}})
     end
 end
 
-function shell_host (arg)
+local function shell_host(arg)
     local host = arg:match('%S+')
     local cmd = arg:match(' %S+')
     if cmd then
@@ -224,30 +219,29 @@ function shell_host (arg)
         exec = ' -e' .. arg:match(' .*')
     end
     local cmd = terminal .. exec
-    print(cmd)
     awful.util.spawn(cmd)
 end
 
-function pick_host(callback)
-  keygrabber.run(
-  function(modifier, key, event)
-      if event ~= "press" then return true end
-      local mod4
-      for k, v in ipairs(modifier) do
-          if v == "Mod4" then mod4 = true end
-      end
-      keygrabber.stop()
-      if key:find('^%u$') or mod4 then
-          host = awful.util.pread("tpope host name " .. key:upper()):sub(1, -2)
-          callback(host)
-      else
-          prompt_host({text = key:match('^.$')}, callback)
-      end
-      return true
-  end)
+local function pick_host(callback)
+    keygrabber.run(
+    function(modifier, key, event)
+        if event ~= "press" then return true end
+        local mod4
+        for k, v in ipairs(modifier) do
+            if v == "Mod4" then mod4 = true end
+        end
+        keygrabber.stop()
+        if key:find('^%u$') or mod4 then
+            host = awful.util.pread("tpope host name " .. key:upper()):sub(1, -2)
+            callback(host)
+        else
+            prompt_host({text = key:match('^.$')}, callback)
+        end
+        return true
+    end)
 end
 
-function prompt_host(options, callback)
+local function prompt_host(options, callback)
     options.prompt = "host: "
     awful.prompt.run(options,
     mypromptbox[mouse.screen].widget,
@@ -271,8 +265,8 @@ function prompt_host(options, callback)
 end
 
 
-function chat()
-    run_or_raise(terminal .. ' -name Chat -T Chat -e tpope chat', { instance = 'Chat' })
+local function chat()
+    run_or_raise(terminal .. ' -name Chat -T Chat -e tpope chat', { instance = {'Chat'} })
 end
 
 -- }}}
@@ -666,8 +660,8 @@ globalkeys = awful.util.table.join(
     ) end),
     awful.key({ modkey, "Mod1"    }, "e", function () prompt_file(edit) end),
     awful.key({ modkey,           }, "e", function () prompt_file(edit) end),
-    awful.key({ modkey            }, "semicolon", function () run_or_raise(nil, { class = '[Vv]im$' }) end),
-    -- awful.key({ modkey            }, "e", function () run_or_raise('gvim', { class = '[Vv]im$' }) end),
+    awful.key({ modkey            }, "semicolon", function () edit() end),
+    -- awful.key({ modkey            }, "e", function () edit() end),
     awful.key({ modkey            }, "c", chat),
     awful.key({ modkey            }, "z", function () raise_host('localhost') end),
     awful.key({ modkey, "Mod1"    }, "z", function () mux_host('localhost') end),
