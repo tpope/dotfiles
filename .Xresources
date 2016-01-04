@@ -3,7 +3,19 @@
 *international: true
 *customization: -color
 
-!## TERMINAL COLORS {{{1
+!## TERMINAL COMMON {{{1
+#ifndef FIXED
+#if WIDTH > 1800
+#define FIXED -misc-fixed-medium-r-normal--20-*-*-*-c-*
+#elif WIDTH > 1450
+#define FIXED -misc-fixed-medium-r-normal--18-*-*-*-c-*
+#elif WIDTH > 1150
+#define FIXED -misc-fixed-medium-r-normal--14-*-*-*-c-*
+#else
+#define FIXED -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*
+#endif
+#endif
+
 *color0:  #000000
 *color1:  #aa0000
 *color2:  #00aa00
@@ -43,86 +55,63 @@ XTerm*trimSelection: true
 XTerm*CharClass: 33:48,37-38:48,45-47:48,58:48,61:48,63-64:48,126:48,161-255:48
 XTerm*activeIcon: true
 XTerm.VT100.translations: #override \
-	Ctrl<Key>comma: smaller-vt-font() \n\
-	Ctrl<Key>period: larger-vt-font() \n\
-	Ctrl<Key>9: scroll-forw(1,page-1) \n\
-	Ctrl<Key>0: scroll-back(1,page-1) \n\
-	<Key>XF86Back: string(0x1b) string("[1;2D") \n\
-	<Key>XF86Forward: string(0x1b) string("[1;2C")
-#define FIXED -misc-fixed-medium-r
-#define ISOENC iso8859-1
-#define UTFENC iso10646-1
-#if WIDTH > 1450
-!#define ISOFONT   FIXED-normal--18-*-*-*-c-*-ISOENC
-!#define UTFFONT   FIXED-normal--18-*-*-*-c-*-UTFENC
-#define ISOFONT   -b&h-lucidatypewriter-medium-r-normal-sans-14-*-*-*-m-*-ISOENC
-#define UTFFONT   -b&h-lucidatypewriter-medium-r-normal-sans-14-*-*-*-m-*-UTFENC
-!#define ISOFONT2  FIXED-normal--14-*-*-*-c-*-ISOENC
-!#define UTFFONT2  FIXED-normal--14-*-*-*-c-*-UTFENC
-#define ISOFONT2  FIXED-normal--13-*-*-*-c-80-ISOENC
-#define UTFFONT2  FIXED-normal--13-*-*-*-c-80-UTFENC
-XTerm.fontMenu.font3.Label:     Medium
-#else
-#if WIDTH > 1150
-#define ISOFONT   FIXED-normal--14-*-*-*-c-*-ISOENC
-#define UTFFONT   FIXED-normal--14-*-*-*-c-*-UTFENC
-#define ISOFONT2  FIXED-semicondensed--13-*-*-*-c-*-ISOENC
-#define UTFFONT2  FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font3.Label:     Normal
-#else
-#if WIDTH < 800
-#define ISOFONT   FIXED-normal--13-*-*-*-c-*-ISOENC
-#define UTFFONT   FIXED-normal--13-*-*-*-c-*-UTFENC
-#define ISOFONT2  FIXED-semicondensed--13-*-*-*-c-*-ISOENC
-#define UTFFONT2  FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font3.Label:     Normal
-#else
-#if WIDTH < 1000
-#define ISOFONT   FIXED-normal--10-*-*-*-c-*-ISOENC
-#define UTFFONT   FIXED-normal--10-*-*-*-c-*-UTFENC
-#define ISOFONT2  FIXED-semicondensed--13-*-*-*-c-*-ISOENC
-#define UTFFONT2  FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font3.Label:     Normal
-#else
-#define ISOFONT   FIXED-semicondensed--13-*-*-*-c-*-ISOENC
-#define UTFFONT   FIXED-semicondensed--13-*-*-*-c-*-UTFENC
-#define ISOFONT2  FIXED-normal--13-*-*-*-c-*-ISOENC
-#define UTFFONT2  FIXED-normal--13-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font3.Label:     Large
-#endif
-#endif
-#endif
-#endif
-XTerm.VT100.font:         ISOFONT
-XTerm.font:               ISOFONT
-XTerm*boldFont:           ISOFONT
-XTerm*font3:              ISOFONT2
-XTerm*utf8Fonts.font:     UTFFONT
-XTerm*utf8Fonts.boldFont: UTFFONT
-XTerm*utf8Fonts.font3:    UTFFONT2
+	Ctrl<Key>comma: scroll-forw(1,page-1) \n\
+	Ctrl<Key>period: scroll-back(1,page-1) \n\
+	Shift Ctrl<Key>minus: smaller-vt-font() \n\
+	Shift Ctrl<Key>equal: larger-vt-font() \n\
+	Ctrl<Key>9: smaller-vt-font() \n\
+	Ctrl<Key>0: larger-vt-font() \n\
+	Ctrl<Key>1: set-render-font(toggle)
 
+#ifdef FIXED
+XTerm.VT100.font:         FIXED-iso8859-1
+XTerm.font:               FIXED-iso8859-1
+XTerm*boldFont:           FIXED-iso8859-1
+XTerm*utf8Fonts.font:     FIXED-iso10646-1
+XTerm*utf8Fonts.boldFont: FIXED-iso10646-1
+#else
+XTerm.VT100.font:         -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm.font:               -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm*boldFont:           -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font:     -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1
+XTerm*utf8Fonts.boldFont: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1
+#endif
+#if WIDTH >= 1920
+XTerm*renderFont: true
+#endif
 XTerm.fontMenu.fontdefault.Label: Default
-XTerm*font1:            -schumacher-clean-medium-r-normal--6-*-*-*-c-*-*-*
-XTerm*utf8Fonts.font1:  FIXED-normal--6-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font1.Label:   Tiny
-XTerm*font2:            FIXED-normal--7-*-*-*-c-*-ISOENC
-XTerm*utf8Fonts.font2:  FIXED-normal--7-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font2.Label:   Small
-XTerm*font4:            FIXED-normal--20-*-*-*-c-*-ISOENC
-XTerm*utf8Fonts.font4:  FIXED-normal--18-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font4.Label:   Huge
-XTerm*font5:            -sony-fixed-medium-r-normal--24-*-*-*-c-*-*-1
-XTerm*utf8Fonts.font5:  FIXED-normal--20-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font5.Label:   Gigantic
-XTerm*font6:            -dosemu-vga-medium-r-normal--17-*-*-*-p-*-*-*
-XTerm*utf8Fonts.font6:  -*-clean-medium-r-normal--12-*-*-*-c-*-UTFENC
-XTerm.fontMenu.font6.Label:   VGA
-XTerm*faceSize: 10
+XTerm.fontMenu.font1.Label: Tiny
+XTerm*font1:                -misc-fixed-medium-r-normal--6-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font1:      -misc-fixed-medium-r-normal--6-*-*-*-c-*-iso10646-1
+XTerm.fontMenu.font2.Label: Small
+XTerm*font2:                -misc-fixed-medium-r-normal--8-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font2:      -misc-fixed-medium-r-normal--8-*-*-*-c-*-iso10646-1
+XTerm.fontMenu.font3.Label: Semicondensed
+XTerm*font3:                -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font3:      -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso10646-1
+XTerm.fontMenu.font4.Label: Medium
+XTerm*font4:                -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font4:      -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso10646-1
+XTerm.fontMenu.font5.Label: Large
+XTerm*font5:                -misc-fixed-medium-r-normal--18-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font5:      -misc-fixed-medium-r-normal--18-*-*-*-c-*-iso10646-1
+XTerm.fontMenu.font6.Label: Huge
+XTerm*font6:                -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
+XTerm*utf8Fonts.font6:      -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1
+XTerm*faceName: MONOSPACE:MEDIUM
+#ifdef MONOSIZE
+XTerm*faceSize: MONOSIZE
+#else
+XTerm*faceSize: 14
+#endif
+XTerm*faceSize1: 10
+XTerm*faceSize2: 12
+XTerm*faceSize3: 14
+XTerm*faceSize4: 17
+XTerm*faceSize5: 21
+XTerm*faceSize6: 24
 
 !## RXVT {{{1
-#define TERMINUS14 -*-terminus-medium-r-normal--14-*-*-*-c-*-UTFENC
-#define TERMINUS16 -*-terminus-medium-r-normal--16-*-*-*-c-*-UTFENC
-
 Rxvt*visualBell:   true
 URxvt.urgentOnBell: true
 URxvt.termName: rxvt-256color
@@ -139,33 +128,34 @@ URxvt.boldFont:
 URxvt.italicFont:
 URxvt.boldItalicFont:
 
-#if WIDTH > 1800
-URxvt.font: FIXED-normal--20-*-*-*-c-*-UTFENC
-URxvt.keysym.C-F1:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
-#elif WIDTH > 1450
-URxvt.font: TERMINUS16,UTFFONT
-URxvt.keysym.C-F1: command:\033]710;TERMINUS16,UTFFONT\007
+#ifdef MONOSIZE
+URxvt.font: xft:MONOSPACE-MONOSIZE:MEDIUM
+#elif WIDTH < 1920
+URxvt.font: FIXED-iso10646-1
 #else
-URxvt.font:        UTFFONT
-URxvt.keysym.C-F1: command:\033]710;UTFFONT\007
+URxvt.font: xft:MONOSPACE-14:MEDIUM
 #endif
 
-URxvt.keysym.C-F2: command:\033]710;FIXED-normal--6-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F3: command:\033]710;FIXED-normal--7-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F4: command:\033]710;FIXED-normal--8-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F5: command:\033]710;FIXED-normal--10-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F6: command:\033]710;FIXED-semicondensed--13-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F7: command:\033]710;FIXED-normal--13-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F8: command:\033]710;TERMINUS14,FIXED-normal--13-*-*-*-c-80-UTFENC\007
-URxvt.keysym.C-F9: command:\033]710;TERMINUS16,FIXED-normal--18-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F10:command:\033]710;FIXED-normal--18-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F11:command:\033]710;FIXED-normal--20-*-*-*-c-*-UTFENC\007
-URxvt.keysym.C-F12:command:\033]710;xft:Mono:pixelsize=20\007
+URxvt.keysym.M-C-1:     command:\033]710;-misc-fixed-medium-r-normal--6-*-*-*-c-*-iso10646-1\007
+URxvt.keysym.M-C-2:     command:\033]710;-misc-fixed-medium-r-normal--8-*-*-*-c-*-iso10646-1\007
+URxvt.keysym.M-C-3:     command:\033]710;-misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso10646-1\007
+URxvt.keysym.M-C-4:     command:\033]710;-misc-fixed-medium-r-normal--14-*-*-*-c-*-iso10646-1\007
+URxvt.keysym.M-C-5:     command:\033]710;-misc-fixed-medium-r-normal--18-*-*-*-c-*-iso10646-1\007
+URxvt.keysym.M-C-6:     command:\033]710;-misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1\007
+URxvt.keysym.M-C-7:     command:\033]710;xft:MONOSPACE-10:MEDIUM\007
+URxvt.keysym.M-C-8:     command:\033]710;xft:MONOSPACE-12:MEDIUM\007
+URxvt.keysym.M-C-9:     command:\033]710;xft:MONOSPACE-14:MEDIUM\007
+URxvt.keysym.M-C-0:     command:\033]710;xft:MONOSPACE-17:MEDIUM\007
+URxvt.keysym.M-C-minus: command:\033]710;xft:MONOSPACE-21:MEDIUM\007
+URxvt.keysym.M-C-equal: command:\033]710;xft:MONOSPACE-24:MEDIUM\007
+
+URxvt.keysym.C-9:            perl:font-size:decrease
+URxvt.keysym.C-0:            perl:font-size:increase
+URxvt.keysym.S-C-underscore: perl:font-size:decrease
+URxvt.keysym.S-C-plus:       perl:font-size:increase
 
 URxvt.keysym.C-1:      perl:matcher
 URxvt.keysym.C-grave:  perl:matcher:list
-URxvt.keysym.C-9:      command:\033]720;12\007
-URxvt.keysym.C-0:      command:\033]721;12\007
 URxvt.keysym.C-comma:  command:\033]720;12\007
 URxvt.keysym.C-period: command:\033]721;12\007
 
@@ -187,7 +177,7 @@ URxvt.keysym.KP_Multiply: string:*
 URxvt.keysym.KP_Divide: string:/
 
 URxvt.iso14755_52: false
-URxvt.perl-ext:    default,searchable-scrollback<C-S-plus>,matcher<C-1>,selection-pastebin,remote-clipboard,selection-autotransform
+URxvt.perl-ext:    default,searchable-scrollback<C-S-question>,matcher,selection-pastebin,remote-clipboard,selection-autotransform
 URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
 	sub { /\\n/ ? ("join lines with spaces" => sub {  s{^\\s+}{}mg; s/ \*\\n/ /g; s{ $}{}; }) : () }, \n\
 	sub { /./ ? ("string quote" => sub {  s([\\\\\\042$@]|#[{])(\\\\$&)g; s{\\n}{\\\\n}g; s{\\t}{\\\\t}g; s{\\r}{\\\\r}g; s{[\\000-\\037]}{sprintf("%03o",ord($&))}eg; $_ = qq("$_"); }) : () }, \n\
