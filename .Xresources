@@ -219,3 +219,8 @@ XScreensaver.overlayStderr: false
 
 !## XCOLORSEL
 Xcolorsel*displayFormat: #rrggbb
+
+!## ROFI
+rofi.terminal: tpope terminal
+rofi.ssh-client: tpope host shell
+rofi.font: MONOSPACE bold 14
