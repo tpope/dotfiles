@@ -1,9 +1,10 @@
 ! ~/.Xresources
+! vim:set foldmethod=expr foldexpr=getline(v\:lnum)=~'^!##'?'>1'\:'=':
 
 *international: true
 *customization: -color
 
-!## TERMINAL COMMON {{{1
+!## TERMINAL COMMON
 #ifndef FIXED
 #if WIDTH > 1800
 #define FIXED -misc-fixed-medium-r-normal--20-*-*-*-c-*
@@ -33,8 +34,8 @@
 *color14: #00ffff
 *color15: #ffffff
 *colorBD: #ffffff
-! }}}1
-!## XTERM {{{1
+
+!## XTERM
 XTerm.customization:     -none
 XTerm.background:        #000000
 XTerm.VT100.background:  #000000
@@ -111,7 +112,7 @@ XTerm*faceSize4: 17
 XTerm*faceSize5: 21
 XTerm*faceSize6: 24
 
-!## RXVT {{{1
+!## RXVT
 Rxvt*visualBell:   true
 URxvt.urgentOnBell: true
 URxvt.termName: rxvt-256color
@@ -192,7 +193,7 @@ URxvt.selection-autotransform.1: if(/^irb.*?> /) { s{^irb.*?[>*]\\s*}{}mg; s/\\n
 URxvt.selection-autotransform.2: if(m{^[ab]/}) { s{^[ab]/}{}g; }
 URxvt.selection-autotransform.3: s/^([^:\\s]*):(\\d+)(:|:in)?$/+$2 $1/g;
 
-!## XDVI {{{1
+!## XDVI
 XDvi.editor: vim -g --remote +%l %f
 XDvi.wwwBrowser: tpope browse
 XDvi.shrinkFactor: 7
@@ -204,18 +205,17 @@ XDvi.mainTranslations: #override \
 	<Btn2Down>: do-href-newwindow()source-special()\n\
 	<Btn3Down>: magnifier(*3)\n
 Fig.inches: true
-! }}}1
-!## XMESSAGE {{{1
+
+!## XMESSAGE
 Xmessage.defaultButton: okay
-! }}}1
-!## XSCREENSAVER {{{1
+
+!## XSCREENSAVER
 XScreenSaver.dpmsEnabled: true
 XScreenSaver.splash: false
 XScreenSaver.ignoreUninstalledPrograms: true
 XScreenSaver.loadURL: tpope browse '%s'
 XScreensaver.captureStderr: false
 XScreensaver.overlayStderr: false
-! }}}1
-!## XCOLORSEL {{{1
+
+!## XCOLORSEL
 Xcolorsel*displayFormat: #rrggbb
-! }}}1
