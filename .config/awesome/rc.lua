@@ -316,9 +316,11 @@ end
 
 -- Activation {{{
 
+local startup_time = os.time()
 local function activate(c, trigger)
+    local runtime = os.difftime(os.time(), startup_time)
     local t = c:tags()[1]
-    if trigger ~= 'rules' and t and not c:isvisible() then
+    if not c:isvisible() and t and runtime > 8 then
         awful.tag.viewonly(t)
     end
 
