@@ -24,6 +24,8 @@ caption    string "%?%F%{y}%?%3n %{= wk}%?%h%:%t%?%{-}"
 activity "Activity in window %n (%t)^G^G"
 bell_msg "Bell in window %n (%t)^G"
 
+unsetenv DBUS_SESSION_BUS_ADDRESS
+
 bind  j next
 bind ^J next
 bind  k prev
