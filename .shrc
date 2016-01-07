@@ -46,6 +46,9 @@ rf() {
   if [ -r "$HOME/.env.$dp" ]; then
     . "$HOME/.env.$dp"
   fi
+  if [ -n "$TMUX" ]; then
+    eval "`tmux showenv|sed -e 's/\([^=]*\)=\(.*\)/\1='\''\2'\''; export \1/' -e 's/^-/unset /'`"
+  fi
   unset dp
   hash -r
 }
