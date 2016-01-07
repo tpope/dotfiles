@@ -4,8 +4,7 @@ PATH=$HOME/.local/bin:$HOME/.rbenv/shims:$HOME/.rbenv/bin:/usr/local/bin:${PATH:
 ENV=$HOME/.shrc
 BASH_ENV=$HOME/.zshenv
 [ -n "$RSYNC_RSH" ] || RSYNC_RSH='ssh -ax'
-[ -n "$CLASSPATH" ] || CLASSPATH=.:$HOME/.java/*
-export PATH ENV BASH_ENV RSYNC_RSH CLASSPATH
+export PATH ENV BASH_ENV RSYNC_RSH
 
 if [ -r "$HOME/.env.local" ]; then
   eval "`command grep '^[A-Z].*=' "$HOME/.env.local"|sed -e 's/^/export /'`"

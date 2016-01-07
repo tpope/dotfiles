@@ -24,7 +24,6 @@ unset dir newpath
 
 setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
-if ( ! $?CLASSPATH ) setenv CLASSPATH ".:$HOME/.java/*"
 if ( ! $?RSYNC_RSH ) setenv RSYNC_RSH 'ssh -ax'
 if ( ! $?SRC ) setenv SRC "$HOME/src"
 
