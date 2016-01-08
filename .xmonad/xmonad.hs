@@ -52,7 +52,6 @@ main = xmonad $ withUrgencyHook BorderUrgencyHook {urgencyBorderColor = "yellow"
   `removeKeys`
   [ (modm .|. shiftMask, xK_slash)
   , (modm, xK_question)
-  , (modm, xK_p)
   , (modm .|. shiftMask, xK_p)
   ]
   `additionalKeys`
