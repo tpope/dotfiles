@@ -215,11 +215,11 @@ function! OpenURL(url)
   if has("win32")
     exe "!start cmd /cstart /b ".a:url.""
   elseif $DISPLAY !~ '^\w'
-    exe "silent !tpope browse \"".a:url."\""
+    exe "silent !tpope open \"".a:url."\""
   elseif exists(':Start')
-    exe "Start tpope browse -T \"".a:url."\""
+    exe "Start tpope open -T \"".a:url."\""
   else
-    exe "!tpope browse -T \"".a:url."\""
+    exe "!tpope open -T \"".a:url."\""
   endif
   redraw!
 endfunction

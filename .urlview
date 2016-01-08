@@ -1,2 +1,2 @@
 REGEXP \b(((https?|ftp|gopher)|mailto):(//)?[^ <>"\t]*|(www|ftp)[0-9]?\.[-a-z0-9.]+)[^ .,;\t\n\r<">\):]?[^, <>"\t]*[^] .,;\t\n\r<">\):]
-COMMAND tpope browser -T
+COMMAND tpope open

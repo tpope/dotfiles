@@ -183,7 +183,7 @@ URxvt.perl-eval:   push @{ $urxvt::TERM->{selection_popup_hook} }, \n\
 	sub { /\\n/ ? ("join lines with spaces" => sub {  s{^\\s+}{}mg; s/ \*\\n/ /g; s{ $}{}; }) : () }, \n\
 	sub { /./ ? ("string quote" => sub {  s([\\\\\\042$@]|#[{])(\\\\$&)g; s{\\n}{\\\\n}g; s{\\t}{\\\\t}g; s{\\r}{\\\\r}g; s{[\\000-\\037]}{sprintf("%03o",ord($&))}eg; $_ = qq("$_"); }) : () }, \n\
 	sub { /\\n\\[?\\d\\d(\\d\\d-|:)\\d\\d/ ? ("quote for irc" => sub { s{^\\[?[\\d:_-]+\\]? +}{}; s/\\s*\\n\\[?[\\d:_-]{5,}\\]? +/ || /g; s/^\\s+/ /mg; s/( ?) \*\\n( ?)/($1||$2)/eg; s{ $}{}; }) : () };
-URxvt.urlLauncher: tpope browser
+URxvt.urlLauncher: tpope open
 URxvt.selection-pastebin.cmd: scp -p % tpo.pe:pastes
 URxvt.selection-pastebin.url: http:\/\/tpo.pe/pastes/%
 URxvt.remote-selection.store: ssh tpo.pe 'cat >/tmp/tpope-distributed-selection'
@@ -195,7 +195,7 @@ URxvt.selection-autotransform.3: s/^([^:\\s]*):(\\d+)(:|:in)?$/+$2 $1/g;
 
 !## XDVI
 XDvi.editor: vim -g --remote +%l %f
-XDvi.wwwBrowser: tpope browse
+XDvi.wwwBrowser: xdg-open
 XDvi.shrinkFactor: 7
 XDvi.expert: true
 XDvi.Margin: 1in
@@ -213,7 +213,7 @@ Xmessage.defaultButton: okay
 XScreenSaver.dpmsEnabled: true
 XScreenSaver.splash: false
 XScreenSaver.ignoreUninstalledPrograms: true
-XScreenSaver.loadURL: tpope browse '%s'
+XScreenSaver.loadURL: xdg-open '%s'
 XScreensaver.captureStderr: false
 XScreensaver.overlayStderr: false
 
