@@ -113,10 +113,10 @@ elif [ -z "$terminal" ] && expr "$DISPLAY" : '^:' >/dev/null; then
 
   firefox_dir="$HOME/.mozilla/firefox"
 
-  for browser in `xdg_command_for_desktop_file "$default"|awk '{print $1}'` google-chrome chromium-browser firefox konqueror dillo; do
-    if type $browser >/dev/null; then
-      if [ "`basename $browser`" = firefox -a ! -d "$firefox_dir" ]; then
-        args=
+  for browser in "`xdg_command_for_desktop_file $default|sed -e 's/%[uUfFic]//'`" google-chrome chromium-browser firefox konqueror dillo; do
+    executable=`echo $browser|awk '{print $1}'`
+    if type $executable >/dev/null 2>&1; then
+      if [ "`basename $executable`" = firefox -a ! -d "$firefox_dir" ]; then
         nohup $browser >/dev/null 2>/dev/null &
         for i in 1 2 3 4 5 6 7 8; do
           sleep 1
@@ -132,10 +132,8 @@ elif [ -z "$terminal" ] && expr "$DISPLAY" : '^:' >/dev/null; then
         else
           tpope setup web
         fi
-      else
-        args=$CHROME_ARGS
       fi
-      nohup $browser $args "$@" >/dev/null 2>/dev/null &
+      nohup $browser "$@" >/dev/null 2>/dev/null &
       disown >/dev/null 2>&1
       case "$url" in
         file:*) sleep 5 ;;
