@@ -1,26 +1,7 @@
 # ~/.mailcap
 
-text/html; tpope browse '%s'; description="HTML Text"; nametemplate=%s.html
-text/html; tpope browse -dump '%s'; description="HTML Text"; copiousoutput; nametemplate=%s.html
-text/x-url; tpope browse `cat '%s'`; description=URL
-text/x-url; tpope browse -dump `cat '%s'`; description=URL; copiousoutput
-text/xml; tpope browse '%s'; description="XML Text"; nametemplate=%s.xml; test=test -n "$DISPLAY"
-text/enriched; richtext -e -t; description="Enriched Text"; copiousoutput
-text/richtext; richtext -t; description="Rich Text"; copiousoutput
-text/x-vcalendar; korganizer '%s'; description="vCalendar File"; test=test -n "$DISPLAY"
-audio/x-amzxml; "$HOME/Music/clamz.sh" '%s'; description="Amazon MP3 Download"
 text/*; less '%s'; edit=vim '%s'; needsterminal; test=test -t 0
-text/*; gvim -Rf '%s'; edit=gvim -f '%s'; test=test -n "$DISPLAY" -a ! -t 0
 video/*; mplayer -quiet -vo fb,fa '%s'; description="Video"; needsterminal; test=test -z "$DISPLAY" -a -t 0
 video/*; mplayer '%s'; description="Video"; needsterminal; test=test -t 0
 audio/*; mplayer '%s'; description="Audio"; needsterminal; test=test -t 0
-video/*; gmplayer '%s'; description="Video"; test=test -n "$DISPLAY"
-audio/*; xmms '%s'; description="Audio"; test=test -n "$DISPLAY"
-image/*; feh -Z '%s'; edit=gimp-remote '%s'; description=Image; test=test -n "$DISPLAY"
-image/*; xv '%s';  description="Image"; test=test -n "$DISPLAY"
-image/*; anytopnm '%s' > '%s.pnm' && aview -driver curses '%s.pnm' && rm -f '%s.pnm';  description="Image"; needsterminal
-image/*; anytopnm '%s' | pnmscale -xysize 80 46 | ppmtopgm | pgmtopbm | pbmtoascii -1x2 2>&1 ; copiousoutput
-image/x-xpm; vim -R '%s'; edit=vim '%s'; description="XPM Image"; needsterminal
-application/msword; openoffice '%s'\; sleep 1; description="Micro$oft Word Document"; test=test -n "$DISPLAY" -a -x "`which openoffice 2>/dev/null`"
-application/msword; antiword '%s'; description="Micro$oft Word Document"; copiousoutput
-application/x-bittorrent; transmission-remote transmission --add '%s' || transmission-gtk '%s' || xmessage '%s'; description="BitTorrent File"
+*/*; xdg-open '%s'; test=expr "$DISPLAY" : :
