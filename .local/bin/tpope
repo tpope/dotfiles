@@ -103,7 +103,7 @@ pager() {
 
 case "$basename" in
 
-  browser|open) # _open
+  browser|open) # open
     exec "$HOME/.local/bin/tpope-browser" "$@" ;;
 
   chat)

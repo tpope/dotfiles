@@ -149,7 +149,7 @@ unset host
 # Aliases {{{1
 
 alias lsd='ls -d *(-/DN)'
-alias b='noglob tpope-browser'
+alias b='noglob tpope open'
 autoload -Uz zmv
 alias zmv='noglob zmv'
 alias ru='noglob ru'
@@ -223,7 +223,7 @@ _tpope() {
 
     local selector=$(egrep "^  ([a-z-]*[|])*${words[1]}([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/.local/bin/$cmd" | sed -e 's/.*# *//')
 
-    if [[ -f "$HOME/.local/bin/$cmd-${words[1]}" ]]; then
+    if [[ -f "$HOME/.local/bin/$cmd-${words[1]}" && -z "$selector" ]]; then
       words[1]="$cmd-${words[1]}"
       _tpope
     elif (( $+functions[_${selector-$words[1]}] )); then
