@@ -15,8 +15,8 @@ _git_prompt_info() {
   if [ -d .svn ]; then
     ref=.svn
   else
-    ref=${$(git symbolic-ref HEAD 2> /dev/null)#refs/heads/} || \
-      ref=${$(git rev-parse HEAD 2>/dev/null)[1][1,7]} || \
+    ref=${$(command git symbolic-ref HEAD 2> /dev/null)#refs/heads/} || \
+      ref=${$(command git rev-parse HEAD 2>/dev/null)[1][1,7]} || \
       return
   fi
   case "$TERM" in
