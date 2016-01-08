@@ -117,8 +117,7 @@ case "$command" in
       bin/tpope-setup \
       bin/sensible-browser \
       bin/x-terminal-emulator \
-      .ruby/lib/tpope.rb \
-      .fvwm
+      .ruby/lib/tpope.rb
     ;;
 
   '')
