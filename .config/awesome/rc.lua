@@ -834,3 +834,8 @@ add_signal(client, "focus", function(c) c.border_color = beautiful.border_focus 
 add_signal(client, "unfocus", function(c) c.border_color = beautiful.border_normal end)
 
 -- }}}
+
+local localrc = awful.util.getdir("config") .. "/local.lua"
+if awful.util.file_readable(localrc) then
+    require('local')
+end
