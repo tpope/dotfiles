@@ -31,15 +31,6 @@ if [ ! -f "$HOME/.local/bin/open" ]; then
     fi
   done
 fi
-if [ Darwin = "`uname`" ]; then
-  (
-  cd "$HOME/.terminfo"
-  for char in ?; do
-    hex="`printf $char | od -t x1 | awk 'NR == 1 { print $2 }'`"
-    [ -e "$hex" ] || ln -s $char $hex
-  done
-  )
-fi
 [ -z "$basics" ] || echo "Initializing basic configuration."
 
 }
