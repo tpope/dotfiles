@@ -56,17 +56,16 @@ rf() {
 alias ll='ls -l'
 alias cp='cp -i'
 alias mv='mv -i'
-alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
 
 alias j='jobs'
 
-alias gst='git status'
-alias ri='ri -f bs'
-
 alias b='tpope open'
+alias gst='git status'
 alias mpl='mplayer -fs -loop 0'
-
-alias wordgrep="cat /usr/share/dict/words|grep -v '[^A-Za-z]s'|tpope page egrep -i"
+alias ri='ri -f bs'
+alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
+alias whois='tpope page whois'
+alias wordgrep='cat /usr/share/dict/words|grep -v "[^A-Za-z]s"|tpope page egrep -i'
 
 alias service='tpope service'
 alias start='tpope runcontrol start'

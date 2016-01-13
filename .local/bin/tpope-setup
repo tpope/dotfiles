@@ -47,7 +47,6 @@ if [ -n "$LYNX_CFG" -a ! -f "$LYNX_CFG" ]; then
 # ~/.lynx.cfg
 INCLUDE:$globalcfg
 ACCEPT_ALL_COOKIES:TRUE
-DEFAULT_EDITOR:tpope sensible-editor
 DEFAULT_USER_MODE:INTERMEDIATE
 EMACS_KEYS_ALWAYS_ON:TRUE
 EXTERNAL:http:tpope open %s:TRUE

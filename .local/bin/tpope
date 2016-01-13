@@ -21,9 +21,9 @@ fi
 
 if [ aliases = "$basename" ]; then
   # Optimization: put this early since it is called for every shell
-  aliases="launch lv pg gp e rm dl sursync vnc whois swap diff"
+  aliases="lv gp rm swap diff"
   PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin
-  for app in apt apt-get aptitude emerge opkg yum; do
+  for app in apt apt-get aptitude emerge yum; do
     [ -x "`which $app 2>/dev/null`" -a ! -h "$HOME/.local/bin/$app" ] && aliases="$aliases $app"
   done
   echo $aliases
@@ -95,7 +95,7 @@ do_clean() {
 
 pager() {
   if [ -t 1 ]; then
-    tpope sensible-pager "$@"
+    ${PAGER:-less} "$@"
   else
     cat "$@"
   fi
@@ -140,24 +140,6 @@ case "$basename" in
     exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope config pull && touch "$HOME/.autodl"' \; 2>/dev/null
   ;;
 
-  launch) # precommand
-    exec >/dev/null 2>&1 </dev/null
-    if [ "$1" = "-d" ]; then
-      shift
-      pidof -x "$1" >/dev/null && exit 0
-    fi
-    for arg in "$2" "$3" "$4"; do
-      case "$arg" in
-        /*) [ -e "$arg" ] && dontcd=1 ;;
-        -*) [ -e "$arg" ] && dontcd=1 ;;
-      esac
-    done
-    [ ! -x /usr/bin/setsid ] || setsid=/usr/bin/setsid
-    [ "$dontcd" ] || cd
-    $setsid $prefix "$@" &
-    exit 0
-  ;;
-
   logview|lv)
     cd /var/log
     root=
@@ -166,15 +148,6 @@ case "$basename" in
     done
     [ -z "$root" ] || root_init
     $root exec less +G "$@"
-    ;;
-
-  pg)
-    if [ "$#" != 1 -o -e "$1" ]; then
-      exec tpope sensible-pager "$@"
-    else
-      echo "Warning: use gp instead." >&2
-      exec tpope gp "$@"
-    fi
     ;;
 
   ps-grep|gp) # grep
@@ -230,7 +203,7 @@ case "$basename" in
       if [ -x /usr/sbin/service ]; then
         exec /usr/sbin/service "$@"
       else
-        echo "Usage: $tpope$basename <action> <init-script> [ <action> <init-script> [ ... ] ]"
+        echo "Usage: $tpope$basename <init-script> <action> [ <init-script> <action> [ ... ] ]"
         exit 1
       fi
     fi
@@ -247,63 +220,6 @@ case "$basename" in
 
   page) # precommand
     exec "$@" | pager ;;
-
-  sensible-pager|pager)
-    term=exec
-    if [ ! -t 0 -a ! -t 1 -a "$DISPLAY" -a -n "$1" -a "$HOME/.rvm/README" != "$1" ]; then
-      term="x-terminal-emulator -title Pager -e"
-      if [ -z "$1" -o "x$1" = x- ]; then
-        tempfile=/tmp/sensible-pager.$$
-        cat > $tempfile
-        [ "x$1" = x- ] && shift
-      fi
-    fi
-    if inpath less; then
-      inpath lesspipe && LESSOPEN='|lesspipe %s'
-      export LESSOPEN
-      pager="less -RFX#10"
-    elif inpath more; then
-      pager="more"
-    elif inpath pg; then
-      pager="pg"
-    else
-      pager="cat"
-    fi
-    if [ ! "$tempfile" ]; then
-      $term $pager "$@"
-    else
-      $term $pager "$tempfile"
-      rm "$tempfile"
-    fi
-    ;;
-
-  tail)
-    if inpath less; then
-      inpath lesspipe && LESSOPEN='|lesspipe %s'
-      export LESSOPEN
-      less "-RFX#10" +F "$@"
-    else
-      exec tail -f "$@"
-    fi
-    ;;
-
-  sensible-editor|editor)
-    if [ "$DISPLAY" -a ! -t 0 ]; then
-      inpath gvim && exec gvim -f "$@"
-      term="exec x-terminal-emulator -title Editor -e"
-    fi
-    if inpath gvim; then
-      $term vim "$@"
-    elif inpath vim; then
-      $term vim "$@"
-    elif inpath vi; then
-      $term vi "$@"
-    elif inpath nano; then
-      $term nano "$@"
-    else
-      echo 'No editor found!' >&2
-      exit 1
-    fi ;;
 
   edit|e)
     gvime_ok() { inpath gvim &&
@@ -359,72 +275,6 @@ case "$basename" in
     exec screen "$@"
     ;;
 
-  sursync|suscp) # rsync
-  for arg in "$@"; do
-    case "$arg" in
-      [!-]*:*) ssh -axqt "`echo $arg|sed -e 's/:.*//'`" sudo -v -p "\"%u@%h's sudo password:\"" || exit ;;
-    esac
-  done
-  args=-P
-  [ "$basename" = suscp ] && args=-P
-  sudo -p "%u@%h's sudo password:" rsync $args -e "ssh -axtF $HOME/.ssh/config -i $HOME/.ssh/id_rsa" --rsync-path="sudo rsync" "$@"
-  ;;
-
-  dl) # urls
-    if [ "$HOME/Downloads" != "`pwd`" ]; then
-      prefix="$HOME/Downloads/"
-      mkdir -p "$prefix"
-    fi
-    if [ -n "$2" ]; then
-      out="$2"
-    else
-      out="`echo "$1"|sed -e 's/?.*//'`"
-      out="`basename "$out"`"
-    fi
-    if [ -e "$1" ]; then
-      cp -a "$1" "$prefix$out"
-    elif inpath wget; then
-      wget -nv -O "$prefix$out" "$1" || exit "$?"
-    elif inpath curl; then
-      curl -L -s -S "$1" > "$prefix$out" || exit "$?"
-    elif inpath lynx; then
-      lynx -source "$1" > "$prefix$out" || exit "$?"
-    else
-      echo "Can't find any download tools." >&2
-      exit 1
-    fi
-    echo "$prefix$out"
-    ;;
-
-  url) # urls
-    if [ "$*" = "-" ]; then
-      url="`cat`"
-    else
-      url="$*"
-    fi
-    if [ ! -e "$url" ]; then
-    case url in
-      /*|./*) ;;
-      *://*|*.*.*/*) url="`echo $url|tr -d ' \t\n\r\f'`" ;;
-      *) url="http://www.google.com/search?q=`echo $url|sed -e 's/%/%25/g' -e 's/+/%2B/g' -e 's/ /+/g' -e 's/&/%26/g' -e 's/=/%3D/g'`" ;;
-    esac
-    fi
-  exec "$HOME/.local/bin/tpope-browser" "$url" ;;
-
-  vnc)
-  if [ -f "$HOME/.vnc/$1" ]; then
-    exec xvncviewer -passwd "$HOME/.vnc/$1" "$@"
-  else
-    exec xvncviewer "$@"
-  fi
-  exit 1
-  ;;
-
-  opkg)
-    case "$1" in
-      '') exec "$basename" "$@" ;;
-      *) root_init; as_root exec "$basename" "$@" ;;
-    esac ;;
   apt|apt-get|aptitude|emerge|yum)
     case "$1" in
       changelog|download|help|search|server|show|source)
@@ -511,7 +361,7 @@ case "$basename" in
         repo="$1"
         ;;
       */*)
-        repo="git://github.com/$1.git"
+        repo="https://github.com/$1.git"
         ;;
       *)
         repo="git@github.com:tpope/$1.git"
@@ -519,10 +369,10 @@ case "$basename" in
     esac
     case "$repo" in
       *@*)
-        dest="$HOME/src/vim/bundle"
+        dest="${SRC:-$HOME/Code}/vim/bundle"
         ;;
       */*)
-        dest="$HOME/src/vim/vendor"
+        dest="${SRC:-$HOME/Code}/vim/vendor"
         ;;
     esac
     mkdir -p "$dest"
@@ -545,14 +395,6 @@ case "$basename" in
       vim -u NONE -c'helptags doc' -cq >/dev/null 2>&1 </dev/null
     fi
     ;;
-
-  whois)
-    [ -d /private ] || args=-H
-    if [ "$1" != "-H" -a -t 1 ]; then
-      exec /usr/bin/whois $args "$@" | pager
-    else
-      exec /usr/bin/whois "$@"
-    fi ;;
 
   '') echo "Usage: `basename "$0"` <command> [options]" ;;
 
