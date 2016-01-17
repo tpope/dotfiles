@@ -54,8 +54,9 @@
 (xbindmod '(x) "exec tpope browser")
 (xbindmod '(control x) "exec xdg-open \"$HOME\"")
 
-(xbindmod '(control z) "exec tpope terminal -e tpope host shell localhost")
-(xbindmod '(mod1 z) "xdotool search --classname '^mux@localhost$' windowactivate || exec tpope terminal -e tpope host mux localhost")
+(define terminal (or (getenv "TERMINAL") "tpope terminal"))
+(xbindmod '(control z) (string-append "exec " terminal " -e tpope host shell localhost"))
+(xbindmod '(mod1 z) (string-append "xdotool search --classname '^mux@localhost$' windowactivate || exec " terminal " -e tpope host mux localhost"))
 (xbindmod '(z) "xdotool search --desktop `xdotool get_desktop` --classname '@localhost$' windowactivate || xdotool search --classname '@localhost$' windowactivate")
 
 (xbindmod '(shift p) "dmenu_run")

@@ -1,17 +1,6 @@
 #!/bin/sh
 # vim:set et sw=2:
 
-# Analyzes what terminal emulators are installed and picks my favorite from the
-# bunch.
-
-if [ -z "$DISPLAY" ]; then
-  echo "No display set.  Aborting." >&2
-  exit 2
-elif [ "$1" = "-E" ]; then
-  term="$2"; shift 2
-  exec "$term" "$@"
-fi
-
 ex=_
 for arg in "$@"; do
   if [ x-name = "x$arg" ]; then
@@ -45,25 +34,5 @@ for arg in "$@"; do
   fi
 done
 
-# NOT exported
-[ -z "$RXVT_SOCKET" ] && RXVT_SOCKET="$HOME/.urxvt/urxvtd-`hostname`"
-if [ -S "$RXVT_SOCKET" -a -x "`which urxvtc 2>/dev/null`" ]; then
-  urxvtc --help 2>/dev/null
-  [ "$?" = 1 ] && exec urxvtc "$@"
-fi
-[ -x "`which urxvt 2>/dev/null`" ] && exec urxvt "$@"
-
-[ "0$LC_ALL" -eq 0 ] && LC_ALL=
-
-for dir in /opt/sfw/bin /usr/local/bin /usr/X11R6/bin; do
-  [ -x $dir/xterm ] && exec $dir/xterm "$@"
-done
-
-[ -x /usr/bin/xterm ] && exec /usr/bin/xterm -u8 "$@"
-
-for term in rxvt aterm konsole gnome-multi-terminal gnome-terminal dtterm; do
-  [ -x "`which $term 2>/dev/null`" ] && exec $term "$@"
-done
-
-echo "No terminal emulators found." >&2
-exit 1
+type urxvt >/dev/null 2>&1 && exec urxvt "$@"
+exec xterm "$@"

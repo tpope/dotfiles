@@ -19,7 +19,7 @@ elif [ -n "$TMUX" ]; then
   launch() { tmux new-window -n "WWW" "$*"; sleep 2; exit 0
   }
 elif [ ! -t 1 ]; then
-  launch() { nohup x-terminal-emulator -title 'WWW-Browser' -e "$@" >/dev/null 2>/dev/null & exit 0
+  launch() { nohup ${TERMINAL:-tpope terminal} -title 'WWW-Browser' -e "$@" >/dev/null 2>/dev/null & exit 0
   }
 else
   launch() { exec "$@"

@@ -203,7 +203,7 @@ end
 local hostname = awful.util.pread('tpope host name'):sub(1, -2)
 local modkey = "Mod4"
 local standalone = not os.getenv('XDG_MENU_PREFIX')
-local terminal = os.getenv('TERMINAL') or 'x-terminal-emulator'
+local terminal = os.getenv('TERMINAL') or 'tpope terminal'
 
 local layouts =
 {
