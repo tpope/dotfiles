@@ -47,11 +47,17 @@ esac
 
 [ ! -f /etc/bash_completion ] || . /etc/bash_completion
 
+if ! type _command_offset >/dev/null 2>&1; then
+  _command_offset() {
+    if [[ $(($1 + 1)) == $COMP_CWORD ]]; then
+      COMPREPLY=($(compgen -c "$cur"))
+    else
+      COMPREPLY=($(compgen -f "$cur"))
+    fi
+  }
+fi
+
 _tpope() {
-  while [ -x "$HOME/.local/bin/${COMP_WORDS[0]}-${COMP_WORDS[1]}" ]; do
-    COMP_WORDS=("${COMP_WORDS[0]}-${COMP_WORDS[1]}" "${COMP_WORDS[@]:2}")
-    COMP_CWORD=$((COMP_CWORD-1))
-  done
   local cmd=${COMP_WORDS[0]} sub=${COMP_WORDS[1]} cur=${COMP_WORDS[COMP_CWORD]}
   if [[ $COMP_CWORD == 1 ]]; then
     COMPREPLY=($(compgen -W "$(grep '^  [a-z-]*[|)]' "$HOME/.local/bin/$cmd" | sed -e 's/).*//' | tr '|' ' ')" "$cur"))
@@ -62,14 +68,29 @@ _tpope() {
         COMPREPLY=($(compgen -W "localhost $(tpope-host list)" "$cur")) ;;
       services)
         _services ;;
-      directories)
+      directories|rmdir)
         COMPREPLY=($(compgen -d "$cur")) ;;
-      precommand)
-        COMPREPLY=($(compgen -c "$cur")) ;;
-      nothing)
+      precommand|exec)
+        _command_offset 2
+        ;;
+      nothing|true)
         COMPREPLY=() ;;
+      '')
+        if [ -x "$HOME/.local/bin/$cmd-$sub" ]; then
+          COMP_CWORD=$((COMP_CWORD-1))
+          COMP_WORDS=("$cmd-$sub" "${COMP_WORDS[@]:2}")
+          COMP_LINE=${COMP_LINE/ /-/}
+          _tpope
+        else
+          _command_offset 1
+        fi
+        ;;
       *)
-        COMPREPLY=($(compgen -f "$cur")) ;;
+        COMP_WORDS[1]=$selector
+        COMP_LINE=${COMP_LINE/ $sub/ $selector}
+        COMP_POINT=$(($COMP_POINT + ${#selector} - ${#sub}))
+        _command_offset 1
+        ;;
     esac
   fi
 }

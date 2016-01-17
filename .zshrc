@@ -222,16 +222,15 @@ _tpope() {
     curcontext="${curcontext%:*:*}:$cmd-${words[1]}:"
 
     local selector=$(egrep "^  ([a-z-]*[|])*${words[1]}([|][a-z-]*)*[)] *# *[_a-z-]*$" "$HOME/.local/bin/$cmd" | sed -e 's/.*# *//')
+    _call_function ret _$selector && return $ret
 
-    if [[ -f "$HOME/.local/bin/$cmd-${words[1]}" && -z "$selector" ]]; then
-      words[1]="$cmd-${words[1]}"
+    if [[ -n "$selector" ]]; then
+      words[1]=$selector
+    elif [[ -f "$HOME/.local/bin/$cmd-${words[1]}" ]]; then
+      words[1]=$cmd-${words[1]}
       _tpope
-    elif (( $+functions[_${selector-$words[1]}] )); then
-      service=${selector-$words[1]}
-      _call_function ret _$service && return $ret
-    else
-      _normal
     fi
+    _normal
   fi
 }
 
