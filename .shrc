@@ -42,12 +42,12 @@ fi
 
 rf() {
   . "$HOME/.profile" >/dev/null
-  dp=`echo $DISPLAY|sed -e 's/\..*$//'`
-  if [ -r "$HOME/.env.$dp" ]; then
-    . "$HOME/.env.$dp"
-  fi
   if [ -n "$TMUX" ]; then
     eval "`tmux showenv|sed -e 's/\([^=]*\)=\(.*\)/\1='\''\2'\''; export \1/' -e 's/^-/unset /'`"
+  fi
+  dp=`echo ${1:-$DISPLAY}|sed -e 's/\..*$//'`
+  if [ -r "$HOME/.env.$dp" ]; then
+    . "$HOME/.env.$dp"
   fi
   unset dp
   hash -r
