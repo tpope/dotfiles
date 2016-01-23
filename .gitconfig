@@ -53,6 +53,6 @@
 [web]
 	browser = dillo
 [browser "dillo"]
-	path = tpope-browser
+	path = tpope-open
 [include]
 	path = .gitconfig.local

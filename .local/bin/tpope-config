@@ -15,7 +15,7 @@ base_files="\
 .cvsignore .gitconfig .git_template \
 .xsession .xsessionrc .Xresources .gtkrc-2.0.mine \
 .xbindkeysrc.scm .config/autostart/xbindkeys.desktop \
-.pixmaps/mini .netscape/user.js .local/bin/tpope-browser \
+.pixmaps/mini .netscape/user.js .local/bin/tpope-open \
 .config/awesome/rc.lua .config/awesome/theme.lua .xmonad/xmonad.hs \
 .local/bin/x-terminal-emulator .local/bin/tpope .local/bin/tpope-config \
 .local/bin/tpope-host .local/bin/tpope-media .local/bin/tpope-setup \
@@ -109,6 +109,7 @@ case "$command" in
   prune) # nothing
     cd
     rm -rf \
+      .local/bin/tpope-browser \
       .zlogin \
       bin/tpope \
       bin/tpope-config \

@@ -50,8 +50,8 @@ ACCEPT_ALL_COOKIES:TRUE
 DEFAULT_EDITOR:tpope sensible-editor
 DEFAULT_USER_MODE:INTERMEDIATE
 EMACS_KEYS_ALWAYS_ON:TRUE
-EXTERNAL:http:tpope browser %s:TRUE
-EXTERNAL:file:tpope browser %s:TRUE
+EXTERNAL:http:tpope open %s:TRUE
+EXTERNAL:file:tpope open %s:TRUE
 SAVE_SPACE:~/Downloads
 STARTFILE:http://www.google.com/
 EOF
