@@ -17,7 +17,7 @@ if [ -z "$PAGER" ] && type less >/dev/null 2>&1; then
   PAGER=less
   export PAGER
 fi
-LESS="qFRX#10"
+LESS="FXRq#10"
 if [ -z "$LESSOPEN" ] && type lesspipe >/dev/null 2>&1; then
   LESSOPEN='|lesspipe %s'
 elif [ -z "$LESSOPEN" ]; then

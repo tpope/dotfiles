@@ -165,7 +165,7 @@ case "$basename" in
       [ -f "$file" -a ! -r "$file" ] && root=as_root
     done
     [ -z "$root" ] || root_init
-    $root exec less "-RFX#10" +G "$@"
+    $root exec less +G "$@"
     ;;
 
   pg)
@@ -178,7 +178,7 @@ case "$basename" in
     ;;
 
   ps-grep|gp) # grep
-    LESS="-FRSX#10"
+    LESS="S$LESS"
     export LESS
     (
     arg="$1"; shift

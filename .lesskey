@@ -14,5 +14,3 @@ i toggle-option i
 ^N down
 ^P up
 \ef word-right
-#env
-LESS=FRX

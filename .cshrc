@@ -40,7 +40,7 @@ else if ( -x /usr/bin/vi || -x /bin/vi ) then
 endif
 setenv BROWSER "tpope browser"
 if ( -x /usr/local/bin/less || -x /usr/bin/less || -x /bin/less ) setenv PAGER less
-setenv LESS 'RFX#10'
+setenv LESS 'FXRq#10'
 if ( -x /usr/bin/lesspipe ) then
   setenv LESSOPEN '|lesspipe %s'
 else
