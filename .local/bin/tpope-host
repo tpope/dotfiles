@@ -107,7 +107,7 @@ case "$command" in
     elif [ localhost = "$1" ]; then
       exec "$SHELL" -c 'exec "$@"' "$@"
     else
-      exec ssh "$@"
+      exec ssh -t "$@"
     fi
     ;;
 
@@ -154,6 +154,10 @@ case "$command" in
       *) host="$1" ;;
     esac
     [ "$#" = 0 ] || shift
+    if [ "x$1" = x-d ]; then
+      detach=-d
+      shift
+    fi
     [ -n "$dir" ] || dir=.
     [ -n "$1" ] || set -- `name`
     if [ localhost = "$host" ]; then
@@ -166,10 +170,10 @@ case "$command" in
       esac
 
       if [ mux = "$mux" ] && type tmux >/dev/null 2>&1; then
-        if tmux has-session -t "$1" >/dev/null; then
+        if tmux has-session -t "$1" 2>/dev/null; then
           exec tmux attach-session $detach -t "$1"
         else
-          exec tmux new-session $detach -s "$1"
+          exec tmux new-session -s "$1"
         fi
       elif type screen >/dev/null 2>&1; then
         exec screen ${detach--x}RR "$1"
