@@ -63,8 +63,11 @@ pager() {
 
 case "$basename" in
 
-  browser|open) # open
+  open) # open
     exec "$HOME/.local/bin/tpope-open" "$@" ;;
+
+  browser) # open
+    exec "$HOME/.local/bin/tpope-open" -B "$@" ;;
 
   chat)
     hostname="`tpope host name`"

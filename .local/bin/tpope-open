@@ -7,6 +7,15 @@
 [ "$PATH" ] || PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin/X11:/usr/bin:/bin"
 [ -f "$HOME/.sb.local" ] && . "$HOME/.sb.local"
 
+if [ $# = 0 -o x-e = "x$1" ]; then
+  exec "$HOME/.local/bin/x-terminal-emulator" "$@"
+elif [ x-t = "$1" ]; then
+  shift
+  exec tpope edit "$@"
+elif [ x-B = "$1" ]; then
+  shift
+fi
+
 if [ "$1" = "-T" ]; then
   shift
   terminal=' '
