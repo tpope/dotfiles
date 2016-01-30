@@ -68,13 +68,24 @@ mpris() {
   dbus-send --print-reply --dest="org.mpris.MediaPlayer2.$dest" /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.$cmd >/dev/null
 }
 
+mplayer_fifo() {
+  if [ -z "$mplayer_did_fifo" ]; then
+    IFS=`printf '\n'`
+    mplayer_fifo=`cat "$HOME/.mplayer/config" 2>/dev/null|grep '^include='|cut -d= -f 2-`
+    mplayer_fifo=`cat "$HOME/.mplayer/config" $mplayer_fifo 2>/dev/null|grep '^input=.*file='|head -1|sed -e 's/.*file=//' -e 's/:.*//'`
+    unset IFS
+    mplayer_did_fifo=1
+  fi
+  echo "$mplayer_fifo"
+}
+
 mplayer_tell() {
   case "$1" in
     quit) echo quit ;;
     stop) echo stop ;;
-    pause) echo frame_step ;;
+    pause) echo pausing pause ;;
     toggle) echo speed_set 1; echo 'osd_show_text ""'; echo pause ;;
-    play|resume) echo speed_set 1; echo 'osd_show_text ""'; [ Playing = "`mplayer_status`" ] || echo pause ;;
+    play|resume) echo pausing speed_set 1; echo 'osd_show_text ""'; echo pause ;;
     next) echo pt_step 1 ;;
     prev) echo pt_step -1 ;;
     seek) echo seek ${2:--15} ;;
@@ -87,11 +98,11 @@ mplayer_tell() {
       esac
       ;;
     *) echo "$*" ;;
-  esac > "$HOME/.mplayer/mplayer"
+  esac >> "`mplayer_fifo`"
 }
 
 mplayer_status() {
-  pid=`pidof mplayer`
+  pid=`pgrep -ou "$LOGNAME" mplayer`
   [ -n "$pid" ] || return 1
   host=`hostname`
   case `find_pulse sink-inputs $pid $host Corked` in
@@ -137,7 +148,7 @@ list() {
       echo $dest
     fi
   done
-  if pidof mplayer >/dev/null && [ -p "$HOME/.mplayer/mplayer" ]; then
+  if pgrep -u "$LOGNAME" mplayer >/dev/null && [ -p "`mplayer_fifo`" ]; then
     echo mplayer
   fi
   if [ -x "/usr/bin/cdcd" ]; then
