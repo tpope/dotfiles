@@ -545,7 +545,7 @@ for s = 1, standalone and screen.count() or 0 do
     end
 
     -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s, height = 24 })
+    mywibox[s] = awful.wibox({ position = os.getenv("AWESOME_BAR_POSITION") or "bottom", screen = s, height = 24 })
 
     if wibox.layout then
         local left_layout = wibox.layout.fixed.horizontal()
