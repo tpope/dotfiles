@@ -409,7 +409,8 @@ local function mux_host(host)
         awful.util.spawn('ssh -X ' .. host)
     else
         local cmd = terminal .. ' -e tpope host mux -d ' .. host
-        run_or_raise(cmd, {instance = {'mux@' .. host}})
+        local labels = {'mux@' .. host, 'tpope@' .. host, hostname .. '@' .. host}
+        run_or_raise(cmd, {instance = labels, role = labels})
     end
 end
 
@@ -1037,61 +1038,137 @@ root.keys(globalkeys)
 -- }}}
 
 -- {{{ Rules
+
+local function app_for_client(c)
+    if not c then return end
+    for _, app in pairs(applications) do
+        local entry = app['Desktop Entry']
+        if entry.StartupWMClass == c.instance or entry.StartupWMClass == c.class then
+            return app
+        end
+    end
+    local exec
+    for _, app in pairs(applications) do
+        exec = app['Desktop Entry'].TryExec or app['Desktop Entry'].Exec or ''
+        exec = exec:gsub('^%S+/', ''):gsub(' %%[UuFf]$', '')
+        if exec == c.class or exec == c.instance then
+            return app
+        end
+    end
+end
+
+local function escape_rule(rule)
+    return '^' .. rule:gsub('[[()?%.*+-]', '%%%0') .. '$'
+end
+
+local function rule_any(rule)
+    rule = rule or {}
+    rule.class = rule.class or {}
+    rule.instance = rule.instance or {}
+    rule.name = rule.name or {}
+    rule.icon_name = rule.icon_name or {}
+    for _, category in ipairs(rule.category or {}) do
+        for _, entry in ipairs(applications_by_category[category] or {}) do
+            entry = entry['Desktop Entry'] or entry
+            if entry.StartupWMClass then
+                table.insert(rule.class, escape_rule(entry.StartupWMClass))
+                table.insert(rule.instance, escape_rule(entry.StartupWMClass))
+            elseif xdg.show(entry) then
+                local exec = (entry.TryExec or entry.Exec or ' '):gsub(' %%[UuFf]', ''):gsub('^%S+/', '')
+                if not exec:find(' ') then
+                    table.insert(rule.instance, escape_rule(exec))
+                end
+                table.insert(rule.class, escape_rule(entry.Name))
+                table.insert(rule.name, escape_rule(entry.Name))
+                table.insert(rule.icon_name, escape_rule(entry.Name))
+            end
+        end
+    end
+    rule.category = nil
+    return rule
+end
+
+awful.rules.match_any_original = awful.rules.match_any_original or awful.rules.match_any
+awful.rules.match_any = function(c, p)
+    return awful.rules.match_any_original(c, rule_any(p))
+end
+
+local function not_startup(c)
+    return not awesome.startup
+end
+
 awful.rules.rules = {
     -- All clients will match this rule.
     { rule = { },
       properties = { border_width = beautiful.border_width,
                      border_color = beautiful.border_normal,
                      focus = true,
+                     maximized_horizontal = false,
+                     maximized_vertical = false,
                      keys = clientkeys,
                      buttons = clientbuttons } },
-    { rule = { class = "MPlayer" },
-      properties = { floating = true } },
-    { rule = { class = "pinentry" },
-      properties = { floating = true } },
-    -- { rule = { class = "gimp" },
-    --   properties = { floating = true, tag = tags[1][6] } },
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
+    { rule = { role = "^gnome" }, properties = { border_width = 0 }},
+    { rule_any = { type = {"dock", "desktop"} },
+      properties = { border_width = 0, focus = false } },
+    { rule_any = {name = {"Event Tester", "XBindKey: Hit a key"} },
+      properties = { floating = true, above = true, opacity = 0.5 }, callback = awful.placement.under_mouse },
+    { rule_any = { class = { "Xmag", "Xcolorsel" }, icon_name = { "xzoom" }},
+      properties = { floating = true, above = true }, callback = awful.placement.under_mouse },
+    { rule_any = rule_any({category = { "Calculator" }, class = { "XCalc" }}),
+      properties = { floating = true, above = true }, callback = awful.placement.under_mouse },
+    { rule_any = { category = { "Settings" }, class = { "Pavucontrol", "Arandr" } },
+      properties = { floating = true, above = true } },
+    { rule_any = rule_any({category = { "P2P" }, class = { "Update-manager" } }),
+      properties = { tag = tags[1][8] } },
+    { rule_any = { class = {"pinentry", "Xmessage", "Gxmessage", "Update-notifier"}, role = {"bubble"} },
+      properties = { floating = true, above = true } },
 }
+
 -- }}}
 
 -- {{{ Signals
 
 -- Signal function to execute when a new client appears.
 add_signal(client, "manage", function (c, startup)
-    if c.instance and c.instance:find('@[%w-]+%*?$') then
-        local host, color, dark
-        host = c.instance:match('@[%w-]+'):sub(2)
-        if host == 'localhost' then host = hostname end
-        color = awful.util.pread('tpope host color ' .. host):sub(1, -2)
-        dark = awful.util.pread('tpope host dark ' .. host):sub(1, -2)
-        local icon
-        if c.instance:find('^mux@') then
-            icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/left-' .. color .. '.xpm'
+    local client_signal = function(signal, callback)
+        if client.connect_signal then
+            c:connect_signal(signal, callback)
         else
-            icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/right-' .. color .. '.xpm'
-        end
-        if image then
-            c.icon = image(icon)
-        else
-            c.icon = awesome.load_image(icon)
+            c:add_signal(signal, callback)
         end
     end
 
+    local set_icon = function()
+        local label = c.role or c.instance
+        if label and label:find('@[%w-]*%*?$') then
+            local host = label:match('@[%w-]*'):sub(2)
+            if host == 'localhost' or host == '' then host = hostname end
+            local cmd = label:match('^[^@]*')
+            local color = awful.util.pread('tpope host color ' .. host):sub(1, -2)
+            local icon
+            if cmd == 'mux' or cmd == 'tpope' or cmd == hostname then
+                icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/left-' .. color .. '.xpm'
+            else
+                icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/right-' .. color .. '.xpm'
+            end
+            if image then
+                c.icon = image(icon)
+            else
+                c.icon = awesome.load_image(icon)
+            end
+        end
+    end
+    client_signal('property::instance', set_icon)
+    client_signal('property::role', set_icon)
+    set_icon()
+
     -- Enable sloppy focus
-    local client_callback = function(c)
+    client_signal('mouse::enter', function()
         if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
             and awful.client.focus.filter(c) then
             client.focus = c
         end
-    end
-    if client.connect_signal then
-        c:connect_signal("mouse::enter", client_callback)
-    else
-        c:add_signal("mouse::enter", client_callback)
-    end
+    end)
 
     if not startup then
         -- Set the windows at the slave,
