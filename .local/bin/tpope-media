@@ -8,7 +8,7 @@ mpris_list() {
 }
 
 mpris_player_get() {
-  dbus-send --print-reply --dest="org.mpris.MediaPlayer2.$1" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:"$2" | sed -ne '2,$p'
+  dbus-send --print-reply --reply-timeout=330 --dest="org.mpris.MediaPlayer2.$1" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:"$2" | sed -ne '2,$p'
 }
 
 normalize_rate() {
@@ -143,11 +143,7 @@ cdcd_status() {
 }
 
 list() {
-  for dest in `mpris_list`; do
-    if mpris_player_get $dest 'PlaybackStatus' | grep P >/dev/null || mpris_player_get $dest 'CanPlay' | grep false >/dev/null; then
-      echo $dest
-    fi
-  done
+  mpris_list
   if pgrep -u "$LOGNAME" mplayer >/dev/null && [ -p "`mplayer_fifo`" ]; then
     echo mplayer
   fi
@@ -202,10 +198,6 @@ status() {
   fi
 }
 
-playing() {
-  [ Playing = `status $1` ]
-}
-
 if [ $# -eq 0 ]; then
   for prog in `list`; do
     echo $prog `status $prog`
@@ -233,7 +225,7 @@ case $cmd in
   pause)
     status=1
     for prog in `list`; do
-      ! playing $prog || tell $prog pause
+      [ Paused = "`status $prog`" ] || tell $prog pause
       status=0
     done
     exit $status
@@ -241,25 +233,28 @@ case $cmd in
 
   activate)
     for prog in `list`; do
-      if playing $prog && wmctrl -x -a $prog; then
-        exit 0
-      fi
+      case `status $prog` in
+        Playing) wmctrl -x -a $prog && exit 0 ;;
+        Paused) paused="$paused $prog" ;;
+        *) stopped="$stopped $prog" ;;
+      esac
     done
-    for prog in `list`; do
-      if wmctrl -x -a $prog; then
-        exit 0
-      fi
+    for prog in $paused $stopped; do
+      wmctrl -x -a $prog && exit 0
     done
+    exit 1
     ;;
 
   toggle|play|resume|stop|next|prev|seek|volume|rate|raise|quit|get)
     for prog in `list`; do
-      if playing $prog && tell $prog "$cmd" "$@"; then
-        exit 0
-      fi
+      case `status $prog` in
+        Playing) tell $prog "$cmd" "$@" && exit 0 ;;
+        Paused) paused="$paused $prog" ;;
+        *) stopped="$stopped $prog" ;;
+      esac
     done
-    for prog in `list`; do
-      ! tell $prog "$cmd" "$@" || exit 0
+    for prog in $paused $stopped; do
+      tell $prog "$cmd" "$@" && exit 0
     done
     exit 1
     ;;
