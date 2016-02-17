@@ -144,7 +144,7 @@ BASH_ENV=$HOME/.zshenv
 PATH=$HOME/.bin:$HOME/.local/bin:$HOME/bin:/usr/local/bin:/usr/bin:/bin
 RSYNC_RSH=ssh -axqoBatchMode=yes
 
-20 * * * *	tpope cron
+20 */6 * * *	tpope cron
 EOF
   cat /tmp/crontab.custom.$$ >> /tmp/crontab.template.$$
   if ! cmp /tmp/crontab.template.$$ /tmp/crontab.original.$$ >/dev/null 2>&1; then

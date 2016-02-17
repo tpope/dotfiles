@@ -33,7 +33,7 @@ set query_command="lbdbq %s 2>/dev/null"
 `if mutt -v|head -1|egrep '1\.[0-4]|1\.5\.[0-5][^0-9]' >/dev/null; then echo set alternates=; else echo alternates; fi` "^((tpope|root)@`hostname`(\.simpson)?|tpope@(tpope\.us|sexygeek\.us)|tim[p]ope@sbcglobal\.net|(tpope|root|tim)@sexygeek\.org|(kstrp00|timothy\.pope)@tamuk\.edu|tim[a-z]*\.pope@jmwaller\.com|(skilled|talented|gifted)@cunn\.iling\.us|cunn@iling\.us|[A-Za-z0-9_.%-]+@(rebelongto\.us|tpope\.info|tpope\.net))$"
 set`[ -d "$HOME/.smime/certificates" ] && " smime_default_key=$(hostname).pem"`
 set`[ -x /usr/bin/muttprint ] && echo " print_command=muttprint"`
-set`[ -d "$HOME/.mutt_cache" ] && echo " header_cache=~/.mutt_cache message_cachedir=~/.mutt_cache"`
+set`[ -d "$HOME/.cache/mutt" ] && echo " header_cache=~/.cache/mutt message_cachedir=~/.cache/mutt"`
 
 mailboxes "!"
 auto_view text/richtext text/html

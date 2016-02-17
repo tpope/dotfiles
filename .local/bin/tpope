@@ -53,46 +53,6 @@ root_init() {
   fi
 }
 
-do_clean() {
-  if [ "$1" = -v ]; then
-    destroy()    { find "$@" ! -type d -print 2>/dev/null; }
-    empty_dirs() { find "$@" -mindepth 1 -type d -empty -print; }
-    shift
-  else
-    empty_dirs() { find "$@" -mindepth 1 -type d -empty -print0 2>/dev/null | \
-        xargs -0 rmdir >/dev/null 2>&1; }
-    if inpath wipe; then
-      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
-          xargs -0 wipe -fcsq >/dev/null 2>&1; }
-    elif inpath shred; then
-      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
-          xargs -0 shred -fun 4 >/dev/null 2>&1; }
-    else
-      destroy() { find "$@" ! -type d -print0 2>/dev/null | \
-          xargs -0 rm >/dev/null 2>&1; }
-    fi
-  fi
-  case "$1" in
-    1|2|3|4) unit=$1 ;;
-    5) unit=4 ;;
-    '') unit=2 ;;
-    *) echo "Usage: $tpope$basename [-v] [1-4]" >&2; exit 1 ;;
-  esac
-  cd
-  destroy . \( -ipath "$HOME/media" -o -ipath "$HOME/pictures" -o -ipath "$HOME/music" -o -ipath "$HOME/movies" -o -ipath "$HOME/tv shows" -o -ipath "$HOME/library" -ipath "$HOME/priv" -o -ipath "$HOME/smb" -o -ipath "$HOME/nfs" \) -prune -o \( -name "*~" -o -name ".*~" -o -name ".*.sw?" -o -name .zcompdump -o -name texput.log -o -name screen-exchange \) \( -mtime +`expr $unit \* 15 + 30` -o -user root -ctime +1 \)
-  destroy . -maxdepth 1 \( -name "*~" -o -name ".*~" -o -name ".*.sw?" \) \( -mtime +`expr $unit \* 15` \)
-  destroy /tmp /var/tmp tmp -user "$LOGNAME" -atime +`expr $unit \* 15 + 30` -type f
-  [ $unit = 4 ] && unit=6
-  destroy .trash .local/share/Trash/files .mutt_cache -atime +`expr $unit \* 15`
-  destroy .trash .local/share/Trash/files -amin +`expr \( $unit - 1 \) \* $unit \* 240` \( -size +8192k -o -name '*.jpg' \)
-  destroy .trash .local/share/Trash/files -amin +`expr \( $unit - 1 \) \* $unit \* 60` -size +65536k
-  empty_dirs .trash .local/share/Trash/files
-  trash-empty  `expr $unit \* 15 + 1` 2>/dev/null
-  autotrash -d `expr $unit \* 15 + 1` 2>/dev/null
-  tpope config prune
-  return 0
-}
-
 pager() {
   if [ -t 1 ]; then
     ${PAGER:-less} "$@"
@@ -116,7 +76,30 @@ case "$basename" in
       exec tpope host ssh tpope.net -t '$HOME/.irssi/Chat-script' "$@"
     fi ;;
 
-  clean) do_clean "$@" ;;
+  clean)
+    if [ "$1" = --dry-run ]; then
+      dryrun=$1
+      shift
+      destroy() { find "$@" -print 2>/dev/null; }
+    else
+      destroy() { find "$@" -print0 2>/dev/null | xargs -0 rm >/dev/null 2>&1; }
+    fi
+    cd
+    days=${1:-30}
+    if inpath autotrash; then
+      autotrash $dryrun -d $days
+    elif inpath trash-empty$verbose; then
+      trash-empty $days
+    else
+      trash='.Trash .local/share/Trash/files'
+      destroy $trash -atime +$days -type f
+      [ -n "$dryrun" ] || \
+        find $trash -mindepth 1 -type d -empty -exec rmdir {} 2>/dev/null
+    fi
+    [ "$days" -lt 2 ] && days=2
+    destroy "$HOME/.cache" /tmp /var/tmp -user "$LOGNAME" -atime +`expr $days \* 4` -type f
+    exit 0
+    ;;
 
   config) exec "$HOME/.local/bin/tpope-config" "$@" ;;
 
@@ -125,17 +108,21 @@ case "$basename" in
     if [ "$1" = --login ]; then
       [ ! -x "`which nice 2>/dev/null`" ] || nice="nice"
       ($nice find "$HOME" -maxdepth 1 -name ". tpope" -mtime +8 -exec tpope cron \; || $nice find "$HOME" -name ". tpope" -mtime +8 -exec tpope cron \;) 2>/dev/null &
-      # The part after the || is for versions of find that don't support
-      # -maxdepth, such as busybox
+      # busybox doesn't support -maxdepth
       exit 0
     fi
     sleep 1
     tpope setup --cron
-    cl=4
-    for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'`; do
-      [ "$i" -gt 90 ] && cl=3
+    clean_days=180
+    for i in `df 2>/dev/null|egrep '(/|/home)$'|sed -e 's/.*\(...\)%.*/\1/'|sort -n`; do
+      case $i in
+        100*) clean_days=1 ;;
+        99) clean_days=7 ;;
+        9?) clean_days=60 ;;
+      esac
     done
-    do_clean $cl
+    tpope clean $clean_days
+    tpope config prune
     touch "$HOME/. tpope"
     exec find "$HOME" -maxdepth 1 -name ".autodl" -mtime +30 -exec sh -c 'tpope config pull && touch "$HOME/.autodl"' \; 2>/dev/null
   ;;
