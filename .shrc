@@ -61,7 +61,6 @@ alias j='jobs'
 
 alias b='tpope open'
 alias gst='git status'
-alias mpl='mplayer -fs -loop 0'
 alias ri='ri -f bs'
 alias rsync='rsync --exclude-from="$HOME/.cvsignore"'
 alias whois='tpope page whois'
