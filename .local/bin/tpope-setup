@@ -174,48 +174,38 @@ fi
 
 for arg in "$@"; do
 
-case "$arg" in
+  case $arg in
 
-  default)
-    setup_basics
-    setup_web
-    crontab -l 2>/dev/null | grep 'tpope cron' >/dev/null && setup_cron
-    ;;
+    default)
+      setup_basics
+      setup_web
+      crontab -l 2>/dev/null | grep 'tpope cron' >/dev/null && setup_cron
+      ;;
 
-  sandbox)
-    touch "$HOME/.sandbox"
-    setup_basics
-    setup_web
-    ;;
+    sandbox)
+      touch "$HOME/.sandbox"
+      setup_basics
+      setup_web
+      ;;
 
-  all)
-    setup_basics
-    setup_web
-    setup_cron
-    setup_shell
-    ;;
+    all)
+      setup_basics
+      setup_web
+      setup_cron
+      setup_shell
+      ;;
 
-  basics)
-    setup_basics
-    ;;
+    *)
+      if type "setup_$1" > /dev/null 2>&1; then
+        "setup_$1"
+      else
+        echo "tpope setup: unknown type \"$arg\"." >&2
+        fail=1
+      fi
+      ;;
 
-  web)
-    setup_web
-    ;;
+  esac
 
-  cron)
-    setup_cron
-    ;;
-
-  shell)
-    setup_shell
-    ;;
-
-  *)
-    echo "Unknown setup "$arg". Proceeding with basics only." >&2
-    setup_basics
-    ;;
-
-esac
+  exit $fail
 
 done
