@@ -364,7 +364,19 @@ local function run_or_raise(cmd, properties)
         return c
     end
     if cmd then
-        awful.util.spawn(cmd)
+        awesome.spawn(cmd, true)
+    end
+end
+
+function awful.util.spawn(cmd, sn)
+    if type(cmd) ~= 'string' or cmd == "" then
+        return false
+    elseif cmd:match("^ .*# %%%S") then
+        local class = cmd:match("# %%(%S+)")
+        return run_or_raise(cmd, {class = {class}, instance = {class}})
+    else
+        if sn == nil then sn = true end
+        return awesome.spawn(cmd, sn)
     end
 end
 
@@ -570,12 +582,11 @@ for _, category in ipairs(menu_categories) do
         local entry = app['Desktop Entry']
         local cmdline = xdg.command_line(entry, terminal)
         if cmdline and xdg.show(entry, session_name) then
-            local exec = function()
-                run_or_raise(cmdline, {class = {entry.StartupWMClass}, instance = {entry.StartupWMClass}})
-            end
+            local class = entry.StartupWMClass or (entry.TryExec or entry.Exec or ""):gsub('^%S+/', '')
+            local cmdmeta = " " .. cmdline .. " # %" ..class .. " " .. (entry.GenericName or "") .. ";" .. (entry.Keywords or "")
             local actions = {
-                {entry.Comment or entry.GenericName or entry.Name, exec, theme = {font = beautiful.font:gsub('(.*) ', '%1 Bold ', 1)}},
-                cmd = exec
+                {entry.Comment or entry.GenericName or entry.Name, cmdmeta, theme = {font = beautiful.font:gsub('(.*) ', '%1 Bold ', 1)}},
+                cmd = function () awful.util.spawn(cmdmeta, true) end
             }
             for action in (entry.Actions or ''):gmatch('[^;]+') do
                 local a = app['Desktop Action ' .. action]
@@ -600,10 +611,11 @@ for _, category in ipairs(menu_categories) do
             end
             table.insert(subitems, lazy_menu_icon({
                 entry.Name or '?',
-                awesome.version:match('v3.[0-4]') and exec or actions,
+                awesome.version:match('v3.[0-4]') and actions.cmd or actions,
                 entry.Icon,
                 theme = {submenu = ""},
-                cmdline = cmdline
+                entry = entry,
+                cmdline = cmdmeta
             }))
         end
     end
@@ -723,10 +735,10 @@ if menubar then
                     end
                 end
                 for _, item in ipairs(cat[2]) do
-                    if item.cmdline then
+                    if item.entry and item.cmdline then
                         table.insert(apps, {
                             category = category,
-                            cmdline = item.cmdline,
+                            cmdline = " " .. item.cmdline .. " # %" ..(item.entry.StartupWMClass or item.entry.TryExec or "") .. " " .. (item.entry.GenericName or "") .. ";" .. (item.entry.Keywords or ""),
                             name = item[1],
                             icon = item[3],
                         })
