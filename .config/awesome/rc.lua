@@ -202,7 +202,7 @@ end
 
 local hostname = awful.util.pread('tpope host name'):sub(1, -2)
 local modkey = "Mod4"
-local standalone = not os.getenv('XDG_MENU_PREFIX')
+local standalone = screen[1].geometry.width == screen[1].workarea.width and screen[1].geometry.height == screen[1].geometry.height
 local terminal = os.getenv('TERMINAL') or 'tpope terminal'
 
 local layouts =
@@ -388,7 +388,7 @@ end
 
 -- Editor {{{
 
-local editor_cmd = 'tpope edit'
+local editor_cmd = 'tpope open -t'
 
 local function complete_file(text, cur_pos, ncomp)
     text, cur_pos, ncomp = awful.completion.shell("gvim " .. text, 5 + cur_pos, ncomp)
@@ -406,8 +406,9 @@ end
 local function edit(file)
     if file then
         awful.util.spawn(editor_cmd .. ' "' .. file .. '"', false)
+    else
+        run_or_raise(nil, { class = {'[Vv]im$'}, category = {'TextEditor'} })
     end
-    run_or_raise(nil, { class = {'[Vv]im$'} })
 end
 
 -- }}}
@@ -497,7 +498,7 @@ end
 
 -- {{{ Tags
 
-local tags = {}
+tags = {}
 local mwfact = 1 - (802 + 4 * beautiful.border_width)/1920
 for s = 1, screen.count() do
     tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
@@ -1093,6 +1094,28 @@ local function escape_rule(rule)
     return '^' .. rule:gsub('[[()?%.*+-]', '%%%0') .. '$'
 end
 
+local function rules_for_entry(entry, rule)
+    entry = entry['Desktop Entry'] or entry
+    rule = rule or {}
+    rule.instance = rule.instance or {}
+    rule.class = rule.class or {}
+    if entry.StartupWMClass then
+        table.insert(rule.class, escape_rule(entry.StartupWMClass))
+        table.insert(rule.instance, escape_rule(entry.StartupWMClass))
+    elseif xdg.show(entry) then
+        local exec = (entry.TryExec or entry.Exec or ' '):gsub(' %%[UuFf]', ''):gsub('^%S+/', '')
+        if not exec:find(' ') then
+            table.insert(rule.instance, escape_rule(exec))
+        end
+        table.insert(rule.class, escape_rule(entry.Name))
+        rule.name = rule.name or {}
+        rule.icon_name = rule.icon_name or {}
+        table.insert(rule.name, escape_rule(entry.Name))
+        table.insert(rule.icon_name, escape_rule(entry.Name))
+    end
+    return rule
+end
+
 local function rule_any(rule)
     rule = rule or {}
     rule.class = rule.class or {}
@@ -1101,19 +1124,7 @@ local function rule_any(rule)
     rule.icon_name = rule.icon_name or {}
     for _, category in ipairs(rule.category or {}) do
         for _, entry in ipairs(applications_by_category[category] or {}) do
-            entry = entry['Desktop Entry'] or entry
-            if entry.StartupWMClass then
-                table.insert(rule.class, escape_rule(entry.StartupWMClass))
-                table.insert(rule.instance, escape_rule(entry.StartupWMClass))
-            elseif xdg.show(entry) then
-                local exec = (entry.TryExec or entry.Exec or ' '):gsub(' %%[UuFf]', ''):gsub('^%S+/', '')
-                if not exec:find(' ') then
-                    table.insert(rule.instance, escape_rule(exec))
-                end
-                table.insert(rule.class, escape_rule(entry.Name))
-                table.insert(rule.name, escape_rule(entry.Name))
-                table.insert(rule.icon_name, escape_rule(entry.Name))
-            end
+            rules_for_entry(entry, rule)
         end
     end
     rule.category = nil
@@ -1123,10 +1134,6 @@ end
 awful.rules.match_any_original = awful.rules.match_any_original or awful.rules.match_any
 awful.rules.match_any = function(c, p)
     return awful.rules.match_any_original(c, rule_any(p))
-end
-
-local function not_startup(c)
-    return not awesome.startup
 end
 
 awful.rules.rules = {
@@ -1139,7 +1146,7 @@ awful.rules.rules = {
                      maximized_vertical = false,
                      keys = clientkeys,
                      buttons = clientbuttons } },
-    { rule = { role = "^gnome" }, properties = { border_width = 0 }},
+    { rule_any = { role = {"^gnome"}, type = {"splash"} }, properties = { border_width = 0 }},
     { rule_any = { type = {"dock", "desktop"} },
       properties = { border_width = 0, focus = false } },
     { rule_any = {name = {"Event Tester", "XBindKey: Hit a key"} },
@@ -1152,7 +1159,7 @@ awful.rules.rules = {
       properties = { floating = true, above = true } },
     { rule_any = rule_any({category = { "P2P" }, class = { "Update-manager" } }),
       properties = { tag = tags[1][8] } },
-    { rule_any = { class = {"pinentry", "Xmessage", "Gxmessage", "Update-notifier"}, role = {"bubble"} },
+    { rule_any = { class = {"pinentry", "Xmessage", "Gxmessage", "Tracker-needle", "Update-notifier"}, role = {"bubble"} },
       properties = { floating = true, above = true } },
 }
 
@@ -1203,14 +1210,19 @@ add_signal(client, "manage", function (c, startup)
     end)
 
     if not startup then
-        -- Set the windows at the slave,
-        -- i.e. put it at the end of others instead of setting it master.
-        -- awful.client.setslave(c)
+        -- Move mpv/mplayer out of master column
+        if c.instance == 'xv' or c.instance == 'gl' then
+            awful.client.swap.byidx(1, c)
+        end
 
         -- Put windows in a smart way, only if they does not set an initial position.
         if not c.size_hints.user_position and not c.size_hints.program_position then
-            awful.placement.no_overlap(c)
-            awful.placement.no_offscreen(c)
+            if awful.layout.get() == awful.layout.suit.floating then
+                awful.placement.no_overlap(c)
+                awful.placement.no_offscreen(c)
+            else
+                awful.placement.centered(c, c.transient_for)
+            end
         end
     end
 end)
