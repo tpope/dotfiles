@@ -3,6 +3,8 @@
 
 # Provides a standard interface for sending commands to various media players.
 
+unset IFS
+
 mpris_list() {
   dbus-send --print-reply --dest=org.freedesktop.DBus / org.freedesktop.DBus.ListNames|grep '^ *string "org\.mpris\.MediaPlayer2\..*"'|sed -e 's/"$//' -e 's/.*\.//'
 }
@@ -224,7 +226,12 @@ case $cmd in
 
   pause)
     status=1
-    for prog in `list`; do
+    list=`list`
+    if [ 1 = `echo "$list"|wc -l` ]; then
+      tell $list pause
+      exit 0
+    fi
+    for prog in $list; do
       [ Paused = "`status $prog`" ] || tell $prog pause
       status=0
     done
