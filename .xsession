@@ -57,9 +57,14 @@ xsetroot -solid '#111111'
 "$@" &
 wmpid=$!
 
-sleep 0.1
-
 : ${XDG_CURRENT_DESKTOP:=${XDG_SESSION_DESKTOP:-${GDMSESSION:-Old}}}
+
+for daemon in ${GSD:-/usr/lib/gnome-settings-daemon}/gsd-*; do
+  [ -x "$daemon" ] && "$daemon" &
+done
+
+sleep 0.5
+
 if type xdg-autostart >/dev/null 2>&1; then
   xdg-autostart "$XDG_CURRENT_DESKTOP"
 elif type dex >/dev/null 2>&1; then
