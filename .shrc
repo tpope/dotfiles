@@ -2,7 +2,7 @@
 
 [ -n "$ENV" ] || . "$HOME/.profile" >/dev/null
 
-set -o emacs -o noclobber
+set -o emacs -o noclobber 2>/dev/null
 
 [ "$TERM" != linux ] || TMOUT=43200
 
@@ -31,7 +31,7 @@ if [ -z "$PS1" ]; then
   [ "`id|sed -e 's/^uid=\([0-9]*\).*$/\1/'`" -eq 0 ] && PS1='# ' || PS1='$ '
 fi
 case $PS1 in
-  ?' ') PS1="$LOGNAME@$hostname `basename $0|sed -e 's/^-//'`$PS1" ;;
+  ?' ') PS1="$LOGNAME@$hostname `basename "$0"|sed -e 's/^-//'`$PS1" ;;
 esac
 
 unset hostname
@@ -80,7 +80,7 @@ if [ -x /usr/bin/dircolors -o -x /usr/local/bin/dircolors ]; then
   case "$TERM" in
     xterm*|screen*) LS_COLORS=`echo "$LS_COLORS"|sed -e 's/01;3/00;9/g'` ;;
   esac
-  alias ls='ls -hF --color=auto'
+  alias ls='LS_COLORS=$LS_COLORS ls -hF --color=auto'
 else
   alias ls='CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
 fi
