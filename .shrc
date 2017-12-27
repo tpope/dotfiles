@@ -36,10 +36,6 @@ esac
 
 unset hostname
 
-if type rbenv >/dev/null 2>&1; then
-  eval "`rbenv init -|grep -v PATH`"
-fi
-
 rf() {
   . "$HOME/.profile" >/dev/null
   if [ -n "$TMUX" ]; then

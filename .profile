@@ -1,6 +1,6 @@
 # ~/.profile
 
-PATH=$HOME/.local/bin:$HOME/.rbenv/shims:$HOME/.rbenv/bin:/usr/local/bin:${PATH:-/usr/bin:/bin}:/usr/sbin:/sbin
+PATH=$HOME/.local/bin:/usr/local/bin:${PATH:-/usr/bin:/bin}:/usr/sbin:/sbin
 ENV=$HOME/.shrc
 BASH_ENV=$HOME/.zshenv
 [ -n "$RSYNC_RSH" ] || RSYNC_RSH='ssh -ax'
