@@ -51,8 +51,8 @@
 	name = Tim Pope
 	email = code@tpop"e.ne"t
 [web]
-	browser = dillo
-[browser "dillo"]
-	path = tpope-open
+	browser = tpope
+[browser "tpope"]
+	cmd = tpope open
 [include]
 	path = .gitconfig.local
