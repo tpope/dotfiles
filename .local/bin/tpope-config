@@ -7,7 +7,6 @@ base_files="\
 .zshenv .zprofile .zshrc .zlogout \
 .inputrc .dir_colors \
 .screenrc .tmux.conf \
-.terminfo/s/screen-256color .terminfo/x/xterm-256color \
 .terminfo/r/rxvt-256color .terminfo/72/rxvt-256color \
 .vim/after .vimrc .less .lesskey .lessfilter \
 .muttrc .urlview .mailcap .curlrc \
