@@ -18,6 +18,10 @@ function! dispatch#tmux#handle(request) abort
   endif
 
   if a:request.action ==# 'make'
+    if !get(a:request, 'background', 0) && empty(v:servername) &&
+          \ !empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2]
+      return 0
+    endif
     return dispatch#tmux#make(a:request)
   elseif a:request.action ==# 'start'
     let command = 'tmux new-window -P -t '.shellescape(session.':')
@@ -26,7 +30,9 @@ function! dispatch#tmux#handle(request) abort
       let command .= ' -d'
     endif
     let command .= ' ' . shellescape('exec ' . dispatch#isolate(
-          \ ['TMUX', 'TMUX_PANE'], dispatch#prepare_start(a:request)))
+          \ a:request, ['TMUX', 'TMUX_PANE'],
+          \ dispatch#set_title(a:request),
+          \ dispatch#prepare_start(a:request)))
     call system(command)
     return 1
   endif
@@ -36,17 +42,19 @@ function! dispatch#tmux#make(request) abort
   let pipepane = (&shellpipe ==# '2>&1| tee' || &shellpipe ==# '|& tee')
         \ && a:request.format !~# '%\\[er]'
   let session = get(g:, 'tmux_session', '')
-  let script = dispatch#isolate(['TMUX', 'TMUX_PANE'],
-        \ call('dispatch#prepare_make',
-        \ [a:request] + (pipepane ? [a:request.expanded] : [])))
+  let script = dispatch#isolate(a:request, ['TMUX', 'TMUX_PANE'],
+        \ call('dispatch#prepare_make', [a:request] +
+        \ (pipepane ? [a:request.expanded . '; echo ' . dispatch#status_var()
+        \  . ' > ' . a:request.file . '.complete'] : [])))
 
   let title = shellescape(get(a:request, 'title', get(a:request, 'compiler', 'make')))
+  let height = get(g:, 'dispatch_tmux_height', get(g:, 'dispatch_quickfix_height', 10))
   if get(a:request, 'background', 0)
     let cmd = 'new-window -d -n '.title
   elseif has('gui_running') || empty($TMUX) || (!empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2])
     let cmd = 'new-window -n '.title
   else
-    let cmd = 'split-window -l 10 -d'
+    let cmd = 'split-window -l '.height.' -d'
   endif
 
   let cmd .= ' ' . dispatch#shellescape('-P', '-t', session.':', 'exec ' . script)
@@ -58,7 +66,13 @@ function! dispatch#tmux#make(request) abort
   elseif uname ==# 'Linux'
     let filter .= ' -u'
   endif
-  let filter .= " -e \"s/\r$//\" -e \"s/.*\r//\" -e \"s/\e\\[K//g\" -e \"s/.*\e\\[2K\e\\[0G//g\" -e \"s/\e\\[[0-9;]*m//g\" > ".a:request.file
+  let filter .= " -e \"s/\r\r*$//\" -e \"s/.*\r//\""
+  let filter .= " -e \"s/\e\\[K//g\" "
+  let filter .= " -e \"s/.*\e\\[2K\e\\[0G//g\""
+  let filter .= " -e \"s/.*\e\\[?25h\e\\[0G//g\""
+  let filter .= " -e \"s/\e\\[[0-9;]*m//g\""
+  let filter .= " -e \"s/\017//g\""
+  let filter .= " > " . a:request.file . ""
   call system('tmux ' . cmd . '|tee ' . s:make_pane .
         \ (pipepane ? '|xargs -I {} tmux pipe-pane -t {} '.shellescape(filter) : ''))
 
@@ -112,5 +126,5 @@ endfunction
 
 augroup dispatch_tmux
   autocmd!
-  autocmd VimResized * if !has('gui_running') | call dispatch#tmux#poll() | endif
+  autocmd VimResized * nested if !has('gui_running') | call dispatch#tmux#poll() | endif
 augroup END

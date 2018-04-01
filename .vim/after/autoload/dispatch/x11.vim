@@ -6,27 +6,40 @@ endif
 let g:autoloaded_dispatch_x11 = 1
 
 function! dispatch#x11#handle(request) abort
-  if $DISPLAY !~# '^:' || a:request.action !=# 'start'
+  if $DISPLAY !~# '^:'
     return 0
   endif
-  if a:request.background && (!v:windowid || !executable('wmctrl'))
+  if (get(a:request, 'background', 0) || a:request.action ==# 'make') &&
+        \ (!v:windowid || !executable('wmctrl'))
     return 0
   endif
-  if !empty($TERMINAL)
-    let terminal = $TERMINAL
-  elseif executable('x-terminal-emulator')
-    let terminal = 'x-terminal-emulator'
+  if exists('g:dispatch_terminal_exec')
+    let terminal = g:dispatch_terminal_exec
+  elseif !empty($TERMINAL)
+    let terminal = $TERMINAL . ' -e'
   elseif executable('xterm')
-    let terminal = 'xterm'
+    let terminal = 'xterm -e'
   else
     return 0
   endif
-  let command = dispatch#set_title(a:request) . '; ' . dispatch#prepare_start(a:request)
-  call system(dispatch#shellescape(terminal, '-e', &shell, &shellcmdflag, command). ' &')
-  if a:request.background
-    sleep 100m
-    call system('wmctrl -i -a '.v:windowid)
+  if a:request.action ==# 'make'
+    if !get(a:request, 'background', 0) && empty(v:servername)
+      return 0
+    endif
+    return dispatch#x11#spawn(terminal, dispatch#prepare_make(a:request), a:request)
+  elseif a:request.action ==# 'start'
+    return dispatch#x11#spawn(terminal, dispatch#prepare_start(a:request), a:request)
+  else
+    return 0
   endif
+endfunction
+
+function! dispatch#x11#spawn(terminal, command, request) abort
+  let command = dispatch#set_title(a:request) . '; ' . a:command
+  if a:request.background || a:request.action ==# 'make'
+    let command = 'wmctrl -i -a '.v:windowid . ';' . command
+  endif
+  call system(a:terminal . ' ' . dispatch#shellescape(&shell, &shellcmdflag, command). ' &')
   return 1
 endfunction
 
