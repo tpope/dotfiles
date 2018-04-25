@@ -19,6 +19,19 @@ local function add_signal(object, signal, callback)
     end
 end
 
+local function pread(cmd)
+    if cmd and cmd ~= "" then
+        local f, err = io.popen(cmd, 'r')
+        if f then
+            local s = f:read("*all")
+            f:close()
+            return s
+        else
+            return err
+        end
+    end
+end
+
 -- }}}
 
 -- Debugging {{{
@@ -200,7 +213,7 @@ end
 
 -- {{{ Variable definitions
 
-local hostname = awful.util.pread('tpope host name'):sub(1, -2)
+local hostname = pread('tpope host name'):sub(1, -2)
 local modkey = "Mod4"
 local standalone = screen[1].geometry.width == screen[1].workarea.width and screen[1].geometry.height == screen[1].geometry.height
 local terminal = os.getenv('TERMINAL') or 'tpope terminal'
@@ -457,7 +470,7 @@ local function pick_host(callback)
         end
         keygrabber.stop()
         if key:find('^%u$') or mod4 then
-            host = awful.util.pread("tpope host name " .. key:upper()):sub(1, -2)
+            host = pread("tpope host name " .. key:upper()):sub(1, -2)
             callback(host)
         else
             prompt_host({text = key:match('^.$')}, callback)
@@ -473,7 +486,7 @@ local function prompt_host(options, callback)
     callback,
     function(t, c, n)
         if(t:len() == 1) then
-            local host = awful.util.pread("tpope host name " .. t):sub(1, -2)
+            local host = pread("tpope host name " .. t):sub(1, -2)
             if host ~= "localhost" then
                 return host, host:len() + 1
             end
@@ -799,8 +812,8 @@ awful.button({ }, 5, function ()
 end))
 
 local function battery_markup ()
-    local out = awful.util.pread("acpi 2>/dev/null | grep -v unavailable | head -1")
-    local percent = tonumber(out:match("(%d?%d?%d)%%"))
+    local out = pread("acpi 2>/dev/null | grep -v unavailable | head -1")
+    local percent = tonumber(out:match("(%d?%d?%d)%%")) or -1
     local color
     if out:match('Discharging') then
         color = (percent <= 20 and "#ff0000" or "#aaaa00")
@@ -1183,7 +1196,7 @@ add_signal(client, "manage", function (c, startup)
             local host = label:match('@[%w-]*'):sub(2)
             if host == 'localhost' or host == '' then host = hostname end
             local cmd = label:match('^[^@]*')
-            local color = awful.util.pread('tpope host color ' .. host):sub(1, -2)
+            local color = pread('tpope host color ' .. host):sub(1, -2)
             local icon
             if cmd == 'mux' or cmd == 'tpope' or cmd == hostname then
                 icon = os.getenv('HOME') .. '/.pixmaps/mini/terminal/left-' .. color .. '.xpm'
