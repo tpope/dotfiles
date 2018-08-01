@@ -18,7 +18,7 @@ function! dispatch#tmux#handle(request) abort
   endif
 
   if a:request.action ==# 'make'
-    if !get(a:request, 'background', 0) && empty(v:servername) &&
+    if !get(a:request, 'background', 0) && !dispatch#has_callback() &&
           \ !empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2]
       return 0
     endif
@@ -47,14 +47,14 @@ function! dispatch#tmux#make(request) abort
         \ (pipepane ? [a:request.expanded . '; echo ' . dispatch#status_var()
         \  . ' > ' . a:request.file . '.complete'] : [])))
 
-  let title = shellescape(get(a:request, 'title', get(a:request, 'compiler', 'make')))
+  let title = shellescape(a:request.title)
   let height = get(g:, 'dispatch_tmux_height', get(g:, 'dispatch_quickfix_height', 10))
-  if get(a:request, 'background', 0)
+  if get(a:request, 'background', 0) || (height <= 0 && dispatch#has_callback())
     let cmd = 'new-window -d -n '.title
   elseif has('gui_running') || empty($TMUX) || (!empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2])
     let cmd = 'new-window -n '.title
   else
-    let cmd = 'split-window -l '.height.' -d'
+    let cmd = 'split-window -l '.(height < 0 ? -height : height).' -d'
   endif
 
   let cmd .= ' ' . dispatch#shellescape('-P', '-t', session.':', 'exec ' . script)
@@ -126,5 +126,5 @@ endfunction
 
 augroup dispatch_tmux
   autocmd!
-  autocmd VimResized * nested if !has('gui_running') | call dispatch#tmux#poll() | endif
+  autocmd VimResized * nested if !dispatch#has_callback() | call dispatch#tmux#poll() | endif
 augroup END
