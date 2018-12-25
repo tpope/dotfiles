@@ -3,7 +3,7 @@
 " Author:       Tim Pope <vimNOSPAM@tpope.info>
 " Last Change:  2011 May 02
 
-if version>600
+if v:version > 600
   hi clear
 endif
 if exists("syntax_on")
@@ -15,6 +15,7 @@ let colors_name = "tpope"
 hi Type        gui=none
 hi Statement   gui=none
 hi Search NONE gui=underline term=underline cterm=underline
+hi QuickfixLine NONE gui=underline term=underline cterm=underline
 
 hi link rubyBlockParameter  NONE
 hi TabLineFill NONE
@@ -30,7 +31,7 @@ if &background=="light"
   hi PmenuSel   ctermfg=Black ctermbg=LightCyan
   hi Comment    term=bold ctermfg=Blue guifg=Blue
   hi SpecialKey ctermfg=LightGrey guifg=Grey
-  if version >= 700
+  if v:version >= 700
     " hi Visual     ctermbg=LightMagenta cterm=none
     hi VisualNOS  ctermbg=LightRed     cterm=none guibg=LightRed gui=none
   endif
@@ -52,7 +53,7 @@ else
   hi Todo       ctermfg=White ctermbg=Black
   hi Comment    term=bold ctermfg=DarkCyan guifg=DarkCyan
   hi SpecialKey ctermfg=DarkGrey guifg=DimGrey
-  if version >= 700
+  if v:version >= 700
     hi Visual     ctermbg=DarkMagenta cterm=none
     hi VisualNOS  ctermbg=DarkRed     cterm=none guibg=DarkRed gui=none
   endif
@@ -66,6 +67,16 @@ else
   hi SpellLocal  ctermbg=DarkGreen
   hi SpellErrors ctermfg=LightRed guifg=Red cterm=underline gui=underline term=reverse
   hi MatchParen  term=reverse ctermbg=DarkBlue guibg=DarkCyan
+  hi DiffChange guibg=#5f005f
+  hi DiffAdd    guibg=#00005f
+  hi DiffRemove guibg=#005f5f
+  hi DiffText   guibg=#5f0000
+  if &t_Co == 256
+    hi DiffChange ctermbg=53
+    hi DiffAdd    ctermbg=17
+    hi DiffDelete ctermbg=23
+    hi DiffText   ctermbg=52
+  endif
   " }}}1
 endif
 " vim:set ft=vim sts=2 sw=2:
