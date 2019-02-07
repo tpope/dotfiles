@@ -314,7 +314,7 @@ autocmd FileType ruby
       \ endif
 autocmd FileType tex let b:dispatch = 'latex -interaction=nonstopmode %'
 
-function! s:open(args) abort
+function! s:open(...) abort
   if has('win32')
     let cmd = 'start'
   elseif executable('xdg-open')
