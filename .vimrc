@@ -384,7 +384,9 @@ endif
 if (&t_Co > 2 || has('gui_running')) && has('syntax')
   let &g:highlight = substitute(&g:highlight, 'NonText', 'SpecialKey', 'g')
   if !exists('syntax_on') && !exists('syntax_manual')
+    exe 'augroup END'
     syntax on
+    exe 'augroup my'
   endif
   if !get(v:, 'vim_did_enter', !has('vim_starting'))
     set list
