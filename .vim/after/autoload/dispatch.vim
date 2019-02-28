@@ -264,16 +264,24 @@ endfunction
 function! dispatch#status_var() abort
   if &shellxquote ==# '"'
     return '%ERRORLEVEL%'
-  elseif &shell =~# 'csh'
+  elseif &shell =~# 'csh\|fish'
     return '$status'
   else
     return '$?'
   endif
 endfunction
 
+function! s:subshell(cmds) abort
+  if &shell =~# 'fish'
+    return 'begin; ' . a:cmds . '; end'
+  else
+    return '(' . a:cmds . ')'
+  endif
+endfunction
+
 function! dispatch#prepare_start(request, ...) abort
   let status = dispatch#status_var()
-  let exec = 'echo $$ > ' . a:request.file . '.pid; '
+  let exec = 'echo ' . (&shell =~# 'fish' ? '%self' : '$$') . ' > ' . a:request.file . '.pid; '
   if executable('perl')
     let exec .= 'sync; perl -e "select(undef,undef,undef,0.1)" 2>/dev/null; '
   else
@@ -281,11 +289,12 @@ function! dispatch#prepare_start(request, ...) abort
   endif
   let exec .= a:0 ? a:1 : a:request.expanded
   let wait = a:0 > 1 ? a:2 : get(a:request, 'wait', 'error')
-  let pause = "(printf '\e[1m--- Press ENTER to continue ---\e[0m\\n'; exec head -1)"
+  let pause = s:subshell("printf '\e[1m--- Press ENTER to continue ---\e[0m\\n'; exec head -1")
   if wait ==# 'always'
     let exec .= '; ' . pause
   elseif wait !=# 'never' && wait !=# 'make'
-    let exec .= "; test ".status." = 0 -o ".status." = 130 || " . pause
+    let exec .= "; test ".status." = 0 -o ".status." = 130" .
+          \ (&shell =~# 'fish' ? '; or ' : ' || ') . pause
   endif
   if wait !=# 'make'
     let exec .= '; touch ' .a:request.file . '.complete'
@@ -295,9 +304,9 @@ function! dispatch#prepare_start(request, ...) abort
 endfunction
 
 function! dispatch#prepare_make(request, ...) abort
-  let exec = a:0 ? a:1 : ('(' . a:request.expanded . '; echo ' .
-        \ dispatch#status_var() . ' > ' . a:request.file . '.complete)' .
-        \ dispatch#shellpipe(a:request.file))
+  let exec = a:0 ? a:1 : s:subshell(a:request.expanded . '; echo ' .
+        \ dispatch#status_var() . ' > ' . a:request.file . '.complete') .
+        \ dispatch#shellpipe(a:request.file)
   return dispatch#prepare_start(a:request, exec, 'make')
 endfunction
 
@@ -313,7 +322,7 @@ function! dispatch#isolate(request, keep, ...) abort
   let command = ['cd ' . shellescape(getcwd())]
   for line in split(system('env'), "\n")
     let var = matchstr(line, '^\w\+\ze=')
-    if !empty(var) && var !=# '_' && index(keep, var) < 0
+    if !empty(var) && var !~# '^\%(_\|SHLVL\|PWD\)$' && index(keep, var) < 0
       if &shell =~# 'csh'
         let command += split('setenv '.var.' '.shellescape(eval('$'.var)), "\n")
       else
@@ -427,7 +436,7 @@ function! dispatch#start_command(bang, command, count, ...) abort
     return s:wrapcd(get(opts, 'directory', getcwd()),
           \ substitute(command, '\>', get(opts, 'background', 0) ? '!' : '', ''))
   endif
-  call dispatch#start(command, opts)
+  call dispatch#start(command, opts, a:count)
   return ''
 endfunction
 
@@ -437,7 +446,7 @@ if type(get(g:, 'DISPATCH_STARTS')) != type({})
 endif
 
 function! dispatch#start(command, ...) abort
-  return dispatch#spawn(a:command, extend({'manage': 1}, a:0 ? a:1 : {}))
+  return dispatch#spawn(a:command, extend({'manage': 1}, a:0 ? a:1 : {}), a:0 > 1 ? a:2 : -1)
 endfunction
 
 function! dispatch#spawn(command, ...) abort
@@ -564,7 +573,7 @@ function! dispatch#compiler_options(compiler) abort
   try
     if a:compiler ==# 'make'
       if &makeprg !=# 'make'
-        setlocal errorformat&
+        setlocal errorformat<
       endif
       return {'program': 'make', 'format': &errorformat}
     endif
@@ -835,7 +844,7 @@ function! dispatch#compile_command(bang, args, count, ...) abort
       endif
     else
       let request.handler = 'sync'
-      let after = 'call DispatchComplete('.request.id.')'
+      let after = 'call dispatch#complete('.request.id.',0)'
       redraw!
       let sp = dispatch#shellpipe(request.file)
       let dest = request.file . '.complete'
@@ -879,21 +888,22 @@ function! dispatch#focus(...) abort
   else
     let [compiler, why] = ['--', (len(&l:makeprg) ? 'Buffer' : 'Global') . ' default']
   endif
-  if haslnum
+  if haslnum || !a:0
+    let lnum = a:0 ? a:1 : -1
     let [compiler, opts] = s:extract_opts(compiler)
     if compiler ==# '--'
-      let task = s:efm_literal('buffer', &errorformat, a:1)
+      let task = s:efm_literal('buffer', &errorformat, lnum)
       if empty(task)
-        let task = s:efm_literal('default', &errorformat, a:1)
+        let task = s:efm_literal('default', &errorformat, lnum)
       endif
       if len(task)
         let compiler .= ' ' . task
       endif
     endif
     if compiler =~# '^:'
-      let compiler = s:command_lnum(compiler, a:1)
+      let compiler = s:command_lnum(compiler, lnum)
     else
-      let compiler = dispatch#expand(compiler, a:1)
+      let compiler = dispatch#expand(compiler, lnum)
     endif
     if has_key(opts, 'compiler') && opts.compiler != dispatch#compiler_for_program(compiler)
       let compiler = '-compiler=' . opts.compiler . ' ' . compiler
@@ -927,7 +937,6 @@ function! dispatch#focus_command(bang, args, count, ...) abort
   let [args, opts] = s:extract_opts(a:args)
   if args ==# ':Dispatch'
     let args = dispatch#focus()[0]
-    let args = args =~# '^:' ? args : dispatch#expand(args, -1)
   elseif args =~# '^:[.$]Dispatch$'
     let args = dispatch#focus(line(a:args[1]))[0]
   elseif args =~# '^:\d\+Dispatch$'
@@ -1069,7 +1078,7 @@ function! dispatch#completed(request) abort
   return get(s:request(a:request), 'completed', 0)
 endfunction
 
-function! dispatch#complete(file) abort
+function! dispatch#complete(file, ...) abort
   if !dispatch#completed(a:file)
     let request = s:request(a:file)
     let request.completed = 1
@@ -1088,10 +1097,14 @@ function! dispatch#complete(file) abort
     else
       let label = 'Complete:'
     endif
-    echo label '!'.request.expanded s:postfix(request)
     if !request.background && !get(request, 'aborted')
       call s:cwindow(request, 0, status)
-      redraw
+      redraw!
+    endif
+    echo label '!'.request.expanded s:postfix(request)
+    if !a:0
+      checktime
+      silent doautocmd ShellCmdPost
     endif
   endif
   return ''
@@ -1103,8 +1116,7 @@ function! dispatch#abort_command(bang, query, ...) abort
   let i = len(s:makes) - 1
   while i >= 0
     let request = s:makes[i]
-    if strpart(request.command, 0, len(a:query)) ==# a:query &&
-          \ !dispatch#completed(request)
+    if strpart(request.command, 0, len(a:query)) ==# a:query
       break
     endif
     let i -= 1
@@ -1118,11 +1130,11 @@ function! dispatch#abort_command(bang, query, ...) abort
     return 'echoerr '.string('No pid file')
   endif
   if exists('*dispatch#'.get(request, 'handler').'#kill')
-    return dispatch#{request.handler}#kill(pid)
+    return dispatch#{request.handler}#kill(pid, a:bang)
   elseif has('win32')
-    call system('taskkill /PID '.pid)
+    call system('taskkill /PID ' . (a:bang ? '/F ' : '') . pid)
   else
-    call system('kill -HUP '.pid)
+    call system('kill -' . (a:bang ? 'KILL' : 'HUP') . ' ' . pid)
   endif
   return 'call dispatch#complete('.request.id.')'
 endfunction
