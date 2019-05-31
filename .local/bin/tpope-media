@@ -267,10 +267,26 @@ shift
 sounds=/usr/share/sounds/freedesktop/stereo
 
 sound() {
-  if [ source != "$3" ]; then
-    paplay -d "$2" "$1" 2>/dev/null
+  out=$2
+  if [ $1 = source ]; then
+    out=`list_pulse source|awk '$1 == "'$out'" { print $2 }'|sed -e 's/_input/_output/' -e 's/\.[^.]*$//'`
+    out=`list_pulse sink|grep "	$out"|cut -f1`
   fi
+  shift 2
+  [ -n "$quiet" ] || paplay -d "$out" "$@"
 }
+
+while getopts q o; do
+  case $o in
+    q) quiet=1 ;;
+    \?) exit 2 ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+cmd=$1
+shift
 
 case $cmd in
 
@@ -372,7 +388,7 @@ case $cmd in
         fi
         for id in `list_pulse $cmd | cut -f1`; do
           pactl set-$cmd-volume $id $volume
-          sound "$sounds/audio-volume-change.oga" $id $cmd &
+          [ $cmd = source ] || sound $cmd $id "$sounds/audio-volume-change.oga" &
         done
         exit 0
         ;;
@@ -413,7 +429,7 @@ case $cmd in
         pactl move-$puttype $put $target 2>/dev/null
       done
     fi
-    sound "$sounds/bell.oga" $target $cmd
+    [ source = "$cmd" ] || sound $cmd $target "$sounds/bell.oga"
     ;;
 
   *)
