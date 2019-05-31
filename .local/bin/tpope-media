@@ -70,12 +70,17 @@ mpris() {
   dbus-send --print-reply --dest="org.mpris.MediaPlayer2.$dest" /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.$cmd >/dev/null
 }
 
+find_fifo() {
+  IFS=`printf '\n'`
+  fifo=`cat "$1" 2>/dev/null|grep '^include='|cut -d= -f 2-`
+  fifo=`cat "$1" $fifo 2>/dev/null|grep '^input.*file='|head -1|sed -e 's/.*file=//' -e 's/:.*//'`
+  unset IFS
+  echo "$fifo"
+}
+
 mplayer_fifo() {
   if [ -z "$mplayer_did_fifo" ]; then
-    IFS=`printf '\n'`
-    mplayer_fifo=`cat "$HOME/.mplayer/config" "$HOME/.config/mpv/mpv.conf" 2>/dev/null|grep '^include='|cut -d= -f 2-`
-    mplayer_fifo=`cat "$HOME/.mplayer/config" "$HOME/.config/mpv/mpv.conf" $mplayer_fifo 2>/dev/null|grep '^input=.*file='|head -1|sed -e 's/.*file=//' -e 's/:.*//'`
-    unset IFS
+    mplayer_fifo=`find_fifo "$HOME/.mplayer/config"`
     mplayer_did_fifo=1
   fi
   echo "$mplayer_fifo"
@@ -85,9 +90,9 @@ mplayer_tell() {
   case "$1" in
     quit) echo quit ;;
     stop) echo stop ;;
-    pause) echo set pause yes; echo frame_step ;;
-    toggle) echo speed_set 1; echo 'osd_show_text ""'; echo pause ;;
-    play|resume) echo pausing speed_set 1; echo 'osd_show_text ""'; echo pause ;;
+    pause) echo frame_step ;;
+    toggle) echo pause ;;
+    play|resume) echo 'osd_show_text ""' ;;
     next) echo pt_step 1 ;;
     prev) echo pt_step -1 ;;
     seek) echo seek ${2:--15} ;;
@@ -99,20 +104,66 @@ mplayer_tell() {
         [*]*) echo speed_mult $rate|sed -e 's/\*//' ;;
       esac
       ;;
-    *) echo "$*" ;;
-  esac >> "`mplayer_fifo`"
+    echo) shift; echo "$*" ;;
+  esac
 }
 
-mplayer_status() {
-  pid=`pgrep -ou "$LOGNAME" '(mplayer|mpv)'`
-  [ -n "$pid" ] || return 1
-  host=`hostname`
-  case `find_pulse sink-inputs $pid $host Corked` in
+pid_host_status() {
+  [ -n "$1" -a -n "$2" ] || return 1
+  case `find_pulse sink-inputs $1 $2 Corked` in
     *no*) echo Playing ;;
     *yes*) echo Paused ;;
     *) echo Stopped ;;
   esac
 }
+
+mplayer_status() {
+  pid_host_status `pgrep -ou "$LOGNAME" mplayer` `hostname`
+}
+
+if [ ! -f "$HOME/.config/mpv/scripts/mpris.so" ]; then
+
+  mpv_fifo() {
+    if [ -z "$mpv_did_fifo" ]; then
+      mpv_fifo=`find_fifo "$HOME/.config/mpv/mpv.conf"`
+      mpv_did_fifo=1
+    fi
+    echo "$mpv_fifo"
+  }
+
+  mpv_tell() {
+    case "$1" in
+      quit) echo quit ;;
+      stop) echo stop ;;
+      pause) echo set pause yes; echo frame_step ;;
+      toggle) echo speed_set 1; echo 'osd_show_text ""'; echo pause ;;
+      play|resume) echo pausing speed_set 1; echo 'osd_show_text ""'; echo pause ;;
+      next) echo pt_step 1 ;;
+      prev) echo pt_step -1 ;;
+      seek) echo seek ${2:--15} ;;
+      rate)
+        rate=`normalize_rate $2`
+        case $rate in
+          [0-9]*) echo speed_set $rate ;;
+          [+-]*) echo speed_incr $rate ;;
+          [*]*) echo speed_mult $rate|sed -e 's/\*//' ;;
+        esac
+        ;;
+      echo) shift; echo "$*" ;;
+    esac >> "`mpv_fifo`"
+  }
+
+  mpv_status() {
+    pid_host_status `pgrep -ou "$LOGNAME" mpv` `hostname`
+  }
+
+else
+
+  mpv_fifo() {
+    :
+  }
+
+fi
 
 cdcd_tell() {
   case "$1" in
@@ -146,7 +197,10 @@ cdcd_status() {
 
 list() {
   mpris_list
-  if pgrep -u "$LOGNAME" '(mplayer|mpv)' >/dev/null && [ -p "`mplayer_fifo`" ]; then
+  if pgrep -u "$LOGNAME" mpv >/dev/null && [ -p "`mpv_fifo`" ]; then
+    echo mpv
+  fi
+  if pgrep -u "$LOGNAME" mplayer >/dev/null && [ -p "`mplayer_fifo`" ]; then
     echo mplayer
   fi
   if [ -x "/usr/bin/cdcd" ]; then
