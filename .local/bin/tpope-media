@@ -254,15 +254,7 @@ status() {
   fi
 }
 
-if [ $# -eq 0 ]; then
-  for prog in `list`; do
-    echo $prog `status $prog`
-  done
-  exit 0
-fi
-
-cmd=$1
-shift
+[ $# -gt 0 ] || set -- list
 
 sounds=/usr/share/sounds/freedesktop/stereo
 
@@ -290,8 +282,24 @@ shift
 
 case $cmd in
 
+  list)
+    if [ $# -eq 0 ]; then
+      for prog in `list`; do
+        echo $prog `status $prog`
+      done
+      exit 0
+    fi
+    ;;
+
   tell)
-    tell "$@"
+    target=$1
+    shift
+    status=1
+    for prog in `list|grep "^$target$"`; do
+      tell "$prog" "$@"
+      status=0
+    done
+    exit $status
     ;;
 
   pause)
