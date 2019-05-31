@@ -6,7 +6,7 @@
 unset IFS
 
 mpris_list() {
-  dbus-send --print-reply --dest=org.freedesktop.DBus / org.freedesktop.DBus.ListNames|grep '^ *string "org\.mpris\.MediaPlayer2\..*"'|sed -e 's/"$//' -e 's/.*\.//'
+  dbus-send --print-reply --dest=org.freedesktop.DBus / org.freedesktop.DBus.ListNames|grep '^ *string "org\.mpris\.MediaPlayer2\..*"'|sed -e 's/"$//' -e 's/.*"org\.mpris\.MediaPlayer2\.//'
 }
 
 mpris_player_get() {
