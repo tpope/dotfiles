@@ -420,29 +420,34 @@ case $cmd in
     case $1 in
       toggle|on|off)
         type=`echo $1|sed -e 's/on/0/' -e 's/off/1/'`
-        if [ -n "$2" ]; then
+        if [ -z "$2" -o --default = "$2" ]; then
+          pactl set-$cmd-mute $default $type
+        elif [ --all = "$2" ]; then
+          for id in `list_pulse $cmd | cut -f1`; do
+            pactl set-$cmd-mute $id $type
+          done
+        else
           for si in `find_pulse ${puttype}s $2 $3`; do
             pactl set-$puttype-mute $si $type
           done
-          exit 0
         fi
-        for id in `list_pulse $cmd | cut -f1`; do
-          pactl set-$cmd-mute $id $type
-        done
         exit 0
       ;;
       *%|*dB|[0-9]*.*)
-        volume=`echo $1|sed -e 's/^\(.*\)\([+-]\)$/\2\1/'`
-        if [ -n "$2" ]; then
+        volume=`echo $1|sed -e 's/\([^ ][^ ]*\)\([+-]\)/\2\1/g'`
+        if [ -z "$2" -o --default = "$2" ]; then
+          pactl set-$cmd-volume $default $volume
+          [ $cmd = source ] || sound $cmd $default "$sounds/audio-volume-change.oga" &
+        elif [ --all = "$2" ]; then
+          for id in `list_pulse $cmd | cut -f1`; do
+            pactl set-$cmd-volume $id $volume
+            [ $cmd = source ] || sound $cmd $id "$sounds/audio-volume-change.oga" &
+          done
+        else
           for si in `find_pulse ${puttype}s $2 $3`; do
             pactl set-$puttype-volume $si $volume
           done
-          exit 0
         fi
-        for id in `list_pulse $cmd | cut -f1`; do
-          pactl set-$cmd-volume $id $volume
-          [ $cmd = source ] || sound $cmd $id "$sounds/audio-volume-change.oga" &
-        done
         exit 0
         ;;
       current) target=$current ;;
