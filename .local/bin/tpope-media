@@ -9,6 +9,10 @@ mpris_list() {
   dbus-send --print-reply --dest=org.freedesktop.DBus / org.freedesktop.DBus.ListNames|grep '^ *string "org\.mpris\.MediaPlayer2\..*"'|sed -e 's/"$//' -e 's/.*"org\.mpris\.MediaPlayer2\.//'
 }
 
+mpris_get() {
+  dbus-send --print-reply --reply-timeout=330 --dest="org.mpris.MediaPlayer2.$1" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2 string:"$2" | sed -ne '2,$p'
+}
+
 mpris_player_get() {
   dbus-send --print-reply --reply-timeout=330 --dest="org.mpris.MediaPlayer2.$1" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:org.mpris.MediaPlayer2.Player string:"$2" | sed -ne '2,$p'
 }
@@ -39,7 +43,8 @@ mpris() {
   dest=$1
   shift
   case $1 in
-    get) mpris_player_get $dest $2; return ;;
+    get) mpris_get $dest $2; return ;;
+    player-get) mpris_player_get $dest $2; return ;;
     volume) mpris_player_change $dest Volume $2; return ;;
     rate)
       if [ "`mpris_player_get $dest MaximumRate`" = "`mpris_player_get $dest MinimumRate`" ]; then
@@ -53,12 +58,19 @@ mpris() {
     raise) cmd=Raise ;;
     stop) cmd=Player.Stop ;;
     play|resume)
-      if mpris_player_get $dest PlaybackStatus | grep Paused >/dev/null; then
-        cmd=Player.PlayPause
-      else
-        cmd=Player.Play
-      fi ;;
-    pause) cmd=Player.Pause ;;
+      case `mpris_player_get $dest PlaybackStatus` in
+        *Paused*) cmd=Player.PlayPause ;;
+        *Playing*) return ;;
+        *) cmd=Player.Play ;;
+      esac
+      ;;
+    pause)
+      case `mpris_player_get $dest PlaybackStatus` in
+        *Paused*) return ;;
+        *Stopped*) cmd=Player.Stop ;;
+        *) cmd=Player.Pause ;;
+      esac
+      ;;
     toggle) cmd=Player.PlayPause ;;
     next) cmd=Player.Next ;;
     prev) cmd=Player.Previous ;;
@@ -196,7 +208,9 @@ cdcd_status() {
 }
 
 list() {
-  mpris_list
+  mpris_list=`mpris_list`
+  echo "$mpris_list"|grep -v '^chrom'
+  echo "$mpris_list"|grep '^chrom'
   if pgrep -u "$LOGNAME" mpv >/dev/null && [ -p "`mpv_fifo`" ]; then
     echo mpv
   fi
@@ -295,7 +309,7 @@ case $cmd in
     target=$1
     shift
     status=1
-    for prog in `list|grep "^$target$"`; do
+    for prog in `list|egrep "^($target)$"`; do
       tell "$prog" "$@"
       status=0
     done
@@ -305,12 +319,13 @@ case $cmd in
   pause)
     status=1
     list=`list`
-    if [ 1 = `echo "$list"|wc -l` ]; then
-      tell $list pause
-      exit 0
-    fi
     for prog in $list; do
-      [ Paused = "`status $prog`" ] || tell $prog pause
+      case `status $prog` in
+        Stopped)
+          tell $prog stop ;;
+        Playing)
+          tell $prog pause ;;
+      esac
       status=0
     done
     exit $status
@@ -318,10 +333,11 @@ case $cmd in
 
   activate)
     for prog in `list`; do
+      name=`echo $prog|sed -e 's/\.instance[0-9]*$//'`
       case `status $prog` in
-        Playing) wmctrl -x -a $prog && exit 0 ;;
-        Paused) paused="$paused $prog" ;;
-        *) stopped="$stopped $prog" ;;
+        Playing) wmctrl -x -a $name && exit 0 ;;
+        Paused) paused="$paused $name" ;;
+        *) stopped="$stopped $name" ;;
       esac
     done
     for prog in $paused $stopped; do
@@ -330,7 +346,7 @@ case $cmd in
     exit 1
     ;;
 
-  toggle|play|resume|stop|next|prev|seek|volume|rate|raise|quit|get)
+  toggle|play|resume|stop|next|prev|seek|volume|rate|raise|quit|get|player-get)
     for prog in `list`; do
       case `status $prog` in
         Playing) tell $prog "$cmd" "$@" && exit 0 ;;
