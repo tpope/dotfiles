@@ -247,7 +247,35 @@ find_pulse() {
 }
 
 list_pulse() {
-  pactl list short "${1}s" | egrep -v '\.monitor|module-combine-sink\.c'
+  tmpname=`mktemp`
+  trap "rm -f $tmpname" EXIT INT TERM
+  pactl list "${1}s" > "$tmpname"
+  while read line; do
+    case $line in
+      "Source "*|"Sink "*)
+        if [ -n "$name" -a -z "$not_avail" -o -n "$force_avail" ]; then
+          printf '%s\t%s\n' "$id" "$name"
+        fi
+        ports=
+        not_avail=
+        force_avail=
+        name=
+        id=`echo "$line"|sed -e 's/.*#//'`
+        ;;
+      Name:*.monitor|Name:.*module-combine-sink.c) ;;
+      Name:*)
+        name=`echo "$line"|sed -e 's/^Name: *//'`
+        ;;
+      Ports:*) ports=1 ;;
+      "["*"not available"*) [ -n "$ports" ] && not_avail=1 ;;
+      "["*) [ -n "$ports" ] && force_avail=1 ;;
+      *) ports= ;;
+    esac
+  done < "$tmpname"
+  rm -f "$tmpname"
+  if [ -n "$name" -a -z "$not_avail" -o -n "$force_avail" ]; then
+    printf '%s\t%s\n' "$id" "$name"
+  fi
 }
 
 tell() {
@@ -276,7 +304,8 @@ sound() {
   out=$2
   if [ $1 = source ]; then
     out=`list_pulse source|awk '$1 == "'$out'" { print $2 }'|sed -e 's/_input/_output/' -e 's/\.[^.]*$//'`
-    out=`list_pulse sink|grep "	$out"|cut -f1`
+    out=`list_pulse sink|grep "	$out"|cut -f1|head -1`
+    [ -n "$out" ] || return
   fi
   shift 2
   [ -n "$quiet" ] || paplay -d "$out" "$@"
