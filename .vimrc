@@ -91,8 +91,8 @@ setglobal iconstring=%{tolower(empty(v:servername)?v:progname\ :\ v:servername)}
 
 autocmd SourcePre */macros/less.vim setglobal laststatus=0 showtabline=0
 
-nnoremap <C-j> <C-w>w
-nnoremap <C-k> <C-w>W
+nnoremap <C-J> <C-w>w
+nnoremap <C-K> <C-w>W
 
 " Section: GUI
 
@@ -194,9 +194,6 @@ if has('digraphs')
   digraph cl 8984
 endif
 
-noremap  <S-Insert> <MiddleMouse>
-noremap! <S-Insert> <MiddleMouse>
-
 nnoremap Y  y$
 
 inoremap <C-C> <Esc>`^
@@ -205,18 +202,81 @@ if exists(':xnoremap')
   xnoremap <Space> I<Space><Esc>gv
 endif
 
+nmap <script><silent><expr> <CR> &buftype ==# 'quickfix' ? "\r" : ":\025confirm " . (&buftype !=# 'terminal' ? (v:count ? 'write' : 'update') : &modified <Bar><Bar> exists('*jobwait') && jobwait([&channel], 0)[0] == -1 ? 'normal! i' : 'bdelete!') . "\r"
+
 inoremap <M-o>      <C-O>o
 inoremap <M-O>      <C-O>O
 inoremap <M-i>      <Left>
 inoremap <M-I>      <C-O>^
 inoremap <M-A>      <C-O>$
-inoremap <C-J>      <Down>
-inoremap <C-K><C-K> <Up>
 
 nnoremap <silent> <C-w>z :wincmd z<Bar>cclose<Bar>lclose<CR>
 nnoremap <silent> <C-w>Q :tabclose<CR>
-nnoremap <silent> <C-w>. :if exists(':Wcd')<Bar>exe 'Wcd'<Bar>elseif exists(':Lcd')<Bar>exe 'Lcd'<Bar>elseif exists(':Glcd')<Bar>exe 'Glcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
-nmap cd <C-W>.
+nnoremap <silent> <C-w>, :if exists(':Wcd')<Bar>exe 'Wcd'<Bar>elseif exists(':Lcd')<Bar>exe 'Lcd'<Bar>elseif exists(':Glcd')<Bar>exe 'Glcd'<Bar>else<Bar>lcd %:h<Bar>endif<CR>
+nmap cd <C-w>,
+
+if exists('&termwinkey')
+  tmap <script><expr> <SID>: (empty(&termwinkey) ? "\027" : eval('"\' . &termwinkey . '"')) . ':'
+  tmap <script><expr> <C-\>: (empty(&termwinkey) ? "\027" : eval('"\' . &termwinkey . '"')) . ':'
+elseif exists(':tmap')
+  tmap <script> <SID>: <C-\><C-N>:
+  tmap <script> <C-\>: <C-\><C-N>:
+endif
+
+function! s:MapEx(one, ...) abort
+  let rhs = join(a:000, ' ')
+  exe 'map  <script>' a:one '<C-\><C-N>:' . rhs . '<CR>'
+  exe 'cmap <script>' a:one '<C-\><C-N>:' . rhs . '<CR>'
+  exe 'imap <script>' a:one '<C-\><C-O>:' . rhs . '<CR>'
+  if exists(':tmap')
+    exe 'tmap <script>' a:one    '<SID>:' . rhs . '<CR>'
+  endif
+  return ''
+endfunction
+
+vnoremap <S-Del> "+x
+vnoremap <C-Insert> "+y
+map  <script> <S-Insert> "+gP
+map! <script> <S-Insert> <C-R><C-R>+
+if has('eval')
+  runtime! autoload/paste.vim
+  if exists('g:paste#paste_cmd')
+    exe 'imap <script> <S-Insert> <C-G>u' . g:paste#paste_cmd['i']
+    exe 'vmap <script> <S-Insert> ' . g:paste#paste_cmd['v']
+  endif
+endif
+if exists(':tmap')
+  tmap <script><expr> <S-Insert> tr(@+, "\n", "\r")
+  tmap <script><silent> <C-PageUp>   <SID>:tabprevious<CR>
+  tmap <script><silent> <C-PageDown> <SID>:tabnext<CR>
+endif
+
+if !has('mac')
+  map  <M-x> <S-Del>
+  map! <M-x> <S-Del>
+  map  <M-c> <C-Insert>
+  map! <M-c> <C-Insert>
+  map  <M-v> <S-Insert>
+  map! <M-v> <S-Insert>
+endif
+
+call s:MapEx('<C-F4>', 'confirm quit')
+call s:MapEx('<F28>', 'confirm quit')
+if !has('gui_running')
+  silent! execute "set <F28>=" . ($TERM =~# 'rxvt' ? "\e[14^" : "\e[1;5S")
+endif
+
+call s:MapEx('<C-S-PageUp>', '-tabmove')
+call s:MapEx('<C-S-PageDown>', '+tabmove')
+
+let s:mod = has('mac') ? 'D' : 'M'
+for s:i in range(1, 9)
+  exe 'noremap  <' . s:mod . '-' . s:i . '> <C-\><C-N>' . s:i . 'gt'
+  exe 'noremap! <' . s:mod . '-' . s:i . '> <C-\><C-N>' . s:i . 'gt'
+  if exists(':tmap')
+    exe 'tnoremap <' . s:mod . '-' . s:i . '> <C-w>:' . s:i . 'tabnext<CR>'
+  endif
+endfor
 
 " Section: Reading and writing files
 
