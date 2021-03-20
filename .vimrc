@@ -503,4 +503,4 @@ endif
 
 exe 'augroup END'
 
-" vim:set et sw=2 foldmethod=expr foldexpr=getline(v\:lnum)=~'^\"\ Section\:'?'>1'\:'=':
+" vim:set et sw=2 foldmethod=expr
