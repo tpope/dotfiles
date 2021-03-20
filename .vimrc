@@ -44,6 +44,7 @@ autocmd VimEnter - if exists(':Dotenv') | exe 'Dotenv! ~/.env.local|Dotenv! ~/.e
 
 " Section: Moving around, searching, patterns, and tags
 
+setglobal cpoptions+=J
 setglobal smartcase
 setglobal incsearch
 setglobal tags=./tags;
@@ -147,13 +148,13 @@ setglobal visualbell
 
 " Section: Editing text and indent
 
-setglobal textwidth=78
+setglobal textwidth=0
 setglobal backspace=2
 setglobal complete-=i     " Searching includes can be slow
 if v:version + has('patch541') >= 704
   setglobal formatoptions+=j
 endif
-setglobal dictionary+=/usr/share/dict/words
+silent! setglobal dictionary+=/usr/share/dict/words
 setglobal infercase
 setglobal showmatch
 setglobal virtualedit=block
@@ -177,7 +178,7 @@ if !get(v:, 'vim_did_enter', !has('vim_starting'))
   setlocal commentstring<
 endif
 
-autocmd FileType c,cpp,cs,java        setlocal commentstring=//\ %s
+autocmd FileType c,cpp,cs,java,arduino setlocal commentstring=//\ %s
 autocmd FileType desktop              setlocal commentstring=#\ %s
 autocmd FileType sql                  setlocal commentstring=--\ %s
 autocmd FileType xdefaults            setlocal commentstring=!%s
@@ -271,20 +272,18 @@ elseif has('unix')
   setglobal grepprg=grep\ -rn\ $*\ /dev/null
 endif
 
-autocmd GUIEnter * let $GIT_EDITOR = 'false'
-
 autocmd BufReadPost *
       \ if getline(1) =~# '^#!' |
       \   let b:dispatch =
-      \       matchstr(getline(1), '#!\%(/usr/bin/env \+\)\=\zs.*') . ' %' |
+      \       matchstr(getline(1), '#!\%(/usr/bin/env \+\)\=\zs.*') . ' %:S' |
       \   let b:start = '-wait=always ' . b:dispatch |
       \ endif
-autocmd BufReadPost ~/.xbindkeys* let b:dispatch = '-dir=~ pkill -f "xbindkeys -X $DISPLAY" && xbindkeys -X $DISPLAY'
+autocmd BufReadPost ~/.xbindkeys* let b:dispatch = '-dir=~ pkill -f "xbindkeys -X $DISPLAY"; xbindkeys -X $DISPLAY'
 autocmd BufReadPost ~/.Xkbmap let b:dispatch = 'setxkbmap `cat %`'
+autocmd BufReadPost ~/.Xresources let b:dispatch = 'xrdb ' . $XRDBOPT . ' -override %'
 autocmd BufReadPost /etc/init.d/* let b:dispatch = 'tpope service %:t restart'
 autocmd BufReadPost /etc/init/*.conf let b:dispatch = 'tpope service %:t:r restart'
 autocmd BufReadPost /etc/udev/* let b:dispatch = 'tpope service udev restart'
-autocmd BufReadPost ~/.Xresources let b:dispatch = 'xrdb $XRDBOPT -load %'
 autocmd BufReadPost ~/.config/awesome/*
       \ let b:current_compiler = 'awesome' |
       \ setlocal makeprg=awesome\ -k
@@ -296,9 +295,10 @@ autocmd FileType html let b:dispatch = ':Browse'
 autocmd BufReadPost ~/public_html/**,~/.public_html/** let b:url =
       \ 'http://'.hostname().'/~tpope'.expand('%:p:~:s?\~/[^/]*??')
 autocmd FileType tmux let b:dispatch = 'tmux source %:p:S'
-autocmd FileType cucumber call extend(b:, {'dispatch': 'cucumber %'}, 'keep')
-autocmd FileType java let b:dispatch = 'javac %'
-autocmd FileType perl let b:dispatch = 'perl -Wc %'
+autocmd FileType cucumber call extend(b:, {'dispatch': 'cucumber %:S'}, 'keep')
+autocmd FileType haskell let b:dispatch = 'ghc %:S'
+autocmd FileType java let b:dispatch = 'javac %:S'
+autocmd FileType perl let b:dispatch = 'perl -Wc %:S'
 autocmd FileType ruby
       \ if !exists('b:start') |
       \   let b:start = executable('pry') ? 'pry -r %:p:S' : 'irb -r %:p:S' |
@@ -349,7 +349,8 @@ autocmd FileType help setlocal ai formatoptions+=2n
 autocmd FileType ruby setlocal comments=:#\ tw=78
 autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak keywordprg=dict
 autocmd FileType tex setlocal formatoptions+=l
-autocmd FileType vim setlocal keywordprg=:help foldmethod=expr|
+autocmd FileType vim setlocal keywordprg=:help |
+      \ if &foldmethod !=# 'diff' | setlocal foldmethod=expr foldlevel=1 | endif |
       \ setlocal foldexpr=getline(v:lnum)=~'^\"\ Section:'?'>1':'='
 
 autocmd BufNewFile,BufRead *named.conf* setlocal ft=named
@@ -382,7 +383,9 @@ if $TERM !~? 'linux' && &t_Co == 8
 endif
 
 if (&t_Co > 2 || has('gui_running')) && has('syntax')
-  let &g:highlight = substitute(&g:highlight, 'NonText', 'SpecialKey', 'g')
+  if &g:highlight =~# 'NonText'
+    let &g:highlight = substitute(&g:highlight, 'NonText', 'SpecialKey', 'g')
+  endif
   if !exists('syntax_on') && !exists('syntax_manual')
     exe 'augroup END'
     syntax on
