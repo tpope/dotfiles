@@ -29,6 +29,11 @@ if !get(v:, 'vim_did_enter', !has('vim_starting'))
   endif
 endif
 
+if $VIM_BARE
+  setglobal noloadplugins
+  finish
+endif
+
 setglobal nocompatible
 setglobal pastetoggle=<F2>
 
