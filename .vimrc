@@ -119,20 +119,18 @@ setglobal winaltkeys=no
 
 function! s:font()
   if has('mac')
-    return 'Monaco:h12'
+    return 'Monaco:h14'
   elseif has('win32')
-    return 'Consolas:h11,Courier New:h10'
+    return 'Consolas:h14,Courier New:h14'
   else
-    return 'Monospace Medium 12'
+    return 'Monospace 14'
   endif
 endfunction
 
 command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
 command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
-nnoremap <M-,>        :Smaller<CR>
-nnoremap <M-.>        :Bigger<CR>
-nnoremap <M-9>        :Smaller<CR>
-nnoremap <M-0>        :Bigger<CR>
+nnoremap <M-->        :Smaller<CR>
+nnoremap <M-=>        :Bigger<CR>
 
 autocmd VimEnter *  if !has('gui_running') | set noicon background=dark | endif
 autocmd GUIEnter * set background=light icon guioptions-=T guioptions-=m guioptions-=e guioptions-=r guioptions-=L
