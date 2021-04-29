@@ -101,9 +101,6 @@ nnoremap <C-K> <C-w>W
 
 " Section: GUI
 
-if has('nvim') && len($TMUX)
-  set guicursor=
-endif
 setglobal printoptions=paper:letter
 setglobal mousemodel=popup
 if $TERM =~# '^screen'
