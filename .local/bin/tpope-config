@@ -96,11 +96,11 @@ case "$command" in
     exec tpope config sync $extra --push "$@"
     ;;
 
-  clone) # directories
+  clone) # rmdir
     set -e
-    git clone git://github.com/tpope/tpope.git "$@"
+    git clone https://github.com/tpope/dotfiles.git "${@:-tpope}"
     cd "${1-tpope}"
-    git config --replace-all remote.origin.url git@github.com:tpope/tpope.git
+    git config --replace-all remote.origin.url git@github.com:tpope/dotfiles.git
     git config alias.import '!find . -name .git -prune -o -type f -print0 | xargs -0 rm && tpope config tar cf - | tar xf -'
     git import
     ;;
