@@ -55,21 +55,20 @@ getcolor() {
   lookup "$1" '#Color' || echo white
 }
 
-red()         { hterm="00;31";hscrn="   r";hlrgb="#D47F7F";hdrgb="#550000";}
-green()       { hterm="00;32";hscrn="   g";hlrgb="#7FD47F";hdrgb="#005500";}
-brown()       { hterm="00;33";hscrn="   y";hlrgb="#D4AA7F";hdrgb="#552b00";}
-navy()        { hterm="00;34";hscrn="   b";hlrgb="#7F7FFF";hdrgb="#000080";}
-purple()      { hterm="00;35";hscrn="   m";hlrgb="#D47FD4";hdrgb="#550055";}
-teal()        { hterm="00;36";hscrn="   c";hlrgb="#7FD4D4";hdrgb="#005555";}
-grey()        { hterm="01;30";hscrn="+b K";hlrgb="#BCBBBB";hdrgb="#3d3c3c";
-        test "$TERM" = dtterm && hscrn=d && hterm="00;37" || true;}
-orange()      { hterm="01;31";hscrn="+b R";hlrgb="#FFA1A1";hdrgb="#802222";}
-lime()        { hterm="01;32";hscrn="+b G";hlrgb="#A2FFA1";hdrgb="#238022";}
-yellow()      { hterm="01;33";hscrn="+b Y";hlrgb="#FFFF7F";hdrgb="#808000";}
-blue()        { hterm="01;34";hscrn="+b B";hlrgb="#A2A2FF";hdrgb="#232380";}
-magenta()     { hterm="01;35";hscrn="+b M";hlrgb="#FF7FFF";hdrgb="#800080";}
-cyan()        { hterm="01;36";hscrn="+b C";hlrgb="#7FFFFF";hdrgb="#008080";}
-white()       { hterm="01;37";hscrn="+b W";hlrgb="#FFFFFF";hdrgb="#808080";}
+red()         { hterm="00;31";hlrgb="#D47F7F";hdrgb="#550000";}
+green()       { hterm="00;32";hlrgb="#7FD47F";hdrgb="#005500";}
+brown()       { hterm="00;33";hlrgb="#D4AA7F";hdrgb="#552b00";}
+navy()        { hterm="00;34";hlrgb="#7F7FFF";hdrgb="#000080";}
+purple()      { hterm="00;35";hlrgb="#D47FD4";hdrgb="#550055";}
+teal()        { hterm="00;36";hlrgb="#7FD4D4";hdrgb="#005555";}
+grey()        { hterm="00;90";hlrgb="#BCBBBB";hdrgb="#3d3c3c";}
+orange()      { hterm="00;91";hlrgb="#FFA1A1";hdrgb="#802222";}
+lime()        { hterm="00;92";hlrgb="#A2FFA1";hdrgb="#238022";}
+yellow()      { hterm="00;93";hlrgb="#FFFF7F";hdrgb="#808000";}
+blue()        { hterm="00;94";hlrgb="#A2A2FF";hdrgb="#232380";}
+magenta()     { hterm="00;95";hlrgb="#FF7FFF";hdrgb="#800080";}
+cyan()        { hterm="00;96";hlrgb="#7FFFFF";hdrgb="#008080";}
+white()       { hterm="00;97";hlrgb="#FFFFFF";hdrgb="#808080";}
 
 [ $# -gt 0 ] || exit 1
 
@@ -95,10 +94,6 @@ case "$command" in
   dark) # hosts
     `getcolor "$1"`
     echo $hdrgb
-    ;;
-  screen-code) # hosts
-    `getcolor "$1"`
-    echo $hscrn
     ;;
 
   shell|ssh) # ssh

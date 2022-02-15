@@ -20,23 +20,20 @@ _git_prompt_info() {
       return
   fi
   case "$TERM" in
-    *-256color)             branchcolor=$'\e[38;5;31m'   ;;
+    *-256color|xterm-kitty) branchcolor=$'\e[38;5;31m'   ;;
     *-88color|rxvt-unicode) branchcolor=$'\e[38;5;22m'   ;;
-    xterm*)                 branchcolor=$'\e[00;94m'     ;;
-    *)                      branchcolor="$fg_bold[blue]" ;;
+    *)                      branchcolor=$'\e[00;94m'     ;;
   esac
-  print -Pn '(%%{$branchcolor%%}%20>..>$ref%<<%%{\e[00m%%})'
+  print -Pn '(%%{$branchcolor%%}%20>…>$ref%<<%%{\e[00m%%})'
 }
-
-autoload -Uz colors && colors
 
 hostcolor=$'\e['`tpope-host ansi 2>/dev/null`m
 
-local usercolor="$fg_bold[yellow]"
-local dircolor="$fg_bold[blue]"
+local usercolor=$'\e[00;93m'
+local dircolor=$'\e[00;34m'
 # Use echotc Co?
 case "$TERM" in
-  *-256color)
+  *-256color|xterm-kitty)
     usercolor=$'\e[38;5;184m'
     dircolor=$'\e[38;5;27m'
     ;;
@@ -45,7 +42,7 @@ case "$TERM" in
     dircolor=$'\e[38;5;23m'
     ;;
 esac
-[ $UID = '0' ] && usercolor="$fg_bold[white]"
+[ $UID = '0' ] && usercolor=$'\e[00;97m'
 reset_color=$'\e[00m'
 
 PROMPT="%{$usercolor%}%n%{$reset_color%}@%{${hostcolor}%}%m%{$reset_color%}:%{$dircolor%}%30<...<%~%<<%{$reset_color%}\$(_git_prompt_info)%# "
@@ -67,7 +64,6 @@ _set_title() {
 
 case $TERM in
   screen*)
-    PROMPT="${PROMPT//01;3/00;9}"
     precmd() {
       _set_title "$@"
       if [ "$STY" -o "$TMUX" ]; then
@@ -90,7 +86,6 @@ case $TERM in
   ;;
 
   xterm*|rxvt*|Eterm*|kterm*|putty*|dtterm*|ansi*|cygwin*)
-    PROMPT="${PROMPT//01;3/00;9}"
     precmd () { _set_title "$@" }
     preexec() { _set_title "$@" }
     ;;

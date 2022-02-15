@@ -52,10 +52,10 @@ set noclobber
 # }}}
 # Prompt {{{1
 if ( `id|sed -e 's/^uid=\([0-9]*\).*$/\1/'` == 0 ) then
-  set usercolor = "01;37"
+  set usercolor = "00;97"
   set promptchar = "#"
 else
-  set usercolor = "01;33"
+  set usercolor = "00;93"
   set promptchar = "%"
 endif
 
@@ -70,7 +70,7 @@ endif
 if ( $?tcsh ) then
   set hostcolor = `tpope host ansi`
 
-  set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[01;34m%}%~%{\e[00m%}%# "
+  set prompt = "%{\e[${usercolor}m%}%n%{\e[00m%}@%{\e[${hostcolor}m%}%m%{\e[00m%}:%{\e[00;94m%}%~%{\e[00m%}%# "
 
   switch ($TERM)
   case screen*:

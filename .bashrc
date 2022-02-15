@@ -8,8 +8,8 @@ unset HISTFILE
 hostcolor=`tpope-host ansi 2>/dev/null`
 
 [ "$UID" ] || UID=`id -u`
-usercolor='01;33'
-dircolor='01;34'
+usercolor='00;93'
+dircolor='00;94'
 case "$TERM" in
   *-256color)
   usercolor='38;5;184'
@@ -20,7 +20,7 @@ case "$TERM" in
   dircolor='38;5;23'
   ;;
 esac
-[ $UID = '0' ] && usercolor="01;37"
+[ $UID = '0' ] && usercolor="00;97"
 
 if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
   ttybracket=" [`tty|sed -e s,^/dev/,,`]"
@@ -31,7 +31,7 @@ PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$di
 
 case "$TERM" in
   screen*|xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
-    PS1='\[\e]1;'$ttyat'\h\007\e]2;\u@\h:\w'$ttybracket'\007\]'"${PS1//01;3/00;9}"
+    PS1='\[\e]1;'$ttyat'\h\007\e]2;\u@\h:\w'$ttybracket'\007\]'"$PS1"
   ;;
   linux*|vt220*) ;;
   *)
