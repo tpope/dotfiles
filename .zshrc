@@ -266,8 +266,12 @@ bindkey -M isearch '^J' accept-search 2>/dev/null
 # [[ -z "$terminfo[khome]" ]] || bindkey -M emacs "$terminfo[khome]" beginning-of-line
 # [[ -z "$terminfo[kend]"  ]] || bindkey -M emacs "$terminfo[kend]" end-of-line
 
+autoload -Uz bracketed-paste-magic
+zle -N bracketed-paste bracketed-paste-magic
 autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
+zstyle -e ':url-quote-magic:*' url-seps 'reply=("&${histchars[1]}")' # Remove ";<>"
+zstyle ':url-quote-magic:*' url-metas '*?[]^()~#' # Remove "=|{}"
 
 autoload -Uz select-word-style
 select-word-style bash
