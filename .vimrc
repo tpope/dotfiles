@@ -70,14 +70,13 @@ autocmd FileType ruby setlocal tags-=./tags;
 
 " Section: Displaying text
 
-if exists('+breakindent')
+if has('vim_starting') && exists('+breakindent')
   set breakindent showbreak=\ +
 endif
 setglobal display=lastline
 setglobal scrolloff=1
 setglobal sidescrolloff=5
 setglobal lazyredraw
-set cmdheight=2
 if (&termencoding ==# 'utf-8' || &encoding ==# 'utf-8') && v:version >= 700
   let &g:listchars = "tab:\u21e5\u00b7,trail:\u2423,extends:\u21c9,precedes:\u21c7,nbsp:\u00b7"
   let &g:fillchars = "vert:\u250b,fold:\u00b7"
@@ -152,7 +151,6 @@ setglobal visualbell
 
 " Section: Editing text and indent
 
-setglobal textwidth=0
 setglobal backspace=2
 setglobal complete-=i     " Searching includes can be slow
 if v:version + has('patch541') >= 704
@@ -165,21 +163,23 @@ setglobal virtualedit=block
 
 setglobal shiftround
 setglobal smarttab
-setglobal autoindent
-setglobal omnifunc=syntaxcomplete#Complete
-setglobal completefunc=syntaxcomplete#Complete
-
-autocmd FileType json set sw=2 et
+if has('vim_starting')
+  if exists('*shiftwidth')
+    set shiftwidth=0 softtabstop=-1
+  endif
+  set autoindent
+  set omnifunc=syntaxcomplete#Complete
+  set completefunc=syntaxcomplete#Complete
+endif
 
 " Section: Folding and Comments
 
-if has('folding')
-  setglobal foldmethod=marker
-  setglobal foldopen+=jump
-endif
-setglobal commentstring=#\ %s
-if !get(v:, 'vim_did_enter', !has('vim_starting'))
-  setlocal commentstring<
+if has('vim_starting')
+  if has('folding')
+    set foldmethod=marker
+    set foldopen+=jump
+  endif
+  set commentstring=#\ %s
 endif
 
 autocmd FileType c,cpp,cs,java,arduino setlocal commentstring=//\ %s
@@ -187,8 +187,6 @@ autocmd FileType desktop              setlocal commentstring=#\ %s
 autocmd FileType sql                  setlocal commentstring=--\ %s
 autocmd FileType xdefaults            setlocal commentstring=!%s
 autocmd FileType git,gitcommit        setlocal foldmethod=syntax foldlevel=1
-
-inoremap <C-X>^ <C-R>=substitute(&commentstring,' \=%s\>'," -*- ".&ft." -*- vim:set ft=".&ft." ".(&et?"et":"noet")." sw=".&sw.(&sts ? " sts=".&sts : "").':','')<CR>
 
 " Section: Maps
 
@@ -299,7 +297,7 @@ if exists('##CursorHold')
         \ if !$VIMSWAP && isdirectory(expand('<amatch>:h')) | let &swapfile = &modified | endif
 endif
 
-if exists('+undofile')
+if has('vim_starting') && exists('+undofile')
   set undofile
 endif
 
@@ -441,10 +439,12 @@ let g:sql_type_default = 'pgsql'
 " Section: Highlighting
 
 if has('spell')
-  setglobal spelllang=en_us
-  setglobal spellfile=~/.vim/spell/en.utf-8.add
-  if &rtp =~# 'Dropbox.Code.vim'
-    setglobal spellfile^=~/Dropbox/Code/vim/spell/en.utf-8.add
+  if has('vim_starting')
+    set spelllang=en_us
+    set spellfile=~/.vim/spell/en.utf-8.add
+    if &rtp =~# 'Dropbox.Code.vim'
+      set spellfile^=~/Dropbox/Code/vim/spell/en.utf-8.add
+    endif
   endif
   let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
   autocmd FileType gitcommit setlocal spell
@@ -461,7 +461,7 @@ if (&t_Co > 2 || has('gui_running')) && has('syntax')
     syntax on
     exe 'augroup my'
   endif
-  if !get(v:, 'vim_did_enter', !has('vim_starting'))
+  if has('vim_starting')
     set list
     if !exists('g:colors_name')
       colorscheme tpope
