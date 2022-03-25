@@ -5,6 +5,7 @@
 if v:version < 600 | finish | endif
 
 if !get(v:, 'vim_did_enter', !has('vim_starting'))
+  filetype off
   if has('win32') || has('nvim')
     setglobal runtimepath^=~/.vim runtimepath+=~/.vim/after
   endif
@@ -51,6 +52,9 @@ autocmd VimEnter - if exists(':Dotenv') | exe 'Dotenv! ~/.env.local|Dotenv! ~/.e
 
 setglobal startofline
 setglobal cpoptions+=J
+if has('vim_starting')
+  setglobal noignorecase
+endif
 setglobal smartcase
 setglobal incsearch
 setglobal tags=./tags;
@@ -164,6 +168,7 @@ setglobal virtualedit=block
 setglobal shiftround
 setglobal smarttab
 if has('vim_starting')
+  set tabstop=8 softtabstop=0
   if exists('*shiftwidth')
     set shiftwidth=0 softtabstop=-1
   endif
@@ -326,7 +331,7 @@ endif
 
 " Section: Command line editing
 
-setglobal history=200
+setglobal history=1000
 setglobal wildmenu
 setglobal wildmode=full
 setglobal wildignore+=tags,.*.un~,*.pyc
