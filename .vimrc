@@ -306,11 +306,20 @@ if !empty($SUDO_USER) && $USER !=# $SUDO_USER
   setglobal viminfo=
   setglobal directory-=~/tmp
   setglobal backupdir-=~/tmp
-elseif exists('+undofile')
-  setglobal undodir=~/.cache/vim/undo
-  if !isdirectory(&undodir)
-    call mkdir(&undodir, 'p')
+elseif exists('+undodir') && !has('nvim-0.5')
+  if !empty($XDG_DATA_HOME)
+    let s:data_home = substitute($XDG_DATA_HOME, '/$', '', '') . '/vim/'
+  elseif has('win32')
+    let s:data_home = expand('~/AppData/Local/vim/')
+  else
+    let s:data_home = expand('~/.local/share/vim/')
   endif
+  let &undodir = s:data_home . 'undo//'
+  let &directory = s:data_home . 'swap//'
+  let &backupdir = s:data_home . 'backup//'
+  if !isdirectory(&undodir) | call mkdir(&undodir, 'p') | endif
+  if !isdirectory(&directory) | call mkdir(&directory, 'p') | endif
+  if !isdirectory(&backupdir) | call mkdir(&backupdir, 'p') | endif
 endif
 
 " Section: Command line editing
