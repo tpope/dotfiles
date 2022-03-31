@@ -413,12 +413,11 @@ command! -nargs=* -complete=file O :exe s:open(<f-args>)
 " Section: Filetype settings
 
 autocmd FileType * setlocal nolinebreak
-autocmd FileType xml,xsd,xslt,javascript setlocal ts=2
-autocmd FileType mail,gitcommit setlocal tw=72
-autocmd FileType sh,zsh,csh,tcsh setlocal fo-=t
-autocmd FileType help setlocal ai formatoptions+=2n
-autocmd FileType ruby setlocal tw=78
-autocmd FileType liquid,markdown,text,txt setlocal tw=78 linebreak keywordprg=dict
+autocmd FileType sh,zsh,csh,tcsh,perl,python,ruby,tcl setlocal fo-=t |
+      \ if !&tw | setlocal tw=78 | endif
+autocmd FileType help setlocal ai formatoptions+=2n formatoptions-=ro
+autocmd FileType markdown,text setlocal linebreak keywordprg=dict
+autocmd FileType markdown if !&tw && expand('%:e') =~# '\<\%(md\|markdown\)\>' | setlocal tw=78 | endif
 autocmd FileType tex setlocal formatoptions+=l
 autocmd FileType vim setlocal keywordprg=:help |
       \ if &foldmethod !=# 'diff' | setlocal foldmethod=expr foldlevel=1 | endif |
