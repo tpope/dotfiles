@@ -31,6 +31,7 @@ if &background=="light"
   hi PmenuSel   ctermfg=Black ctermbg=LightCyan
   hi Comment    term=bold ctermfg=Blue guifg=Blue
   hi SpecialKey ctermfg=LightGrey guifg=Grey
+  hi NonText    ctermfg=LightGrey guifg=Grey
   if v:version >= 700
     " hi Visual     ctermbg=LightMagenta cterm=none
     hi VisualNOS  ctermbg=LightRed     cterm=none guibg=LightRed gui=none

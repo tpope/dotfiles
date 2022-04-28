@@ -49,6 +49,7 @@ autocmd VimEnter - if exists(':Dotenv') | exe 'Dotenv! ~/.env.local|Dotenv! ~/.e
 
 " Section: Moving around, searching, patterns, and tags
 
+setglobal startofline
 setglobal cpoptions+=J
 setglobal smartcase
 setglobal incsearch
@@ -93,6 +94,9 @@ if empty(&g:statusline)
 endif
 setglobal titlestring=%{v:progname}\ %{tolower(empty(v:servername)?'':'--servername\ '.v:servername.'\ ')}%{fnamemodify(getcwd(),':~')}%{exists('$SSH_TTY')?'\ <'.hostname().'>':''}
 setglobal iconstring=%{tolower(empty(v:servername)?v:progname\ :\ v:servername)}%{exists('$SSH_TTY')?'@'.hostname():''}
+if has('vim_starting')
+  setglobal nohidden
+endif
 
 autocmd SourcePre */macros/less.vim setglobal laststatus=0 showtabline=0
 
@@ -452,9 +456,6 @@ if $TERM !~? 'linux' && &t_Co == 8
 endif
 
 if (&t_Co > 2 || has('gui_running')) && has('syntax')
-  if &g:highlight =~# 'NonText'
-    let &g:highlight = substitute(&g:highlight, 'NonText', 'SpecialKey', 'g')
-  endif
   if !exists('syntax_on') && !exists('syntax_manual')
     exe 'augroup END'
     syntax on
