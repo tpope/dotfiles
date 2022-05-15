@@ -3,7 +3,7 @@
 
 # Common {{{1
 
-if ( -r "$HOME/.env.local" ) then
+if ( -z "$ENV" &&  -r "$HOME/.env.local" ) then
   eval `grep '^[A-Z].*=' "$HOME/.env.local"|sed -e 's/=/ /' -e 's/^/;setenv /'`
 endif
 
@@ -25,28 +25,12 @@ unset dir newpath
 setenv ENV "$HOME/.shrc"
 setenv BASH_ENV "$HOME/.zshenv"
 if ( ! $?RSYNC_RSH ) setenv RSYNC_RSH 'ssh -ax'
-if ( ! $?SRC ) setenv SRC "$HOME/src"
 
 if ( $?prompt == 0 ) exit
 if ( "$prompt" == "" ) exit
 # }}}1
 # Environment {{{1
 if ( -x /bin/stty ) stty -ixon
-
-if ( -x /usr/local/bin/vim || -x /usr/bin/vim ) then
-  setenv VISUAL vim
-else if ( -x /usr/bin/vi || -x /bin/vi ) then
-  setenv VISUAL vi
-endif
-setenv BROWSER "tpope browser"
-if ( -x /usr/local/bin/less || -x /usr/bin/less || -x /bin/less ) setenv PAGER less
-setenv LESS 'FXRq#10'
-if ( -x /usr/bin/lesspipe ) then
-  setenv LESSOPEN '|lesspipe %s'
-else
-  setenv LESSOPEN '|"$HOME/.lessfilter" %s'
-endif
-if ( ! $?HOST ) set HOST = `tpope host name`
 
 set noclobber
 # }}}
@@ -106,6 +90,7 @@ if ( $?tcsh ) then
 
   endsw
 else
+  if ( ! $?HOST ) setenv HOST `hostname`
   alias cd 'cd \!* && setprompt'
   alias chdir 'chdir \!* && setprompt'
   alias pushd 'pushd \!* && setprompt'
@@ -129,7 +114,7 @@ else
   alias ls 'env CLICOLOR=1 LSCOLORS=ExGxFxdxCxfxDxxbadacad ls -hF'
 endif
 
-eval `grep '^alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
+if ( $?tcsh ) eval `grep '^alias' $HOME/.shrc | sed -e 's/=/ /' -e 's/$/;/'`
 
 if ( $?VISUAL && "$VISUAL" == vim ) alias vi vim
 
