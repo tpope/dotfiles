@@ -1,4 +1,0 @@
-# ~/.logout
-# -*- csh -*- vim:set ft=csh:
-
-if ( ! $?SSH_TTY && "$TERM" == linux ) clear

@@ -3,7 +3,6 @@
 
 base_files="\
 .shrc .profile .bashrc .bash_profile .bash_logout \
-.cshrc .login .logout \
 .zshenv .zprofile .zshrc .zlogout \
 .inputrc .dir_colors \
 .screenrc .tmux.conf \
@@ -108,6 +107,7 @@ case "$command" in
   prune) # nothing
     cd
     rm -rf \
+      .cshrc .login .logout \
       .local/bin/tpope-browser \
       .zlogin \
       bin/tpope \
