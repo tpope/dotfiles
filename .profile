@@ -10,7 +10,6 @@ if [ -r "$HOME/.env.local" ]; then
   eval "`command grep '^[A-Z].*=' "$HOME/.env.local"|sed -e 's/^/export /'`"
 fi
 
-[ -z "$ZSH_VERSION" ] || setopt shwordsplit
 [ ! -r "$HOME/.profile.local" ] || . "$HOME/.profile.local"
 
 if [ -z "$PAGER" ] && type less >/dev/null 2>&1; then
@@ -41,7 +40,6 @@ done
 PATH=$newpath
 
 unset IFS dir newpath
-[ -z "$ZSH_VERSION" ] || setopt noshwordsplit
 
 if [ -t 1 ] && expr "$-" : '.*i' >/dev/null; then
   if [ -f "$HOME/.hushlogin" ]; then

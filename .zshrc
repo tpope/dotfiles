@@ -103,6 +103,7 @@ unset hostcolor hostletter hostcode dircolor usercolor usercode reset_color
 # Options {{{1
 
 setopt rmstarsilent histignoredups
+setopt noclobber
 setopt nonomatch
 setopt completeinword extendedglob
 setopt autocd cdable_vars

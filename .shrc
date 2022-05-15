@@ -2,8 +2,6 @@
 
 [ -n "$ENV" ] || . "$HOME/.profile" >/dev/null
 
-set -o emacs -o noclobber 2>/dev/null
-
 [ "$TERM" != linux ] || TMOUT=43200
 
 hostname=`tpope-host name`
@@ -37,7 +35,11 @@ esac
 unset hostname
 
 rf() {
-  . "$HOME/.profile" >/dev/null
+  if [ -n "$ZSH_VERSION" ]; then
+    emulate sh -c '. "$HOME/.profile"' >/dev/null
+  else
+    . "$HOME/.profile" >/dev/null
+  fi
   if [ -n "$TMUX" ]; then
     eval "`tmux showenv|sed -e 's/\([^=]*\)=\(.*\)/\1='\''\2'\''; export \1/' -e 's/^-/unset /'`"
   fi
@@ -90,5 +92,7 @@ for cmd in `tpope aliases`; do
   alias $cmd="\"\$HOME\"/.local/bin/tpope $cmd"
 done
 unset cmd
+
+[ -n "$ZSH_VERSION" ] || set -o emacs -o noclobber 2>/dev/null
 
 [ ! -r "$HOME/.shrc.local" ] || . "$HOME/.shrc.local"

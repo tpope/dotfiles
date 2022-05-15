@@ -1,3 +1,3 @@
-# ~/.zlogout, ~/.bash_logout
+# ~/.zlogout
 
-[ "0$SHLVL" -le 1 -a -z "$SSH_TTY" -a "$TERM" = linux ] && clear
+emulate sh -c '. "$HOME/.bash_logout"'
