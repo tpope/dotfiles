@@ -1,6 +1,6 @@
 " unimpaired.vim - Pairs of handy bracket mappings
 " Maintainer:   Tim Pope <http://tpo.pe/>
-" Version:      2.0
+" Version:      2.1
 " GetLatestVimScripts: 1590 1 :AutoInstall: unimpaired.vim
 
 if exists("g:loaded_unimpaired") || &cp || v:version < 700
@@ -8,20 +8,13 @@ if exists("g:loaded_unimpaired") || &cp || v:version < 700
 endif
 let g:loaded_unimpaired = 1
 
-let s:maps = []
-function! s:map(...) abort
-  call add(s:maps, copy(a:000))
-endfunction
-
-function! s:maps() abort
-  for [mode, head, rhs; rest] in s:maps
-    let flags = get(rest, 0, '') . (rhs =~# '^<Plug>' ? '' : '<script>')
-    let tail = ''
-    let keys = get(g:, mode.'remap', {})
-    if type(keys) != type({})
-      continue
-    endif
-    while !empty(head)
+function! s:Map(...) abort
+  let [mode, head, rhs; rest] = a:000
+  let flags = get(rest, 0, '') . (rhs =~# '^<Plug>' ? '' : '<script>')
+  let tail = ''
+  let keys = get(g:, mode.'remap', {})
+  if type(keys) == type({}) && !empty(keys)
+    while !empty(head) && len(keys)
       if has_key(keys, head)
         let head = keys[head]
         if empty(head)
@@ -32,44 +25,55 @@ function! s:maps() abort
       let tail = matchstr(head, '<[^<>]*>$\|.$') . tail
       let head = substitute(head, '<[^<>]*>$\|.$', '', '')
     endwhile
-    if head !=# '<skip>' && (flags !~? '<unique>' || empty(maparg(head.tail, mode)))
-      exe mode.'map' flags head.tail rhs
-    endif
-  endfor
+  endif
+  if head !=# '<skip>' && empty(maparg(head.tail, mode))
+    return mode.'map ' . flags . ' ' . head.tail . ' ' . rhs
+  endif
+  return ''
 endfunction
 
 " Section: Next and previous
 
-function! s:MapNextFamily(map,cmd) abort
+function! s:MapNextFamily(map, cmd, current) abort
+  let prefix = '<Plug>(unimpaired-' . a:cmd
   let map = '<Plug>unimpaired'.toupper(a:map)
   let cmd = '".(v:count ? v:count : "")."'.a:cmd
-  let end = '"<CR>'.(a:cmd ==# 'l' || a:cmd ==# 'c' ? 'zv' : '')
+  let zv = (a:cmd ==# 'l' || a:cmd ==# 'c' ? 'zv' : '')
+  let end = '"<CR>'.zv
+  execute 'nnoremap <silent> '.prefix.'previous) :<C-U>exe "'.cmd.'previous'.end
+  execute 'nnoremap <silent> '.prefix.'next)     :<C-U>exe "'.cmd.'next'.end
+  execute 'nnoremap '.prefix.'first)    :<C-U><C-R>=v:count ? v:count . "' . a:current . '" : "' . a:cmd . 'first"<CR><CR>' . zv
+  execute 'nnoremap '.prefix.'last)     :<C-U><C-R>=v:count ? v:count . "' . a:current . '" : "' . a:cmd . 'last"<CR><CR>' . zv
   execute 'nnoremap <silent> '.map.'Previous :<C-U>exe "'.cmd.'previous'.end
   execute 'nnoremap <silent> '.map.'Next     :<C-U>exe "'.cmd.'next'.end
   execute 'nnoremap <silent> '.map.'First    :<C-U>exe "'.cmd.'first'.end
   execute 'nnoremap <silent> '.map.'Last     :<C-U>exe "'.cmd.'last'.end
-  call s:map('n', '['.        a:map , map.'Previous')
-  call s:map('n', ']'.        a:map , map.'Next')
-  call s:map('n', '['.toupper(a:map), map.'First')
-  call s:map('n', ']'.toupper(a:map), map.'Last')
-  if exists(':'.a:cmd.'nfile')
+  exe s:Map('n', '['.        a:map , prefix.'previous)')
+  exe s:Map('n', ']'.        a:map , prefix.'next)')
+  exe s:Map('n', '['.toupper(a:map), prefix.'first)')
+  exe s:Map('n', ']'.toupper(a:map), prefix.'last)')
+  if a:cmd ==# 'c' || a:cmd ==# 'l'
+    execute 'nnoremap <silent> '.prefix.'pfile)  :<C-U>exe "'.cmd.'pfile'.end
+    execute 'nnoremap <silent> '.prefix.'nfile)  :<C-U>exe "'.cmd.'nfile'.end
     execute 'nnoremap <silent> '.map.'PFile :<C-U>exe "'.cmd.'pfile'.end
     execute 'nnoremap <silent> '.map.'NFile :<C-U>exe "'.cmd.'nfile'.end
-    call s:map('n', '[<C-'.toupper(a:map).'>', map.'PFile')
-    call s:map('n', ']<C-'.toupper(a:map).'>', map.'NFile')
-  elseif exists(':p'.a:cmd.'next')
+    exe s:Map('n', '[<C-'.toupper(a:map).'>', prefix.'pfile)')
+    exe s:Map('n', ']<C-'.toupper(a:map).'>', prefix.'nfile)')
+  elseif a:cmd ==# 't'
+    nnoremap <silent> <Plug>(unimpaired-ptprevious) :<C-U>exe v:count1 . "ptprevious"<CR>
+    nnoremap <silent> <Plug>(unimpaired-ptnext) :<C-U>exe v:count1 . "ptnext"<CR>
     execute 'nnoremap <silent> '.map.'PPrevious :<C-U>exe "p'.cmd.'previous'.end
     execute 'nnoremap <silent> '.map.'PNext :<C-U>exe "p'.cmd.'next'.end
-    call s:map('n', '[<C-'.toupper(a:map).'>', map.'PPrevious')
-    call s:map('n', ']<C-'.toupper(a:map).'>', map.'PNext')
+    exe s:Map('n', '[<C-T>', '<Plug>(unimpaired-ptprevious)')
+    exe s:Map('n', ']<C-T>', '<Plug>(unimpaired-ptnext)')
   endif
 endfunction
 
-call s:MapNextFamily('a','')
-call s:MapNextFamily('b','b')
-call s:MapNextFamily('l','l')
-call s:MapNextFamily('q','c')
-call s:MapNextFamily('t','t')
+call s:MapNextFamily('a', '' , 'argument')
+call s:MapNextFamily('b', 'b', 'buffer')
+call s:MapNextFamily('l', 'l', 'll')
+call s:MapNextFamily('q', 'c', 'cc')
+call s:MapNextFamily('t', 't', 'trewind')
 
 function! s:entries(path) abort
   let path = substitute(a:path,'[\\/]$','','')
@@ -81,7 +85,7 @@ function! s:entries(path) abort
   let filter_suffixes = substitute(escape(&suffixes, '~.*$^'), ',', '$\\|', 'g') .'$'
   call filter(files, 'v:val !~# filter_suffixes')
 
-  return files
+  return sort(files)
 endfunction
 
 function! s:FileByOffset(num) abort
@@ -93,9 +97,9 @@ function! s:FileByOffset(num) abort
   while num
     let files = s:entries(fnamemodify(file,':h'))
     if a:num < 0
-      call reverse(sort(filter(files,'v:val <# file')))
+      call reverse(filter(files,'v:val <# file'))
     else
-      call sort(filter(files,'v:val ># file'))
+      call filter(files,'v:val ># file')
     endif
     let temp = get(files,0,'')
     if empty(temp)
@@ -125,22 +129,67 @@ function! s:fnameescape(file) abort
   endif
 endfunction
 
-nnoremap <silent> <Plug>unimpairedDirectoryNext     :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(v:count1), ':.'))<CR><CR>
-nnoremap <silent> <Plug>unimpairedDirectoryPrevious :<C-U>edit <C-R>=<SID>fnameescape(fnamemodify(<SID>FileByOffset(-v:count1), ':.'))<CR><CR>
-call s:map('n', ']f', '<Plug>unimpairedDirectoryNext')
-call s:map('n', '[f', '<Plug>unimpairedDirectoryPrevious')
+function! s:GetWindow() abort
+  if exists('*getwininfo') && exists('*win_getid')
+    return get(getwininfo(win_getid()), 0, {})
+  else
+    return {}
+  endif
+endfunction
+
+function! s:PreviousFileEntry(count) abort
+  let window = s:GetWindow()
+
+  if get(window, 'loclist')
+    return 'lolder ' . a:count
+  elseif get(window, 'quickfix')
+    return 'colder ' . a:count
+  else
+    return 'edit ' . s:fnameescape(fnamemodify(s:FileByOffset(-v:count1), ':.'))
+  endif
+endfunction
+
+function! s:NextFileEntry(count) abort
+  let window = s:GetWindow()
+
+  if get(window, 'loclist')
+    return 'lnewer ' . a:count
+  elseif get(window, 'quickfix')
+    return 'cnewer ' . a:count
+  else
+    return 'edit ' . s:fnameescape(fnamemodify(s:FileByOffset(v:count1), ':.'))
+  endif
+endfunction
+
+nnoremap <silent> <Plug>(unimpaired-directory-next)     :<C-U>execute <SID>NextFileEntry(v:count1)<CR>
+nnoremap <silent> <Plug>(unimpaired-directory-previous) :<C-U>execute <SID>PreviousFileEntry(v:count1)<CR>
+nnoremap <silent> <Plug>unimpairedDirectoryNext     :<C-U>execute <SID>NextFileEntry(v:count1)<CR>
+nnoremap <silent> <Plug>unimpairedDirectoryPrevious :<C-U>execute <SID>PreviousFileEntry(v:count1)<CR>
+exe s:Map('n', ']f', '<Plug>(unimpaired-directory-next)')
+exe s:Map('n', '[f', '<Plug>(unimpaired-directory-previous)')
 
 " Section: Diff
 
-call s:map('n', '[n', '<Plug>unimpairedContextPrevious')
-call s:map('n', ']n', '<Plug>unimpairedContextNext')
-call s:map('o', '[n', '<Plug>unimpairedContextPrevious')
-call s:map('o', ']n', '<Plug>unimpairedContextNext')
+nnoremap <silent> <Plug>(unimpaired-context-previous) :<C-U>call <SID>Context(1)<CR>
+nnoremap <silent> <Plug>(unimpaired-context-next)     :<C-U>call <SID>Context(0)<CR>
+vnoremap <silent> <Plug>(unimpaired-context-previous) :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
+vnoremap <silent> <Plug>(unimpaired-context-next)     :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+onoremap <silent> <Plug>(unimpaired-context-previous) :<C-U>call <SID>ContextMotion(1)<CR>
+onoremap <silent> <Plug>(unimpaired-context-next)     :<C-U>call <SID>ContextMotion(0)<CR>
 
-nnoremap <silent> <Plug>unimpairedContextPrevious :call <SID>Context(1)<CR>
-nnoremap <silent> <Plug>unimpairedContextNext     :call <SID>Context(0)<CR>
-onoremap <silent> <Plug>unimpairedContextPrevious :call <SID>ContextMotion(1)<CR>
-onoremap <silent> <Plug>unimpairedContextNext     :call <SID>ContextMotion(0)<CR>
+exe s:Map('n', '[n', '<Plug>(unimpaired-context-previous)')
+exe s:Map('n', ']n', '<Plug>(unimpaired-context-next)')
+exe s:Map('x', '[n', '<Plug>(unimpaired-context-previous)')
+exe s:Map('x', ']n', '<Plug>(unimpaired-context-next)')
+exe s:Map('o', '[n', '<Plug>(unimpaired-context-previous)')
+exe s:Map('o', ']n', '<Plug>(unimpaired-context-next)')
+
+nnoremap <silent> <Plug>unimpairedContextPrevious :<C-U>call <SID>Context(1)<CR>
+nnoremap <silent> <Plug>unimpairedContextNext     :<C-U>call <SID>Context(0)<CR>
+xnoremap <silent> <Plug>unimpairedContextPrevious :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
+xnoremap <silent> <Plug>unimpairedContextNext     :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
+onoremap <silent> <Plug>unimpairedContextPrevious :<C-U>call <SID>ContextMotion(1)<CR>
+onoremap <silent> <Plug>unimpairedContextNext     :<C-U>call <SID>ContextMotion(0)<CR>
 
 function! s:Context(reverse) abort
   call search('^\(@@ .* @@\|[<=>|]\{7}[<=>|]\@!\)', a:reverse ? 'bW' : 'W')
@@ -178,23 +227,30 @@ endfunction
 
 " Section: Line operations
 
-function! s:BlankUp(count) abort
-  put!=repeat(nr2char(10), a:count)
-  ']+1
-  silent! call repeat#set("\<Plug>unimpairedBlankUp", a:count)
+function! s:BlankUp() abort
+  let cmd = 'put!=repeat(nr2char(10), v:count1)|silent '']+'
+  if &modifiable
+    let cmd .= '|silent! call repeat#set("\<Plug>(unimpaired-blank-up)", v:count1)'
+  endif
+  return cmd
 endfunction
 
-function! s:BlankDown(count) abort
-  put =repeat(nr2char(10), a:count)
-  '[-1
-  silent! call repeat#set("\<Plug>unimpairedBlankDown", a:count)
+function! s:BlankDown() abort
+  let cmd = 'put =repeat(nr2char(10), v:count1)|silent ''[-'
+  if &modifiable
+    let cmd .= '|silent! call repeat#set("\<Plug>(unimpaired-blank-down)", v:count1)'
+  endif
+  return cmd
 endfunction
 
-nnoremap <silent> <Plug>unimpairedBlankUp   :<C-U>call <SID>BlankUp(v:count1)<CR>
-nnoremap <silent> <Plug>unimpairedBlankDown :<C-U>call <SID>BlankDown(v:count1)<CR>
+nnoremap <silent> <Plug>(unimpaired-blank-up)   :<C-U>exe <SID>BlankUp()<CR>
+nnoremap <silent> <Plug>(unimpaired-blank-down) :<C-U>exe <SID>BlankDown()<CR>
 
-call s:map('n', '[<Space>', '<Plug>unimpairedBlankUp')
-call s:map('n', ']<Space>', '<Plug>unimpairedBlankDown')
+nnoremap <silent> <Plug>unimpairedBlankUp   :<C-U>exe <SID>BlankUp()<CR>
+nnoremap <silent> <Plug>unimpairedBlankDown :<C-U>exe <SID>BlankDown()<CR>
+
+exe s:Map('n', '[<Space>', '<Plug>(unimpaired-blank-up)')
+exe s:Map('n', ']<Space>', '<Plug>(unimpaired-blank-down)')
 
 function! s:ExecMove(cmd) abort
   let old_fdm = &foldmethod
@@ -211,62 +267,66 @@ endfunction
 
 function! s:Move(cmd, count, map) abort
   call s:ExecMove('move'.a:cmd.a:count)
-  silent! call repeat#set("\<Plug>unimpairedMove".a:map, a:count)
+  silent! call repeat#set("\<Plug>(unimpaired-move-".a:map.")", a:count)
 endfunction
 
 function! s:MoveSelectionUp(count) abort
   call s:ExecMove("'<,'>move'<--".a:count)
-  silent! call repeat#set("\<Plug>unimpairedMoveSelectionUp", a:count)
+  silent! call repeat#set("\<Plug>(unimpaired-move-selection-up)", a:count)
 endfunction
 
 function! s:MoveSelectionDown(count) abort
   call s:ExecMove("'<,'>move'>+".a:count)
-  silent! call repeat#set("\<Plug>unimpairedMoveSelectionDown", a:count)
+  silent! call repeat#set("\<Plug>(unimpaired-move-selection-down)", a:count)
 endfunction
 
-nnoremap <silent> <Plug>unimpairedMoveUp            :<C-U>call <SID>Move('--',v:count1,'Up')<CR>
-nnoremap <silent> <Plug>unimpairedMoveDown          :<C-U>call <SID>Move('+',v:count1,'Down')<CR>
+nnoremap <silent> <Plug>(unimpaired-move-up)            :<C-U>call <SID>Move('--',v:count1,'up')<CR>
+nnoremap <silent> <Plug>(unimpaired-move-down)          :<C-U>call <SID>Move('+',v:count1,'down')<CR>
+noremap  <silent> <Plug>(unimpaired-move-selection-up)   :<C-U>call <SID>MoveSelectionUp(v:count1)<CR>
+noremap  <silent> <Plug>(unimpaired-move-selection-down) :<C-U>call <SID>MoveSelectionDown(v:count1)<CR>
+nnoremap <silent> <Plug>unimpairedMoveUp            :<C-U>call <SID>Move('--',v:count1,'up')<CR>
+nnoremap <silent> <Plug>unimpairedMoveDown          :<C-U>call <SID>Move('+',v:count1,'down')<CR>
 noremap  <silent> <Plug>unimpairedMoveSelectionUp   :<C-U>call <SID>MoveSelectionUp(v:count1)<CR>
 noremap  <silent> <Plug>unimpairedMoveSelectionDown :<C-U>call <SID>MoveSelectionDown(v:count1)<CR>
 
-call s:map('n', '[e', '<Plug>unimpairedMoveUp')
-call s:map('n', ']e', '<Plug>unimpairedMoveDown')
-call s:map('x', '[e', '<Plug>unimpairedMoveSelectionUp')
-call s:map('x', ']e', '<Plug>unimpairedMoveSelectionDown')
+exe s:Map('n', '[e', '<Plug>(unimpaired-move-up)')
+exe s:Map('n', ']e', '<Plug>(unimpaired-move-down)')
+exe s:Map('x', '[e', '<Plug>(unimpaired-move-selection-up)')
+exe s:Map('x', ']e', '<Plug>(unimpaired-move-selection-down)')
 
 " Section: Option toggling
 
-function! s:statusbump() abort
+function! s:StatuslineRefresh() abort
   let &l:readonly = &l:readonly
   return ''
 endfunction
 
-function! s:toggle(op) abort
-  call s:statusbump()
+function! s:Toggle(op) abort
+  call s:StatuslineRefresh()
   return eval('&'.a:op) ? 'no'.a:op : a:op
 endfunction
 
-function! s:cursor_options() abort
+function! s:CursorOptions() abort
   return &cursorline && &cursorcolumn ? 'nocursorline nocursorcolumn' : 'cursorline cursorcolumn'
 endfunction
 
 function! s:option_map(letter, option, mode) abort
-  call s:map('n', '[o'.a:letter, ':'.a:mode.' '.a:option.'<C-R>=<SID>statusbump()<CR><CR>')
-  call s:map('n', ']o'.a:letter, ':'.a:mode.' no'.a:option.'<C-R>=<SID>statusbump()<CR><CR>')
-  call s:map('n', 'yo'.a:letter, ':'.a:mode.' <C-R>=<SID>toggle("'.a:option.'")<CR><CR>')
+  exe 'nmap <script> <Plug>(unimpaired-enable)' .a:letter ':<C-U>'.a:mode.' '.a:option.'<C-R>=<SID>StatuslineRefresh()<CR><CR>'
+  exe 'nmap <script> <Plug>(unimpaired-disable)'.a:letter ':<C-U>'.a:mode.' no'.a:option.'<C-R>=<SID>StatuslineRefresh()<CR><CR>'
+  exe 'nmap <script> <Plug>(unimpaired-toggle)' .a:letter ':<C-U>'.a:mode.' <C-R>=<SID>Toggle("'.a:option.'")<CR><CR>'
 endfunction
 
-call s:map('n', '[ob', ':set background=light<CR>')
-call s:map('n', ']ob', ':set background=dark<CR>')
-call s:map('n', 'yob', ':set background=<C-R>=&background == "dark" ? "light" : "dark"<CR><CR>')
+nmap <script> <Plug>(unimpaired-enable)b  :<C-U>set background=light<CR>
+nmap <script> <Plug>(unimpaired-disable)b :<C-U>set background=dark<CR>
+nmap <script> <Plug>(unimpaired-toggle)b  :<C-U>set background=<C-R>=&background == "dark" ? "light" : "dark"<CR><CR>
 call s:option_map('c', 'cursorline', 'setlocal')
 call s:option_map('-', 'cursorline', 'setlocal')
 call s:option_map('_', 'cursorline', 'setlocal')
 call s:option_map('u', 'cursorcolumn', 'setlocal')
 call s:option_map('<Bar>', 'cursorcolumn', 'setlocal')
-call s:map('n', '[od', ':diffthis<CR>')
-call s:map('n', ']od', ':diffoff<CR>')
-call s:map('n', 'yod', ':<C-R>=&diff ? "diffoff" : "diffthis"<CR><CR>')
+nmap <script> <Plug>(unimpaired-enable)d  :<C-U>diffthis<CR>
+nmap <script> <Plug>(unimpaired-disable)d :<C-U>diffoff<CR>
+nmap <script> <Plug>(unimpaired-toggle)d  :<C-U><C-R>=&diff ? "diffoff" : "diffthis"<CR><CR>
 call s:option_map('h', 'hlsearch', 'set')
 call s:option_map('i', 'ignorecase', 'set')
 call s:option_map('l', 'list', 'setlocal')
@@ -274,39 +334,74 @@ call s:option_map('n', 'number', 'setlocal')
 call s:option_map('r', 'relativenumber', 'setlocal')
 call s:option_map('s', 'spell', 'setlocal')
 call s:option_map('w', 'wrap', 'setlocal')
-call s:map('n', '[ov', ':set virtualedit+=all<CR>')
-call s:map('n', ']ov', ':set virtualedit-=all<CR>')
-call s:map('n', 'yov', ':set <C-R>=(&virtualedit =~# "all") ? "virtualedit-=all" : "virtualedit+=all"<CR><CR>')
-call s:map('n', '[ox', ':set cursorline cursorcolumn<CR>')
-call s:map('n', ']ox', ':set nocursorline nocursorcolumn<CR>')
-call s:map('n', 'yox', ':set <C-R>=<SID>cursor_options()<CR><CR>')
-call s:map('n', '[o+', ':set cursorline cursorcolumn<CR>')
-call s:map('n', ']o+', ':set nocursorline nocursorcolumn<CR>')
-call s:map('n', 'yo+', ':set <C-R>=<SID>cursor_options()<CR><CR>')
+if empty(maparg('<Plug>(unimpaired-toggle)z', 'n'))
+  call s:option_map('z', 'spell', 'setlocal')
+endif
+nmap <script> <Plug>(unimpaired-enable)v  :<C-U>set virtualedit+=all<CR>
+nmap <script> <Plug>(unimpaired-disable)v :<C-U>set virtualedit-=all<CR>
+nmap <script> <Plug>(unimpaired-toggle)v  :<C-U>set <C-R>=(&virtualedit =~# "all") ? "virtualedit-=all" : "virtualedit+=all"<CR><CR>
+nmap <script> <Plug>(unimpaired-enable)x  :<C-U>set cursorline cursorcolumn<CR>
+nmap <script> <Plug>(unimpaired-disable)x :<C-U>set nocursorline nocursorcolumn<CR>
+nmap <script> <Plug>(unimpaired-toggle)x  :<C-U>set <C-R>=<SID>CursorOptions()<CR><CR>
+nmap <script> <Plug>(unimpaired-enable)+  :<C-U>set cursorline cursorcolumn<CR>
+nmap <script> <Plug>(unimpaired-disable)+ :<C-U>set nocursorline nocursorcolumn<CR>
+nmap <script> <Plug>(unimpaired-toggle)+  :<C-U>set <C-R>=<SID>CursorOptions()<CR><CR>
 
-function! s:setup_paste() abort
+function! s:ColorColumn(should_clear) abort
+  if !empty(&colorcolumn)
+    let s:colorcolumn = &colorcolumn
+  endif
+  return a:should_clear ? '' : get(s:, 'colorcolumn', get(g:, 'unimpaired_colorcolumn', '+1'))
+endfunction
+nmap <script> <Plug>(unimpaired-enable)t  :<C-U>set colorcolumn=<C-R>=<SID>ColorColumn(0)<CR><CR>
+nmap <script> <Plug>(unimpaired-disable)t :<C-U>set colorcolumn=<C-R>=<SID>ColorColumn(1)<CR><CR>
+nmap <script> <Plug>(unimpaired-toggle)t  :<C-U>set colorcolumn=<C-R>=<SID>ColorColumn(!empty(&cc))<CR><CR>
+
+exe s:Map('n', 'yo', '<Plug>(unimpaired-toggle)')
+exe s:Map('n', '[o', '<Plug>(unimpaired-enable)')
+exe s:Map('n', ']o', '<Plug>(unimpaired-disable)')
+exe s:Map('n', 'yo<Esc>', '<Nop>')
+exe s:Map('n', '[o<Esc>', '<Nop>')
+exe s:Map('n', ']o<Esc>', '<Nop>')
+exe s:Map('n', '=s', '<Plug>(unimpaired-toggle)')
+exe s:Map('n', '<s', '<Plug>(unimpaired-enable)')
+exe s:Map('n', '>s', '<Plug>(unimpaired-disable)')
+exe s:Map('n', '=s<Esc>', '<Nop>')
+exe s:Map('n', '<s<Esc>', '<Nop>')
+exe s:Map('n', '>s<Esc>', '<Nop>')
+
+function! s:RestorePaste() abort
+  if exists('s:paste')
+    let &paste = s:paste
+    let &mouse = s:mouse
+    unlet s:paste
+    unlet s:mouse
+  endif
+  autocmd! unimpaired_paste
+endfunction
+
+function! s:SetupPaste() abort
   let s:paste = &paste
   let s:mouse = &mouse
   set paste
   set mouse=
   augroup unimpaired_paste
     autocmd!
-    autocmd InsertLeave *
-          \ if exists('s:paste') |
-          \   let &paste = s:paste |
-          \   let &mouse = s:mouse |
-          \   unlet s:paste |
-          \   unlet s:mouse |
-          \ endif |
-          \ autocmd! unimpaired_paste
+    autocmd InsertLeave * call s:RestorePaste()
+    if exists('##ModeChanged')
+      autocmd ModeChanged *:n call s:RestorePaste()
+    else
+      autocmd CursorHold,CursorMoved * call s:RestorePaste()
+    endif
   augroup END
 endfunction
 
-nnoremap <silent> <Plug>unimpairedPaste :call <SID>setup_paste()<CR>
+nnoremap <silent> <Plug>unimpairedPaste :call <SID>SetupPaste()<CR>
+nmap <script><silent> <Plug>(unimpaired-paste) :<C-U>call <SID>SetupPaste()<CR>
 
-call s:map('n', '[op', ':call <SID>setup_paste()<CR>O', '<silent>')
-call s:map('n', ']op', ':call <SID>setup_paste()<CR>o', '<silent>')
-call s:map('n', 'yop', ':call <SID>setup_paste()<CR>0C', '<silent>')
+nmap <script><silent> <Plug>(unimpaired-enable)p  :<C-U>call <SID>SetupPaste()<CR>O
+nmap <script><silent> <Plug>(unimpaired-disable)p :<C-U>call <SID>SetupPaste()<CR>o
+nmap <script><silent> <Plug>(unimpaired-toggle)p  :<C-U>call <SID>SetupPaste()<CR>0C
 
 " Section: Put
 
@@ -318,23 +413,32 @@ function! s:putline(how, map) abort
     call setreg(v:register, body, 'l')
     exe 'normal! "'.v:register.a:how
     call setreg(v:register, body, type)
-    silent! call repeat#set("\<Plug>unimpairedPut".a:map)
   endif
+  silent! call repeat#set("\<Plug>(unimpaired-put-".a:map.")")
 endfunction
 
-nnoremap <silent> <Plug>unimpairedPutAbove :call <SID>putline('[p', 'Above')<CR>
-nnoremap <silent> <Plug>unimpairedPutBelow :call <SID>putline(']p', 'Below')<CR>
+nnoremap <silent> <Plug>(unimpaired-put-above) :call <SID>putline('[p', 'above')<CR>
+nnoremap <silent> <Plug>(unimpaired-put-below) :call <SID>putline(']p', 'below')<CR>
+nnoremap <silent> <Plug>(unimpaired-put-above-rightward) :<C-U>call <SID>putline(v:count1 . '[p', 'Above')<CR>>']
+nnoremap <silent> <Plug>(unimpaired-put-below-rightward) :<C-U>call <SID>putline(v:count1 . ']p', 'Below')<CR>>']
+nnoremap <silent> <Plug>(unimpaired-put-above-leftward)  :<C-U>call <SID>putline(v:count1 . '[p', 'Above')<CR><']
+nnoremap <silent> <Plug>(unimpaired-put-below-leftward)  :<C-U>call <SID>putline(v:count1 . ']p', 'Below')<CR><']
+nnoremap <silent> <Plug>(unimpaired-put-above-reformat)  :<C-U>call <SID>putline(v:count1 . '[p', 'Above')<CR>=']
+nnoremap <silent> <Plug>(unimpaired-put-below-reformat)  :<C-U>call <SID>putline(v:count1 . ']p', 'Below')<CR>=']
+nnoremap <silent> <Plug>unimpairedPutAbove :call <SID>putline('[p', 'above')<CR>
+nnoremap <silent> <Plug>unimpairedPutBelow :call <SID>putline(']p', 'below')<CR>
 
-call s:map('n', '[p', '<Plug>unimpairedPutAbove', '<unique>')
-call s:map('n', ']p', '<Plug>unimpairedPutBelow', '<unique>')
-call s:map('n', '[P', '<Plug>unimpairedPutAbove')
-call s:map('n', ']P', '<Plug>unimpairedPutBelow')
-call s:map('n', '>P', ":call <SID>putline('[p', 'Above')<CR>>']", '<silent>')
-call s:map('n', '>p', ":call <SID>putline(']p', 'Below')<CR>>']", '<silent>')
-call s:map('n', '<P', ":call <SID>putline('[p', 'Above')<CR><']", '<silent>')
-call s:map('n', '<p', ":call <SID>putline(']p', 'Below')<CR><']", '<silent>')
-call s:map('n', '=P', ":call <SID>putline('[p', 'Above')<CR>=']", '<silent>')
-call s:map('n', '=p', ":call <SID>putline(']p', 'Below')<CR>=']", '<silent>')
+exe s:Map('n', '[p', '<Plug>(unimpaired-put-above)')
+exe s:Map('n', ']p', '<Plug>(unimpaired-put-below)')
+exe s:Map('n', '[P', '<Plug>(unimpaired-put-above)')
+exe s:Map('n', ']P', '<Plug>(unimpaired-put-below)')
+
+exe s:Map('n', '>P', "<Plug>(unimpaired-put-above-rightward)")
+exe s:Map('n', '>p', "<Plug>(unimpaired-put-below-rightward)")
+exe s:Map('n', '<P', "<Plug>(unimpaired-put-above-leftward)")
+exe s:Map('n', '<p', "<Plug>(unimpaired-put-below-leftward)")
+exe s:Map('n', '=P', "<Plug>(unimpaired-put-above-reformat)")
+exe s:Map('n', '=p', "<Plug>(unimpaired-put-below-reformat)")
 
 " Section: Encoding and decoding
 
@@ -353,12 +457,13 @@ function! s:string_decode(str) abort
 endfunction
 
 function! s:url_encode(str) abort
-  return substitute(a:str,'[^A-Za-z0-9_.~-]','\="%".printf("%02X",char2nr(submatch(0)))','g')
+  " iconv trick to convert utf-8 bytes to 8bits indiviual char.
+  return substitute(iconv(a:str, 'latin1', 'utf-8'),'[^A-Za-z0-9_.~-]','\="%".printf("%02X",char2nr(submatch(0)))','g')
 endfunction
 
 function! s:url_decode(str) abort
   let str = substitute(substitute(substitute(a:str,'%0[Aa]\n$','%0A',''),'%0[Aa]','\n','g'),'+',' ','g')
-  return substitute(str,'%\(\x\x\)','\=nr2char("0x".submatch(1))','g')
+  return iconv(substitute(str,'%\(\x\x\)','\=nr2char("0x".submatch(1))','g'), 'utf-8', 'latin1')
 endfunction
 
 " HTML entities {{{2
@@ -436,6 +541,7 @@ function! s:xml_encode(str) abort
   let str = substitute(str,'<','\&lt;','g')
   let str = substitute(str,'>','\&gt;','g')
   let str = substitute(str,'"','\&quot;','g')
+  let str = substitute(str,"'",'\&apos;','g')
   return str
 endfunction
 
@@ -460,9 +566,10 @@ function! s:Transform(algorithm,type) abort
   let sel_save = &selection
   let cb_save = &clipboard
   set selection=inclusive clipboard-=unnamed clipboard-=unnamedplus
-  let reg_save = @@
+  let reg_save = exists('*getreginfo') ? getreginfo('@') : getreg('@')
   if a:type ==# 'line'
     silent exe "normal! '[V']y"
+    let @@ = substitute(@@, "\n$", '', '')
   elseif a:type ==# 'block'
     silent exe "normal! `[\<C-V>`]y"
   else
@@ -474,7 +581,7 @@ function! s:Transform(algorithm,type) abort
     let @@ = s:{a:algorithm}(@@)
   endif
   norm! gvp
-  let @@ = reg_save
+  call setreg('@', reg_save)
   let &selection = sel_save
   let &clipboard = cb_save
 endfunction
@@ -490,23 +597,26 @@ function! s:TransformSetup(algorithm) abort
 endfunction
 
 function! UnimpairedMapTransform(algorithm, key) abort
+  let name = tr(a:algorithm, '_', '-')
   exe 'nnoremap <expr> <Plug>unimpaired_'    .a:algorithm.' <SID>TransformSetup("'.a:algorithm.'")'
   exe 'xnoremap <expr> <Plug>unimpaired_'    .a:algorithm.' <SID>TransformSetup("'.a:algorithm.'")'
   exe 'nnoremap <expr> <Plug>unimpaired_line_'.a:algorithm.' <SID>TransformSetup("'.a:algorithm.'")."_"'
-  call s:map('n', a:key, '<Plug>unimpaired_'.a:algorithm)
-  call s:map('x', a:key, '<Plug>unimpaired_'.a:algorithm)
-  call s:map('n', a:key.a:key[strlen(a:key)-1], '<Plug>unimpaired_line_'.a:algorithm)
+  exe 'nnoremap <expr> <Plug>(unimpaired-' . name . ') <SID>TransformSetup("'.a:algorithm.'")'
+  exe 'xnoremap <expr> <Plug>(unimpaired-' . name . ') <SID>TransformSetup("'.a:algorithm.'")'
+  exe 'nnoremap <expr> <Plug>(unimpaired-' . name . '-line) <SID>TransformSetup("'.a:algorithm.'")."_"'
+  exe s:Map('n', a:key, '<Plug>(unimpaired-' . name . ')')
+  exe s:Map('x', a:key, '<Plug>(unimpaired-' . name . ')')
+  exe s:Map('n', a:key.a:key[strlen(a:key)-1], '<Plug>(unimpaired-' . name . '-line)')
+  return ''
 endfunction
 
-call UnimpairedMapTransform('string_encode','[y')
-call UnimpairedMapTransform('string_decode',']y')
-call UnimpairedMapTransform('url_encode','[u')
-call UnimpairedMapTransform('url_decode',']u')
-call UnimpairedMapTransform('xml_encode','[x')
-call UnimpairedMapTransform('xml_decode',']x')
-
-" Section: Activation
-
-call s:maps()
+exe UnimpairedMapTransform('string_encode','[y')
+exe UnimpairedMapTransform('string_decode',']y')
+exe UnimpairedMapTransform('string_encode','[C')
+exe UnimpairedMapTransform('string_decode',']C')
+exe UnimpairedMapTransform('url_encode','[u')
+exe UnimpairedMapTransform('url_decode',']u')
+exe UnimpairedMapTransform('xml_encode','[x')
+exe UnimpairedMapTransform('xml_decode',']x')
 
 " vim:set sw=2 sts=2:
