@@ -5,13 +5,17 @@ shopt -s extglob cdable_vars 2>/dev/null
 export HISTCONTROL=ignoredups
 unset HISTFILE
 
+_running_cmd() {
+  builtin history 1|sed -E -e "1 s/^ *[0-9][0-9]*[* ] //" -e "s/^(.{${1:-9}})...*/\1…/"|tr -d '\n'|tr '\0-\037' '?'
+}
+
 hostcolor=`tpope-host ansi 2>/dev/null`
 
 [ "$UID" ] || UID=`id -u`
 usercolor='00;93'
 dircolor='00;94'
 case "$TERM" in
-  *-256color)
+  *-256color|xterm-kitty)
   usercolor='38;5;184'
   dircolor='38;5;27'
   ;;
@@ -28,20 +32,23 @@ if [ -x /usr/bin/tty -o -x /usr/local/bin/tty ]; then
 fi
 
 PS1='\[\e['$usercolor'm\]\u\[\e[00m\]@\[\e['$hostcolor'm\]\h\[\e[00m\]:\[\e['$dircolor'm\]\w\[\e[00m\]\$ '
+PS0=
 
 case "$TERM" in
+  linux*|vt220*) ;;
   screen*|xterm*|rxvt*|Eterm*|kterm*|dtterm*|ansi*|cygwin*)
     PS1='\[\e]1;'$ttyat'\h\007\e]2;\u@\h:\w'$ttybracket'\007\]'"$PS1"
+    PS0='\[\e]1;'$ttyat'\h*\007\e]2;\u@\h:\w ($(_running_cmd 23))'$ttybracket'\007\]'$PS0
   ;;
-  linux*|vt220*) ;;
-  *)
-  PS1='\u@\h:\w\$ '
+  dumb*)
+    PS1='\u@\h:\w\$ '
   ;;
 esac
 
 case $TERM in
   screen*)
-    PS1="$PS1"'\[\ek'"$ttyat`[ "$STY" -o "$TMUX" ] || echo '\h'`"'\e\\\]'
+    PS1="$PS1"'\[\ek'"@`[ "$STY" -o "$TMUX" ] || echo '\h'`"'\e\\\]'
+    PS0='\[\ek$(_running_cmd 9)@'`[ "$STY" -o "$TMUX" ] || echo '\h'`'\e\\\]'
     ;;
 esac
 
