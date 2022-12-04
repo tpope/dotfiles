@@ -9,9 +9,11 @@ if !get(v:, 'vim_did_enter', !has('vim_starting'))
   if has('win32') || has('nvim')
     setglobal runtimepath^=~/.vim runtimepath+=~/.vim/after
   endif
-  if isdirectory(expand('~/Dropbox/Code/vim'))
-    setglobal runtimepath^=~/Dropbox/Code/vim runtimepath+=~/Dropbox/Code/vim/after
-  endif
+  for s:dir in reverse(split($PATH, has('win32') ? ';' : ':'))
+    if s:dir =~# '^[^,]*[\/]Code[\/]bin$' && isdirectory(s:dir[0:-4] . 'vim')
+      let &runtimepath = s:dir[0:-4] . 'vim,' . &runtimepath . ',' . s:dir[0:-4] . 'vim/after'
+    endif
+  endfor
   if has('packages')
     let &packpath = &runtimepath
   else
@@ -26,8 +28,8 @@ if !get(v:, 'vim_did_enter', !has('vim_starting'))
       endif
     endfor
     let &runtimepath = join(s:rtp, ',')
-    unlet! s:rtp s:dir
   endif
+  unlet! s:rtp s:dir
 endif
 
 if $VIM_BARE
@@ -441,9 +443,11 @@ if has('spell')
   if has('vim_starting')
     set spelllang=en_us
     set spellfile=~/.vim/spell/en.utf-8.add
-    if &rtp =~# 'Dropbox.Code.vim'
-      set spellfile^=~/Dropbox/Code/vim/spell/en.utf-8.add
-    endif
+    for s:dir in reverse(split(&runtimepath, ','))
+      if s:dir =~# '[\/]Code[\/]vim$'
+        let &spellfile = s:dir . '/spell/en.utf-8.add,' . &spellfile
+      endif
+    endfor
   endif
   let g:spellfile_URL = 'http://ftp.vim.org/vim/runtime/spell'
   autocmd FileType gitcommit setlocal spell
