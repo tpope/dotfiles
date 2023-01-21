@@ -128,25 +128,31 @@ if exists('+macmeta')
 endif
 setglobal winaltkeys=no
 
-function! s:font()
+function! s:DefaultFont() abort
   if has('mac')
     return 'Monaco:h14'
   elseif has('win32')
     return 'Consolas:h14,Courier New:h14'
   else
-    return 'Monospace 14'
+    let match = matchlist(system('xrdb -get URxvt.font'), '^xft:\([^:,]*\)-\([0-9.]\+\)')
+    if len(match)
+      return join(match[1:2], ' ')
+    else
+      return 'Monospace 13'
+    endif
   endif
 endfunction
+if has("gui_running")
+  let &guifont = s:DefaultFont()
+endif
 
-command! -bar -nargs=0 Bigger  :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)+1','')
-command! -bar -nargs=0 Smaller :let &guifont = substitute(&guifont,'\d\+$','\=submatch(0)-1','')
-nnoremap <M-->        :Smaller<CR>
-nnoremap <M-=>        :Bigger<CR>
+command! -bar -nargs=0 Bigger  let &guifont = substitute(&guifont,'[0-9.]\+$','\=submatch(0)+1','')
+command! -bar -nargs=0 Smaller let &guifont = substitute(&guifont,'[0-9.]\+$','\=submatch(0)-1','')
 
 autocmd VimEnter *  if !has('gui_running') | set noicon background=dark | endif
 autocmd GUIEnter * set background=light icon guioptions-=T guioptions-=m guioptions-=e guioptions-=r guioptions-=L
-autocmd GUIEnter * silent! colorscheme vividchalk
-autocmd GUIEnter * let &g:guifont = substitute(&g:guifont, '^$', s:font(), '')
+autocmd GUIEnter * nested silent! colorscheme vividchalk
+autocmd GUIEnter * nested if empty(&guifont)|let &guifont = s:DefaultFont()|endif
 autocmd FocusLost * let s:confirm = &confirm | setglobal noconfirm | silent! wall | let &confirm = s:confirm
 
 " Section: Messages and info
