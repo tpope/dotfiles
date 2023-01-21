@@ -12,10 +12,19 @@
 (define mod
   (string->symbol (or (getenv "XBINDKEYS_MOD") "mod4")))
 
-(define (xbind keys command)
+; xbindkeys changes a DISPLAY of ":0" to ":0.0", which is annoying even if it
+; doesn't directly break anything.
+(define xdisplay-prefix
+  (let ((d (or (getenv "DISPLAY") ".")))
+    (if (string-any #\. d)
+      ""
+      (string-append "DISPLAY=" d "\n"))))
+
+(define (xbind keys command . extra)
   (if (string? command)
-    (xbindkey keys command)
-    (xbindkey-function keys command)))
+    (xbindkey keys (string-append xdisplay-prefix (string-join (cons command extra) "\n")))
+    (if command
+      (xbindkey-function keys (lambda () apply command extra)))))
 
 (define (xbindmod keys command)
   (xbind (cons mod keys) command))
